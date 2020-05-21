@@ -1,0 +1,38 @@
+<?php
+
+use Bdf\Prime\Migration\Migration;
+
+/**
+ * {className}
+ */
+class {className} extends Migration
+{
+    /**
+     * Initialize the migration
+     */
+    public function initialize()
+    {
+    }
+
+    /**
+     * Do the migration
+     */
+    public function up()
+    {
+    }
+
+    /**
+     * Undo the migration
+     */
+    public function down()
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function stage()
+    {
+        return '{stage}';
+    }
+}

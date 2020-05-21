@@ -1,0 +1,101 @@
+<?php
+
+namespace Bdf\Prime\Entity\Hydrator;
+
+/**
+ * HydratorRegistry
+ */
+class HydratorRegistry
+{
+    /**
+     * @var HydratorInterface
+     */
+    protected $baseHydrator;
+
+    /**
+     * @var HydratorInterface[]
+     */
+    protected $hydrators = [];
+
+    /**
+     * @var callable[]
+     */
+    protected $factories = [];
+
+    /**
+     * Set the base hydrator.
+     *
+     * @param HydratorInterface $baseHydrator
+     */
+    public function setBaseHydrator(HydratorInterface $baseHydrator)
+    {
+        $this->baseHydrator = $baseHydrator;
+    }
+
+    /**
+     * Register all hydrators
+     *
+     * @param HydratorInterface[] $hydrators
+     */
+    public function setHydrators(array $hydrators)
+    {
+        $this->hydrators = $hydrators;
+    }
+
+    /**
+     * Register a new Hydrator
+     *
+     * @param string $entityClass
+     * @param HydratorInterface $hydrator
+     */
+    public function add($entityClass, HydratorInterface $hydrator)
+    {
+        $this->hydrators[$entityClass] = $hydrator;
+    }
+
+    /**
+     * Register all hydrator factory
+     *
+     * @param callable[] $factories
+     */
+    public function setFactories(array $factories)
+    {
+        $this->factories = $factories;
+    }
+
+    /**
+     * Register a new hydrator factory
+     *
+     * @param string $entityClass
+     * @param callable $factory
+     */
+    public function factory($entityClass, $factory)
+    {
+        $this->factories[$entityClass] = $factory;
+    }
+
+    /**
+     * Get the hydrator object
+     *
+     * @param string $entityClass
+     *
+     * @return HydratorInterface
+     */
+    public function get($entityClass)
+    {
+        if (isset($this->hydrators[$entityClass])) {
+            return $this->hydrators[$entityClass];
+        }
+
+        if (isset($this->factories[$entityClass])) {
+            $fn = $this->factories[$entityClass];
+            return $this->hydrators[$entityClass] = $fn($this);
+        }
+
+        if ($this->baseHydrator === null) {
+            $this->baseHydrator = new ArrayHydrator();
+        }
+
+        return $this->baseHydrator;
+    }
+}

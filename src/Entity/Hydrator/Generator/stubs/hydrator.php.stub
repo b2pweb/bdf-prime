@@ -1,0 +1,105 @@
+<?php
+
+<namespace>
+
+use Bdf\Prime\Entity\Instantiator\InstantiatorInterface;
+use Bdf\Prime\Mapper\Metadata;
+use Bdf\Prime\Platform\PlatformTypesInterface;
+
+/**
+ * Hydrator class for {@link <normalizedEntityClassName>}
+ */
+final class <hydratorClassName> extends <normalizedEntityClassName> implements <hydratorInterface>
+{
+    private $__instantiator;
+    private $__metadata;
+
+    <properties>
+
+    <constructor>
+
+    /**
+     * {@inheritdoc}
+     */
+    final public function setPrimeInstantiator(InstantiatorInterface $instantiator)
+    {
+        $this->__instantiator = $instantiator;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    final public function setPrimeMetadata(Metadata $metadata)
+    {
+        $this->__metadata = $metadata;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    final public function hydrate($object, array $data)
+    {
+        <hydrateBody>
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    final public function extract($object, array $attributes = [])
+    {
+        <extractBody>
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    final public function flatExtract($object, array $attributes = null)
+    {
+        <flatExtractBody>
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    final public function flatHydrate($object, array $data, PlatformTypesInterface $types)
+    {
+        <flatHydrateBody>
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    final public function extractOne($object, $attribute)
+    {
+        <extractOneBody>
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    final public function hydrateOne($object, $attribute, $value)
+    {
+        <hydrateOneBody>
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function supportedPrimeClassName()
+    {
+        return '<entityClassName>';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public static function embeddedPrimeClasses()
+    {
+        return <embeddedClasses>;
+    }
+
+    /**
+     * Disable destructor for ensure that the hydrator instance will not clear data
+     */
+    public function __destruct() {}
+}

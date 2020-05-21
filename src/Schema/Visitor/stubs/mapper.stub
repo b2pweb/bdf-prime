@@ -1,0 +1,29 @@
+<?php
+
+use Bdf\Prime\Mapper\Mapper;
+
+/**
+ *
+ */
+class <className> extends Mapper
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function schema()
+    {
+        return [
+            'connection' => '<connection>',
+            'database'   => '<database>',
+            'table'      => '<tableName>',
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildFields($builder)
+    {
+        <fields>
+    }<sequence><indexes>
+}

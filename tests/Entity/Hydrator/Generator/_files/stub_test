@@ -1,0 +1,14 @@
+<placeHolderNotIndented>
+
+class A
+{
+    public function foo()
+    {
+        <placeholderIndented>
+    }
+
+    public function bar()
+    {
+        return <placeholderInline>;
+    }
+}
