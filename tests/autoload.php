@@ -10,5 +10,7 @@ include_once __DIR__ . '/_files/MyCustomRelation.php';
 include_once __DIR__ . '/_files/ForeignInRelation.php';
 include_once __DIR__ . '/Entity/_files/embedded.php';
 
+date_default_timezone_set('Europe/Paris');
+
 \Bdf\PHPUnit\DeprecationErrorHandler::register();
 SebastianBergmann\Comparator\Factory::getInstance()->register(new \Bdf\PHPUnit\Comparator\DateTimeComparator());
