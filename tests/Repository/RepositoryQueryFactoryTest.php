@@ -5,6 +5,7 @@ namespace Bdf\Prime\Repository;
 use Bdf\Prime\Cache\ArrayCache;
 use Bdf\Prime\CompositePkEntity;
 use Bdf\Prime\Customer;
+use Bdf\Prime\CustomerPack;
 use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\QueryException;
 use Bdf\Prime\Faction;
@@ -118,6 +119,44 @@ class RepositoryQueryFactoryTest extends TestCase
         $this->assertEntity($this->pack()->get('entity'), $this->factory->findById(['id' => 1]));
         $this->assertNull($this->factory->findById('not_found'));
         $this->assertNull($this->factory->findById(['id' => 'not_found']));
+    }
+
+    /**
+     *
+     */
+    public function test_findById_composite_key()
+    {
+        $this->pack()->nonPersist([
+            'pack1' => new CustomerPack([
+                'customerId' => '123',
+                'packId' => 456,
+            ]),
+            'pack2' => new CustomerPack([
+                'customerId' => '321',
+                'packId' => 456,
+            ]),
+        ]);
+
+        $factory = new RepositoryQueryFactory(CustomerPack::repository());
+
+        $this->assertEntity($this->pack()->get('pack1'), $factory->findById(['customerId' => '123', 'packId' => 456]));
+        $this->assertEntity($this->pack()->get('pack2'), $factory->findById(['customerId' => '321', 'packId' => 456]));
+        $this->assertEntity($this->pack()->get('pack2'), $factory->findById(['packId' => 456, 'customerId' => '321']));
+        $this->assertNull($factory->findById(['customerId' => '321', 'packId' => 654]));
+
+        try {
+            $factory->findById(['badKey' => '321', 'packId' => 654]);
+            $this->fail('Expect QueryException');
+        } catch (QueryException $e) {
+            $this->assertEquals('Only primary keys must be passed to findById()', $e->getMessage());
+        }
+
+        try {
+            $factory->findById(['customerId' => '321']);
+            $this->fail('Expect QueryException');
+        } catch (QueryException $e) {
+            $this->assertEquals('Only primary keys must be passed to findById()', $e->getMessage());
+        }
     }
 
     /**

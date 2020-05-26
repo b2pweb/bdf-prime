@@ -172,7 +172,7 @@ class RepositoryQueryFactory
         }
 
         if (is_array($id)) {
-            if (array_keys($id) !== $this->metadata->primary['attributes']) {
+            if (!$this->isPrimaryKeyFilter($id)) {
                 throw new QueryException('Only primary keys must be passed to findById()');
             }
 
@@ -365,5 +365,29 @@ class RepositoryQueryFactory
         }
 
         return clone $this->extension;
+    }
+
+    /**
+     * Check if the given filter exactly match with primary key attributes
+     *
+     * @param array $filter
+     *
+     * @return bool
+     */
+    private function isPrimaryKeyFilter(array $filter): bool
+    {
+        $pk = $this->metadata->primary['attributes'];
+
+        if (count($filter) !== count($pk)) {
+            return false;
+        }
+
+        foreach ($pk as $key) {
+            if (!isset($filter[$key])) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
