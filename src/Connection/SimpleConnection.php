@@ -334,36 +334,26 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
 
         $this->prepareLogger();
 
-        if ($logger = $this->_config->getSQLLogger()) {
-            $logger->startQuery(method_exists($query, 'toSql') ? $query->toSql() : '**PREPARED**', $bindings);
-        }
-
         try {
-            try {
-                $statement->execute($bindings);
-            } catch (DBALException $exception) {
-                // Prepared query on SQLite for PHP < 7.2 invalidates the query when schema change
-                // This process may be removed on PHP 7.2
-                if ($this->causedBySchemaChange($exception)) {
-                    $statement = $query->compile(true);
-                    $statement->execute($query->getBindings());
-                } elseif ($this->causedByLostConnection($exception->getPrevious())) { // If the connection is lost, the query must be recompiled
-                    $this->close();
-                    $this->connect();
+            $statement->execute($bindings);
+        } catch (DBALException $exception) {
+            // Prepared query on SQLite for PHP < 7.2 invalidates the query when schema change
+            // This process may be removed on PHP 7.2
+            if ($this->causedBySchemaChange($exception)) {
+                $statement = $query->compile(true);
+                $statement->execute($query->getBindings());
+            } elseif ($this->causedByLostConnection($exception->getPrevious())) { // If the connection is lost, the query must be recompiled
+                $this->close();
+                $this->connect();
 
-                    $statement = $query->compile(true);
-                    $statement->execute($query->getBindings());
-                } else {
-                    throw $exception;
-                }
-            }
-
-            return new PdoResultSet($statement);
-        } finally {
-            if ($logger) {
-                $logger->stopQuery();
+                $statement = $query->compile(true);
+                $statement->execute($query->getBindings());
+            } else {
+                throw $exception;
             }
         }
+
+        return new PdoResultSet($statement);
     }
 
     /**
