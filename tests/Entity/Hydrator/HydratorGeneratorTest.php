@@ -421,6 +421,24 @@ EOL;
     /**
      *
      */
+    public function test_generate_flatHydrate_with_arrayOf()
+    {
+        $generator = new HydratorGenerator(
+            Prime::service(),
+            Prime::service()->repository(ArrayOfEntity::class)->mapper(),
+            ArrayOfEntity::class
+        );
+
+        $code = $generator->generate();
+
+        $this->assertStringContainsString('$typearrayOfinteger = $types->get(\'integer[]\');', $code);
+        $this->assertStringContainsString('$value = $typearrayOfinteger->fromDatabase($data[\'values\']);', $code);
+        $this->assertStringContainsString('$object->values = $value;', $code);
+    }
+
+    /**
+     *
+     */
     public function test_generate_extractOne()
     {
         $generator = new HydratorGenerator(
@@ -1320,5 +1338,32 @@ class ComplexConstructorEntityMapper extends Mapper
     public function buildFields($builder)
     {
         $builder->string('id');
+    }
+}
+
+class ArrayOfEntity extends Model
+{
+    /**
+     * @var int[]
+     */
+    protected $values;
+}
+
+class ArrayOfEntityMapper extends Mapper
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function schema()
+    {
+        return [];
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function buildFields($builder)
+    {
+        $builder->arrayOfInt('values');
     }
 }

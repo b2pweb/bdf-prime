@@ -8,6 +8,7 @@ use Bdf\Prime\Entity\Hydrator\Generator\AttributesResolver;
 use Bdf\Prime\Entity\Hydrator\Generator\ClassAccessor;
 use Bdf\Prime\Entity\Hydrator\Generator\CodeGenerator;
 use Bdf\Prime\Entity\Hydrator\Generator\EmbeddedInfo;
+use Bdf\Prime\Entity\Hydrator\Generator\TypeAccessor;
 use Bdf\Prime\Exception\HydratorException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\SingleTableInheritanceMapper;
@@ -509,8 +510,9 @@ PHP;
      */
     protected function generateFlatHydrate()
     {
+        $types = new TypeAccessor($this->code);
+
         $out = '';
-        $types = [];
         $set = [];
         $relationKeys = [];
 
@@ -519,13 +521,9 @@ PHP;
         }
 
         foreach ($this->resolver->attributes() as $attribute) {
-            $types[$attribute->type()] = true;
-            $set[$attribute->field()] = $this->generateAttributeFlatHydrate($attribute, $relationKeys);
+            $set[$attribute->field()] = $this->generateAttributeFlatHydrate($attribute, $relationKeys, $types);
         }
 
-        foreach ($types as $type => $tmp) {
-            $out .= "\$type{$this->getValidVariableName($type)} = \$types->get('{$type}');{$this->code->eol()}";
-        }
 
         foreach ($set as $field => $declaration) {
             $out .= <<<PHP
@@ -537,7 +535,7 @@ if (array_key_exists('{$field}', \$data)) {
 PHP;
         }
 
-        return $out;
+        return $types->generateDeclaration().$out;
     }
 
     /**
@@ -545,21 +543,19 @@ PHP;
      *
      * @param AttributeInfo $attribute
      * @param array $relationKeys
+     * @param TypeAccessor $types
      *
      * @return string
      */
-    protected function generateAttributeFlatHydrate(AttributeInfo $attribute, array $relationKeys)
+    protected function generateAttributeFlatHydrate(AttributeInfo $attribute, array $relationKeys, TypeAccessor $types)
     {
         $options = '';
         if ($attribute->phpOptions()) {
-            $options = ", \$this->__metadata->fields['{$attribute->field()}']['phpOptions']";
+            $options = "\$this->__metadata->fields['{$attribute->field()}']['phpOptions']";
         }
 
         $target = "\$value";
-        $out = <<<PHP
-\$value = \$type{$this->getValidVariableName($attribute->type())}->fromDatabase(\$data['{$attribute->field()}']{$options});
-
-PHP;
+        $out = $target.' = '.$types->generateFromDatabase($attribute->type(), '$data[\''.$attribute->field().'\']', $options);
 
         if (!$attribute->isEmbedded()) {
             return $out."\n".$this->accessor->setter('$object', $attribute->name(), $target, false).';';
@@ -697,17 +693,5 @@ PHP
                 ->embedded($embedded->parent())
                 ->fullSetter($embedded->property(), '$value').';'
             ;
-    }
-
-    /**
-     * Get a valid variable name
-     *
-     * @param string $typeName
-     *
-     * @return string
-     */
-    private function getValidVariableName(string $typeName)
-    {
-        return str_replace([' ', '\\', '-', '.', ':', '/'], '', $typeName);
     }
 }
