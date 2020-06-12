@@ -16,6 +16,8 @@ use IteratorAggregate;
  * ]);
  * $config->get('connection_name'); //['item1' => 'value1']
  * </code>
+ *
+ * @deprecated Since 1.1
  */
 class ConnectionConfig implements IteratorAggregate, ArrayAccess
 {

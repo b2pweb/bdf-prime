@@ -78,8 +78,9 @@ EOF
 
         $path = realpath($io->argument('mapper'));
         
-        $this->locator->config()->setMetadataCache(null);
-        
+        $cache = $this->locator->mappers()->getMetadataCache();
+        $this->locator->mappers()->setMetadataCache(null);
+
         foreach ($this->getClassIterator($path) as $classInfo) {
             $className = $classInfo->getClass();
 
@@ -94,6 +95,7 @@ EOF
             $this->runUserActions($io, $generator, $mapper, $classInfo);
         }
 
+        $this->locator->mappers()->setMetadataCache($cache);
         return 0;
     }
     

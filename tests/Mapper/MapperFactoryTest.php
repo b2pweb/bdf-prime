@@ -52,8 +52,8 @@ class MapperFactoryTest extends TestCase
     {
         $factory = new MapperFactory();
         
-        $factory->setCache($cache = new ArrayCachePool());
-        $this->assertEquals($cache, $factory->getCache());
+        $factory->setMetadataCache($cache = new ArrayCachePool());
+        $this->assertEquals($cache, $factory->getMetadataCache());
     }
     
     /**
@@ -140,7 +140,7 @@ class MapperFactoryTest extends TestCase
     public function test_createMapper_save_metadata_in_cache()
     {
         $factory = new MapperFactory();
-        $factory->setCache($cache = new ArrayCachePool());
+        $factory->setMetadataCache($cache = new ArrayCachePool());
         
         $mapper = $factory->createMapper(Prime::service(), 'Bdf\Prime\TestEntityMapper');
         
@@ -158,7 +158,7 @@ class MapperFactoryTest extends TestCase
         $cache->expects($this->never())->method('set');
         
         $factory = new MapperFactory();
-        $factory->setCache($cache);
+        $factory->setMetadataCache($cache);
         
         $factory->createMapper(Prime::service(), 'Bdf\Prime\TestEntityMapper');
     }

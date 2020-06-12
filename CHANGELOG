@@ -1,0 +1,11 @@
+v1.1.0
+------
+
+BC Breaks
+* MasterSlaveConnection and ShardingConnection will no longer change their internal connection name with their method setName
+* ConnectionManager::__construct() accepts configration in third parameter.
+* ConnectionManager::connectionNames() now returns all the connection (current and lazy one)
+* ConnectionManager::allConnectionNames() has been removed
+* The signature of constructor of the abstract class DatabaseCommand changed
+* The method MapperFactory::setCache() has been renamed as MapperFactory::setMetadataCache()
+* Use methods MapperFactory::setMetadataCache() and MapperFactory::setResultCache() to disable cache. Configuration is checked during intialization of service.

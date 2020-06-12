@@ -3,7 +3,14 @@
 namespace Bdf\Prime\Console;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Connection\ConnectionRegistry;
+use Bdf\Prime\Connection\Factory\ChainFactory;
+use Bdf\Prime\Connection\Factory\ConnectionFactory;
+use Bdf\Prime\Connection\Factory\ConnectionFactoryInterface;
+use Bdf\Prime\Connection\Factory\MasterSlaveConnectionFactory;
+use Bdf\Prime\Connection\Factory\ShardingConnectionFactory;
 use Bdf\Prime\ConnectionManager;
+use Bdf\Prime\ConnectionRegistryInterface;
 use Bdf\Prime\ServiceLocator;
 use Bdf\Util\Console\BdfStyle;
 use Doctrine\DBAL\Connection as DoctrineConnection;
@@ -19,9 +26,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 abstract class DatabaseCommand extends Command
 {
     /**
-     * @var ServiceLocator
+     * @var ConnectionRegistryInterface
      */
-    private $locator;
+    private $registry;
+
+    /**
+     * @var ConnectionFactoryInterface
+     */
+    private $connectionFactory;
 
     /**
      * @var BdfStyle
@@ -31,11 +43,25 @@ abstract class DatabaseCommand extends Command
     /**
      * DatabaseCommand constructor.
      *
-     * @param ServiceLocator $locator
+     * @param ConnectionRegistryInterface $registry
+     * @param ConnectionFactoryInterface $connectionFactory
      */
-    public function __construct(ServiceLocator $locator)
+    public function __construct(/* ConnectionRegistryInterface */ $registry, ConnectionFactoryInterface $connectionFactory = null)
     {
-        $this->locator = $locator;
+        $this->registry = $registry;
+        $this->connectionFactory = $connectionFactory;
+
+        if ($registry instanceof ServiceLocator) {
+            @trigger_error(__METHOD__.' signature has changed since 1.1. Inject instances '.ConnectionRegistryInterface::class.' '.ConnectionFactoryInterface::class);
+
+            $factory = new ConnectionFactory();
+            $this->connectionFactory = new ChainFactory([
+                new MasterSlaveConnectionFactory($factory),
+                new ShardingConnectionFactory($factory),
+                $factory,
+            ]);
+            $this->registry = new ConnectionRegistry([], $this->connectionFactory, $registry->config());
+        }
 
         parent::__construct(static::$defaultName);
     }
@@ -57,31 +83,29 @@ abstract class DatabaseCommand extends Command
     {
         $this->io = new BdfStyle($input, $output);
 
-        /** @var ConnectionManager $connectionManager */
-        $connectionManager = $this->locator->connections();
         $name = $this->io->option('connection');
 
-        $connections = $name ? [$name] : $connectionManager->allConnectionNames();
+        $connections = $name ? [$name] : $this->registry->getConnectionNames();
 
         foreach ($connections as $connectionName) {
-            $connection = $connectionManager->connection($connectionName);
+            $connection = $this->registry->getConnection($connectionName);
 
             if (!$connection instanceof DoctrineConnection) {
                 $this->io->line('Connection <comment>%s</comment> is ignored: only doctrine connection can be managed', $connectionName);
                 continue;
             }
 
-            $config = $connection->getParams();
+            $parameters = $connection->getParams();
 
             // Skip connections marked as "ignore" on configuration
             // Permit to declare SQLite connections, which do not supports database management
-            if (!empty($config['ignore'])) {
+            if (!empty($parameters['ignore'])) {
                 $this->io->line('Connection <comment>%s</comment> is ignored.', $connectionName);
                 continue;
             }
 
-            $dbName = $this->prepareConnectionConfig($config);
-            $connectionTmp = $connectionManager->createConnection($config, $connectionManager->config());
+            $dbName = $this->prepareConnectionConfig($parameters);
+            $connectionTmp = $this->connectionFactory->create($connectionName, $parameters, $connection->getConfiguration());
             $schema = $connectionTmp->schema();
 
             if ($schema->hasDatabase($dbName)) {
@@ -101,22 +125,22 @@ abstract class DatabaseCommand extends Command
      * Prepare the configuration of the connection
      * Change the user and remove db name.
      *
-     * @param array $config
+     * @param array $parameters
      *
      * @return string The db name to interact
      */
-    protected function prepareConnectionConfig(&$config): string
+    protected function prepareConnectionConfig(&$parameters): string
     {
         $user = $this->io->option('user');
 
-        if (!isset($config['user']) || $config['user'] !== $user) {
-            $config['user'] = $user;
-            $config['password'] = $this->io->option('password');
+        if (!isset($parameters['user']) || $parameters['user'] !== $user) {
+            $parameters['user'] = $user;
+            $parameters['password'] = $this->io->option('password');
         }
 
         // Force the connection with no database to allow doctrine to connect.
-        $dbName = $config['dbname'] ?? $config['path'];
-        $config['dbname'] = $config['path'] = $config['url'] = null;
+        $dbName = $parameters['dbname'] ?? $parameters['path'];
+        $parameters['dbname'] = $parameters['path'] = $parameters['url'] = null;
 
         return $dbName;
     }

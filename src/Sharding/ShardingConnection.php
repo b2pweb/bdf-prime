@@ -111,8 +111,8 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      */
     public function __construct(array $params, Driver $driver, Configuration $config = null, EventManager $eventManager = null)
     {
-        if (!isset($params['shards'])) {
-            throw new LogicException('Sharding connection needs shards configuration in parameters');
+        if (!isset($params['shard_connections'])) {
+            throw new LogicException('Sharding connection needs "shard_connections" configuration in parameters');
         }
         if (!isset($params['distributionKey'])) {
             throw new LogicException('Sharding connection needs distribution key in parameters');
@@ -120,33 +120,12 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
 
         $this->distributionKey = $params['distributionKey'];
         $this->shardChoser = $params['shardChoser'] ?? new ModuloChoser();
-        $allParameters = $params['shards'];
-
-        unset($params['shards']);
-        unset($params['wrapperClass']);
-        unset($params['distributionKey']);
-        unset($params['shardChoser']);
-
-        foreach ($allParameters as $shardId => $shardParameters) {
-            $this->connections[$shardId] = ConnectionManager::createConnection(array_merge($params, $shardParameters), $config, $eventManager);
-        }
+        $this->connections = $params['shard_connections'];
 
         parent::__construct($params, $driver, $config, $eventManager);
 
         $this->factory()->alias(InsertQueryInterface::class, ShardingInsertQuery::class);
         $this->factory()->alias(KeyValueQueryInterface::class, ShardingKeyValueQuery::class);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setName($name)
-    {
-        foreach ($this->connections as $shardId => $connection) {
-            $connection->setName($name.'.'.$shardId);
-        }
-
-        return parent::setName($name);
     }
 
     /**

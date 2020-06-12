@@ -2,6 +2,9 @@
 
 namespace Bdf\Prime\Sharding;
 
+use Bdf\Prime\Connection\ConnectionRegistry;
+use Bdf\Prime\Connection\Factory\ConnectionFactory;
+use Bdf\Prime\Connection\Factory\ShardingConnectionFactory;
 use Bdf\Prime\ConnectionManager;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
@@ -28,14 +31,14 @@ class ShardingConnectionTest extends TestCase
     {
         $this->primeStart();
 
-        $this->connections = new ConnectionManager([
-//            'logger' => new PsrDecorator(new Logger()),
-            'dbConfig' => [
-                'sharding' => 'sqlite::memory:?distributionKey=id&shards[shard1][dbname]=TEST_SHARD1&shards[shard2][dbname]=TEST_SHARD2'
-            ]
-        ]);
+        $configMap = [
+            'sharding' => 'sqlite::memory:?distributionKey=id&shards[shard1][dbname]=TEST_SHARD1&shards[shard2][dbname]=TEST_SHARD2'
+        ];
 
-        $this->connections->connection('sharding')->schema()
+        $this->factory = new ShardingConnectionFactory(new ConnectionFactory());
+        $this->registry = new ConnectionRegistry($configMap, $this->factory);
+        $this->connections = new ConnectionManager($this->registry);
+        $this->connections->getConnection('sharding')->schema()
             ->table('test', function(TypesHelperTableBuilder $table) {
                 $table->bigint('id', true);
                 $table->string('name');
@@ -56,7 +59,7 @@ class ShardingConnectionTest extends TestCase
      */
     public function test_wrapper()
     {
-        $this->assertEquals(ShardingConnection::class, get_class($this->connections->connection('sharding')));
+        $this->assertEquals(ShardingConnection::class, get_class($this->connections->getConnection('sharding')));
     }
 
     /**
@@ -64,7 +67,7 @@ class ShardingConnectionTest extends TestCase
      */
     public function test_distribution_key()
     {
-        $this->assertEquals('id', $this->connections->connection('sharding')->getDistributionKey());
+        $this->assertEquals('id', $this->connections->getConnection('sharding')->getDistributionKey());
     }
 
     /**
@@ -72,7 +75,7 @@ class ShardingConnectionTest extends TestCase
      */
     public function test_shard_connection_wrapper()
     {
-        $sharding = $this->connections->connection('sharding');
+        $sharding = $this->connections->getConnection('sharding');
 
         foreach ($sharding->getShardConnection() as $shard) {
             $this->assertEquals('Bdf\Prime\Connection\SimpleConnection', get_class($shard));
@@ -84,7 +87,7 @@ class ShardingConnectionTest extends TestCase
      */
     public function test_wrapped_connection_of_shard()
     {
-        $sharding = $this->connections->connection('sharding');
+        $sharding = $this->connections->getConnection('sharding');
         $sharding->useShard('shard1');
 
         $this->assertEquals($sharding->getConnection('shard1')->getWrappedConnection(), $sharding->getWrappedConnection());
@@ -97,7 +100,7 @@ class ShardingConnectionTest extends TestCase
     {
         $this->expectException('Doctrine\DBAL\Sharding\ShardingException');
 
-        $this->connections->connection('sharding')->getConnection('unknown');
+        $this->connections->getConnection('sharding')->getConnection('unknown');
     }
 
     /**
@@ -105,7 +108,7 @@ class ShardingConnectionTest extends TestCase
      */
     public function test_sub_connection_interface()
     {
-        $master = $this->connections->connection('sharding');
+        $master = $this->connections->getConnection('sharding');
 
         $this->assertEquals($master->getShardConnection('shard1'), $master->getConnection('shard1'));
         $this->assertEquals($master->getShardConnection('shard2'), $master->getConnection('shard2'));
@@ -116,7 +119,7 @@ class ShardingConnectionTest extends TestCase
      */
     public function test_connection_manager_access()
     {
-        $shard = $this->connections->connection('sharding.shard1');
+        $shard = $this->connections->getConnection('sharding.shard1');
 
         $this->assertEquals('sharding.shard1', $shard->getName());
     }
@@ -127,7 +130,7 @@ class ShardingConnectionTest extends TestCase
     public function test_set_name()
     {
 
-        $sharding = $this->connections->connection('sharding');
+        $sharding = $this->connections->getConnection('sharding');
         $sharding->setName('sharding');
 
         $i = 1;
@@ -144,7 +147,7 @@ class ShardingConnectionTest extends TestCase
      */
     public function test_get_shard_ids()
     {
-        $this->assertEquals(['shard1', 'shard2'], $this->connections->connection('sharding')->getShardIds());
+        $this->assertEquals(['shard1', 'shard2'], $this->connections->getConnection('sharding')->getShardIds());
     }
 
     /**
@@ -152,7 +155,7 @@ class ShardingConnectionTest extends TestCase
      */
     public function test_get_choser()
     {
-        $this->assertEquals('Bdf\Prime\Sharding\ModuloChoser', get_class($this->connections->connection('sharding')->getShardChoser()));
+        $this->assertEquals('Bdf\Prime\Sharding\ModuloChoser', get_class($this->connections->getConnection('sharding')->getShardChoser()));
     }
 
     /**
@@ -161,7 +164,7 @@ class ShardingConnectionTest extends TestCase
     public function test_pick_shard()
     {
         /** @var ShardingConnection $connection */
-        $connection = $this->connections->connection('sharding');
+        $connection = $this->connections->getConnection('sharding');
 
         $connection->pickShard(0);
         $this->assertEquals('shard1', $connection->getCurrentShardId());
@@ -179,7 +182,7 @@ class ShardingConnectionTest extends TestCase
     public function test_use_shard()
     {
         /** @var ShardingConnection $connection */
-        $connection = $this->connections->connection('sharding');
+        $connection = $this->connections->getConnection('sharding');
 
         $connection->useShard('shard1');
         $this->assertEquals('shard1', $connection->getCurrentShardId());
@@ -194,7 +197,7 @@ class ShardingConnectionTest extends TestCase
     public function test_close_reset_current_shard()
     {
         /** @var ShardingConnection $connection */
-        $connection = $this->connections->connection('sharding');
+        $connection = $this->connections->getConnection('sharding');
         $connection->useShard('shard2');
         $connection->close();
         $this->assertEquals(null, $connection->getCurrentShardId());
@@ -206,7 +209,7 @@ class ShardingConnectionTest extends TestCase
     public function test_sharding()
     {
         /** @var ShardingConnection $connection */
-        $connection = $this->connections->connection('sharding');
+        $connection = $this->connections->getConnection('sharding');
 
         //testing data
         $connection->insert('test', [
@@ -246,7 +249,7 @@ class ShardingConnectionTest extends TestCase
     public function test_write_methods()
     {
         /** @var ShardingConnection $connection */
-        $connection = $this->connections->connection('sharding');
+        $connection = $this->connections->getConnection('sharding');
 
         //testing data
         $connection->insert('test', [
@@ -276,7 +279,7 @@ class ShardingConnectionTest extends TestCase
     public function test_count()
     {
         /** @var ShardingConnection $connection */
-        $connection = $this->connections->connection('sharding');
+        $connection = $this->connections->getConnection('sharding');
 
         //testing data
         $connection->insert('test', [
@@ -302,7 +305,7 @@ class ShardingConnectionTest extends TestCase
     public function test_last_insert_id()
     {
         /** @var ShardingConnection $connection */
-        $connection = $this->connections->connection('sharding');
+        $connection = $this->connections->getConnection('sharding');
 
         //testing data
         $connection->pickShard(10);
@@ -320,7 +323,7 @@ class ShardingConnectionTest extends TestCase
     public function test_committed_transaction()
     {
         /** @var ShardingConnection $connection */
-        $connection = $this->connections->connection('sharding');
+        $connection = $this->connections->getConnection('sharding');
 
         $connection->transactional(function($conn) {
             $conn->insert('test', [
@@ -339,7 +342,7 @@ class ShardingConnectionTest extends TestCase
     public function test_rollbacked_transaction()
     {
         /** @var ShardingConnection $connection */
-        $connection = $this->connections->connection('sharding');
+        $connection = $this->connections->getConnection('sharding');
 
         try {
             $connection->transactional(function($conn) {
@@ -363,7 +366,7 @@ class ShardingConnectionTest extends TestCase
     public function test_functionnal()
     {
         /** @var ShardingConnection $connection */
-        $connection = $this->connections->connection('sharding');
+        $connection = $this->connections->getConnection('sharding');
 
         //testing data
         $connection->insert('test', [
@@ -410,7 +413,7 @@ class ShardingConnectionTest extends TestCase
     public function test_make()
     {
         /** @var ShardingConnection $connection */
-        $connection = $this->connections->connection('sharding');
+        $connection = $this->connections->getConnection('sharding');
 
         $this->assertInstanceOf(ShardingInsertQuery::class, $connection->make(InsertQueryInterface::class));
         $this->assertInstanceOf(ShardingKeyValueQuery::class, $connection->make(KeyValueQueryInterface::class));

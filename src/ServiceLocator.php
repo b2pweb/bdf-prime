@@ -75,8 +75,12 @@ class ServiceLocator
         $this->instantiator = $instantiator ?: new RegistryInstantiator();
         $this->hydrators = new HydratorRegistry();
 
+        // TODO Legacy. Should be removed
         if ($cache = $this->connectionManager->config()->getMetadataCache()) {
-            $this->mapperFactory->setCache($cache);
+            $this->mapperFactory->setMetadataCache($cache);
+        }
+        if ($cache = $this->connectionManager->config()->getResultCache()) {
+            $this->mapperFactory->setResultCache($cache);
         }
     }
 
@@ -104,6 +108,8 @@ class ServiceLocator
      * Returns connection manager config
      * 
      * @return Configuration
+     *
+     * @deprecated Since 1.1.
      */
     public function config()
     {
@@ -119,7 +125,7 @@ class ServiceLocator
      */
     public function connection($name = null)
     {
-        return $this->connectionManager->connection($name);
+        return $this->connectionManager->getConnection($name);
     }
     
     /**
@@ -257,6 +263,8 @@ class ServiceLocator
      * Get the types registry
      *
      * @return TypesRegistryInterface
+     *
+     * @deprecated Since 1.1.
      */
     public function types()
     {

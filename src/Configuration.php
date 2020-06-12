@@ -72,9 +72,13 @@ class Configuration extends BaseConfiguration
      * Contains profil info to connect database
      * 
      * @param callable|ConnectionConfig|array $config   Config object or config file
+     *
+     * @deprecated Since 1.1. Use ConnectionRegistry to declare your connections.
      */
     public function setDbConfig($config)
     {
+        @trigger_error(__METHOD__.' is deprecated since 1.1 and will be removed in 1.2. Use ConnectionRegistry to declare your connections.', E_USER_DEPRECATED);
+
         $this->_attributes['dbConfig'] = $config;
     }
     
@@ -82,9 +86,13 @@ class Configuration extends BaseConfiguration
      * Get the db config object
      * 
      * @return ConnectionConfig
+     *
+     * @deprecated Since 1.1. Use ConnectionRegistry to declare your connections.
      */
     public function getDbConfig()
     {
+        @trigger_error(__METHOD__.' is deprecated since 1.1 and will be removed in 1.2. Use ConnectionRegistry to declare your connections.', E_USER_DEPRECATED);
+
         if ($this->_attributes['dbConfig'] instanceof ConnectionConfig) {
             return $this->_attributes['dbConfig'];
         }

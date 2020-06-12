@@ -74,22 +74,9 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
             throw new LogicException('Master/slave connection needs readable connection in parameters');
         }
 
-        $readParameters = $params['read'];
-        unset($params['read']);
-        unset($params['wrapperClass']);
-
-        $this->readConnection = ConnectionManager::createConnection(array_merge($params, $readParameters), $config, $eventManager);
+        $this->readConnection = $params['read'];
 
         parent::__construct($params, $driver, $config, $eventManager);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setName($name)
-    {
-        $this->readConnection->setName($name.'.read');
-        return parent::setName($name);
     }
 
     /**

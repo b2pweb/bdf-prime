@@ -324,7 +324,7 @@ class BulkInsertQueryTest extends TestCase
      */
     public function test_orm_cache()
     {
-        Prime::service()->config()->setResultCache($cache = new ArrayCache());
+        Prime::service()->mappers()->setResultCache($cache = new ArrayCache());
 
         $this->pack()->declareEntity(TestEntity::class);
 

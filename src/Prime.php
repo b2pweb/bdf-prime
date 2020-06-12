@@ -3,6 +3,12 @@
 namespace Bdf\Prime;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Connection\ConnectionRegistry;
+use Bdf\Prime\Connection\Factory\ChainFactory;
+use Bdf\Prime\Connection\Factory\ConnectionFactory;
+use Bdf\Prime\Connection\Factory\MasterSlaveConnectionFactory;
+use Bdf\Prime\Connection\Factory\ShardingConnectionFactory;
+use Bdf\Prime\Mapper\MapperFactory;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Psr\Container\ContainerInterface;
 use RuntimeException;
@@ -370,20 +376,38 @@ class Prime
             throw new RuntimeException('Prime is not configured');
         }
 
-        static::$serviceLocator = new ServiceLocator(
-            new ConnectionManager([
-                'dbConfig' => static::$config['connection']['config'] ?? []
+        $factory = new ConnectionFactory();
+        $registry = new ConnectionRegistry(
+            static::$config['connection']['config'] ?? [],
+            new ChainFactory([
+                new MasterSlaveConnectionFactory($factory),
+                new ShardingConnectionFactory($factory),
+                $factory,
             ])
         );
 
-        if ($types = static::$config['types'] ?? null) {
-            foreach ($types as $type => $class) {
-                static::$serviceLocator->addType($type, $class);
-            }
-        }
-        
+        $mapperFactory = new MapperFactory(
+            null,
+            static::$config['metadataCache'] ?? null,
+            static::$config['resultCache'] ?? null
+        );
+
+        static::$serviceLocator = new ServiceLocator(
+            new ConnectionManager($registry),
+            $mapperFactory
+        );
+
         if ($logger = static::$config['logger'] ?? null) {
-            static::$serviceLocator->config()->setSQLLogger($logger);
+            $registry->getDefaultConfiguration()->setSQLLogger($logger);
+        }
+
+        // TODO remove in 1.2. Inject caches for legacy usage
+        if ($cache = static::$config['resultCache'] ?? null) {
+            $registry->getDefaultConfiguration()->setResultCache($cache);
+        }
+
+        if ($cache = static::$config['metadataCache'] ?? null) {
+            $registry->getDefaultConfiguration()->setMetadataCache($cache);
         }
 
         if ($serializer = static::$config['serializer'] ?? null) {

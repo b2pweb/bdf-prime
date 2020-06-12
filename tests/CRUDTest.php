@@ -53,8 +53,8 @@ class CRUDTest extends TestCase
     protected function declareTestData($pack)
     {
         $pack->declareEntity([
-            'Bdf\Prime\User',
-            'Bdf\Prime\Customer',
+            User::class,
+            Customer::class,
         ]);
     }
 
@@ -71,7 +71,7 @@ class CRUDTest extends TestCase
      */
     public function test_insert()
     {
-        $repository = Prime::repository('Bdf\Prime\User');
+        $repository = Prime::repository(User::class);
 
         $this->assertEquals(1, $repository->insert($this->basicUser), 'method insert');
         $this->assertEquals(1, $repository->count(), 'method count');
@@ -449,7 +449,7 @@ class CRUDTest extends TestCase
             public function supportsPartialIndexes() { return true; }
         };
 
-        $this->prime()->connections()->addConnection('test2', [
+        $this->prime()->connections()->declareConnection('test2', [
             'adapter' => 'sqlite',
             'memory' => true,
             'platform' => $platform

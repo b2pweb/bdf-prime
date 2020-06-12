@@ -47,7 +47,7 @@ class CacheCommandTest extends TestCase
         $cache = $this->createMock(CacheInterface::class);
         $cache->expects($this->never())->method('clear');
 
-        $this->prime->config()->setResultCache($cache);
+        $this->prime->mappers()->setResultCache($cache);
 
         $tester = new CommandTester($this->command);
         $tester->execute([]);
@@ -63,7 +63,7 @@ class CacheCommandTest extends TestCase
         $cache = $this->createMock(CacheInterface::class);
         $cache->expects($this->once())->method('clear');
 
-        $this->prime->config()->setResultCache($cache);
+        $this->prime->mappers()->setResultCache($cache);
 
         $tester = new CommandTester($this->command);
         $tester->execute(['--clear' => true]);

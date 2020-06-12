@@ -76,7 +76,8 @@ class HydratorGenerationCommand extends Command
         $this->configureOutputs($io);
         $path = realpath($io->argument('path'));
 
-        $this->locator->config()->setMetadataCache(null);
+        $cache = $this->locator->mappers()->getMetadataCache();
+        $this->locator->mappers()->setMetadataCache(null);
 
         if ($io->argument('path')) {
             $io->info('Generating hydrators...');
@@ -97,6 +98,7 @@ class HydratorGenerationCommand extends Command
 
         $this->generateLoader($io);
 
+        $this->locator->mappers()->setMetadataCache($cache);
         return 0;
     }
 

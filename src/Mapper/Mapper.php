@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Mapper;
 
 use Bdf\Prime\Behaviors\BehaviorInterface;
+use Bdf\Prime\Cache\CacheInterface;
 use Bdf\Prime\Entity\ImportableInterface;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
 use Bdf\Prime\Entity\Hydrator\MapperHydratorInterface;
@@ -11,6 +12,7 @@ use Bdf\Prime\Mapper\Info\MapperInfo;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
 use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\ServiceLocator;
 use Bdf\Prime\IdGenerators\GeneratorInterface;
 use Bdf\Prime\IdGenerators\AutoIncrementGenerator;
@@ -36,11 +38,11 @@ abstract class Mapper
      * Enable/Disable query result cache on repository
      * If null global cache will be set.
      * Set it to false to deactivate cache on this repository
-     * Set the cache class name in configure method
+     * Set the cache instance in configure method
      * 
-     * @var string|bool
+     * @var false|CacheInterface
      */
-    protected $resultCacheClass;
+    protected $resultCache;
     
     /**
      * @var Metadata
@@ -131,14 +133,16 @@ abstract class Mapper
      *
      * @param ServiceLocator $serviceLocator
      * @param string $entityClass
-     * @param Metadata $metadata
-     * @param MapperHydratorInterface $hydrator
+     * @param Metadata|null $metadata
+     * @param MapperHydratorInterface|null $hydrator
+     * @param CacheInterface|null $resultCache
      */
-    public function __construct(ServiceLocator $serviceLocator, $entityClass, $metadata = null, MapperHydratorInterface $hydrator = null)
+    public function __construct(ServiceLocator $serviceLocator, $entityClass, $metadata = null, MapperHydratorInterface $hydrator = null, CacheInterface $resultCache = null)
     {
         $this->entityClass = $entityClass;
         $this->metadata = $metadata ?: new Metadata();
         $this->serviceLocator = $serviceLocator;
+        $this->resultCache = $resultCache;
 
         $this->configure();
         
@@ -469,22 +473,13 @@ abstract class Mapper
     /**
      * Get the repository
      * 
-     * @return \Bdf\Prime\Repository\RepositoryInterface
+     * @return RepositoryInterface
      */
     public function repository()
     {
         $className = $this->repositoryClass;
-        
-        if ($this->resultCacheClass === null) {
-            $cache = $this->serviceLocator->config()->getResultCache();
-        } elseif ($this->resultCacheClass === false) {
-            $cache = null;
-        } else {
-            $cacheClassName = $this->resultCacheClass;
-            $cache = new $cacheClassName();
-        }
-        
-        return new $className($this, $this->serviceLocator, $cache);
+
+        return new $className($this, $this->serviceLocator, $this->resultCache === false ? null : $this->resultCache);
     }
 
     /**

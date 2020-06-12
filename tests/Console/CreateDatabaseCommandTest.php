@@ -2,14 +2,16 @@
 
 namespace Bdf\Prime\Console;
 
+use Bdf\Prime\Connection\ConnectionRegistry;
+use Bdf\Prime\Connection\Factory\ConnectionFactory;
 use Bdf\Prime\ServiceLocator;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class CreateDatabaseCommandTest extends TestCase
 {
-    /** @var ServiceLocator */
-    protected $prime;
+    /** @var ConnectionRegistry */
+    protected $registry;
     /** @var CreateDatabaseCommand */
     protected $command;
 
@@ -17,7 +19,9 @@ class CreateDatabaseCommandTest extends TestCase
     {
         parent::setUp();
 
-        $this->command = new CreateDatabaseCommand($this->prime = new ServiceLocator());
+        $factory = new ConnectionFactory();
+        $this->registry = new ConnectionRegistry([], $factory);
+        $this->command = new CreateDatabaseCommand($this->registry, $factory);
     }
 
     /**
@@ -25,7 +29,24 @@ class CreateDatabaseCommandTest extends TestCase
      */
     public function test_ignore()
     {
-        $this->prime->connections()->config()->getDbConfig()->set('test', [
+        $this->registry->declareConnection('test', [
+            'url' => 'sqlite::memory:',
+            'ignore' => '1'
+        ]);
+
+        $tester = new CommandTester($this->command);
+        $tester->execute([]);
+
+        $this->assertStringContainsString('Connection test is ignored.', $tester->getDisplay());
+    }
+
+    /**
+     *
+     */
+    public function test_legacy_constructor()
+    {
+        $this->command = new CreateDatabaseCommand($prime = new ServiceLocator());
+        $prime->config()->getDbConfig()->set('test', [
             'url' => 'sqlite::memory:',
             'ignore' => '1'
         ]);

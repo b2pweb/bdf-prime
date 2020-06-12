@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Connection\ConnectionRegistry;
 use Bdf\Prime\Entity\Hydrator\HydratorInterface;
 use Bdf\Prime\Entity\Hydrator\HydratorRegistry;
 use Bdf\Prime\Entity\InitializableInterface;
@@ -95,12 +96,13 @@ class ServiceLocatorTest extends TestCase
     public function test_meta_cache()
     {
         $cache = new ArrayCachePool();
-        
-        $service = new ServiceLocator(new ConnectionManager([
+
+        $registry = new ConnectionRegistry([], null, new Configuration([
             'metadataCache' => $cache,
         ]));
+        $service = new ServiceLocator(new ConnectionManager($registry));
         
-        $this->assertEquals($cache, $service->mappers()->getCache());
+        $this->assertEquals($cache, $service->mappers()->getMetadataCache());
     }
     
     /**

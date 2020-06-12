@@ -51,8 +51,8 @@ class CacheCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $caches = [
-            'result cache'   => $this->locator->config()->getResultCache(),
-            'metadata cache' => $this->locator->config()->getMetadataCache(),
+            'result cache'   => $this->locator->mappers()->getResultCache(),
+            'metadata cache' => $this->locator->mappers()->getMetadataCache(),
         ];
 
         foreach ($caches as $name => $cache) {

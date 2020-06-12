@@ -3,6 +3,9 @@
 namespace Bdf\Prime\Sharding\Query;
 
 use Bdf\Prime\Cache\ArrayCache;
+use Bdf\Prime\Connection\ConnectionRegistry;
+use Bdf\Prime\Connection\Factory\ConnectionFactory;
+use Bdf\Prime\Connection\Factory\ShardingConnectionFactory;
 use Bdf\Prime\ConnectionManager;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Schema\Builder\TypesHelperTableBuilder;
@@ -31,23 +34,23 @@ class ShardingInsertQueryTest extends TestCase
     {
         $this->primeStart();
 
-        $this->connections = new ConnectionManager([
-//            'logger' => new PsrDecorator(new Logger()),
-            'dbConfig' => [
-                'sharding' => [
-                    'adapter'           => 'sqlite',
-                    'memory'            => true,
-                    'dbname'            => 'TEST',
-                    'distributionKey'   => 'id',
-                    'shards'    => [
-                        'shard1' => ['dbname'  => 'TEST_SHARD1'],
-                        'shard2' => ['dbname'  => 'TEST_SHARD2'],
-                    ]
-                ],
-            ]
-        ]);
+        $configMap = [
+            'sharding' => [
+                'adapter'           => 'sqlite',
+                'memory'            => true,
+                'dbname'            => 'TEST',
+                'distributionKey'   => 'id',
+                'shards'    => [
+                    'shard1' => ['dbname'  => 'TEST_SHARD1'],
+                    'shard2' => ['dbname'  => 'TEST_SHARD2'],
+                ]
+            ],
+        ];
 
-        $this->connection = $this->connections->connection('sharding');
+        $this->factory = new ShardingConnectionFactory(new ConnectionFactory());
+        $this->registry = new ConnectionRegistry($configMap, $this->factory);
+        $this->connections = new ConnectionManager($this->registry);
+        $this->connection = $this->connections->getConnection('sharding');
 
         $this->connection->schema()
             ->table('test', function(TypesHelperTableBuilder $table) {

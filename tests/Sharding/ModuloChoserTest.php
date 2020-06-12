@@ -16,7 +16,7 @@ class ModuloChoserTest extends TestCase
     {
         $choser = new ModuloChoser();
 
-        $connection = $this->getMockBuilder('Bdf\Prime\Sharding\ShardingConnection')
+        $connection = $this->getMockBuilder(ShardingConnection::class)
             ->disableOriginalConstructor()
             ->setMethods(['getShardIds'])
             ->getMock();

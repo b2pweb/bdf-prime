@@ -40,7 +40,7 @@ class ShardingCRUDTest extends TestCase
         $this->configurePrime();
 
         $this->prime()->connections()->removeConnection('test');
-        $this->prime()->connections()->addConnection('test', [
+        $this->prime()->connections()->declareConnection('test', [
             'adapter'           => 'sqlite',
             'memory'            => true,
             'dbname'            => 'TEST',

@@ -2,6 +2,8 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Connection\ConnectionRegistry;
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Exception\DBALException;
 use PHPUnit\Framework\TestCase;
@@ -24,19 +26,10 @@ class ConnectionManagerTest extends TestCase
     /**
      * 
      */
-    public function test_constructor_with_array_config()
-    {
-        $manager = new ConnectionManager(['resultCache' => 'cache']);
-        
-        $this->assertEquals('cache', $manager->config()->getResultCache());
-    }
-    
-    /**
-     * 
-     */
     public function test_constructor_with_config()
     {
-        $manager = new ConnectionManager(new Configuration(['resultCache' => 'cache']));
+        $registry = new ConnectionRegistry([], null, new Configuration(['resultCache' => 'cache']));
+        $manager = new ConnectionManager($registry);
         
         $this->assertEquals('cache', $manager->config()->getResultCache());
     }
@@ -57,14 +50,17 @@ class ConnectionManagerTest extends TestCase
      */
     public function test_add_remove_connection()
     {
+        $connection = $this->createMock(SimpleConnection::class);
+        $connection->expects($this->any())->method('getName')->willReturn('test');
+
         $manager = new ConnectionManager();
-        $manager->addConnection('test', 'sqlite::memory:');
+        $manager->addConnection($connection);
         
-        $this->assertEquals(['test'], $manager->connectionNames());
+        $this->assertEquals(['test'], $manager->getConnectionNames());
         
         $manager->removeConnection('test');
         
-        $this->assertEquals([], $manager->connectionNames());
+        $this->assertEquals([], $manager->getConnectionNames());
     }
     
     /**
@@ -72,12 +68,13 @@ class ConnectionManagerTest extends TestCase
      */
     public function test_remove_unknown_connection()
     {
-        $manager = new ConnectionManager();
-        
-        $manager->addConnection('test', 'sqlite::memory:');
+        $registry = new ConnectionRegistry();
+        $registry->declareConnection('test', 'sqlite::memory:');
+
+        $manager = new ConnectionManager($registry);
         $manager->removeConnection('unknown');
         
-        $this->assertEquals(['test'], $manager->connectionNames());
+        $this->assertEquals(['test'], $manager->getConnectionNames());
     }
     
     /**
@@ -86,9 +83,12 @@ class ConnectionManagerTest extends TestCase
     public function test_add_connection_set_default_connection()
     {
         $manager = new ConnectionManager();
-        
+
+        $connection = $this->createMock(SimpleConnection::class);
+        $connection->expects($this->any())->method('getName')->willReturn('test');
+
         $this->assertEquals(null, $manager->getDefaultConnection());
-        $manager->addConnection('test', 'sqlite::memory:');
+        $manager->addConnection($connection);
         $this->assertEquals('test', $manager->getDefaultConnection());
     }
     
@@ -100,9 +100,12 @@ class ConnectionManagerTest extends TestCase
         $this->expectException('LogicException');
         $this->expectExceptionMessage('Connection for "test" already exists. Connection name must be unique.');
 
+        $connection = $this->createMock(SimpleConnection::class);
+        $connection->expects($this->any())->method('getName')->willReturn('test');
+
         $manager = new ConnectionManager();
-        $manager->addConnection('test', 'sqlite::memory:');
-        $manager->addConnection('test', 'sqlite::memory:');
+        $manager->addConnection($connection);
+        $manager->addConnection($connection);
     }
     
     /**
@@ -110,8 +113,11 @@ class ConnectionManagerTest extends TestCase
      */
     public function test_get_connections()
     {
+        $connection = $this->createMock(SimpleConnection::class);
+        $connection->expects($this->any())->method('getName')->willReturn('test');
+
         $manager = new ConnectionManager();
-        $manager->addConnection('test', 'sqlite::memory:');
+        $manager->addConnection($connection);
         
         $connections = $manager->connections();
         
@@ -127,11 +133,12 @@ class ConnectionManagerTest extends TestCase
         $connection = $this->getMockBuilder(SimpleConnection::class)
             ->disableOriginalConstructor()
             ->getMock();
+        $connection->expects($this->any())->method('getName')->willReturn('test');
         
         $manager = new ConnectionManager();
-        $manager->addConnection('test', $connection);
+        $manager->addConnection($connection);
         
-        $this->assertSame($connection, $manager->connection());
+        $this->assertSame($connection, $manager->getConnection());
     }
     
     /**
@@ -143,7 +150,7 @@ class ConnectionManagerTest extends TestCase
         $this->expectExceptionMessage('Connection name "test" is not set');
 
         $manager = new ConnectionManager();
-        $manager->connection('test');
+        $manager->getConnection('test');
     }
     
     /**
@@ -151,26 +158,13 @@ class ConnectionManagerTest extends TestCase
      */
     public function test_get_connection_from_config()
     {
-        $manager = new ConnectionManager();
-        $manager->config()->setDbConfig(['test' => ['adapter' => 'sqlite', 'memory' => true]]);
-        
-        $connection = $manager->connection('test');
+        $registry = new ConnectionRegistry();
+        $registry->declareConnection('test', ['adapter' => 'sqlite', 'memory' => true]);
+        $manager = new ConnectionManager($registry);
+
+        $connection = $manager->getConnection('test');
         
         $this->assertEquals('sqlite', $connection->getDatabasePlatform()->getName());
-    }
-
-    /**
-     *
-     */
-    public function test_register_driver_map()
-    {
-        $manager = new ConnectionManager();
-
-        $manager->registerDriverMap('test-map', 'driver', 'wrapper');
-        $this->assertEquals(['driver', 'wrapper'], $manager->getDriverMap('test-map'));
-
-        $manager->unregisterDriverMap('test-map');
-        $this->assertNull($manager->getDriverMap('test-map'));
     }
 
     /**
@@ -178,10 +172,11 @@ class ConnectionManagerTest extends TestCase
      */
     public function test_dsn($dsn, $expectedParams)
     {
-        $manager = new ConnectionManager();
-        $connection = $manager->addConnection('test', $dsn);
+        $registry = new ConnectionRegistry();
+        $registry->declareConnection('test', $dsn);
+        $manager = new ConnectionManager($registry);
 
-        $this->assertEquals($expectedParams, $connection->getParams());
+        $this->assertEquals($expectedParams, $manager->getConnection('test')->getParams());
     }
     public function dsnProvider()
     {
@@ -250,13 +245,20 @@ class ConnectionManagerTest extends TestCase
     /**
      *
      */
-    public function test_all_connection_names()
+    public function test_connection_names()
     {
-        $manager = new ConnectionManager();
-        $manager->config()->setDbConfig(['foo' => ['adapter' => 'sqlite', 'memory' => true]]);
-        $manager->addConnection('bar', 'sqlite::memory:');
+        $connection = $this->createMock(ConnectionInterface::class);
+        $connection->expects($this->any())->method('getName')->willReturn('bar');
 
-        $this->assertSame(['bar'], $manager->connectionNames());
-        $this->assertSame(['bar', 'foo'], $manager->allConnectionNames());
+        $registry = new ConnectionRegistry();
+        $registry->declareConnection('foo', ['adapter' => 'sqlite', 'memory' => true]);
+        $registry->declareConnection('bar', ['adapter' => 'sqlite', 'memory' => true]);
+
+        $manager = new ConnectionManager($registry);
+        $manager->addConnection($connection);
+
+        $this->assertSame(['bar'], $manager->getCurrentConnectionNames());
+        $this->assertSame(['bar', 'foo'], $manager->getConnectionNames());
+        $this->assertSame(['bar', 'foo'], $manager->connectionNames());
     }
 }

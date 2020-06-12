@@ -2,12 +2,13 @@
 
 namespace Bdf\Prime\Mapper;
 
+use Bdf\Prime\Cache\CacheInterface;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
 use Bdf\Prime\Entity\Hydrator\MapperHydratorInterface;
 use Bdf\Prime\Mapper\NameResolver\ResolverInterface;
 use Bdf\Prime\Mapper\NameResolver\SuffixResolver;
 use Bdf\Prime\ServiceLocator;
-use Psr\SimpleCache\CacheInterface;
+use Psr\SimpleCache\CacheInterface as Psr16CacheInterface;
 
 /**
  * @package Bdf\Prime\Mapper
@@ -17,51 +18,30 @@ class MapperFactory
     /**
      * @var ResolverInterface
      */
-    protected $nameResolver;
+    private $nameResolver;
     
+    /**
+     * @var Psr16CacheInterface
+     */
+    private $metadataCache;
+
     /**
      * @var CacheInterface
      */
-    protected $cache;
-    
+    private $resultCache;
+
     /**
      * @param ResolverInterface $nameResolver
+     * @param Psr16CacheInterface|null $metadataCache
+     * @param CacheInterface|null $resultCache
      */
-    public function __construct(ResolverInterface $nameResolver = null)
+    public function __construct(ResolverInterface $nameResolver = null, Psr16CacheInterface $metadataCache = null, CacheInterface $resultCache = null)
     {
         $this->nameResolver = $nameResolver ?: new SuffixResolver();
+        $this->metadataCache = $metadataCache;
+        $this->resultCache = $resultCache;
     }
-    
-    /**
-     * Get the mapper name resolver
-     * 
-     * @return ResolverInterface
-     */
-    public function getNameResolver()
-    {
-        return $this->nameResolver;
-    }
-    
-    /**
-     * Set meta cache
-     * 
-     * @param CacheInterface $cache
-     */
-    public function setCache(CacheInterface $cache)
-    {
-        $this->cache = $cache;
-    }
-    
-    /**
-     * Get meta cache
-     * 
-     * @return CacheInterface
-     */
-    public function getCache()
-    {
-        return $this->cache;
-    }
-    
+
     /**
      * Get associated entity mapper
      *
@@ -95,9 +75,9 @@ class MapperFactory
         }
         
         $metadata = null;
-        if ($this->cache !== null) {
+        if ($this->metadataCache !== null) {
             $cacheKey = $this->getCacheKey($mapperClass);
-            $metadata = $this->cache->get($cacheKey);
+            $metadata = $this->metadataCache->get($cacheKey);
         }
 
         $hydrator = $serviceLocator->hydrator($entityClass);
@@ -107,10 +87,10 @@ class MapperFactory
         }
 
         /** @var Mapper $mapper */
-        $mapper = new $mapperClass($serviceLocator, $entityClass, $metadata, $hydrator);
-        
-        if ($this->cache !== null && $metadata === null) {
-            $this->cache->set($cacheKey, $mapper->metadata());
+        $mapper = new $mapperClass($serviceLocator, $entityClass, $metadata, $hydrator, $this->resultCache);
+
+        if ($this->metadataCache !== null && $metadata === null) {
+            $this->metadataCache->set($cacheKey, $mapper->metadata());
         }
 
         if ($mapper instanceof MapperFactoryAwareInterface) {
@@ -154,5 +134,55 @@ class MapperFactory
     private function getCacheKey($mapperClass)
     {
         return str_replace('\\', '.', $mapperClass);
+    }
+
+    /**
+     * Get the mapper name resolver
+     *
+     * @return ResolverInterface
+     */
+    public function getNameResolver()
+    {
+        return $this->nameResolver;
+    }
+
+    /**
+     * Set meta cache
+     *
+     * @param null|Psr16CacheInterface $cache
+     */
+    public function setMetadataCache(?Psr16CacheInterface $cache)
+    {
+        $this->metadataCache = $cache;
+    }
+
+    /**
+     * Get meta cache
+     *
+     * @return Psr16CacheInterface
+     */
+    public function getMetadataCache(): ?Psr16CacheInterface
+    {
+        return $this->metadataCache;
+    }
+
+    /**
+     * Set the result cache
+     *
+     * @param null|CacheInterface $cache
+     */
+    public function setResultCache(?CacheInterface $cache)
+    {
+        $this->resultCache = $cache;
+    }
+
+    /**
+     * Get the resul cache
+     *
+     * @return CacheInterface
+     */
+    public function getResultCache(): ?CacheInterface
+    {
+        return $this->resultCache;
     }
 }

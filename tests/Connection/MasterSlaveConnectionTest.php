@@ -2,6 +2,8 @@
 
 namespace Bdf\Prime\Connection;
 
+use Bdf\Prime\Connection\Factory\ConnectionFactory;
+use Bdf\Prime\Connection\Factory\MasterSlaveConnectionFactory;
 use Bdf\Prime\ConnectionManager;
 use Bdf\Prime\PrimeTestCase;
 use PHPUnit\Framework\TestCase;
@@ -13,8 +15,12 @@ class MasterSlaveConnectionTest extends TestCase
 {
     use PrimeTestCase;
 
-    /** @var ConnectionManager $connections */
+    /** @var ConnectionRegistry */
+    protected $registry;
+    /** @var ConnectionManager */
     protected $connections;
+    /** @var MasterSlaveConnectionFactory */
+    protected $factory;
 
     /**
      * 
@@ -23,21 +29,21 @@ class MasterSlaveConnectionTest extends TestCase
     {
         $this->primeStart();
 
-        $this->connections = new ConnectionManager([
-//            'logger' => new PsrDecorator(new Logger()),
-            'dbConfig' => [
-                'master-slave' => [
-                    'adapter' => 'sqlite',
-                    'memory'  => true,
-                    'dbname'  => 'TEST',
-                    'read'    => [
-                        'dbname'  => 'TEST_READ',
-                    ]
-                ],
-            ]
-        ]);
+        $configMap = [
+            'master-slave' => [
+                'adapter' => 'sqlite',
+                'memory'  => true,
+                'dbname'  => 'TEST',
+                'read'    => [
+                    'dbname'  => 'TEST_READ',
+                ]
+            ],
+        ];
 
-        $master = $this->connections->connection('master-slave');
+        $this->factory = new MasterSlaveConnectionFactory(new ConnectionFactory());
+        $this->registry = new ConnectionRegistry($configMap, $this->factory);
+        $this->connections = new ConnectionManager($this->registry);
+        $master = $this->connections->getConnection('master-slave');
         $master->schema()
             ->table('test', function($table) {
                 $table->bigint('id', true);
@@ -63,9 +69,18 @@ class MasterSlaveConnectionTest extends TestCase
     /**
      *
      */
+    public function test_support()
+    {
+        $this->assertFalse($this->factory->support('foo', []));
+        $this->assertTrue($this->factory->support('foo', ['read' => []]));
+    }
+
+    /**
+     *
+     */
     public function test_wrapper()
     {
-        $this->assertEquals('Bdf\Prime\Connection\MasterSlaveConnection', get_class($this->connections->connection('master-slave')));
+        $this->assertEquals(MasterSlaveConnection::class, get_class($this->connections->getConnection('master-slave')));
     }
 
     /**
@@ -73,7 +88,7 @@ class MasterSlaveConnectionTest extends TestCase
      */
     public function test_read_connection_wrapper()
     {
-        $this->assertEquals('Bdf\Prime\Connection\SimpleConnection', get_class($this->connections->connection('master-slave')->getReadConnection()));
+        $this->assertEquals(SimpleConnection::class, get_class($this->connections->getConnection('master-slave')->getReadConnection()));
     }
 
     /**
@@ -83,7 +98,7 @@ class MasterSlaveConnectionTest extends TestCase
     {
         $this->expectException('LogicException');
 
-        $this->connections->connection('master-slave')->getConnection('unknown');
+        $this->connections->getConnection('master-slave')->getConnection('unknown');
     }
 
     /**
@@ -91,7 +106,7 @@ class MasterSlaveConnectionTest extends TestCase
      */
     public function test_sub_connection_interface()
     {
-        $master = $this->connections->connection('master-slave');
+        $master = $this->connections->getConnection('master-slave');
 
         $this->assertEquals($master->getReadConnection(), $master->getConnection('read'));
         $this->assertEquals($master, $master->getConnection('master'));
@@ -102,25 +117,11 @@ class MasterSlaveConnectionTest extends TestCase
      */
     public function test_connection_manager_access()
     {
-        $master = $this->connections->connection('master-slave.master');
+        $master = $this->connections->getConnection('master-slave.master');
         $this->assertEquals('master-slave', $master->getName());
 
-        $read = $this->connections->connection('master-slave.read');
+        $read = $this->connections->getConnection('master-slave.read');
         $this->assertEquals('master-slave.read', $read->getName());
-    }
-
-    /**
-     *
-     */
-    public function test_set_name()
-    {
-
-        $master   = $this->connections->connection('master-slave');
-        $slave    = $master->getReadConnection();
-        $master->setName('master');
-
-        $this->assertEquals('master', $master->getName());
-        $this->assertEquals('master.read', $slave->getName());
     }
 
     /**
@@ -128,7 +129,7 @@ class MasterSlaveConnectionTest extends TestCase
      */
     public function test_quote()
     {
-        $master = $this->connections->connection('master-slave');
+        $master = $this->connections->getConnection('master-slave');
 
         $this->assertEquals('\'f"f\'', $master->quote('f"f'));
     }
@@ -146,7 +147,7 @@ class MasterSlaveConnectionTest extends TestCase
     public function test_master_slave()
     {
         /** @var MasterSlaveConnection $connection */
-        $master   = $this->connections->connection('master-slave');
+        $master   = $this->connections->getConnection('master-slave');
         $slave    = $master->getReadConnection();
 
         //testing data
