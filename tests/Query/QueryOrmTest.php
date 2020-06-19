@@ -42,14 +42,8 @@ class QueryOrmTest extends TestCase
         $this->table = $this->repository->mapper()->metadata()->table();
         $this->query = $this->repository->builder();
         
-        $connection = $this->getMockBuilder(SimpleConnection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'platform', 'factory'])
-            ->getMock();
-        $connection->expects($this->any())->method('getDatabasePlatform')->will($this->returnValue($this->repository->connection()->getDatabasePlatform()));
-        $connection->expects($this->any())->method('platform')->will($this->returnValue($this->repository->connection()->platform()));
-        $connection->expects($this->any())->method('factory')->will($this->returnValue($this->repository->connection()->factory()));
-        $connection->expects($this->any())->method('executeQuery')->will($this->returnValue(new CacheStatement([])));
+        $connection = $this->createConnectionMock();
+        $connection->expects($this->any())->method('executeQuery')->willReturn(new CacheStatement([]));
         
         $this->query->on($connection);
     }
@@ -646,16 +640,10 @@ class QueryOrmTest extends TestCase
      */
     public function test_count_pagination()
     {
-        $connection = $this->getMockBuilder(SimpleConnection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'platform', 'factory'])
-            ->getMock();
-        $connection->expects($this->any())->method('getDatabasePlatform')->will($this->returnValue($this->repository->connection()->getDatabasePlatform()));
-        $connection->expects($this->any())->method('platform')->will($this->returnValue($this->repository->connection()->platform()));
-        $connection->expects($this->any())->method('factory')->will($this->returnValue($this->repository->connection()->factory()));
+        $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(*) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->will($this->returnValue(new CacheStatement([['aggregate' => 1]])));
+            ->willReturn(new CacheStatement([['aggregate' => 1]]));
 
         $this->query->on($connection)->where('name', 'test')->paginationCount();
     }
@@ -665,16 +653,10 @@ class QueryOrmTest extends TestCase
      */
     public function test_count_pagination_field()
     {
-        $connection = $this->getMockBuilder(SimpleConnection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'platform', 'factory'])
-            ->getMock();
-        $connection->expects($this->any())->method('getDatabasePlatform')->will($this->returnValue($this->repository->connection()->getDatabasePlatform()));
-        $connection->expects($this->any())->method('platform')->will($this->returnValue($this->repository->connection()->platform()));
-        $connection->expects($this->any())->method('factory')->will($this->returnValue($this->repository->connection()->factory()));
+        $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(*) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->will($this->returnValue(new CacheStatement([['aggregate' => 1]])));
+            ->willReturn(new CacheStatement([['aggregate' => 1]]));
 
         $this->query->on($connection)->select('name')->where('name', 'test')->paginationCount();
     }
@@ -686,12 +668,12 @@ class QueryOrmTest extends TestCase
 //    {
 //        $connection = $this->getMockBuilder(SimpleConnection::class)
 //            ->disableOriginalConstructor()
-//            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform'])
+//            ->onlyMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform'])
 //            ->getMock();
-//        $connection->expects($this->any())->method('getDatabasePlatform')->will($this->returnValue($this->repository->connection()->getDatabasePlatform()));
+//        $connection->expects($this->any())->method('getDatabasePlatform')->willReturn($this->repository->connection()->getDatabasePlatform());
 //        $connection->expects($this->once())->method('executeQuery')
 //            ->with("SELECT COUNT(DISTINCT IFNULL(t0.id,\"___null___\")) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-//            ->will($this->returnValue(new CacheStatement([['aggregate' => 1]])));
+//            ->willReturn(new CacheStatement([['aggregate' => 1]]));
 //
 //        $this->query->on($connection)->distinct()->where('name', 'test')->paginationCount();
 //    }
@@ -701,16 +683,10 @@ class QueryOrmTest extends TestCase
      */
     public function test_count_pagination_distinct_field()
     {
-        $connection = $this->getMockBuilder(SimpleConnection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'platform', 'factory'])
-            ->getMock();
-        $connection->expects($this->any())->method('getDatabasePlatform')->will($this->returnValue($this->repository->connection()->getDatabasePlatform()));
-        $connection->expects($this->any())->method('platform')->will($this->returnValue($this->repository->connection()->platform()));
-        $connection->expects($this->any())->method('factory')->will($this->returnValue($this->repository->connection()->factory()));
+        $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(DISTINCT IFNULL(t0.name,\"___null___\")) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->will($this->returnValue(new CacheStatement([['aggregate' => 1]])));
+            ->willReturn(new CacheStatement([['aggregate' => 1]]));
 
         $this->query->on($connection)->select('name')->distinct()->where('name', 'test')->paginationCount();
     }
@@ -720,16 +696,10 @@ class QueryOrmTest extends TestCase
      */
     public function test_count_pagination_distinct_fields()
     {
-        $connection = $this->getMockBuilder(SimpleConnection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'platform', 'factory'])
-            ->getMock();
-        $connection->expects($this->any())->method('getDatabasePlatform')->will($this->returnValue($this->repository->connection()->getDatabasePlatform()));
-        $connection->expects($this->any())->method('platform')->will($this->returnValue($this->repository->connection()->platform()));
-        $connection->expects($this->any())->method('factory')->will($this->returnValue($this->repository->connection()->factory()));
+        $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(DISTINCT IFNULL(t0.name,\"___null___\")) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->will($this->returnValue(new CacheStatement([['aggregate' => 1]])));
+            ->willReturn(new CacheStatement([['aggregate' => 1]]));
 
         $this->query->on($connection)->distinct()->select('name', 'dateInsert')->where('name', 'test')->paginationCount();
     }
@@ -739,16 +709,10 @@ class QueryOrmTest extends TestCase
      */
     public function test_count_pagination_group_by()
     {
-        $connection = $this->getMockBuilder(SimpleConnection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'platform', 'factory'])
-            ->getMock();
-        $connection->expects($this->any())->method('getDatabasePlatform')->will($this->returnValue($this->repository->connection()->getDatabasePlatform()));
-        $connection->expects($this->any())->method('platform')->will($this->returnValue($this->repository->connection()->platform()));
-        $connection->expects($this->any())->method('factory')->will($this->returnValue($this->repository->connection()->factory()));
+        $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(DISTINCT IFNULL(t0.name,\"___null___\")) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->will($this->returnValue(new CacheStatement([['aggregate' => 1]])));
+            ->willReturn(new CacheStatement([['aggregate' => 1]]));
 
         $this->query->on($connection)->group('name', 'dateInsert')->where('name', 'test')->paginationCount();
     }
@@ -758,16 +722,10 @@ class QueryOrmTest extends TestCase
      */
     public function test_count()
     {
-        $connection = $this->getMockBuilder(SimpleConnection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'platform', 'factory'])
-            ->getMock();
-        $connection->expects($this->any())->method('getDatabasePlatform')->will($this->returnValue($this->repository->connection()->getDatabasePlatform()));
-        $connection->expects($this->any())->method('platform')->will($this->returnValue($this->repository->connection()->platform()));
-        $connection->expects($this->any())->method('factory')->will($this->returnValue($this->repository->connection()->factory()));
+        $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(*) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->will($this->returnValue(new CacheStatement([['aggregate' => 1]])));
+            ->willReturn(new CacheStatement([['aggregate' => 1]]));
 
         $this->query->on($connection)->select('name', 'dateInsert')->where('name', 'test')->count();
     }
@@ -777,16 +735,10 @@ class QueryOrmTest extends TestCase
      */
     public function test_count_field()
     {
-        $connection = $this->getMockBuilder(SimpleConnection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'platform', 'factory'])
-            ->getMock();
-        $connection->expects($this->any())->method('getDatabasePlatform')->will($this->returnValue($this->repository->connection()->getDatabasePlatform()));
-        $connection->expects($this->any())->method('platform')->will($this->returnValue($this->repository->connection()->platform()));
-        $connection->expects($this->any())->method('factory')->will($this->returnValue($this->repository->connection()->factory()));
+        $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(t0.name) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->will($this->returnValue(new CacheStatement([['aggregate' => 1]])));
+            ->willReturn(new CacheStatement([['aggregate' => 1]]));
 
         $this->query->on($connection)->where('name', 'test')->count('name');
     }
@@ -796,16 +748,10 @@ class QueryOrmTest extends TestCase
      */
     public function test_count_distinct()
     {
-        $connection = $this->getMockBuilder(SimpleConnection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'platform', 'factory'])
-            ->getMock();
-        $connection->expects($this->any())->method('getDatabasePlatform')->will($this->returnValue($this->repository->connection()->getDatabasePlatform()));
-        $connection->expects($this->any())->method('platform')->will($this->returnValue($this->repository->connection()->platform()));
-        $connection->expects($this->any())->method('factory')->will($this->returnValue($this->repository->connection()->factory()));
+        $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(DISTINCT t0.name) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->will($this->returnValue(new CacheStatement([['aggregate' => 1]])));
+            ->willReturn(new CacheStatement([['aggregate' => 1]]));
 
         $this->query->on($connection)->distinct()->where('name', 'test')->count('name');
     }
@@ -815,16 +761,10 @@ class QueryOrmTest extends TestCase
      */
     public function test_count_join()
     {
-        $connection = $this->getMockBuilder(SimpleConnection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'platform', 'factory'])
-            ->getMock();
-        $connection->expects($this->any())->method('getDatabasePlatform')->will($this->returnValue($this->repository->connection()->getDatabasePlatform()));
-        $connection->expects($this->any())->method('platform')->will($this->returnValue($this->repository->connection()->platform()));
-        $connection->expects($this->any())->method('factory')->will($this->returnValue($this->repository->connection()->factory()));
+        $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(*) AS aggregate FROM $this->table t0 INNER JOIN foreign_ t1 ON t1.pk_id = t0.foreign_key WHERE t0.name = ? AND t1.name_ LIKE ? AND t1.city LIKE ?")
-            ->will($this->returnValue(new CacheStatement([['aggregate' => 1]])));
+            ->willReturn(new CacheStatement([['aggregate' => 1]]));
 
         $this->query
             ->on($connection)
@@ -841,16 +781,10 @@ class QueryOrmTest extends TestCase
      */
     public function test_aggregate($method)
     {
-        $connection = $this->getMockBuilder(SimpleConnection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'platform', 'factory'])
-            ->getMock();
-        $connection->expects($this->any())->method('getDatabasePlatform')->will($this->returnValue($this->repository->connection()->getDatabasePlatform()));
-        $connection->expects($this->any())->method('platform')->will($this->returnValue($this->repository->connection()->platform()));
-        $connection->expects($this->any())->method('factory')->will($this->returnValue($this->repository->connection()->factory()));
+        $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT ".strtoupper($method)."(*) AS aggregate FROM $this->table t0")
-            ->will($this->returnValue(new CacheStatement([['aggregate' => 1]])));
+            ->willReturn(new CacheStatement([['aggregate' => 1]]));
 
         $this->query->on($connection)->$method();
     }
@@ -860,16 +794,10 @@ class QueryOrmTest extends TestCase
      */
     public function test_aggregate_field($method)
     {
-        $connection = $this->getMockBuilder(SimpleConnection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'platform', 'factory'])
-            ->getMock();
-        $connection->expects($this->any())->method('getDatabasePlatform')->will($this->returnValue($this->repository->connection()->getDatabasePlatform()));
-        $connection->expects($this->any())->method('platform')->will($this->returnValue($this->repository->connection()->platform()));
-        $connection->expects($this->any())->method('factory')->will($this->returnValue($this->repository->connection()->factory()));
+        $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT ".strtoupper($method)."(DISTINCT t0.name) AS aggregate FROM $this->table t0")
-            ->will($this->returnValue(new CacheStatement([['aggregate' => 1]])));
+            ->willReturn(new CacheStatement([['aggregate' => 1]]));
 
         $this->query->on($connection)->distinct()->$method('name');
     }
@@ -889,16 +817,10 @@ class QueryOrmTest extends TestCase
      */
     public function test_unknown_aggregate()
     {
-        $connection = $this->getMockBuilder(SimpleConnection::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'platform', 'factory'])
-            ->getMock();
-        $connection->expects($this->any())->method('getDatabasePlatform')->will($this->returnValue($this->repository->connection()->getDatabasePlatform()));
-        $connection->expects($this->any())->method('platform')->will($this->returnValue($this->repository->connection()->platform()));
-        $connection->expects($this->any())->method('factory')->will($this->returnValue($this->repository->connection()->factory()));
+        $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT MD5(DISTINCT t0.name) AS aggregate FROM $this->table t0")
-            ->will($this->returnValue(new CacheStatement([['aggregate' => 1]])));
+            ->willReturn(new CacheStatement([['aggregate' => 1]]));
 
         $this->query->on($connection)->distinct()->aggregate('md5', 'name');
     }
@@ -1175,5 +1097,22 @@ class QueryOrmTest extends TestCase
                 ]
             ]
         ], end($query->statements['joins']));
+    }
+
+    /**
+     * @return \PHPUnit\Framework\MockObject\MockObject|SimpleConnection
+     */
+    private function createConnectionMock()
+    {
+        $connection = $this->getMockBuilder(SimpleConnection::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'getDatabase', 'platform', 'factory'])
+            ->getMock();
+        $connection->expects($this->any())->method('getDatabasePlatform')->willReturn($this->repository->connection()->getDatabasePlatform());
+        $connection->expects($this->any())->method('platform')->willReturn($this->repository->connection()->platform());
+        $connection->expects($this->any())->method('factory')->willReturn($this->repository->connection()->factory());
+        $connection->expects($this->any())->method('getDatabase')->willReturn($this->repository->connection()->getDatabase());
+
+        return $connection;
     }
 }

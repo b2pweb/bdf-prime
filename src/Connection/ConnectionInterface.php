@@ -91,11 +91,12 @@ interface ConnectionInterface
     /**
      * Get a select query builder from table
      *
-     * @param string $table
+     * @param string|QueryInterface $table
+     * @param string $alias
      *
      * @return QueryInterface
      */
-    public function from($table);
+    public function from($table, string $alias = null);
 
     /**
      * Executes select query and returns array of object

@@ -188,9 +188,9 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function from($table)
+    public function from($table, string $alias = null)
     {
-        return $this->builder()->from($table);
+        return $this->builder()->from($table, $alias);
     }
 
     /**

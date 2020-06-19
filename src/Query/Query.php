@@ -388,7 +388,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
         
         $this->statements['tables'][] = [
             'table' => $from,
-            'alias' => $alias
+            'alias' => $alias,
         ];
         
         return $this;

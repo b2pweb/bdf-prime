@@ -1041,11 +1041,12 @@ class QueryTest extends TestCase
 
         $connection = $this->getMockBuilder(SimpleConnection::class)
             ->disableOriginalConstructor()
-            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'platform', 'factory'])
+            ->onlyMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'getDatabase', 'platform', 'factory'])
             ->getMock();
-        $connection->expects($this->any())->method('getDatabasePlatform')->will($this->returnValue($mysql->getDatabasePlatform()));
-        $connection->expects($this->any())->method('platform')->will($this->returnValue($mysql->platform()));
-        $connection->expects($this->any())->method('factory')->will($this->returnValue($mysql->factory()));
+        $connection->expects($this->any())->method('getDatabasePlatform')->willReturn($mysql->getDatabasePlatform());
+        $connection->expects($this->any())->method('getDatabase')->willReturn($mysql->getDatabase());
+        $connection->expects($this->any())->method('platform')->willReturn($mysql->platform());
+        $connection->expects($this->any())->method('factory')->willReturn($mysql->factory());
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(*) AS aggregate FROM test_")
             ->will($this->returnValue(new CacheStatement([['aggregate' => 1]])));

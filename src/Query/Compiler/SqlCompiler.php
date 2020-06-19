@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Query\Compiler;
 
+use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Bdf\Prime\Query\Expression\ExpressionTransformerInterface;
@@ -427,21 +428,26 @@ class SqlCompiler extends AbstractCompiler
     protected function compileFrom(CompilableClause $query)
     {
         $sql = [];
+        $databasePrefix = $this->getDatabaseNamePrefix($query);
 
         // Loop through all FROM clauses
         foreach ($query->statements['tables'] as $from) {
-            $from = $query->preprocessor()->table($from);
-
-            if ($from['alias'] === null) {
-                $sql[$from['table']] = $this->quoteIdentifier($query, $from['table']);
+            if ($from['table'] instanceof QueryInterface) {
+                $sql[] = $this->compileSubQuery($query, $from['table'], $from['alias']);
             } else {
-                $sql[$from['alias']] = $this->quoteIdentifier($query, $from['table']) . ' ' . $this->quoteIdentifier($query, $from['alias']);
+                $from = $query->preprocessor()->table($from);
+
+                if ($from['alias'] === null) {
+                    $sql[$from['table']] = $this->quoteIdentifier($query, $databasePrefix.$from['table']);
+                } else {
+                    $sql[$from['alias']] = $this->quoteIdentifier($query, $databasePrefix.$from['table']) . ' ' . $this->quoteIdentifier($query, $from['alias']);
+                }
             }
         }
 
         return ' FROM '.implode(', ', $sql);
     }
-    
+
     /**
      * @param CompilableClause $query
      *
@@ -454,24 +460,41 @@ class SqlCompiler extends AbstractCompiler
         }
         
         $sql = [];
+        $databasePrefix = $this->getDatabaseNamePrefix($query);
 
         foreach ($query->statements['joins'] as $join) {
             $join = $query->preprocessor()->table($join);
 
             if ($join['alias'] === null) {
                 $sql[$join['table']] = $join['type']
-                    . ' JOIN ' . $this->quoteIdentifier($query, $join['table'])
+                    . ' JOIN ' . $this->quoteIdentifier($query, $databasePrefix.$join['table'])
                     . ' ON '   . $this->compileCompilableClauses($query, $join['on']);
             } else {
                 $sql[$join['alias']] = $join['type']
-                    . ' JOIN ' . $this->quoteIdentifier($query, $join['table']).' '.$this->quoteIdentifier($query, $join['alias'])
+                    . ' JOIN ' . $this->quoteIdentifier($query, $databasePrefix.$join['table']).' '.$this->quoteIdentifier($query, $join['alias'])
                     . ' ON '   . $this->compileCompilableClauses($query, $join['on']);
             }
         }
 
         return ' '.implode(' ', $sql);
     }
-    
+
+    /**
+     * Adding database prefix for sub query x-db
+     *
+     * @param CompilableClause $query
+     *
+     * @return string
+     */
+    protected function getDatabaseNamePrefix(CompilableClause $query): string
+    {
+        if ($query instanceof CommandInterface && $query->connection()->getDatabase() !== $this->connection->getDatabase()) {
+            return $query->connection()->getDatabase().'.';
+        }
+
+        return '';
+    }
+
     /**
      * Compile Where sql
      * 

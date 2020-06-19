@@ -2,11 +2,13 @@
 
 namespace Bdf\Prime\Query\Compiler;
 
+use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Customer;
 use Bdf\Prime\Document;
 use Bdf\Prime\Faction;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Query\CacheStatement;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
 use Bdf\Prime\Query\Expression\Value;
@@ -466,5 +468,61 @@ class SqlCompilerTest extends TestCase
             'INSERT INTO customer_ (name_, parent_id) SELECT t0.name_ as name_, t0.id_ as parent_id FROM customer_ t0 INNER JOIN user_ t1 ON t1.customer_id = t0.id_ WHERE t1.name_ IN (?,?,?)',
             $this->compiler->compileInsert($insert)
         );
+    }
+
+    /**
+     *
+     */
+    public function test_sub_query_in_from_clause()
+    {
+        $subQuery = User::repository()->select(['name', 'customer.id']);
+
+        $query = User::repository()->connection()
+            ->from($subQuery, 'alias')
+            ->select('name_')
+            ->group('customer_id');
+
+        $this->assertEquals('SELECT name_ FROM (SELECT t0.name_, t0.customer_id FROM user_ t0) as alias GROUP BY customer_id', $query->toSql());
+    }
+
+    /**
+     *
+     */
+    public function test_subquery_x_db()
+    {
+        $mysql = Prime::service()->connections()->addConnection('mysql', ['adapter' => 'mysql', 'serverVersion' => '5.6']);
+
+        $connection = $this->getMockBuilder(SimpleConnection::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'getDatabase', 'platform', 'factory'])
+            ->getMock();
+        $connection->expects($this->any())->method('getDatabasePlatform')->willReturn($mysql->getDatabasePlatform());
+        $connection->expects($this->any())->method('getDatabase')->willReturn('TEST');
+        $connection->expects($this->any())->method('platform')->willReturn($mysql->platform());
+        $connection->expects($this->any())->method('factory')->willReturn($mysql->factory());
+
+        $subConnection = $this->getMockBuilder(SimpleConnection::class)
+            ->disableOriginalConstructor()
+            ->onlyMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'getDatabase', 'platform', 'factory'])
+            ->getMock();
+        $subConnection->expects($this->any())->method('getDatabasePlatform')->willReturn($mysql->getDatabasePlatform());
+        $subConnection->expects($this->any())->method('getDatabase')->willReturn('TEST2');
+        $subConnection->expects($this->any())->method('platform')->willReturn($mysql->platform());
+        $subConnection->expects($this->any())->method('factory')->willReturn($mysql->factory());
+
+        $subQuery = new Query($subConnection);
+        $subQuery
+            ->select(['name_', 'customer_id'])
+            ->from('user_');
+
+        $query = new Query($connection);
+        $query
+            ->select('name_')
+            ->from($subQuery, 'alias')
+            ->group('customer_id');
+
+        $this->assertEquals('SELECT name_ FROM (SELECT name_, customer_id FROM TEST2.user_) as alias GROUP BY customer_id', $query->toSql());
+
+        Prime::service()->connections()->removeConnection('mysql');
     }
 }
