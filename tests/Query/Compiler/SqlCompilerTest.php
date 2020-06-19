@@ -494,7 +494,7 @@ class SqlCompilerTest extends TestCase
 
         $connection = $this->getMockBuilder(SimpleConnection::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'getDatabase', 'platform', 'factory'])
+            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'getDatabase', 'platform', 'factory'])
             ->getMock();
         $connection->expects($this->any())->method('getDatabasePlatform')->willReturn($mysql->getDatabasePlatform());
         $connection->expects($this->any())->method('getDatabase')->willReturn('TEST');
@@ -503,7 +503,7 @@ class SqlCompilerTest extends TestCase
 
         $subConnection = $this->getMockBuilder(SimpleConnection::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'getDatabase', 'platform', 'factory'])
+            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'getDatabase', 'platform', 'factory'])
             ->getMock();
         $subConnection->expects($this->any())->method('getDatabasePlatform')->willReturn($mysql->getDatabasePlatform());
         $subConnection->expects($this->any())->method('getDatabase')->willReturn('TEST2');

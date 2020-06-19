@@ -668,7 +668,7 @@ class QueryOrmTest extends TestCase
 //    {
 //        $connection = $this->getMockBuilder(SimpleConnection::class)
 //            ->disableOriginalConstructor()
-//            ->onlyMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform'])
+//            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform'])
 //            ->getMock();
 //        $connection->expects($this->any())->method('getDatabasePlatform')->willReturn($this->repository->connection()->getDatabasePlatform());
 //        $connection->expects($this->once())->method('executeQuery')
@@ -1106,7 +1106,7 @@ class QueryOrmTest extends TestCase
     {
         $connection = $this->getMockBuilder(SimpleConnection::class)
             ->disableOriginalConstructor()
-            ->onlyMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'getDatabase', 'platform', 'factory'])
+            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'getDatabase', 'platform', 'factory'])
             ->getMock();
         $connection->expects($this->any())->method('getDatabasePlatform')->willReturn($this->repository->connection()->getDatabasePlatform());
         $connection->expects($this->any())->method('platform')->willReturn($this->repository->connection()->platform());
