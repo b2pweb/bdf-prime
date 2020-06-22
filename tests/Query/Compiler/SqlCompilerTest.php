@@ -521,7 +521,9 @@ class SqlCompilerTest extends TestCase
             ->from($subQuery, 'alias')
             ->group('customer_id');
 
-        $this->assertEquals('SELECT name_ FROM (SELECT name_, customer_id FROM TEST2.user_) as alias GROUP BY customer_id', $query->toSql());
+        $compiler = new SqlCompiler($connection);
+
+        $this->assertEquals('SELECT name_ FROM (SELECT name_, customer_id FROM TEST2.user_) as alias GROUP BY customer_id', $compiler->compileSelect($query));
 
         Prime::service()->connections()->removeConnection('mysql');
     }

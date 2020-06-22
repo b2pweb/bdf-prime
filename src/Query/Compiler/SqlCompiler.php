@@ -488,7 +488,7 @@ class SqlCompiler extends AbstractCompiler
      */
     protected function getDatabaseNamePrefix(CompilableClause $query): string
     {
-        if ($query instanceof CommandInterface && $query->connection()->getDatabase() !== $this->connection->getDatabase()) {
+        if ($query instanceof CommandInterface && $query->compiler() !== $this && $query->connection()->getDatabase() !== $this->connection->getDatabase()) {
             return $query->connection()->getDatabase().'.';
         }
 

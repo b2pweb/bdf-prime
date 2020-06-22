@@ -1044,7 +1044,7 @@ class QueryTest extends TestCase
             ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'getDatabase', 'platform', 'factory'])
             ->getMock();
         $connection->expects($this->any())->method('getDatabasePlatform')->willReturn($mysql->getDatabasePlatform());
-        $connection->expects($this->any())->method('getDatabase')->willReturn($mysql->getDatabase());
+        $connection->expects($this->any())->method('getDatabase')->willReturn('my database');
         $connection->expects($this->any())->method('platform')->willReturn($mysql->platform());
         $connection->expects($this->any())->method('factory')->willReturn($mysql->factory());
         $connection->expects($this->once())->method('executeQuery')
