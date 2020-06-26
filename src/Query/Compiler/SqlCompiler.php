@@ -127,7 +127,7 @@ class SqlCompiler extends AbstractCompiler
             }
         }
 
-        $sql = ' '.$select->toSql(); // @todo Ensure that the query is sql compilable
+        $sql = ' '.$this->compileSelect($select); // @todo Ensure that the query is sql compilable
         $this->addQueryBindings($query, $select);
 
         return empty($columns) ? $sql : ' ('.implode(', ', $columns).')'.$sql;

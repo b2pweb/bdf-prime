@@ -527,4 +527,43 @@ class SqlCompilerTest extends TestCase
 
         Prime::service()->connections()->removeConnection('mysql');
     }
+
+    /**
+     *
+     */
+    public function test_insert_select_x_db()
+    {
+        $mysql = Prime::service()->connections()->addConnection('mysql', ['adapter' => 'mysql', 'serverVersion' => '5.6']);
+
+        $connection = $this->getMockBuilder(SimpleConnection::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'getDatabase', 'platform', 'factory'])
+            ->getMock();
+        $connection->expects($this->any())->method('getDatabasePlatform')->willReturn($mysql->getDatabasePlatform());
+        $connection->expects($this->any())->method('getDatabase')->willReturn('TEST');
+        $connection->expects($this->any())->method('platform')->willReturn($mysql->platform());
+        $connection->expects($this->any())->method('factory')->willReturn($mysql->factory());
+
+        $subConnection = $this->getMockBuilder(SimpleConnection::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['executeUpdate', 'executeQuery', 'getDatabasePlatform', 'getDatabase', 'platform', 'factory'])
+            ->getMock();
+        $subConnection->expects($this->any())->method('getDatabasePlatform')->willReturn($mysql->getDatabasePlatform());
+        $subConnection->expects($this->any())->method('getDatabase')->willReturn('TEST2');
+        $subConnection->expects($this->any())->method('platform')->willReturn($mysql->platform());
+        $subConnection->expects($this->any())->method('factory')->willReturn($mysql->factory());
+
+        $query = Customer::where('users.name', ['Shrek', 'Mickey', 'Donald']);
+        $query->on($subConnection);
+
+        $insert = Customer::values($query);
+        $compiler = new SqlCompiler($connection);
+
+        $this->assertEquals(
+            'INSERT INTO customer_ SELECT t0.* FROM TEST2.customer_ t0 INNER JOIN TEST2.user_ t1 ON t1.customer_id = t0.id_ WHERE t1.name_ IN (?,?,?)',
+            $compiler->compileInsert($insert)
+        );
+
+        Prime::service()->connections()->removeConnection('mysql');
+    }
 }
