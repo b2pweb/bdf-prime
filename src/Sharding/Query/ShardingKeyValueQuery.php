@@ -9,6 +9,7 @@ use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Extension\CachableTrait;
 use Bdf\Prime\Query\Extension\ExecutableTrait;
+use Bdf\Prime\Sharding\Extension\ShardPicker;
 use Bdf\Prime\Sharding\ShardingConnection;
 
 /**
@@ -22,6 +23,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
 {
     use CachableTrait;
     use ExecutableTrait;
+    use ShardPicker;
 
     /**
      * @var KeyValueQueryInterface[]
@@ -270,23 +272,31 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      *
      * @throws \Doctrine\DBAL\Sharding\ShardingException
      */
-    private function selectQueries()
+    private function selectQueries(): iterable
     {
+        foreach ($this->getShardIds() as $shardId) {
+            yield $this->getQueryByShard($shardId);
+        }
+    }
+
+    /**
+     * Get the targeted shard IDs
+     *
+     * @return string[]
+     */
+    private function getShardIds(): array
+    {
+        if ($this->shardId !== null) {
+            return [$this->shardId];
+        }
+
         $distributionKey = $this->connection->getDistributionKey();
 
-        if (!isset($this->statements['where'][$distributionKey])) {
-            $shardIds = $this->connection->getShardIds();
-        } else {
-            $shardIds = [$this->connection->getShardChoser()->pick($this->statements['where'][$distributionKey], $this->connection)];
+        if (isset($this->statements['where'][$distributionKey])) {
+            return [$this->connection->getShardChoser()->pick($this->statements['where'][$distributionKey], $this->connection)];
         }
 
-        $queries = [];
-
-        foreach ($shardIds as $shardId) {
-            $queries[] = $this->getQueryByShard($shardId);
-        }
-
-        return $queries;
+        return $this->connection->getShardIds();
     }
 
     /**

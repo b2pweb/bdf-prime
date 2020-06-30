@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Sharding;
 
 use Bdf\Prime\Query\Query;
+use Bdf\Prime\Sharding\Extension\ShardPicker;
 
 /**
  * ShardingQuery
@@ -11,6 +12,8 @@ use Bdf\Prime\Query\Query;
  */
 class ShardingQuery extends Query
 {
+    use ShardPicker;
+
     /**
      * {@inheritdoc}
      */
@@ -19,10 +22,10 @@ class ShardingQuery extends Query
         $lastShard = $this->connection->getCurrentShardId();
 
         try {
-            if ($this->statements['where']) {
+            if (!$this->shardId && $this->statements['where']) {
                 $this->explodeQueryClauses($this->statements['where'], $this->connection->getDistributionKey());
             } else {
-                $this->connection->pickShard();
+                $this->connection->useShard($this->shardId);
             }
 
             return parent::execute($columns);
@@ -41,10 +44,10 @@ class ShardingQuery extends Query
         try {
             $distributionKey = $this->connection->getDistributionKey();
 
-            if (isset($this->statements['values']['data'][$distributionKey])) {
+            if (!$this->shardId && isset($this->statements['values']['data'][$distributionKey])) {
                 $this->connection->pickShard($this->statements['values']['data'][$distributionKey]);
             } else {
-                $this->connection->pickShard();
+                $this->connection->useShard($this->shardId);
             }
 
             return parent::executeUpdate($type);

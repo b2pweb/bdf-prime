@@ -153,7 +153,7 @@ class ShardingInsertQueryTest extends TestCase
         $this->assertEquals([
             ['id' => 1, 'value' => 'val', 'other' => '42'],
             ['id' => 3, 'value' => 'val2', 'other' => null],
-        ], $this->connection->getShardConnection('shard2')->builder()->from('test2')->all());
+        ], $this->connection->getShardConnection('shard2')->from('test2')->all());
     }
 
     /**
@@ -202,6 +202,34 @@ class ShardingInsertQueryTest extends TestCase
         $this->connection->useShard('shard1');
         $this->query()->values(['id' => 3, 'name' => 'Bob'])->execute();
         $this->assertEquals('shard1', $this->connection->getCurrentShardId());
+    }
+
+    /**
+     *
+     */
+    public function test_pick_same_shard()
+    {
+        $query = $this->query();
+        $query->pickShard(1);
+        $query->values(['id' => 1, 'name' => 'John']);
+        $query->execute();
+
+        $this->assertSame(0, $this->connection->getShardConnection('shard1')->from('test')->count());
+        $this->assertSame(1, $this->connection->getShardConnection('shard2')->from('test')->count());
+    }
+
+    /**
+     *
+     */
+    public function test_pick_shard()
+    {
+        $query = $this->query();
+        $query->pickShard(2);
+        $query->values(['id' => 1, 'name' => 'John']);
+        $query->execute();
+
+        $this->assertSame(1, $this->connection->getShardConnection('shard1')->from('test')->count());
+        $this->assertSame(0, $this->connection->getShardConnection('shard2')->from('test')->count());
     }
 
     /**

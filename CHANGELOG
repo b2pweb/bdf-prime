@@ -1,6 +1,11 @@
 v1.1.0
 ------
 
+* Adding connection factory and registry interface.
+* Adding support of sub query in from clause.
+* Adding support of cross database sub query.
+* Adding feature allowing developper to choose manually the shard on the query.
+
 BC Breaks
 * MasterSlaveConnection and ShardingConnection will no longer change their internal connection name with their method setName
 * ConnectionManager::__construct() accepts configration in third parameter.

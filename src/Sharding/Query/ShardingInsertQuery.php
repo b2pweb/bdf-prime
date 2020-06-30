@@ -12,6 +12,7 @@ use Bdf\Prime\Query\Contract\Cachable;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
 use Bdf\Prime\Query\Custom\BulkInsert\BulkInsertQuery;
 use Bdf\Prime\Query\Extension\CachableTrait;
+use Bdf\Prime\Sharding\Extension\ShardPicker;
 use Bdf\Prime\Sharding\ShardingConnection;
 
 /**
@@ -21,6 +22,7 @@ use Bdf\Prime\Sharding\ShardingConnection;
 class ShardingInsertQuery extends CompilableClause implements InsertQueryInterface, CommandInterface, Cachable
 {
     use CachableTrait;
+    use ShardPicker;
 
     /**
      * The DBAL Connection.
@@ -215,13 +217,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
             return $this->currentQuery;
         }
 
-        $distributionKey = $this->connection->getDistributionKey();
-
-        if (!isset($this->values[$distributionKey])) {
-            throw new \LogicException('The value "'.$distributionKey.'" must be provided for selecting the sharding');
-        }
-
-        $shardId = $this->connection->getShardChoser()->pick($this->values[$distributionKey], $this->connection);
+        $shardId = $this->getShardId();
 
         if (isset($this->queries[$shardId])) {
             return $this->queries[$shardId];
@@ -238,6 +234,26 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
         ;
 
         return $this->currentQuery = $this->queries[$shardId] = $query;
+    }
+
+    /**
+     * Get the targeted shard ID
+     *
+     * @return string|null
+     */
+    private function getShardId()
+    {
+        if ($this->shardId !== null) {
+            return $this->shardId;
+        }
+
+        $distributionKey = $this->connection->getDistributionKey();
+
+        if (!isset($this->values[$distributionKey])) {
+            throw new \LogicException('The value "'.$distributionKey.'" must be provided for selecting the sharding');
+        }
+
+        return $this->connection->getShardChoser()->pick($this->values[$distributionKey], $this->connection);
     }
 
     /**

@@ -106,6 +106,50 @@ class ShardingQueryTest extends TestCase
     }
 
     /**
+     *
+     */
+    public function test_dont_pick_shard()
+    {
+        $query = $this->query();
+        $query->insert(['id' => 1, 'name' => 'John']);
+
+        $this->assertSame(1, $this->query()->pickShard(1)->count());
+        $this->assertSame(0, $this->query()->pickShard(2)->count());
+        $this->assertSame(0, $this->connection->getShardConnection('shard1')->from('test')->count());
+        $this->assertSame(1, $this->connection->getShardConnection('shard2')->from('test')->count());
+    }
+
+    /**
+     *
+     */
+    public function test_pick_same_shard()
+    {
+        $query = $this->query();
+        $query->pickShard(1);
+        $query->insert(['id' => 1, 'name' => 'John']);
+
+        $this->assertSame(1, $this->query()->pickShard(1)->count());
+        $this->assertSame(0, $this->query()->pickShard(2)->count());
+        $this->assertSame(0, $this->connection->getShardConnection('shard1')->from('test')->count());
+        $this->assertSame(1, $this->connection->getShardConnection('shard2')->from('test')->count());
+    }
+
+    /**
+     *
+     */
+    public function test_pick_shard()
+    {
+        $query = $this->query();
+        $query->pickShard(2);
+        $query->insert(['id' => 1, 'name' => 'John']);
+
+        $this->assertSame(0, $this->query()->pickShard(1)->count());
+        $this->assertSame(1, $this->query()->pickShard(2)->count());
+        $this->assertSame(1, $this->connection->getShardConnection('shard1')->from('test')->count());
+        $this->assertSame(0, $this->connection->getShardConnection('shard2')->from('test')->count());
+    }
+
+    /**
      * @return ShardingQuery
      */
     private function query()

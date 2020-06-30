@@ -430,6 +430,19 @@ class ShardingKeyValueQueryTest extends TestCase
     }
 
     /**
+     *
+     */
+    public function test_pick_shard()
+    {
+        $this->connection->insert('test', ['id' => 1, 'name' => 'John']);
+
+        $this->assertSame(1, $this->query()->pickShard(1)->count());
+        $this->assertSame(0, $this->query()->pickShard(2)->count());
+        $this->assertSame(0, $this->connection->getShardConnection('shard1')->from('test')->count());
+        $this->assertSame(1, $this->connection->getShardConnection('shard2')->from('test')->count());
+    }
+
+    /**
      * @return ShardingKeyValueQuery
      */
     private function query()
