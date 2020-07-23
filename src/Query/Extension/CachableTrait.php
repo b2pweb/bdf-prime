@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query\Extension;
 
 use Bdf\Prime\Cache\CacheInterface;
+use Bdf\Prime\Cache\CacheKey;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Query\Contract\Cachable;
 
@@ -26,6 +27,11 @@ trait CachableTrait
      * @var bool
      */
     protected $disableCache = true;
+
+    /**
+     * @var CacheKey
+     */
+    protected $cacheKey = null;
 
 
     /**
@@ -58,18 +64,78 @@ trait CachableTrait
     }
 
     /**
+     * Define the cache lifetime
+     *
+     * @param int $lifetime The cache lifetime in seconds
+     *
+     * @return $this
+     */
+    public function setCacheLifetime(int $lifetime)
+    {
+        $this->getCacheKey()->setLifetime($lifetime);
+
+        return $this;
+    }
+
+    /**
+     * Define the cache key
+     *
+     * @param string $cacheKey
+     *
+     * @return $this
+     */
+    public function setCacheKey(string $cacheKey)
+    {
+        $this->getCacheKey()->setKey($cacheKey);
+
+        return $this;
+    }
+
+    /**
+     * Define the cache namespace
+     *
+     * @param string $namespace
+     *
+     * @return $this
+     */
+    public function setCacheNamespace(string $namespace)
+    {
+        $this->getCacheKey()->setNamespace($namespace);
+
+        return $this;
+    }
+
+    /**
+     * Get the cache key
+     *
+     * @return CacheKey
+     */
+    public function getCacheKey(): CacheKey
+    {
+        if ($this->cacheKey === null) {
+            return $this->cacheKey = new CacheKey(
+                function () { return $this->cacheNamespace(); },
+                function () { return $this->cacheKey(); }
+            );
+        }
+
+        return $this->cacheKey;
+    }
+
+    /**
      * Retrieve data from cache, or execute the query and save into cache
      *
      * @return mixed
      */
     protected function executeCached()
     {
-        if ($this->disableCache || null === ($key = $this->cacheKey())) {
+        $key = $this->getCacheKey();
+
+        if ($this->disableCache || !$key->valid()) {
             return $this->connection->execute($this)->all();
         }
 
-        $namespace = $this->cacheNamespace();
-        $data = $this->cache->get($namespace, $key);
+        $data = $this->cache->get($key);
 
         if ($data !== null) {
             return $data;
@@ -77,7 +143,7 @@ trait CachableTrait
 
         $data = $this->connection->execute($this)->all();
 
-        $this->cache->set($namespace, $key, $data);
+        $this->cache->set($key, $data);
 
         return $data;
     }
@@ -88,7 +154,7 @@ trait CachableTrait
     protected function clearCacheOnWrite()
     {
         if ($this->cache) {
-            $this->cache->flush($this->cacheNamespace());
+            $this->cache->flush($this->getCacheKey()->namespace());
         }
     }
 

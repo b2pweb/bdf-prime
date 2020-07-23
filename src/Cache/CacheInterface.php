@@ -10,29 +10,26 @@ interface CacheInterface
     /**
      * Read key from namespace
      * 
-     * @param string $namespace
-     * @param string $key
+     * @param CacheKey $key
      * 
      * @return array
      */
-    public function get($namespace, $key);
+    public function get(CacheKey $key);
 
     /**
      * Write data on namespace
      * 
-     * @param string $namespace
-     * @param string $key
+     * @param CacheKey $key
      * @param array  $data
      */
-    public function set($namespace, $key, $data);
+    public function set(CacheKey $key, $data);
 
     /**
      * Delete key from namespace
      * 
-     * @param string $namespace
-     * @param string $key
+     * @param CacheKey $key
      */
-    public function delete($namespace, $key);
+    public function delete(CacheKey $key);
 
     /**
      * Flush namespace only

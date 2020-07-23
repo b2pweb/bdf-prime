@@ -16,7 +16,7 @@ class ArrayCacheTest extends TestCase
     {
         $cache = new ArrayCache();
         
-        $this->assertNull($cache->get('namespace', 'id'));
+        $this->assertNull($cache->get((new CacheKey())->setNamespace('namespace')->setKey('id')));
     }
     
     /**
@@ -25,10 +25,11 @@ class ArrayCacheTest extends TestCase
     public function test_set_in_namespace()
     {
         $cache = new ArrayCache();
+
+        $key = (new CacheKey())->setNamespace('namespace')->setKey('id');
+        $cache->set($key, 'data');
         
-        $cache->set('namespace', 'id', 'data');
-        
-        $this->assertEquals('data', $cache->get('namespace', 'id'));
+        $this->assertEquals('data', $cache->get($key));
     }
     
     /**
@@ -37,16 +38,20 @@ class ArrayCacheTest extends TestCase
     public function test_delete_in_namespace()
     {
         $cache = new ArrayCache();
+
+        $key1 = (new CacheKey())->setNamespace('namespace')->setKey('id1');
+        $key2 = (new CacheKey())->setNamespace('namespace')->setKey('id2');
+        $key3 = (new CacheKey())->setNamespace('other')->setKey('id');
+
+        $cache->set($key1, 'data1');
+        $cache->set($key2, 'data2');
+        $cache->set($key3, 'data');
         
-        $cache->set('namespace', 'id1', 'data1');
-        $cache->set('namespace', 'id2', 'data2');
-        $cache->set('other', 'id', 'data');
+        $cache->delete($key1);
         
-        $cache->delete('namespace', 'id1');
-        
-        $this->assertNull($cache->get('namespace', 'id1'));
-        $this->assertEquals('data2', $cache->get('namespace', 'id2'));
-        $this->assertEquals('data', $cache->get('other', 'id'));
+        $this->assertNull($cache->get($key1));
+        $this->assertEquals('data2', $cache->get($key2));
+        $this->assertEquals('data', $cache->get($key3));
     }
     
     /**
@@ -55,16 +60,20 @@ class ArrayCacheTest extends TestCase
     public function test_flush_namespace()
     {
         $cache = new ArrayCache();
-        
-        $cache->set('namespace', 'id1', 'data1');
-        $cache->set('namespace', 'id2', 'data2');
-        $cache->set('other', 'id', 'data');
-        
+
+        $key1 = (new CacheKey())->setNamespace('namespace')->setKey('id1');
+        $key2 = (new CacheKey())->setNamespace('namespace')->setKey('id2');
+        $key3 = (new CacheKey())->setNamespace('other')->setKey('id');
+
+        $cache->set($key1, 'data1');
+        $cache->set($key2, 'data2');
+        $cache->set($key3, 'data');
+
         $cache->flush('namespace');
         
-        $this->assertNull($cache->get('namespace', 'id1'));
-        $this->assertNull($cache->get('namespace', 'id2'));
-        $this->assertEquals('data', $cache->get('other', 'id'));
+        $this->assertNull($cache->get($key2));
+        $this->assertNull($cache->get($key2));
+        $this->assertEquals('data', $cache->get($key3));
     }
     
     /**
@@ -73,15 +82,19 @@ class ArrayCacheTest extends TestCase
     public function test_clear()
     {
         $cache = new ArrayCache();
-        
-        $cache->set('namespace', 'id1', 'data1');
-        $cache->set('namespace', 'id2', 'data2');
-        $cache->set('other', 'id', 'data');
-        
+
+        $key1 = (new CacheKey())->setNamespace('namespace')->setKey('id1');
+        $key2 = (new CacheKey())->setNamespace('namespace')->setKey('id2');
+        $key3 = (new CacheKey())->setNamespace('other')->setKey('id');
+
+        $cache->set($key1, 'data1');
+        $cache->set($key2, 'data2');
+        $cache->set($key3, 'data');
+
         $cache->clear();
         
-        $this->assertNull($cache->get('namespace', 'id1'));
-        $this->assertNull($cache->get('namespace', 'id2'));
-        $this->assertNull($cache->get('other', 'id'));
+        $this->assertNull($cache->get($key1));
+        $this->assertNull($cache->get($key2));
+        $this->assertNull($cache->get($key3));
     }
 }
