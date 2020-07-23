@@ -3,6 +3,8 @@
 namespace Bdf\Prime\Query\Custom\KeyValue;
 
 use Bdf\Prime\Cache\ArrayCache;
+use Bdf\Prime\Cache\CacheKey;
+use Bdf\Prime\Cache\DoctrineCacheAdapter;
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Customer;
 use Bdf\Prime\Exception\DBALException;
@@ -567,13 +569,13 @@ class KeyValueQueryTest extends TestCase
             'name' => 'John'
         ]];
 
-        $cache = new ArrayCache();
+        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
 
         $query = $this->query()->from('test_');
         $query->setCache($cache);
 
         $this->assertEquals($expected, $query->execute(['id', 'name']));
-        $this->assertEquals($expected, $cache->get('test:test_', sha1('SELECT id, name FROM test_-a:0:{}')));
+        $this->assertEquals($expected, $cache->get(new CacheKey('test:test_', sha1('SELECT id, name FROM test_-a:0:{}'))));
     }
 
     /**
@@ -591,7 +593,7 @@ class KeyValueQueryTest extends TestCase
             'name' => 'John'
         ]];
 
-        $cache = new ArrayCache();
+        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
 
         $query = $this->query()->from('test_');
         $query->setCache($cache);
@@ -621,7 +623,7 @@ class KeyValueQueryTest extends TestCase
             'name' => 'John'
         ]];
 
-        $cache = new ArrayCache();
+        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
 
         $query = $this->query()->from('test_')->where('id', 1);
         $query->setCache($cache);
@@ -629,7 +631,7 @@ class KeyValueQueryTest extends TestCase
 
         $query->delete();
 
-        $this->assertNull($cache->get('test:test_', sha1('SELECT id, name FROM test_-a:0:{}')));
+        $this->assertNull($cache->get(new CacheKey('test:test_', sha1('SELECT id, name FROM test_-a:0:{}'))));
 
         $this->assertEmpty($query->execute(['id', 'name']));
     }
@@ -649,7 +651,7 @@ class KeyValueQueryTest extends TestCase
             'name' => 'John'
         ]];
 
-        $cache = new ArrayCache();
+        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
 
         $query = $this->query()->from('test_')->where('id', 1);
         $query->setCache($cache);
@@ -658,7 +660,7 @@ class KeyValueQueryTest extends TestCase
         $query->disableCache();
         $query->delete();
 
-        $this->assertNull($cache->get('test:test_', sha1('SELECT id, name FROM test_-a:0:{}')));
+        $this->assertNull($cache->get(new CacheKey('test:test_', sha1('SELECT id, name FROM test_-a:0:{}'))));
     }
 
     /**
@@ -770,7 +772,7 @@ class KeyValueQueryTest extends TestCase
             'name' => 'John'
         ]];
 
-        $cache = new ArrayCache();
+        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
 
         $query = $this->query()->from('test_')->where('id', 1);
         $query->setCache($cache);
@@ -778,7 +780,7 @@ class KeyValueQueryTest extends TestCase
 
         $query->update(['name' => 'Bob']);
 
-        $this->assertNull($cache->get('test:test_', sha1('SELECT id, name FROM test_-a:0:{}')));
+        $this->assertNull($cache->get(new CacheKey('test:test_', sha1('SELECT id, name FROM test_-a:0:{}'))));
 
         $this->assertEquals([[
             'id' => 1,

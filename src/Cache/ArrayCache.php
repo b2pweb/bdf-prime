@@ -15,29 +15,29 @@ class ArrayCache implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function get($namespace, $key)
+    public function get(CacheKey $key)
     {
-        if (!isset($this->data[$namespace][$key])) {
+        if (!isset($this->data[$key->namespace()][$key->key()])) {
             return null;
         }
 
-        return $this->data[$namespace][$key];
+        return $this->data[$key->namespace()][$key->key()];
     }
 
     /**
      * {@inheritDoc}
      */
-    public function set($namespace, $key, $data)
+    public function set(CacheKey $key, $data)
     {
-        $this->data[$namespace][$key] = $data;
+        $this->data[$key->namespace()][$key->key()] = $data;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function delete($namespace, $key)
+    public function delete(CacheKey $key)
     {
-        unset($this->data[$namespace][$key]);
+        unset($this->data[$key->namespace()][$key->key()]);
     }
 
     /**

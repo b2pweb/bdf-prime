@@ -4,6 +4,8 @@ namespace Bdf\Prime\Query;
 
 use Bdf\Prime\Cache\ArrayCache;
 use Bdf\Prime\Cache\CacheInterface;
+use Bdf\Prime\Cache\CacheKey;
+use Bdf\Prime\Cache\DoctrineCacheAdapter;
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
@@ -1171,7 +1173,7 @@ class QueryTest extends TestCase
             'name' => 'test-name1'
         ]);
 
-        $cache = new ArrayCache();
+        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
         $query = $this->query();
         $query->setCache($cache);
 
@@ -1185,7 +1187,7 @@ class QueryTest extends TestCase
             'id' => '1',
             'name' => 'test-name1',
             'date_insert' => null
-        ]], $cache->get('test:test_', sha1('SELECT * FROM test_-a:0:{}')));
+        ]], $cache->get(new CacheKey('test:test_', sha1('SELECT * FROM test_-a:0:{}'))));
 
         $this->push([
             'id' => 2,
@@ -1209,7 +1211,7 @@ class QueryTest extends TestCase
             'name' => 'test-name1'
         ]);
 
-        $cache = new ArrayCache();
+        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
         $query = $this->query();
         $query->setCache($cache);
 
@@ -1218,10 +1220,10 @@ class QueryTest extends TestCase
             'name' => 'test-name1',
             'date_insert' => null
         ]], $query->execute());
-        $this->assertNotNull($cache->get('test:test_', sha1('SELECT * FROM test_-a:0:{}')));
+        $this->assertNotNull($cache->get(new CacheKey('test:test_', sha1('SELECT * FROM test_-a:0:{}'))));
 
         $query->update(['name' => 'new-name']);
-        $this->assertNull($cache->get('test:test_', sha1('SELECT * FROM test_-a:0:{}')));
+        $this->assertNull($cache->get(new CacheKey('test:test_', sha1('SELECT * FROM test_-a:0:{}'))));
     }
 
     /**
@@ -1234,7 +1236,7 @@ class QueryTest extends TestCase
             'name' => 'test-name1'
         ]);
 
-        $cache = new ArrayCache();
+        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
         $query = $this->query();
         $query->setCache($cache);
 
@@ -1243,12 +1245,12 @@ class QueryTest extends TestCase
             'name' => 'test-name1',
             'date_insert' => null
         ]], $query->execute());
-        $this->assertNotNull($cache->get('test:test_', sha1('SELECT * FROM test_-a:0:{}')));
+        $this->assertNotNull($cache->get(new CacheKey('test:test_', sha1('SELECT * FROM test_-a:0:{}'))));
 
         $query->disableCache();
 
         $query->update(['name' => 'new-name']);
-        $this->assertNull($cache->get('test:test_', sha1('SELECT * FROM test_-a:0:{}')));
+        $this->assertNull($cache->get(new CacheKey('test:test_', sha1('SELECT * FROM test_-a:0:{}'))));
     }
 
     /**
@@ -1412,13 +1414,13 @@ class QueryTest extends TestCase
             'name' => 'John'
         ]];
 
-        $cache = new ArrayCache();
+        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
 
         $query = $this->query();
         $query->setCache($cache);
 
         $this->assertEquals($expected, $query->execute(['id', 'name']));
-        $this->assertEquals($expected, $cache->get('test:test_', sha1('SELECT id, name FROM test_-a:0:{}')));
+        $this->assertEquals($expected, $cache->get(new CacheKey('test:test_', sha1('SELECT id, name FROM test_-a:0:{}'))));
     }
 
     /**
@@ -1436,7 +1438,7 @@ class QueryTest extends TestCase
             'name' => 'John'
         ]];
 
-        $cache = new ArrayCache();
+        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
 
         $query = $this->query();
         $query->setCache($cache);
@@ -1462,5 +1464,32 @@ class QueryTest extends TestCase
                 'name' => 'Mickey'
             ],
         ], $query->execute(['id', 'name']));
+    }
+
+    /**
+     *
+     */
+    public function test_cache()
+    {
+        $this->push([
+            'id' => 1,
+            'name' => 'test-name1'
+        ]);
+
+        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
+        $query = $this->query();
+        $query->setCache($cache);
+
+        $this->assertEquals('test:test_', $query->getCacheKey()->namespace());
+        $this->assertEquals(sha1('SELECT * FROM test_-a:0:{}'), $query->getCacheKey()->key());
+        $this->assertEquals(0, $query->getCacheKey()->lifetime());
+
+        $this->assertEquals('my-ns', $query->setCacheNamespace('my-ns')->getCacheKey()->namespace());
+        $this->assertEquals('my-key', $query->setCacheKey('my-key')->getCacheKey()->key());
+        $this->assertEquals(100, $query->setCacheLifetime(100)->getCacheKey()->lifetime());
+
+        $result = $query->execute();
+
+        $this->assertEquals($result, $cache->get($query->getCacheKey()));
     }
 }
