@@ -333,10 +333,10 @@ class ShardingKeyValueQueryTest extends TestCase
 
         $this->query()->setCache($cache);
 
-        $this->connection->from('test')->setCache($cache)->all();
+        $this->connection->from('test')->setCache($cache)->useCache()->all();
         $this->assertNotNull($cache->get(new CacheKey('sharding:test', sha1('SELECT * FROM test-a:0:{}'))));
 
-        $this->query()->setCache($cache)->where('id', 1)->update(['name' => 'Richard']);
+        $this->query()->setCache($cache)->useCache()->where('id', 1)->update(['name' => 'Richard']);
         $this->assertNull($cache->get(new CacheKey('sharding:test', sha1('SELECT * FROM test-a:0:{}'))));
     }
 
@@ -353,10 +353,10 @@ class ShardingKeyValueQueryTest extends TestCase
 
         $this->query()->setCache($cache);
 
-        $this->connection->from('test')->setCache($cache)->all();
+        $this->connection->from('test')->setCache($cache)->useCache()->all();
         $this->assertNotNull($cache->get(new CacheKey('sharding:test', sha1('SELECT * FROM test-a:0:{}'))));
 
-        $this->query()->setCache($cache)->where('id', 1)->delete();
+        $this->query()->setCache($cache)->useCache()->where('id', 1)->delete();
         $this->assertNull($cache->get(new CacheKey('sharding:test', sha1('SELECT * FROM test-a:0:{}'))));
     }
 
@@ -373,10 +373,10 @@ class ShardingKeyValueQueryTest extends TestCase
 
         $this->query()->setCache($cache);
 
-        $this->connection->from('test')->setCache($cache)->all();
+        $this->connection->from('test')->setCache($cache)->useCache()->all();
         $this->assertNotNull($cache->get(new CacheKey('sharding:test', sha1('SELECT * FROM test-a:0:{}'))));
 
-        $this->query()->setCache($cache)->where('id', 42)->update(['name' => 'Richard']);
+        $this->query()->setCache($cache)->where('id', 42)->useCache()->update(['name' => 'Richard']);
         $this->assertNotNull($cache->get(new CacheKey('sharding:test', sha1('SELECT * FROM test-a:0:{}'))));
     }
 
@@ -393,10 +393,10 @@ class ShardingKeyValueQueryTest extends TestCase
 
         $this->query()->setCache($cache);
 
-        $this->connection->from('test')->setCache($cache)->all();
+        $this->connection->from('test')->setCache($cache)->useCache()->all();
         $this->assertNotNull($cache->get(new CacheKey('sharding:test', sha1('SELECT * FROM test-a:0:{}'))));
 
-        $this->query()->setCache($cache)->where('id', 42)->delete();
+        $this->query()->setCache($cache)->useCache()->where('id', 42)->delete();
         $this->assertNotNull($cache->get(new CacheKey('sharding:test', sha1('SELECT * FROM test-a:0:{}'))));
     }
 

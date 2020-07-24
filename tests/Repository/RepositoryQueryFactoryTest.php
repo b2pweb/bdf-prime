@@ -223,25 +223,6 @@ class RepositoryQueryFactoryTest extends TestCase
     /**
      *
      */
-    public function test_disableCache()
-    {
-        $this->assertNull($this->factory->disableCache()->builder()->cache());
-        $this->assertNull($this->factory->disableCache()->keyValue()->cache());
-
-        $this->assertSame($this->cache, $this->factory->keyValue()->cache());
-    }
-
-    /**
-     *
-     */
-    public function test_disableCache_findById()
-    {
-        $this->assertEntity($this->pack()->get('entity'), $this->factory->disableCache()->findById(1));
-    }
-
-    /**
-     *
-     */
     public function test_magic_call_custom_query()
     {
         $query = $this->factory->testQuery(5);
@@ -270,7 +251,6 @@ class RepositoryQueryFactoryTest extends TestCase
         $this->assertEquals(0, $this->factory->countKeyValue('id', 5));
         $this->assertEquals(1, $this->factory->countKeyValue(['id' => 1]));
         $this->assertEquals(1, $this->factory->countKeyValue(['id' => 1, 'name' => 'Entity']));
-        $this->assertEquals(1, $this->factory->disableCache()->countKeyValue('id', 1));
     }
 
     /**

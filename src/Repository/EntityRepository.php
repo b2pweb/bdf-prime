@@ -270,22 +270,6 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
     
     /**
-     * Disable the cache result.
-     * +Be aware+ The cache should be disabled only for select queries.
-     *
-     * @return $this
-     *
-     * @deprecated since 1.5 Use Cachable::disableCache()
-     * @see Cachable::disableCache()
-     */
-    public function disableCache()
-    {
-        $this->queries->disableCache();
-        
-        return $this;
-    }
-    
-    /**
      * Load relations on given entity
      * If the relation is already loaded, the relation will not be reloaded
      * Use reloadRelation for force loading
