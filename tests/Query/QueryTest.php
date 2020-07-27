@@ -109,20 +109,6 @@ class QueryTest extends TestCase
     }
 
     /**
-     *
-     */
-    public function test_disable_cache()
-    {
-        $cache = $this->createMock(CacheInterface::class);
-
-        $query = $this->query();
-        $query->setCache($cache);
-        $query->disableCache();
-
-        $this->assertNull($query->cache());
-    }
-
-    /**
      * 
      */
     public function test_set_get_connection()
@@ -1175,7 +1161,7 @@ class QueryTest extends TestCase
 
         $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
         $query = $this->query();
-        $query->setCache($cache);
+        $query->setCache($cache)->useCache();
 
         $this->assertEquals([[
             'id' => '1',
@@ -1213,7 +1199,7 @@ class QueryTest extends TestCase
 
         $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
         $query = $this->query();
-        $query->setCache($cache);
+        $query->setCache($cache)->useCache();
 
         $this->assertEquals([[
             'id' => '1',
@@ -1221,33 +1207,6 @@ class QueryTest extends TestCase
             'date_insert' => null
         ]], $query->execute());
         $this->assertNotNull($cache->get(new CacheKey('test:test_', sha1('SELECT * FROM test_-a:0:{}'))));
-
-        $query->update(['name' => 'new-name']);
-        $this->assertNull($cache->get(new CacheKey('test:test_', sha1('SELECT * FROM test_-a:0:{}'))));
-    }
-
-    /**
-     *
-     */
-    public function test_update_will_clear_cache_with_cache_disabled()
-    {
-        $this->push([
-            'id' => 1,
-            'name' => 'test-name1'
-        ]);
-
-        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
-        $query = $this->query();
-        $query->setCache($cache);
-
-        $this->assertEquals([[
-            'id' => '1',
-            'name' => 'test-name1',
-            'date_insert' => null
-        ]], $query->execute());
-        $this->assertNotNull($cache->get(new CacheKey('test:test_', sha1('SELECT * FROM test_-a:0:{}'))));
-
-        $query->disableCache();
 
         $query->update(['name' => 'new-name']);
         $this->assertNull($cache->get(new CacheKey('test:test_', sha1('SELECT * FROM test_-a:0:{}'))));
@@ -1417,7 +1376,7 @@ class QueryTest extends TestCase
         $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
 
         $query = $this->query();
-        $query->setCache($cache);
+        $query->setCache($cache)->useCache();
 
         $this->assertEquals($expected, $query->execute(['id', 'name']));
         $this->assertEquals($expected, $cache->get(new CacheKey('test:test_', sha1('SELECT id, name FROM test_-a:0:{}'))));
@@ -1441,7 +1400,7 @@ class QueryTest extends TestCase
         $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
 
         $query = $this->query();
-        $query->setCache($cache);
+        $query->setCache($cache)->useCache();
         $this->assertEquals($expected, $query->execute(['id', 'name']));
 
         // insert without clear cache
@@ -1452,7 +1411,7 @@ class QueryTest extends TestCase
 
         $this->assertEquals($expected, $query->execute(['id', 'name']));
 
-        $query->disableCache();
+        $query->setCacheKey(null);
 
         $this->assertEquals([
             [
@@ -1478,7 +1437,10 @@ class QueryTest extends TestCase
 
         $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
         $query = $this->query();
-        $query->setCache($cache);
+        $query
+            ->setCache($cache)
+            ->useCache()
+        ;
 
         $this->assertEquals('test:test_', $query->getCacheKey()->namespace());
         $this->assertEquals(sha1('SELECT * FROM test_-a:0:{}'), $query->getCacheKey()->key());
@@ -1491,5 +1453,33 @@ class QueryTest extends TestCase
         $result = $query->execute();
 
         $this->assertEquals($result, $cache->get($query->getCacheKey()));
+    }
+
+    /**
+     *
+     */
+    public function test_useCache()
+    {
+        $this->push([
+            'id' => 1,
+            'name' => 'test-name1'
+        ]);
+
+        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
+        $query = $this->query();
+        $query
+            ->setCache($cache)
+            ->useCache(100, 'my-key')
+        ;
+
+        $this->assertEquals('test:test_', $query->getCacheKey()->namespace());
+        $this->assertEquals('my-key', $query->getCacheKey()->key());
+        $this->assertEquals(100, $query->getCacheKey()->lifetime());
+
+        $query->useCache(500, 'other-key');
+
+        $this->assertEquals('test:test_', $query->getCacheKey()->namespace());
+        $this->assertEquals('other-key', $query->getCacheKey()->key());
+        $this->assertEquals(500, $query->getCacheKey()->lifetime());
     }
 }

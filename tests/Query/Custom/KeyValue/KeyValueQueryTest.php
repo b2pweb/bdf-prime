@@ -572,7 +572,10 @@ class KeyValueQueryTest extends TestCase
         $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
 
         $query = $this->query()->from('test_');
-        $query->setCache($cache);
+        $query
+            ->setCache($cache)
+            ->useCache()
+        ;
 
         $this->assertEquals($expected, $query->execute(['id', 'name']));
         $this->assertEquals($expected, $cache->get(new CacheKey('test:test_', sha1('SELECT id, name FROM test_-a:0:{}'))));
@@ -596,7 +599,7 @@ class KeyValueQueryTest extends TestCase
         $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
 
         $query = $this->query()->from('test_');
-        $query->setCache($cache);
+        $query->setCache($cache)->useCache();
         $this->assertEquals($expected, $query->execute(['id', 'name']));
 
         // insert without clear cache
@@ -634,33 +637,6 @@ class KeyValueQueryTest extends TestCase
         $this->assertNull($cache->get(new CacheKey('test:test_', sha1('SELECT id, name FROM test_-a:0:{}'))));
 
         $this->assertEmpty($query->execute(['id', 'name']));
-    }
-
-    /**
-     *
-     */
-    public function test_delete_will_clear_cache_with_disableCache()
-    {
-        $this->connection->insert('test_', [
-            'id' => 1,
-            'name' => 'John'
-        ]);
-
-        $expected = [[
-            'id' => 1,
-            'name' => 'John'
-        ]];
-
-        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
-
-        $query = $this->query()->from('test_')->where('id', 1);
-        $query->setCache($cache);
-        $this->assertEquals($expected, $query->execute(['id', 'name']));
-
-        $query->disableCache();
-        $query->delete();
-
-        $this->assertNull($cache->get(new CacheKey('test:test_', sha1('SELECT id, name FROM test_-a:0:{}'))));
     }
 
     /**

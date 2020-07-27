@@ -10,7 +10,6 @@ use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\OrmPreprocessor;
 use Bdf\Prime\Query\Contract\Cachable;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
-use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\QueryRepositoryExtension;
 use Bdf\Prime\Query\ReadCommandInterface;
@@ -48,14 +47,6 @@ class RepositoryQueryFactory
     private $resultCache;
 
     /**
-     * Disable query result cache temporaly
-     *
-     * @var bool
-     * @deprecated
-     */
-    private $disableCache = false;
-
-    /**
      * Check if the repository can support optimised KeyValue query
      * If this value is false, keyValue() must returns null
      *
@@ -90,37 +81,17 @@ class RepositoryQueryFactory
      *
      * @param RepositoryInterface $repository
      * @param CacheInterface $resultCache
-     * @param bool $disableCache
      */
-    public function __construct(RepositoryInterface $repository, CacheInterface $resultCache = null, $disableCache = false)
+    public function __construct(RepositoryInterface $repository, CacheInterface $resultCache = null)
     {
         $this->repository = $repository;
         $this->resultCache = $resultCache;
-        $this->disableCache = $disableCache;
 
         $this->supportsKeyValue = empty($repository->constraints());
 
         $this->connection = $repository->connection();
         $this->queries = $repository->mapper()->queries();
         $this->metadata = $repository->metadata();
-    }
-
-    /**
-     * Disable the cache result.
-     * +Be aware+ The cache should be disabled only for select queries.
-     *
-     * @return $this
-     *
-     * @deprecated since 1.5 Use Cachable::disableCache()
-     * @see Cachable::disableCache()
-     */
-    public function disableCache()
-    {
-        @trigger_error(__METHOD__.' is deprecated since 1.5 and will be removed in 1.6. Use Cachable::disableCache() on the query instead', E_USER_DEPRECATED);
-
-        $this->disableCache = true;
-
-        return $this;
     }
 
     /**
@@ -160,9 +131,8 @@ class RepositoryQueryFactory
     public function findById($id)
     {
         // Create a new query if cache is disabled
-        if ($this->disableCache || !$this->supportsKeyValue) {
+        if (!$this->supportsKeyValue) {
             $query = $this->builder();
-            $this->disableCache = false;
         } else {
             if (!$this->findByIdQuery) {
                 $this->findByIdQuery = $this->keyValue();
@@ -243,9 +213,8 @@ class RepositoryQueryFactory
      */
     public function countKeyValue($attribute = null, $value = null)
     {
-        if ($this->disableCache || !$this->supportsKeyValue) {
+        if (!$this->supportsKeyValue) {
             $query = $this->builder();
-            $this->disableCache = false;
         } else {
             if (!$this->countKeyValueQuery) {
                 $this->countKeyValueQuery = $this->keyValue();
@@ -343,11 +312,6 @@ class RepositoryQueryFactory
 
         if ($query instanceof Cachable) {
             $query->setCache($this->resultCache);
-
-            if ($this->disableCache) {
-                $query->disableCache();
-                $this->disableCache = false;
-            }
         }
 
         return $query;

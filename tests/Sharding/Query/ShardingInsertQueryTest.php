@@ -165,7 +165,7 @@ class ShardingInsertQueryTest extends TestCase
         $cache = new ArrayCache();
 
         $this->connection->insert('test', ['id' => 1, 'name' => 'foo']);
-        $this->connection->from('test')->setCache($cache)->all();
+        $this->connection->from('test')->setCache($cache)->useCache()->all();
 
         $this->assertNotNull($cache->get(new CacheKey('sharding:test', sha1('SELECT * FROM test-a:0:{}'))));
 

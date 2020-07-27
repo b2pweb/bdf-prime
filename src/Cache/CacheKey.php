@@ -59,7 +59,7 @@ final class CacheKey
      */
     public function key(): ?string
     {
-        return is_string($this->key) ? $this->key : ($this->key)();
+        return $this->key === null || is_string($this->key) ? $this->key : ($this->key)();
     }
 
     /**
@@ -91,6 +91,11 @@ final class CacheKey
         return $this;
     }
 
+    /**
+     * Check if the key is valid (i.e. not empty)
+     *
+     * @return bool
+     */
     public function valid(): bool
     {
         return !empty($this->key());

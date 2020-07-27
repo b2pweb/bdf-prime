@@ -24,11 +24,6 @@ trait CachableTrait
     protected $cache;
 
     /**
-     * @var bool
-     */
-    protected $disableCache = true;
-
-    /**
      * @var CacheKey
      */
     protected $cacheKey = null;
@@ -39,7 +34,31 @@ trait CachableTrait
      */
     public function cache()
     {
-        return $this->disableCache ? null : $this->cache;
+        return $this->cache;
+    }
+
+    /**
+     * @see Cachable::useCache()
+     */
+    public function useCache(int $lifetime = 0, ?string $key = null)
+    {
+        if ($this->cacheKey === null) {
+            $this->cacheKey = new CacheKey(
+                function () { return $this->cacheNamespace(); },
+                $key ?? function () { return $this->cacheKey(); },
+                $lifetime
+            );
+
+            return $this;
+        }
+
+        $this->cacheKey->setLifetime($lifetime);
+
+        if ($key !== null) {
+            $this->cacheKey->setKey($key);
+        }
+
+        return $this;
     }
 
     /**
@@ -47,78 +66,58 @@ trait CachableTrait
      */
     public function setCache(CacheInterface $cache = null)
     {
-        $this->disableCache = $cache === null;
         $this->cache = $cache;
 
         return $this;
     }
 
     /**
-     * @see Cachable::disableCache()
-     */
-    public function disableCache()
-    {
-        $this->disableCache = true;
-
-        return $this;
-    }
-
-    /**
-     * Define the cache lifetime
-     *
-     * @param int $lifetime The cache lifetime in seconds
-     *
-     * @return $this
+     * @see Cachable::setCacheLifetime()
      */
     public function setCacheLifetime(int $lifetime)
     {
-        $this->getCacheKey()->setLifetime($lifetime);
+        if (!$this->cacheKey) {
+            $this->useCache();
+        }
+
+        $this->cacheKey->setLifetime($lifetime);
 
         return $this;
     }
 
     /**
-     * Define the cache key
-     *
-     * @param string $cacheKey
-     *
-     * @return $this
+     * @see Cachable::setCacheKey()
      */
-    public function setCacheKey(string $cacheKey)
+    public function setCacheKey(?string $cacheKey)
     {
-        $this->getCacheKey()->setKey($cacheKey);
+        if (!$this->cacheKey) {
+            $this->useCache();
+        }
+
+        $this->cacheKey->setKey($cacheKey);
 
         return $this;
     }
 
     /**
-     * Define the cache namespace
-     *
-     * @param string $namespace
-     *
-     * @return $this
+     * @see Cachable::setCacheNamespace()
      */
     public function setCacheNamespace(string $namespace)
     {
-        $this->getCacheKey()->setNamespace($namespace);
+        if (!$this->cacheKey) {
+            $this->useCache();
+        }
+
+        $this->cacheKey->setNamespace($namespace);
 
         return $this;
     }
 
     /**
-     * Get the cache key
-     *
-     * @return CacheKey
+     * @see Cachable::getCacheKey()
      */
-    public function getCacheKey(): CacheKey
+    public function getCacheKey(): ?CacheKey
     {
-        if ($this->cacheKey === null) {
-            return $this->cacheKey = new CacheKey(
-                function () { return $this->cacheNamespace(); },
-                function () { return $this->cacheKey(); }
-            );
-        }
-
         return $this->cacheKey;
     }
 
@@ -129,9 +128,9 @@ trait CachableTrait
      */
     protected function executeCached()
     {
-        $key = $this->getCacheKey();
+        $key = $this->cacheKey;
 
-        if ($this->disableCache || !$key->valid()) {
+        if (!$this->cache || !$key || !$key->valid()) {
             return $this->connection->execute($this)->all();
         }
 
@@ -154,7 +153,7 @@ trait CachableTrait
     protected function clearCacheOnWrite()
     {
         if ($this->cache) {
-            $this->cache->flush($this->getCacheKey()->namespace());
+            $this->cache->flush($this->cacheKey ? $this->cacheKey->namespace() : $this->cacheNamespace());
         }
     }
 
