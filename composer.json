@@ -19,14 +19,15 @@
     "ext-mbstring": "*",
     "b2pweb/bdf-dsn": "~1.0",
     "b2pweb/bdf-event-notifier": "~1.0",
-    "b2pweb/bdf-serializer": ">1.0",
-    "b2pweb/bdf-util": ">1.0",
+    "b2pweb/bdf-serializer": "~1.0",
+    "b2pweb/bdf-util": "~1.0",
     "doctrine/dbal": "~2.5",
     "doctrine/inflector": "~1.0",
     "psr/container": "~1.0",
     "psr/log": "~1.0",
     "psr/simple-cache": "^1.0",
-    "symfony/filesystem": "~4.3|~5.0"
+    "symfony/filesystem": "~4.3|~5.0",
+    "doctrine/orm": "2.8.x-dev"
   },
   "require-dev": {
     "b2pweb/bdf-phpunit": "~1.0",
