@@ -72,19 +72,19 @@ class ShardingEmbededDistributionKeyTest extends TestCase
                     'name'     => 'Holmes',
                     'location' => new Location([
                         'address' => '221b Baker Street',
-                        'city'    => 'London',
+                        'city'    => '1',
                     ])
                 ],
             ])
         );
 
-        $document = Document::where('contact.location.city', 'London')->first();
+        $document = Document::where('contact.location.city', '1')->first();
 
         $this->assertInstanceOf('Bdf\Prime\Contact', $document->contact);
         $this->assertInstanceOf('Bdf\Prime\Location', $document->contact->location);
 
         $this->assertEquals('Holmes', $document->contact->name);
         $this->assertEquals('221b Baker Street', $document->contact->location->address);
-        $this->assertEquals('London', $document->contact->location->city);
+        $this->assertEquals('1', $document->contact->location->city);
     }
 }
