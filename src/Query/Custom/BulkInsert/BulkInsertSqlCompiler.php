@@ -75,11 +75,7 @@ class BulkInsertSqlCompiler extends AbstractCompiler
 
             foreach ($query->statements['values'] as $values) {
                 foreach ($query->state()->compiledParts['columns']['types'] as $field => $type) {
-                    if (!isset($values[$field])) {
-                        $bindings[] = null;
-                    } else {
-                        $bindings[] = $this->platform()->types()->toDatabase($values[$field], $type);
-                    }
+                    $bindings[] = $this->platform()->types()->toDatabase($values[$field] ?? null, $type);
                 }
             }
 
@@ -90,11 +86,7 @@ class BulkInsertSqlCompiler extends AbstractCompiler
         $bindings = [];
 
         foreach ($query->state()->compiledParts['columns']['types'] as $field => $type) {
-            if (!isset($values[$field])) {
-                $bindings[] = null;
-            } else {
-                $bindings[] = $this->platform()->types()->toDatabase($values[$field], $type);
-            }
+            $bindings[] = $this->platform()->types()->toDatabase($values[$field] ?? null, $type);
         }
 
         return $bindings;

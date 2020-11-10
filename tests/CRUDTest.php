@@ -480,4 +480,43 @@ class CRUDTest extends TestCase
 
         $this->assertEquals(3, PartialIndexEntity::count());
     }
+
+    /**
+     * @see https://github.com/b2pweb/bdf-prime/issues/8
+     */
+    public function test_custom_nullable_type()
+    {
+        $this->prime()->types()->register(new FooType());
+        $this->pack()->declareEntity(MyCustomNullableEntity::class);
+
+        // Simple insert
+        $entity = new MyCustomNullableEntity(['foo' => new Foo('oof')]);
+        $entity->insert();
+
+        // Check PHP and database value
+        $this->assertEquals(new Foo('oof'), MyCustomNullableEntity::refresh($entity)->foo);
+        $this->assertSame('oof', MyCustomNullableEntity::where('id', $entity->id)->inRow('foo'));
+
+        // Update to null should save as "0"
+        $entity->foo = null;
+        $entity->update();
+        $this->assertSame('0', MyCustomNullableEntity::where('id', $entity->id)->inRow('foo'));
+
+        // Insert with null should save as "0"
+        $withNull = new MyCustomNullableEntity(['foo' => null]);
+        $withNull->insert();
+
+        $this->assertSame('0', MyCustomNullableEntity::where('id', $withNull->id)->inRow('foo'));
+
+        // Test select on custom type : null should be converted
+        $query = MyCustomNullableEntity::where('foo', null);
+
+        $this->assertEquals([$entity, $withNull], $query->all());
+        $this->assertEquals('SELECT t0.* FROM my_custom_nullable t0 WHERE t0.foo = ?', $query->toSql());
+        $this->assertSame(['0'], $query->getBindings());
+
+        $query = MyCustomNullableEntity::where('foo', [null, new Foo('bar')]);
+        $this->assertEquals('SELECT t0.* FROM my_custom_nullable t0 WHERE t0.foo IN (?,?)', $query->toSql());
+        $this->assertSame(['0', 'bar'], $query->getBindings());
+    }
 }

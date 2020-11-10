@@ -3,8 +3,13 @@
 namespace Bdf\Prime\Query\Custom\BulkInsert;
 
 use Bdf\Prime\Connection\SimpleConnection;
+use Bdf\Prime\FooType;
+use Bdf\Prime\MyCustomNullableEntity;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Query\Compiler\Preprocessor\OrmPreprocessor;
 use Bdf\Prime\Schema\Builder\TypesHelperTableBuilder;
+use Bdf\Prime\TestEntity;
+use Bdf\Prime\User;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -221,5 +226,51 @@ class BulkInsertSqlCompilerTest extends TestCase
         $this->compiler->compileInsert($query);
 
         $this->assertSame(['Mickey', 'Mouse', '1928-11-18'], $this->compiler->getBindings($query));
+    }
+
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function test_compile_with_null($bulk)
+    {
+        $this->pack()->declareEntity(TestEntity::class);
+
+        $query = new BulkInsertQuery($this->connection, new OrmPreprocessor(TestEntity::repository()));
+        $query
+            ->into('test_')
+            ->bulk($bulk)
+            ->values([
+                'name' => 'Foo',
+                'dateInsert' => null,
+            ])
+        ;
+
+        $compiled = $this->compiler->compileInsert($query);
+
+        $this->assertEquals($this->connection->prepare('INSERT INTO test_(name, date_insert) VALUES (?, ?)'), $compiled);
+        $this->assertSame(['Foo', null], $this->compiler->getBindings($query));
+    }
+
+    /**
+     * @testWith [true]
+     *           [false]
+     */
+    public function test_compile_with_custom_null_type($bulk)
+    {
+        $this->prime()->types()->register(new FooType());
+        $this->pack()->declareEntity(MyCustomNullableEntity::class);
+
+        $query = new BulkInsertQuery($this->connection, new OrmPreprocessor(MyCustomNullableEntity::repository()));
+        $query
+            ->into('my_custom_nullable')
+            ->bulk($bulk)
+            ->values(['foo' => null])
+        ;
+
+        $compiled = $this->compiler->compileInsert($query);
+
+        $this->assertEquals($this->connection->prepare('INSERT INTO my_custom_nullable(foo) VALUES (?)'), $compiled);
+        $this->assertSame(['0'], $this->compiler->getBindings($query));
     }
 }

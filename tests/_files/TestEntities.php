@@ -17,3 +17,4 @@ require_once __DIR__ . '/custom_relation_entities.php';
 require_once __DIR__ . '/polymorph_embedded.php';
 require_once __DIR__ . '/composite_pk.php';
 require_once __DIR__. '/cross_connection_sequence.php';
+require_once __DIR__.'/entity_with_custom_nullable_type.php';
