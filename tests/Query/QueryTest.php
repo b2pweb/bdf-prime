@@ -34,12 +34,12 @@ class QueryTest extends TestCase
         $connection = Prime::connection('test');
         $connection->schema()
             ->table('test_', function($table) {
-                $table->bigint('id', true);
+                $table->bigint('id')->autoincrement()->primary();
                 $table->string('name', 90)->nillable();
                 $table->dateTime('date_insert')->nillable();
             })
             ->table('test_backup', function($table) {
-                $table->bigint('id', true);
+                $table->bigint('id')->autoincrement()->primary();
                 $table->string('name', 90)->nillable();
                 $table->dateTime('date_insert')->nillable();
             })
@@ -63,9 +63,16 @@ class QueryTest extends TestCase
      */
     protected function tearDown(): void
     {
+        $connection = Prime::connection('test');
+        $connection->schema()
+            ->drop('test_')
+            ->drop('test_backup')
+            ->drop('no_primary')
+        ;
+
         $this->primeStop();
     }
-    
+
     /**
      * @return Query
      */
@@ -799,7 +806,31 @@ class QueryTest extends TestCase
         $query = $this->query()
             ->where(['id :between' => [1,3]]);
 
-        $this->assertEquals("SELECT * FROM test_ WHERE id BETWEEN '1' AND '3'", $query->toSql());
+        $this->assertEquals("SELECT * FROM test_ WHERE id BETWEEN ? AND ?", $query->toSql());
+        $this->assertEquals([1, 3], $query->getBindings());
+    }
+
+    /**
+     *
+     */
+    public function test_between_functional()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'Bob'
+        ]);
+        $this->push([
+            'id'   => 3,
+            'name' => 'George'
+        ]);
+        $this->push([
+            'id'   => 6,
+            'name' => 'Paul'
+        ]);
+
+        $this->assertEquals(['George', 'Paul'], $this->query()->where(['id :between' => [2, 8]])->inRows('name'));
+        $this->assertEquals(['Bob', 'George'], $this->query()->where(['id :between' => [1, 5]])->inRows('name'));
+        $this->assertEquals(['Bob', 'George'], $this->query()->where('name', ':between', ['A', 'K'])->inRows('name'));
     }
 
     /**
@@ -810,7 +841,8 @@ class QueryTest extends TestCase
         $query = $this->query()
             ->where(['id :notbetween' => [1,3]]);
 
-        $this->assertEquals("SELECT * FROM test_ WHERE NOT(id BETWEEN '1' AND '3')", $query->toSql());
+        $this->assertEquals("SELECT * FROM test_ WHERE NOT(id BETWEEN ? AND ?)", $query->toSql());
+        $this->assertEquals([1, 3], $query->getBindings());
     }
 
     /**
@@ -1067,7 +1099,7 @@ class QueryTest extends TestCase
         $query->useQuoteIdentifier();
 
         $this->assertTrue($query->isQuoteIdentifier());
-        $this->assertEquals('SELECT * FROM "test_" WHERE "id" BETWEEN \'1\' AND \'3\'', $query->toSql());
+        $this->assertEquals('SELECT * FROM "test_" WHERE "id" BETWEEN ? AND ?', $query->toSql());
     }
 
     /**

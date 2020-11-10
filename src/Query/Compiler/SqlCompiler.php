@@ -157,7 +157,7 @@ class SqlCompiler extends AbstractCompiler
             }
 
             $columns[] = $this->quoteIdentifier($query, $column);
-            $values[]  = $this->compileExpressionValue($query, $value, $type);
+            $values[]  = $this->compileTypedValue($query, $value, $type);
         }
 
         return [$columns, $values];
@@ -196,7 +196,7 @@ class SqlCompiler extends AbstractCompiler
 
             $values[] = $this->quoteIdentifier($query, $column)
                 . ' = '
-                . $this->compileExpressionValue($query, $value, $type);
+                . $this->compileTypedValue($query, $value, $type);
         }
 
         return $values;
@@ -609,28 +609,28 @@ class SqlCompiler extends AbstractCompiler
                 if (is_array($value)) {
                     return $this->compileIntoExpression($query, $value, $column, '<', $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' < '.$this->compileExpressionValue($query, $value, $converted ? false : null);
+                return $this->quoteIdentifier($query, $column).' < '.$this->compileExpressionValue($query, $value, $converted);
 
             case '<=':
             case ':lte':
                 if (is_array($value)) {
                     return $this->compileIntoExpression($query, $value, $column, '<=', $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' <= '.$this->compileExpressionValue($query, $value, $converted ? false : null);
+                return $this->quoteIdentifier($query, $column).' <= '.$this->compileExpressionValue($query, $value, $converted);
 
             case '>':
             case ':gt':
                 if (is_array($value)) {
                     return $this->compileIntoExpression($query, $value, $column, '>', $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' > '.$this->compileExpressionValue($query, $value, $converted ? false : null);
+                return $this->quoteIdentifier($query, $column).' > '.$this->compileExpressionValue($query, $value, $converted);
 
             case '>=':
             case ':gte':
                 if (is_array($value)) {
                     return $this->compileIntoExpression($query, $value, $column, '>=', $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' >= '.$this->compileExpressionValue($query, $value, $converted ? false : null);
+                return $this->quoteIdentifier($query, $column).' >= '.$this->compileExpressionValue($query, $value, $converted);
 
             // REGEX matching
             case '~=':
@@ -639,14 +639,14 @@ class SqlCompiler extends AbstractCompiler
                 if (is_array($value)) {
                     return $this->compileIntoExpression($query, $value, $column, 'REGEXP', $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' REGEXP '.$this->compileExpressionValue($query, (string)$value, $converted ? false : null);
+                return $this->quoteIdentifier($query, $column).' REGEXP '.$this->compileExpressionValue($query, (string)$value, $converted);
 
             // LIKE
             case ':like':
                 if (is_array($value)) {
                     return $this->compileIntoExpression($query, $value, $column, 'LIKE', $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' LIKE '.$this->compileExpressionValue($query, $value, $converted ? false : null);
+                return $this->quoteIdentifier($query, $column).' LIKE '.$this->compileExpressionValue($query, $value, $converted);
 
             // NOT LIKE
             case ':notlike':
@@ -654,7 +654,7 @@ class SqlCompiler extends AbstractCompiler
                 if (is_array($value)) {
                     return $this->compileIntoExpression($query, $value, $column, 'NOT LIKE', $converted, CompositeExpression::TYPE_AND);
                 }
-                return $this->quoteIdentifier($query, $column).' NOT LIKE '.$this->compileExpressionValue($query, $value, $converted ? false : null);
+                return $this->quoteIdentifier($query, $column).' NOT LIKE '.$this->compileExpressionValue($query, $value, $converted);
 
             // In
             case 'in':
@@ -677,9 +677,9 @@ class SqlCompiler extends AbstractCompiler
             case 'between':
             case ':between':
                 if (is_array($value)) {
-                    return $this->platform()->grammar()->getBetweenExpression($this->quoteIdentifier($query, $column), $this->quote($value[0]), $this->quote($value[1]));
+                    return $this->platform()->grammar()->getBetweenExpression($this->quoteIdentifier($query, $column), $this->compileExpressionValue($query, $value[0], $converted), $this->compileExpressionValue($query, $value[1], $converted));
                 }
-                return $this->platform()->grammar()->getBetweenExpression($this->quoteIdentifier($query, $column), 0, $this->quote($value));
+                return $this->platform()->grammar()->getBetweenExpression($this->quoteIdentifier($query, $column), 0, $this->compileExpressionValue($query, $value, $converted));
 
             // Not between
             case '!between':
@@ -697,7 +697,7 @@ class SqlCompiler extends AbstractCompiler
                 if (is_array($value)) {
                     return $this->compileExpression($query, $column, ':notin', $value, $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' != '.$this->compileExpressionValue($query, $value, $converted ? false : null);
+                return $this->quoteIdentifier($query, $column).' != '.$this->compileExpressionValue($query, $value, $converted);
 
             // Equals
             case '=':
@@ -708,7 +708,7 @@ class SqlCompiler extends AbstractCompiler
                 if (is_array($value)) {
                     return $this->compileExpression($query, $column, ':in', $value, $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' = '.$this->compileExpressionValue($query, $value, $converted ? false : null);
+                return $this->quoteIdentifier($query, $column).' = '.$this->compileExpressionValue($query, $value, $converted);
                 
             // Unsupported operator
             default:
@@ -721,21 +721,43 @@ class SqlCompiler extends AbstractCompiler
      *
      * @param CompilableClause $query
      * @param mixed $value
-     * @param TypeInterface|false|null $type
+     * @param bool $converted Does the value is already converted to database ?
      * 
      * @return string
      */
-    protected function compileExpressionValue(CompilableClause $query, $value, $type = null)
+    protected function compileExpressionValue(CompilableClause $query, $value, bool $converted)
     {
         if ($value instanceof QueryInterface) {
             return $this->compileSubQuery($query, $value);
         }
-        
+
         if ($value instanceof ExpressionInterface) {
             return $value->build($query, $this);
         }
 
-        return $this->bind($query, $value, $type);
+        return $converted ? $this->bindRaw($query, $value) : $this->bindTyped($query, $value, null);
+    }
+
+    /**
+     * Compile expression value with type
+     *
+     * @param CompilableClause $query
+     * @param mixed $value
+     * @param TypeInterface|null $type The type. If null it will be resolved from value
+     *
+     * @return string
+     */
+    protected function compileTypedValue(CompilableClause $query, $value, ?TypeInterface $type)
+    {
+        if ($value instanceof QueryInterface) {
+            return $this->compileSubQuery($query, $value);
+        }
+
+        if ($value instanceof ExpressionInterface) {
+            return $value->build($query, $this);
+        }
+
+        return $this->bindTyped($query, $value, $type);
     }
 
     /**
@@ -786,14 +808,14 @@ class SqlCompiler extends AbstractCompiler
      * Compile IN or NOT IN expression
      *
      * @param CompilableClause $query
-     * @param array|self  $values
+     * @param array|QueryInterface|ExpressionInterface  $values
      * @param string $column
      * @param string $operator
      * @param boolean $converted
      * 
      * @return string
      */
-    protected function compileInExpression(CompilableClause $query, $values, $column, $operator = 'IN', $converted = false)
+    protected function compileInExpression(CompilableClause $query, $values, string $column, string $operator = 'IN', bool $converted = false)
     {
         if (is_array($values)) {
             $hasNullValue = null;
@@ -802,7 +824,7 @@ class SqlCompiler extends AbstractCompiler
                     unset($values[$index]);
                     $hasNullValue = true;
                 } else {
-                    $value = $this->bind($query, $value);
+                    $value = $converted ? $this->bindRaw($query, $value) : $this->bindTyped($query, $value, null);
                 }
             }
 
@@ -827,9 +849,10 @@ class SqlCompiler extends AbstractCompiler
         } elseif ($values instanceof ExpressionInterface) {
             $values = '('.$values->build($query, $this).')';
         } else {
-            $values = '('.$this->bind($query, $values).')';
+            $values = $converted ? $this->bindRaw($query, $values) : $this->bindTyped($query, $values, null);
+            $values = '('.$values.')'; // @todo utile ?
         }
-        
+
         return $this->quoteIdentifier($query, $column).' '.$operator.' '.$values;
     }
 
@@ -853,7 +876,7 @@ class SqlCompiler extends AbstractCompiler
         $column = $this->quoteIdentifier($query, $column);
 
         foreach ($values as $value) {
-            $into[] = $column.' '.$operator.' '.$this->compileExpressionValue($query, $value, $converted ? false : null);
+            $into[] = $column.' '.$operator.' '.$this->compileExpressionValue($query, $value, $converted);
         }
 
         return '('.implode(' '.$separator.' ', $into).')';
@@ -949,14 +972,15 @@ class SqlCompiler extends AbstractCompiler
     protected function addQueryBindings(CompilableClause $clause, $subQuery)
     {
         foreach ($subQuery->getBindings() as $binding) {
-            $this->bind($clause, $binding);
+            $this->bindRaw($clause, $binding); // Types are already converted on compilation
         }
-        
+
         return $this;
     }
-    
+
     /**
      * Creates a new positional parameter and bind the given value to it.
+     * The value will be converted according to the given type. If the type is not defined, it will be resolved from PHP value.
      *
      * Attention: If you are using positional parameters with the query builder you have
      * to be very careful to bind all parameters in the order they appear in the SQL
@@ -965,13 +989,32 @@ class SqlCompiler extends AbstractCompiler
      *
      * @param CompilableClause $query
      * @param mixed $value
-     * @param TypeInterface|false|null $type The type to bind, or null to resolve, or false to skip conversion
+     * @param TypeInterface|null $type The type to bind, or null to resolve
      *
      * @return string
      */
-    protected function bind(CompilableClause $query, $value, $type = null)
+    protected function bindTyped(CompilableClause $query, $value, ?TypeInterface $type)
     {
-        $query->state()->bind($type !== false ? $this->platform()->types()->toDatabase($value, $type) : $value);
+        return $this->bindRaw($query, $this->platform()->types()->toDatabase($value, $type));
+    }
+
+    /**
+     * Creates a new positional parameter and bind the given value to it.
+     * The value will not be converted here
+     *
+     * Attention: If you are using positional parameters with the query builder you have
+     * to be very careful to bind all parameters in the order they appear in the SQL
+     * statement , otherwise they get bound in the wrong order which can lead to serious
+     * bugs in your code.
+     *
+     * @param CompilableClause $query
+     * @param mixed $value Raw database value : must be converted before
+     *
+     * @return string
+     */
+    protected function bindRaw(CompilableClause $query, $value)
+    {
+        $query->state()->bind($value);
 
         return '?';
     }
