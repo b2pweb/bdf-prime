@@ -94,7 +94,7 @@ class UpgraderCommand extends Command
                     $schema->migrate($useDrop);
 
                     $io->info('[OK]');
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     $io->alert($e->getMessage());
                 }
             }

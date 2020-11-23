@@ -2,10 +2,14 @@
 
 namespace Bdf\Prime\Relations;
 
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\EntityJoinable;
+use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
+use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
@@ -32,7 +36,7 @@ class BelongsToMany extends Relation
     /**
      * Through repository
      *
-     * @var RepositoryInterface
+     * @var EntityRepository
      */
     protected $through;
 
@@ -229,7 +233,7 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * {@inheritdoc}
+     * Build the query for find related entities
      */
     protected function relationQuery($keys, $constraints)
     {
@@ -269,6 +273,7 @@ class BelongsToMany extends Relation
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     protected function relations($keys, $with, $constraints, $without)
     {
         list($constraints, $throughConstraints) = $this->extractConstraints($constraints);
@@ -326,7 +331,10 @@ class BelongsToMany extends Relation
 
     /**
      * {@inheritdoc}
+     *
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function associate($owner, $entity)
     {
         $this->attach($owner, $entity);
@@ -336,7 +344,10 @@ class BelongsToMany extends Relation
 
     /**
      * {@inheritdoc}
+     *
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function dissociate($owner)
     {
         $this->detach($owner, $this->getRelation($owner));
@@ -346,6 +357,8 @@ class BelongsToMany extends Relation
 
     /**
      * {@inheritdoc}
+     *
+     * @throws PrimeException
      */
     public function create($owner, array $data = [])
     {
@@ -361,6 +374,7 @@ class BelongsToMany extends Relation
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function add($owner, $entity)
     {
         return $this->attach($owner, $entity);
@@ -369,6 +383,7 @@ class BelongsToMany extends Relation
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function saveAll($owner, array $relations = [])
     {
         //Detach all relations
@@ -383,6 +398,7 @@ class BelongsToMany extends Relation
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function deleteAll($owner, array $relations = [])
     {
         return $this->detach($owner, $this->getRelation($owner));
@@ -395,7 +411,9 @@ class BelongsToMany extends Relation
      * @param string|object   $entity
      *
      * @return boolean
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function has($owner, $entity)
     {
         $data = [$this->throughLocal => $this->getLocalKeyValue($owner)];
@@ -416,7 +434,9 @@ class BelongsToMany extends Relation
      * @param string|array|object       $entities
      *
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function attach($owner, $entities)
     {
         if (empty($entities)) {
@@ -454,7 +474,9 @@ class BelongsToMany extends Relation
      * @param string|array|object   $entities
      *
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function detach($owner, $entities)
     {
         if (empty($entities)) {

@@ -4,8 +4,11 @@ namespace Bdf\Prime\Connection\Factory;
 
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\SimpleConnection;
+use Bdf\Prime\Exception\DBALException;
+use Bdf\Prime\Exception\PrimeException;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\DBALException as DoctrineDBALException;
 use Doctrine\DBAL\DriverManager;
 
 /**
@@ -48,11 +51,12 @@ class ConnectionFactory implements ConnectionFactoryInterface
     /**
      * Create the instance of the connection
      *
-     * @param array              $parameters
+     * @param array $parameters
      * @param Configuration|null $config
-     * @param EventManager|null  $eventManager The event manager, optional.
+     * @param EventManager|null $eventManager The event manager, optional.
      *
      * @return ConnectionInterface
+     * @throws DBALException
      */
     private function createConnection(array $parameters, Configuration $config = null, EventManager $eventManager = null): ConnectionInterface
     {
@@ -78,7 +82,11 @@ class ConnectionFactory implements ConnectionFactoryInterface
             $parameters['wrapperClass'] = SimpleConnection::class;
         }
 
-        return DriverManager::getConnection($parameters, $config, $eventManager);
+        try {
+            return DriverManager::getConnection($parameters, $config, $eventManager);
+        } catch (DoctrineDBALException $e) {
+            throw new DBALException('Cannot create the connection : '.$e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**

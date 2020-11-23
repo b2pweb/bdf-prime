@@ -3,6 +3,8 @@
 namespace Bdf\Prime\Connection;
 
 use Bdf\Prime\Connection\Result\ResultSetInterface;
+use Bdf\Prime\Exception\DBALException;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
@@ -38,6 +40,7 @@ interface ConnectionInterface
      * Gets the SchemaManager.
      *
      * @return SchemaManagerInterface
+     * @throws PrimeException
      */
     public function schema();
 
@@ -49,6 +52,8 @@ interface ConnectionInterface
      *
      * @param array $fieldOptions
      * @return mixed
+     *
+     * @throws PrimeException When cannot convert value
      */
     public function fromDatabase($value, $type, array $fieldOptions = []);
 
@@ -59,15 +64,17 @@ interface ConnectionInterface
      * @param null|string|TypeInterface $type
      *
      * @return mixed
+     *
+     * @throws PrimeException When cannot convert value
      */
     public function toDatabase($value, $type = null);
 
     /**
      * Get a query builder
      *
-     * @param PreprocessorInterface $preprocessor The compiler preprocessor to use
+     * @param PreprocessorInterface|null $preprocessor The compiler preprocessor to use
      *
-     * @return QueryInterface
+     * @return CommandInterface
      */
     public function builder(PreprocessorInterface $preprocessor = null);
 
@@ -75,7 +82,7 @@ interface ConnectionInterface
      * Make a new query
      *
      * @param string $query The query name, or class name
-     * @param PreprocessorInterface $preprocessor The compiler preprocessor to use
+     * @param PreprocessorInterface|null $preprocessor The compiler preprocessor to use
      *
      * @return CommandInterface
      */
@@ -99,13 +106,14 @@ interface ConnectionInterface
     public function from($table, string $alias = null);
 
     /**
-     * Executes select query and returns array of object
+     * Executes a raw select query and returns array of object
      *
      * @param string $query
      * @param array  $bindings
      * @param array  $types
      *
-     * @return array
+     * @return array The database result
+     * @throws PrimeException When select fail
      */
     public function select($query, array $bindings = [], array $types = []);
 
@@ -118,6 +126,7 @@ interface ConnectionInterface
      * @return ResultSetInterface
      *
      * @see Compilable::type() The query type
+     * @throws PrimeException When execution fail
      */
     public function execute(Compilable $query);
 
@@ -132,6 +141,7 @@ interface ConnectionInterface
      * Get the platform instance
      *
      * @return PlatformInterface
+     * @throws PrimeException
      */
     public function platform();
 

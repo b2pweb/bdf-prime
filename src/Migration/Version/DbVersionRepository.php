@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Migration\Version;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Migration\VersionRepositoryInterface;
 
 /**
@@ -150,6 +151,7 @@ class DbVersionRepository implements VersionRepositoryInterface
 
     /**
      * Prepare the repository
+     * @throws PrimeException
      */
     public function prepare(): void
     {
@@ -162,6 +164,7 @@ class DbVersionRepository implements VersionRepositoryInterface
      * Is the schema ready? 
      *
      * @return boolean
+     * @throws PrimeException
      */
     public function hasSchema(): bool
     {
@@ -176,6 +179,7 @@ class DbVersionRepository implements VersionRepositoryInterface
      * Create Schema
      *
      * @return $this
+     * @throws PrimeException
      */
     public function createSchema()
     {

@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Query\Custom\BulkInsert;
 
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\AbstractCompiler;
 use Bdf\Prime\Types\TypeInterface;
@@ -98,6 +99,7 @@ class BulkInsertSqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     private function compileMode(CompilableClause $query)
     {
@@ -121,6 +123,7 @@ class BulkInsertSqlCompiler extends AbstractCompiler
      * Compile columns, and resolve types
      *
      * @param CompilableClause $query
+     * @throws PrimeException
      */
     private function compileColumns(CompilableClause $query)
     {

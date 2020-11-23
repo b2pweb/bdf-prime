@@ -2,14 +2,14 @@
 
 namespace Bdf\Prime\Exception;
 
+use RuntimeException;
+
 /**
  * EntityNotFoundException
  * 
  * throws when an entity has not be found by repository
- * 
- * @package Bdf\Prime\Exception
  */
-class EntityNotFoundException extends \RuntimeException
+class EntityNotFoundException extends RuntimeException implements PrimeException
 {
     
 }

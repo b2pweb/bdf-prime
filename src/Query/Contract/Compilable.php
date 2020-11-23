@@ -2,6 +2,8 @@
 
 namespace Bdf\Prime\Query\Contract;
 
+use Bdf\Prime\Exception\PrimeException;
+
 /**
  * Base type for self-compile queries
  * Those queries can be auto-executed by connections
@@ -21,6 +23,7 @@ interface Compilable
      * @param boolean $forceRecompile Force recompile the query
      *
      * @return mixed
+     * @throws PrimeException When compile fail
      */
     public function compile($forceRecompile = false);
 
@@ -28,6 +31,7 @@ interface Compilable
      * Get the query bindings
      *
      * @return mixed
+     * @throws PrimeException
      */
     public function getBindings();
 

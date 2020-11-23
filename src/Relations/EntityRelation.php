@@ -2,6 +2,9 @@
 
 namespace Bdf\Prime\Relations;
 
+use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\QueryInterface;
 
 /**
@@ -81,7 +84,9 @@ class EntityRelation
      * @param object $related
      *
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function add($related)
     {
         return $this->relation->add($this->owner, $related);
@@ -93,7 +98,9 @@ class EntityRelation
      * @param string|object  $related
      *
      * @return boolean
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function has($related)
     {
         return $this->relation->has($this->owner, $related);
@@ -105,7 +112,9 @@ class EntityRelation
      * @param string|array|object   $related
      *
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function attach($related)
     {
         return $this->relation->attach($this->owner, $related);
@@ -139,7 +148,9 @@ class EntityRelation
      * @param string|array $relations
      *
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function saveAll($relations = [])
     {
         return $this->relation->saveAll($this->owner, (array)$relations);
@@ -151,7 +162,9 @@ class EntityRelation
      * @param string|array $relations
      *
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function deleteAll($relations = [])
     {
         return $this->relation->deleteAll($this->owner, (array)$relations);

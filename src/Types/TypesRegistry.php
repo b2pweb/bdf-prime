@@ -12,7 +12,7 @@ class TypesRegistry implements TypesRegistryInterface
     /**
      * Store type instances
      *
-     * @var TypeInterface[]
+     * @var TypeInterface[]|string[]
      */
     private $types = [];
 
@@ -20,7 +20,7 @@ class TypesRegistry implements TypesRegistryInterface
     /**
      * TypesRegistry constructor.
      *
-     * @param TypeInterface[] $types
+     * @param TypeInterface[]|string[] $types
      */
     public function __construct(array $types = [])
     {

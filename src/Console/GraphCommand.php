@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Console;
 
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Schema\Transformer\Doctrine\TableTransformer;
 use Bdf\Prime\Schema\Visitor\Graphviz;
 use Bdf\Prime\ServiceLocator;
@@ -82,6 +83,8 @@ class GraphCommand extends Command
      * @param string $path
      *
      * @return Schema
+     *
+     * @throws PrimeException
      */
     protected function getSchemaFromModel($io, $path)
     {

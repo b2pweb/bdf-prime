@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Schema;
 
+use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Platform\Sql\Types\SqlStringType;
 use Bdf\Prime\Prime;
@@ -220,7 +221,7 @@ class AbstractSchemaManagerTest extends TestCase
                     ->truncate('test_')
                     ->drop('unknown');
             });
-        } catch (TableNotFoundException $e) {
+        } catch (DBALException $e) {
             $this->assertEquals(1, Prime::repository('Bdf\Prime\TestEntity')->count());
             $this->assertFalse($this->schema->isBuffered());
             $this->assertEmpty($this->schema->pending());

@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Query\Expression;
 
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 
@@ -21,6 +22,7 @@ interface ExpressionInterface
      * @param CompilerInterface $compiler
      *
      * @return string
+     * @throws PrimeException
      */
     public function build($query, $compiler);
 }

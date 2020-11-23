@@ -12,6 +12,8 @@ interface InstantiatorInterface extends BaseInstantiatorInterface
     const USE_CONSTRUCTOR_HINT = 1;
 
     /**
+     * {@inheritdoc}
+     *
      * Instantiate an object from its class name
      *
      * @param string $className  The class name to instantiate

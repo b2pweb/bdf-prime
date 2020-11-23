@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query\Pagination;
 
 use Bdf\Prime\Collection\CollectionInterface;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\PrimeSerializable;
 use Bdf\Prime\Query\QueryInterface;
 
@@ -78,6 +79,8 @@ abstract class AbstractPaginator extends PrimeSerializable
     
     /**
      * Load entities
+     *
+     * @throws PrimeException
      */
     protected function loadCollection()
     {

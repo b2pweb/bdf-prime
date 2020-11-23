@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Query;
 
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\Aggregatable;
 use Bdf\Prime\Query\Contract\EntityJoinable;
 use Bdf\Prime\Query\Contract\Joinable;
@@ -17,6 +18,8 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Orderable, Joinable, Lockable, EntityJoinable
 {
     /**
+     * {@inheritdoc}
+     *
      * Gets all defined query bindings for the query being constructed indexed by parameter index or name.
      *
      * @return array The currently defined query parameters indexed by parameter index or name.
@@ -186,6 +189,7 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * @param int $type
      *
      * @return string
+     * @throws PrimeException
      */
     public function quote($value, $type = null);
 
@@ -195,6 +199,7 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * @param string $column
      *
      * @return string
+     * @throws PrimeException
      */
     public function quoteIdentifier($column);
 
@@ -205,6 +210,7 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * @param array|string $column
      *
      * @return int
+     * @throws PrimeException When execute fail
      */
     public function paginationCount($column = null);
 
@@ -219,11 +225,13 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * </code>
      *
      * @return string The SQL query string.
+     * @throws PrimeException When compilation fail
      */
     public function toSql();
 
     /**
      * @todo A reprendre: utiliser les types des bindings
+     * @throws PrimeException When compilation fail
      */
     public function toRawSql();
 }

@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Schema\Manager;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Schema\TableInterface;
 
 /**
@@ -28,6 +29,7 @@ interface DatabaseManagerInterface
      * @return $this
      *
      * @internal
+     * @throws PrimeException
      */
     public function setConnection(ConnectionInterface $connection);
 
@@ -37,6 +39,7 @@ interface DatabaseManagerInterface
      * @param  string $database
      *
      * @return bool
+     * @throws PrimeException When list databases fail
      */
     public function hasDatabase($database);
 
@@ -44,6 +47,7 @@ interface DatabaseManagerInterface
      * Get the databases listing.
      *
      * @return array
+     * @throws PrimeException When list databases fail
      */
     public function getDatabases();
 
@@ -53,6 +57,7 @@ interface DatabaseManagerInterface
      * @param string $database The name of the database to create.
      *
      * @return $this
+     * @throws PrimeException When query fail
      */
     public function createDatabase($database);
 
@@ -64,6 +69,7 @@ interface DatabaseManagerInterface
      * @param string $database The name of the database to drop.
      *
      * @return $this
+     * @throws PrimeException When query fail
      */
     public function dropDatabase($database);
 
@@ -73,6 +79,7 @@ interface DatabaseManagerInterface
      * @param  string $tableName
      *
      * @return bool
+     * @throws PrimeException When query fail
      */
     public function hasTable($tableName);
 
@@ -82,6 +89,7 @@ interface DatabaseManagerInterface
      * @param string $tableName
      *
      * @return TableInterface
+     * @throws PrimeException When query fail
      */
     public function loadTable($tableName);
 
@@ -91,6 +99,7 @@ interface DatabaseManagerInterface
      * @param string $tableName
      *
      * @return $this
+     * @throws PrimeException When query fail
      */
     public function drop($tableName);
 
@@ -101,6 +110,7 @@ interface DatabaseManagerInterface
      * @param bool $cascade
      *
      * @return $this
+     * @throws PrimeException When query fail
      */
     public function truncate($tableName, $cascade = false);
 
@@ -111,6 +121,7 @@ interface DatabaseManagerInterface
      * @param  string $to
      *
      * @return $this
+     * @throws PrimeException When query fail
      */
     public function rename($from, $to);
 }

@@ -4,6 +4,8 @@ namespace Bdf\Prime\Repository\Write;
 
 use Bdf\Event\EventNotifier;
 use Bdf\Prime\Events;
+use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
@@ -60,9 +62,9 @@ class BufferedWriter implements WriterInterface
      * BufferedWriter constructor.
      *
      * @param EventNotifier|RepositoryInterface $repository The owner repository where operation should be performed
-     * @param WriterInterface $writer The base writer. If not provided, will use the repository writer
+     * @param WriterInterface|null $writer The base writer. If not provided, will use the repository writer
      */
-    public function __construct(RepositoryInterface $repository, WriterInterface $writer = null)
+    public function __construct(RepositoryInterface $repository, ?WriterInterface $writer = null)
     {
         $this->repository = $repository;
         $this->writer = $writer ?: $repository->writer();
@@ -112,7 +114,9 @@ class BufferedWriter implements WriterInterface
      * Flush pending operations
      *
      * @return int Number of affected rows
+     * @throws PrimeException When pending query fail
      */
+    #[WriteOperation]
     public function flush()
     {
         try {
@@ -134,6 +138,7 @@ class BufferedWriter implements WriterInterface
 
     /**
      * @return int
+     * @throws PrimeException
      */
     private function flushInsert()
     {
@@ -148,6 +153,7 @@ class BufferedWriter implements WriterInterface
 
     /**
      * @return int
+     * @throws PrimeException
      */
     private function flushUpdate()
     {
@@ -162,6 +168,7 @@ class BufferedWriter implements WriterInterface
 
     /**
      * @return int
+     * @throws PrimeException
      */
     private function flushDelete()
     {
@@ -197,6 +204,7 @@ class BufferedWriter implements WriterInterface
 
     /**
      * Flush on destruct
+     * @throws PrimeException
      */
     public function __destruct()
     {

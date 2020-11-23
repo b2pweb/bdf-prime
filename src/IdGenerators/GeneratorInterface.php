@@ -3,6 +3,7 @@
 namespace Bdf\Prime\IdGenerators;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\ServiceLocator;
 
 /**
@@ -22,6 +23,8 @@ interface GeneratorInterface
      *
      * @param array $data  By reference
      * @param ServiceLocator   $serviceLocator
+     *
+     * @throws PrimeException
      */
     public function generate(array &$data, ServiceLocator $serviceLocator);
     
@@ -29,6 +32,8 @@ interface GeneratorInterface
      * Modify entity after insertion
      * 
      * @param object $entity
+     *
+     * @throws PrimeException
      */
     public function postProcess($entity);
 }

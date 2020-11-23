@@ -3,12 +3,15 @@
 namespace Bdf\Prime\Migration;
 
 
+use Bdf\Prime\Exception\PrimeException;
+
 interface VersionRepositoryInterface
 {
     /**
      * Get a new identifier
      *
      * @return string
+     * @throws PrimeException
      */
     public function newIdentifier(): string;
 
@@ -18,6 +21,7 @@ interface VersionRepositoryInterface
      * @param string $version
      *
      * @return boolean
+     * @throws PrimeException
      */
     public function has(string $version): bool;
 
@@ -25,6 +29,7 @@ interface VersionRepositoryInterface
      * Get the current version
      *
      * @return string
+     * @throws PrimeException
      */
     public function current(): string;
 
@@ -32,6 +37,7 @@ interface VersionRepositoryInterface
      * Get all versions
      *
      * @return array
+     * @throws PrimeException
      */
     public function all(): array;
 
@@ -43,6 +49,7 @@ interface VersionRepositoryInterface
      * @param string $version
      *
      * @return $this
+     * @throws PrimeException
      */
     public function add(string $version);
 
@@ -54,6 +61,7 @@ interface VersionRepositoryInterface
      * @param string $version
      *
      * @return $this
+     * @throws PrimeException
      */
     public function remove(string $version);
 }

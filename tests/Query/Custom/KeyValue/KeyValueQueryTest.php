@@ -506,7 +506,7 @@ class KeyValueQueryTest extends TestCase
     public function test_dbal_error()
     {
         $this->expectException(DBALException::class);
-        $this->expectExceptionMessage('dbal internal error has occurred');
+        $this->expectExceptionMessage("Error on execute : An exception occurred while executing 'SELECT * FROM not_found':\n\nSQLSTATE[HY000]: General error: 1 no such table: not_found");
 
         $this->query()->from('not_found')->execute();
     }
@@ -517,7 +517,7 @@ class KeyValueQueryTest extends TestCase
     public function test_dbal_error_delete()
     {
         $this->expectException(DBALException::class);
-        $this->expectExceptionMessage('dbal internal error has occurred');
+        $this->expectExceptionMessage("Error on execute : An exception occurred while executing 'DELETE FROM not_found':\n\nSQLSTATE[HY000]: General error: 1 no such table: not_found");
 
         $this->query()->from('not_found')->delete();
     }
@@ -528,7 +528,7 @@ class KeyValueQueryTest extends TestCase
     public function test_dbal_error_update()
     {
         $this->expectException(DBALException::class);
-        $this->expectExceptionMessage('dbal internal error has occurred');
+        $this->expectExceptionMessage("Error on execute : An exception occurred while executing 'UPDATE not_found':\n\nSQLSTATE[HY000]: General error: 1 incomplete input");
 
         $this->query()->from('not_found')->update();
     }

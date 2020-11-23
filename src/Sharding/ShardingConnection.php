@@ -4,7 +4,7 @@ namespace Bdf\Prime\Sharding;
 
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Connection\SubConnectionManagerInterface;
-use Bdf\Prime\ConnectionManager;
+use Bdf\Prime\Exception\ShardingException;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
@@ -14,7 +14,6 @@ use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Driver;
-use Doctrine\DBAL\Sharding\ShardingException;
 use LogicException;
 
 /**
@@ -198,7 +197,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     public function useShard($shardId = null)
     {
         if ($shardId !== null && !isset($this->connections[$shardId])) {
-            throw new ShardingException('Trying to use an unknown shard id "'.$shardId.'"');
+            throw ShardingException::unknown($shardId);
         }
 
         $this->currentShardId = $shardId;
@@ -233,7 +232,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
         }
 
         if (!isset($this->connections[$shardId])) {
-            throw new ShardingException('Trying to get an unknown shard id "'.$shardId.'"');
+            throw ShardingException::unknown($shardId);
         }
 
         return $this->connections[$shardId];

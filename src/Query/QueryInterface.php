@@ -3,10 +3,13 @@
 namespace Bdf\Prime\Query;
 
 use Bdf\Prime\Collection\CollectionInterface;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Contract\Deletable;
 use Bdf\Prime\Query\Contract\Projectionable;
+use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\Whereable;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Pagination\PaginatorInterface;
 
 /**
@@ -28,7 +31,9 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * @param array $types
      *
      * @return int The number of updated rows
+     * @throws PrimeException When execute fail
      */
+    #[WriteOperation]
     public function update(array $data = [], array $types = []);
 
     /**
@@ -66,7 +71,9 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * @param array $data The values to set.
      *
      * @return int The number of updated rows
+     * @throws PrimeException When execute fail
      */
+    #[WriteOperation]
     public function insert(array $data = []);
 
     /**
@@ -96,7 +103,9 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * @param array $values The values to replace.
      *
      * @return int The number of updated rows
+     * @throws PrimeException When execute fail
      */
+    #[WriteOperation]
     public function replace(array $values = []);
 
     /**
@@ -106,7 +115,9 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * @param string|array $attributes
      *
      * @return object[]|CollectionInterface|PaginatorInterface
+     * @throws PrimeException When execute fail
      */
+    #[ReadOperation]
     public function find(array $criteria, $attributes = null);
 
     /**
@@ -116,6 +127,8 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * @param string|array $attributes
      *
      * @return object|null
+     * @throws PrimeException When execute fail
      */
+    #[ReadOperation]
     public function findOne(array $criteria, $attributes = null);
 }

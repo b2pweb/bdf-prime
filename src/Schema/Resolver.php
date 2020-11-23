@@ -3,6 +3,8 @@
 namespace Bdf\Prime\Schema;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Exception\DBALException;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Schema\Adapter\ConstraintTable;
 use Bdf\Prime\Schema\Adapter\MapperInfo\MapperInfoConstraintSet;
 use Bdf\Prime\Schema\Adapter\MapperInfo\Resolver\MapperInfoForeignKeyResolver;
@@ -10,6 +12,7 @@ use Bdf\Prime\Schema\Adapter\Metadata\MetadataTable;
 use Bdf\Prime\Schema\Builder\TableBuilder;
 use Bdf\Prime\ServiceLocator;
 use Bdf\Prime\Mapper\Metadata;
+use Doctrine\DBAL\Exception\TableNotFoundException;
 
 /**
  * Schema resolver
@@ -96,6 +99,7 @@ class Resolver implements ResolverInterface
      * @param bool $foreignKeys Add foreign key constraints to the schema ?
      *
      * @return TableInterface
+     * @throws PrimeException
      */
     public function table($foreignKeys = false)
     {
@@ -123,6 +127,7 @@ class Resolver implements ResolverInterface
      * Create sequence schema from meta
      *
      * @return null|TableInterface
+     * @throws PrimeException
      */
     public function sequence()
     {
@@ -143,6 +148,8 @@ class Resolver implements ResolverInterface
     
     /**
      * Insert sequence id into sequence table
+     *
+     * @throws PrimeException
      */
     public function insertSequenceId()
     {
@@ -181,15 +188,20 @@ class Resolver implements ResolverInterface
             }
             
             return true;
-        } catch (\Exception $e) {
-            return false;
+        } catch (DBALException $e) {
+            if ($e->getPrevious() instanceof TableNotFoundException) {
+                return false;
+            }
+
+            throw $e;
         }
     }
-    
+
     /**
      * Get the schema builder
      * 
      * @return SchemaManagerInterface
+     * @throws PrimeException
      */
     protected function schema()
     {
@@ -204,6 +216,7 @@ class Resolver implements ResolverInterface
      * Get the schema builder for sequence
      *
      * @return SchemaManagerInterface
+     * @throws PrimeException
      */
     protected function schemaSequence()
     {

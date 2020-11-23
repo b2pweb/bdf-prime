@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Connection\Factory;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Exception\DBALException;
 use Doctrine\DBAL\Configuration;
 
 /**
@@ -18,6 +19,7 @@ interface ConnectionFactoryInterface
      * @param Configuration $config
      *
      * @return ConnectionInterface
+     * @throws DBALException
      */
     public function create(string $connectionName, array $parameters, Configuration $config): ConnectionInterface;
 

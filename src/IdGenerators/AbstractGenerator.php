@@ -3,6 +3,7 @@
 namespace Bdf\Prime\IdGenerators;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\ServiceLocator;
 
@@ -103,6 +104,7 @@ abstract class AbstractGenerator implements GeneratorInterface
      * @param ServiceLocator   $serviceLocator
      *
      * @return string   Returns the generated id
+     * @throws PrimeException
      */
     protected function doGenerate($property, array &$data, ServiceLocator $serviceLocator)
     {

@@ -3,7 +3,9 @@
 namespace Bdf\Prime\Query;
 
 use Bdf\Prime\Collection\CollectionFactory;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\Cachable;
+use Bdf\Prime\Query\Contract\ReadOperation;
 
 /**
  * Base type for "read" operation commands
@@ -80,7 +82,9 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      * @param string|array $columns
      *
      * @return array
+     * @throws PrimeException When execute fail
      */
+    #[ReadOperation]
     public function all($columns = null);
 
     /**
@@ -95,7 +99,9 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      * @param string|array $columns
      *
      * @return array|object|null
+     * @throws PrimeException When execute fail
      */
+    #[ReadOperation]
     public function first($columns = null);
 
     /**
@@ -118,7 +124,9 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      * @param string $column
      *
      * @return array
+     * @throws PrimeException When execute fail
      */
+    #[ReadOperation]
     public function inRows($column);
 
     /**
@@ -136,6 +144,8 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      * @param string $column
      *
      * @return string
+     * @throws PrimeException When execute fail
      */
+    #[ReadOperation]
     public function inRow($column);
 }

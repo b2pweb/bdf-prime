@@ -6,6 +6,7 @@ use BadMethodCallException;
 use Bdf\Prime\Collection\Indexer\EntityIndexer;
 use Bdf\Prime\Events;
 use Bdf\Prime\Exception\EntityNotFoundException;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Relations\Relation;
@@ -217,6 +218,7 @@ class QueryRepositoryExtension extends QueryCompatExtension
      * @param array $data
      *
      * @return array
+     * @throws PrimeException
      */
     public function processEntities(array $data)
     {

@@ -5,6 +5,8 @@ namespace Bdf\Prime\Relations;
 use Bdf\Prime\Collection\Indexer\EntityIndexer;
 use Bdf\Prime\Collection\Indexer\EntityIndexerInterface;
 use Bdf\Prime\Query\Contract\EntityJoinable;
+use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Contract\WriteOperation;
 
 /**
  * MorphTo
@@ -48,6 +50,7 @@ class MorphTo extends BelongsTo
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = [])
     {
         if ($collection->empty()) {
@@ -86,6 +89,7 @@ class MorphTo extends BelongsTo
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function saveAll($owner, array $relations = [])
     {
         $relations = $this->rearrangeWith($relations);
@@ -97,6 +101,7 @@ class MorphTo extends BelongsTo
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function deleteAll($owner, array $relations = [])
     {
         $relations = $this->rearrangeWith($relations);

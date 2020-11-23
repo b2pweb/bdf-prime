@@ -8,6 +8,8 @@ use Bdf\Prime\Connection\Extensions\SchemaChanged;
 use Bdf\Prime\Connection\Result\PdoResultSet;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Connection\Result\UpdateResultSet;
+use Bdf\Prime\Exception\DBALException;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Platform\Sql\SqlPlatform;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Compiler\SqlCompiler;
@@ -22,11 +24,12 @@ use Bdf\Prime\Query\Factory\DefaultQueryFactory;
 use Bdf\Prime\Query\Factory\QueryFactoryInterface;
 use Bdf\Prime\Query\Query;
 use Bdf\Prime\Schema\SchemaManager;
+use Closure;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection as BaseConnection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\DBALException as DoctrineDBALException;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Statement;
 use PDO;
@@ -72,7 +75,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
      * @param Driver $driver
      * @param Configuration|null $config
      * @param EventManager|null $eventManager
-     * @throws DBALException
+     * @throws DoctrineDBALException
      */
     public function __construct(array $params, Driver $driver, Configuration $config = null, EventManager $eventManager = null)
     {
@@ -136,10 +139,11 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
     public function platform()
     {
         if ($this->platform === null) {
-            $this->platform = new SqlPlatform(
-                $this->getDatabasePlatform(),
-                $this->getConfiguration()->getTypes()
-            );
+            try {
+                $this->platform = new SqlPlatform($this->getDatabasePlatform(), $this->getConfiguration()->getTypes());
+            } catch (DoctrineDBALException $e) {
+                throw new DBALException($e->getMessage(), $e->getCode(), $e);
+            }
         }
 
         return $this->platform;
@@ -278,6 +282,8 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
     
     /**
      * {@inheritdoc}
+     *
+     * @throws PrimeException
      */
     public function exec($statement)
     {
@@ -290,6 +296,8 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws PrimeException
      */
     public function prepare($statement)
     {
@@ -303,20 +311,24 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
      */
     public function execute(Compilable $query)
     {
-        $statement = $query->compile();
+        try {
+            $statement = $query->compile();
 
-        if ($statement instanceof Statement) {
-            return $this->executePrepared($statement, $query);
+            if ($statement instanceof Statement) {
+                return $this->executePrepared($statement, $query);
+            }
+
+            // $statement is a SQL query
+            if ($query->type() === Compilable::TYPE_SELECT) {
+                $stmt = $this->executeQuery($statement, $query->getBindings());
+
+                return new PdoResultSet($stmt);
+            }
+
+            return new UpdateResultSet($this->executeUpdate($statement, $query->getBindings()));
+        } catch (DoctrineDBALException $e) {
+            throw new DBALException('Error on execute : '.$e->getMessage(), $e->getCode(), $e);
         }
-
-        // $statement is a SQL query
-        if ($query->type() === Compilable::TYPE_SELECT) {
-            $stmt = $this->executeQuery($statement, $query->getBindings());
-
-            return new PdoResultSet($stmt);
-        }
-
-        return new UpdateResultSet($this->executeUpdate($statement, $query->getBindings()));
     }
 
     /**
@@ -326,7 +338,8 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
      * @param Compilable $query
      *
      * @return ResultSetInterface The query result
-     * @throws DBALException
+     * @throws DoctrineDBALException
+     * @throws PrimeException
      */
     protected function executePrepared(Statement $statement, Compilable $query)
     {
@@ -336,7 +349,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
 
         try {
             $statement->execute($bindings);
-        } catch (DBALException $exception) {
+        } catch (DoctrineDBALException $exception) {
             // Prepared query on SQLite for PHP < 7.2 invalidates the query when schema change
             // This process may be removed on PHP 7.2
             if ($this->causedBySchemaChange($exception)) {
@@ -395,14 +408,9 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
 
         $this->_eventManager->dispatchEvent(ConnectionClosedListenerInterface::EVENT_NAME);
     }
-    
+
     /**
-     * Log a query
-     * 
-     * @param string $query
-     * @param int    $seconds
-     * @param array  $bindings
-     * @param array  $types
+     * Setup the logger by setting the connection
      */
     protected function prepareLogger()
     {
@@ -416,28 +424,32 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
     /**
      * Execute a query. Try to reconnect if needed
      *
-     * @param \Closure $callback
+     * @param Closure $callback
      *
      * @return mixed  The query result
      *
      * @throws DBALException
      */
-    protected function runOrReconnect($callback)
+    protected function runOrReconnect(Closure $callback)
     {
         try {
-            return $callback();
-        } catch (DBALException $exception) {
-            if ($this->causedByLostConnection($exception->getPrevious())) {
-                // Should check for active transaction.
-                // Only reconnect the start transaction.
-                // Should raise exception during transaction.
-                $this->close();
-                $this->connect();
-
+            try {
                 return $callback();
-            }
+            } catch (DoctrineDBALException $exception) {
+                if ($this->causedByLostConnection($exception->getPrevious())) {
+                    // Should check for active transaction.
+                    // Only reconnect the start transaction.
+                    // Should raise exception during transaction.
+                    $this->close();
+                    $this->connect();
 
-            throw $exception;
+                    return $callback();
+                }
+
+                throw $exception;
+            }
+        } catch (DoctrineDBALException $e) {
+            throw new DBALException('Error on execute : '.$e->getMessage(), $e->getCode(), $e);
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Query\Custom\KeyValue;
 
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\AbstractCompiler;
 use Bdf\Prime\Query\Contract\Compilable;
@@ -89,6 +90,7 @@ class KeyValueSqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     private function compileWhere(CompilableClause $query)
     {
@@ -129,6 +131,7 @@ class KeyValueSqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     private function compileProjection(CompilableClause $query)
     {
@@ -157,6 +160,7 @@ class KeyValueSqlCompiler extends AbstractCompiler
      * @param string $column    The column to aggregate
      *
      * @return string
+     * @throws PrimeException
      */
     private function compileAggregate(CompilableClause $query, $function, $column)
     {
@@ -187,6 +191,7 @@ class KeyValueSqlCompiler extends AbstractCompiler
      * @param string $alias
      *
      * @return string
+     * @throws PrimeException
      */
     private function compileExpressionColumn(CompilableClause $query, $column, $alias = null)
     {
@@ -216,6 +221,7 @@ class KeyValueSqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     private function compileLimit(CompilableClause $query)
     {
@@ -250,6 +256,7 @@ class KeyValueSqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     private function compileValues(CompilableClause $query)
     {

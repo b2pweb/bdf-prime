@@ -3,6 +3,7 @@
 namespace Bdf\Prime\IdGenerators;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\ServiceLocator;
 
@@ -38,6 +39,7 @@ class TableGenerator extends AbstractGenerator
      * @param Metadata   $metadata
      *
      * @return string  Return the new sequence id
+     * @throws PrimeException
      */
     protected function incrementSequence(ConnectionInterface $connection, Metadata $metadata)
     {

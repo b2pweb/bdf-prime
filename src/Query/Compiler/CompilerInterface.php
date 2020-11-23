@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Query\Compiler;
 
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Query\CompilableClause;
 
@@ -16,6 +17,7 @@ interface CompilerInterface
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     public function compileInsert(CompilableClause $query);
 
@@ -25,6 +27,7 @@ interface CompilerInterface
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     public function compileUpdate(CompilableClause $query);
 
@@ -34,6 +37,7 @@ interface CompilerInterface
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     public function compileDelete(CompilableClause $query);
 
@@ -43,6 +47,7 @@ interface CompilerInterface
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     public function compileSelect(CompilableClause $query);
 
@@ -50,6 +55,7 @@ interface CompilerInterface
      * Gets the connection platform
      *
      * @return PlatformInterface
+     * @throws PrimeException
      */
     public function platform();
 
@@ -60,6 +66,7 @@ interface CompilerInterface
      * @param string $column
      *
      * @return string
+     * @throws PrimeException
      */
     public function quoteIdentifier(CompilableClause $query, $column);
 
@@ -67,6 +74,7 @@ interface CompilerInterface
      * @todo Supprimer ? Il est plus logique que ce soit la query elle même qui gère ses bindings. En l'état impossible, mais à voir pour gérer une autre stratégie de gestion des bindings
      *
      * @param CompilableClause $query
+     * @throws PrimeException
      */
     public function getBindings(CompilableClause $query);
 }
