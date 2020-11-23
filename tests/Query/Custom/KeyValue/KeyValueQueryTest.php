@@ -528,7 +528,7 @@ class KeyValueQueryTest extends TestCase
     public function test_dbal_error_update()
     {
         $this->expectException(DBALException::class);
-        $this->expectExceptionMessage("Error on execute : An exception occurred while executing 'UPDATE not_found':\n\nSQLSTATE[HY000]: General error: 1 incomplete input");
+        $this->expectExceptionMessage("Error on execute : An exception occurred while executing 'UPDATE not_found'");
 
         $this->query()->from('not_found')->update();
     }
