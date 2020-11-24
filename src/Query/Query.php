@@ -3,10 +3,12 @@
 namespace Bdf\Prime\Query;
 
 use Bdf\Prime\Connection\ConnectionInterface;
-use Bdf\Prime\Exception\DBALException;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Contract\Paginable;
+use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Expression\Raw;
 use Bdf\Prime\Query\Extension\EntityJoinTrait;
 use Bdf\Prime\Query\Extension\LimitableTrait;
@@ -14,7 +16,6 @@ use Bdf\Prime\Query\Extension\LockableTrait;
 use Bdf\Prime\Query\Extension\OrderableTrait;
 use Bdf\Prime\Query\Extension\PaginableTrait;
 use Bdf\Prime\Query\Extension\SimpleJoinTrait;
-use Doctrine\DBAL\DBALException as BaseDBALException;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 /**
@@ -99,6 +100,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function delete()
     {
         return $this->executeUpdate(self::TYPE_DELETE);
@@ -107,6 +109,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function update(array $data = [], array $types = [])
     {
         if ($data) {
@@ -122,6 +125,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function insert(array $data = [])
     {
         if ($data) {
@@ -146,6 +150,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function replace(array $values = [])
     {
         $this->statements['replace'] = true;
@@ -205,24 +210,20 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
      * @param string $type The query type
      *
      * @return int The number of updated rows
+     *
+     * @throws PrimeException
      */
     protected function executeUpdate($type)
     {
         $this->setType($type);
 
-        try {
-            $nb = $this->connection->execute($this)->count();
+        $nb = $this->connection->execute($this)->count();
 
-            if ($nb > 0) {
-                $this->clearCacheOnWrite();
-            }
-
-            return $nb;
-        } catch (BaseDBALException $e) {
-            //Encapsulation des exceptions de la couche basse. 
-            //Permet d'eviter la remonté des infos systèmes en cas de catch non intentionnel
-            throw new DBALException('dbal internal error has occurred', 0, $e);
+        if ($nb > 0) {
+            $this->clearCacheOnWrite();
         }
+
+        return $nb;
     }
 
     /**
@@ -230,6 +231,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
      *
      * @todo Return statement instead of array ?
      */
+    #[ReadOperation]
     public function execute($columns = null)
     {
         if (!empty($columns)) {
@@ -238,13 +240,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
 
         $this->setType(self::TYPE_SELECT);
 
-        try {
-            return $this->executeCached();
-        } catch (BaseDBALException $e) {
-            //Encapsulation des exceptions de la couche basse.
-            //Permet d'eviter la remonté des infos systèmes en cas de catch non intentionnel
-            throw new DBALException('dbal internal error has occurred', 0, $e);
-        }
+        return $this->executeCached();
     }
 
     /**
@@ -258,6 +254,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function paginationCount($columns = null)
     {
         $statements = $this->statements;
@@ -311,6 +308,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function count($column = null)
     {
         return (int)$this->aggregate(__FUNCTION__, $column);
@@ -319,6 +317,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function avg($column = null)
     {
         return (float)$this->aggregate(__FUNCTION__, $column);
@@ -327,6 +326,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function min($column = null)
     {
         return (float)$this->aggregate(__FUNCTION__, $column);
@@ -335,6 +335,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function max($column = null)
     {
         return (float)$this->aggregate(__FUNCTION__, $column);
@@ -343,6 +344,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function sum($column = null)
     {
         return (float)$this->aggregate(__FUNCTION__, $column);
@@ -351,6 +353,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function aggregate($function, $column = null)
     {
         $statements = $this->statements;

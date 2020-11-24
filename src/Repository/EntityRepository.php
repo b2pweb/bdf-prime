@@ -10,7 +10,10 @@ use Bdf\Prime\Collection\Indexer\SingleEntityIndexer;
 use Bdf\Prime\Connection\Event\ConnectionClosedListenerInterface;
 use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Events;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Mapper;
+use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\QueryRepositoryExtension;
 use Bdf\Prime\Relations\EntityRelation;
@@ -21,6 +24,7 @@ use Bdf\Prime\Repository\Write\WriterInterface;
 use Bdf\Prime\Schema\NullResolver;
 use Bdf\Prime\Schema\Resolver;
 use Bdf\Prime\ServiceLocator;
+use Closure;
 use Doctrine\Common\EventSubscriber;
 
 /**
@@ -92,9 +96,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * 
      * @param Mapper         $mapper
      * @param ServiceLocator $serviceLocator
-     * @param CacheInterface $cache
+     * @param CacheInterface|null $cache
      */
-    public function __construct(Mapper $mapper, ServiceLocator $serviceLocator, CacheInterface $cache = null)
+    public function __construct(Mapper $mapper, ServiceLocator $serviceLocator, ?CacheInterface $cache = null)
     {
         $this->resultCache = $cache;
         $this->mapper = $mapper;
@@ -189,7 +193,15 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * {@inheritdoc}
+     * Hydrate on property value of an entity
+     *
+     * @param object $entity
+     * @param string $property
+     * @param mixed  $value
+     *
+     * @return void
+     *
+     * @see Mapper::hydrateOne()
      */
     public function hydrateOne($entity, $property, $value)
     {
@@ -197,7 +209,14 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * {@inheritdoc}
+     * Get attribute value of an entity
+     *
+     * @param object $entity
+     * @param string $property
+     *
+     * @return mixed
+     *
+     * @see Mapper::extractOne()
      */
     public function extractOne($entity, $property)
     {
@@ -219,11 +238,11 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * Else the repository will be linked with this new connection
      * 
      * @param string   $connection
-     * @param \Closure $work
+     * @param Closure|null $work
      * 
      * @return $this|mixed  Returns the work result if set or the instance if not set
      */
-    public function on($connection, \Closure $work = null)
+    public function on($connection, ?Closure $work = null)
     {
         $original = $this->changeActiveConnection($connection);
 
@@ -241,15 +260,18 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Launch transactionnal queries
      * 
-     * @param \Closure $work
+     * @param Closure $work
      * @return mixed
      * 
      * @throws \Exception
+     * @throws PrimeException
      */
-    public function transaction(\Closure $work)
+    public function transaction(Closure $work)
     {
         $connection = $this->connection();
-        
+
+        // @todo handle Doctrine DBAL Exception ?
+        // @todo transaction method on connection ?
         try {
             $connection->beginTransaction();
             
@@ -278,9 +300,11 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param string|array    $relations
      *
      * @return void
+     * @throws PrimeException
      *
      * @see EntityRepository::reloadRelations() For force load relations
      */
+    #[ReadOperation]
     public function loadRelations($entity, $relations)
     {
         foreach (Relation::sanitizeRelations((array)$relations) as $relationName => $meta) {
@@ -299,9 +323,11 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param string|array    $relations
      *
      * @return void
+     * @throws PrimeException
      *
      * @see EntityRepository::loadRelations() For loading relation only if not yet loaded
      */
+    #[ReadOperation]
     public function reloadRelations($entity, $relations)
     {
         foreach (Relation::sanitizeRelations((array)$relations) as $relationName => $meta) {
@@ -345,7 +371,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param string|array   $relations
      *
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function saveAll($entity, $relations)
     {
         $relations = Relation::sanitizeRelations((array)$relations);
@@ -368,7 +396,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param string|array   $relations
      *
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function deleteAll($entity, $relations)
     {
         $relations = Relation::sanitizeRelations((array)$relations);
@@ -460,10 +490,12 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * Count entity
      * 
      * @param array $criteria
-     * @param string|array $attributes
+     * @param string|array|null $attributes
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function count(array $criteria = [], $attributes = null)
     {
         return $this->builder()->where($criteria)->count($attributes);
@@ -475,7 +507,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param object $entity
      *
      * @return boolean
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function exists($entity)
     {
         return $this->queries->countKeyValue($this->mapper()->primaryCriteria($entity)) > 0;
@@ -487,8 +521,10 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param object $entity
      * @param array  $criteria
      *
-     * @return object           The refreshed object
+     * @return object The refreshed object
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function refresh($entity, array $criteria = [])
     {
         if (empty($criteria)) {
@@ -530,7 +566,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param object $entity
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function save($entity)
     {
         $isNew = $this->isNew($entity);
@@ -559,7 +597,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param object $entity
      *
      * @return int  Returns 2 if updated and 1 if inserting
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function replace($entity)
     {
         $isNew = $this->isNew($entity);
@@ -578,7 +618,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param object $entity
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function duplicate($entity)
     {
         $this->mapper()->setId($entity, null);
@@ -593,7 +635,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param bool   $ignore
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function insert($entity, $ignore = false)
     {
         return $this->writer->insert($entity, ['ignore' => $ignore]);
@@ -605,7 +649,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param object $entity
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function insertIgnore($entity)
     {
         return $this->insert($entity, true);
@@ -618,7 +664,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param array  $attributes
      *
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function update($entity, array $attributes = null)
     {
         return $this->writer->update($entity, ['attributes' => $attributes]);
@@ -631,7 +679,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param array $criteria
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function updateBy(array $attributes, array $criteria = [])
     {
         return $this->builder()->where($criteria)->update($attributes);
@@ -643,7 +693,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param object $entity
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function delete($entity)
     {
         return $this->writer->delete($entity);
@@ -655,7 +707,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param array $criteria
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function deleteBy(array $criteria)
     {
         return $this->builder()->where($criteria)->delete();
@@ -936,7 +990,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param array $attributes
      * 
      * @return array
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function find(array $criteria, $attributes = null)
     {
         return $this->builder()->find($criteria, $attributes);
@@ -947,7 +1003,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param array $attributes
      * 
      * @return object
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function findOne(array $criteria, $attributes = null)
     {
         return $this->builder()->findOne($criteria, $attributes);

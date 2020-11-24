@@ -3,7 +3,8 @@
 namespace Bdf\Prime\Query\Pagination;
 
 use Bdf\Prime\Collection\CollectionInterface;
-use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\ReadCommandInterface;
 
 /**
@@ -54,7 +55,10 @@ class Walker extends AbstractPaginator implements \Iterator, PaginatorInterface
 
     /**
      * Load the first page of collection
+     *
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function load()
     {
         $this->page = $this->startPage;
@@ -109,7 +113,10 @@ class Walker extends AbstractPaginator implements \Iterator, PaginatorInterface
      * SPL - Iterator
      *
      * {@inheritdoc}
+     *
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function next()
     {
         if (false === next($this->collection)) {
@@ -132,7 +139,10 @@ class Walker extends AbstractPaginator implements \Iterator, PaginatorInterface
      * SPL - Iterator
      *
      * {@inheritdoc}
+     *
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function rewind()
     {
         if (($this->page == $this->startPage) && count($this->collection)) {
@@ -147,6 +157,8 @@ class Walker extends AbstractPaginator implements \Iterator, PaginatorInterface
      * {@inheritdoc}
      * 
      * l'iterator force le count sql
+     *
+     * @throws PrimeException
      */
     protected function buildSize()
     {

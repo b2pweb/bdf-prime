@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Query\Contract\Query;
 
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\Aggregatable;
 use Bdf\Prime\Query\Contract\Deletable;
 use Bdf\Prime\Query\Contract\Projectionable;
@@ -99,6 +100,7 @@ interface KeyValueQueryInterface extends ReadCommandInterface, Projectionable, A
      * @return int Number of affected rows
      *
      * @see KeyValueQueryInterface::values() For set value (internally used by $values parameters)
+     * @throws PrimeException When execute fail
      */
     public function update($values = null);
 

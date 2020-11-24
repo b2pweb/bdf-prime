@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query\Compiler;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Query\CompilableClause;
 
@@ -114,6 +115,7 @@ abstract class AbstractCompiler implements CompilerInterface
      * @param mixed $value
      *
      * @return mixed
+     * @throws PrimeException
      */
     protected function autoConvertValue($value)
     {
@@ -130,6 +132,7 @@ abstract class AbstractCompiler implements CompilerInterface
      * @param mixed $values If is array, convert each values, else convert the value
      *
      * @return mixed
+     * @throws PrimeException
      *
      * @see AbstractCompiler::autoConvertValue()
      */
@@ -152,6 +155,7 @@ abstract class AbstractCompiler implements CompilerInterface
      * @param CompilableClause $query
      *
      * @return mixed
+     * @throws PrimeException
      */
     abstract protected function doCompileInsert(CompilableClause $query);
 
@@ -161,6 +165,7 @@ abstract class AbstractCompiler implements CompilerInterface
      * @param CompilableClause $query
      *
      * @return mixed
+     * @throws PrimeException
      */
     abstract protected function doCompileUpdate(CompilableClause $query);
 
@@ -170,6 +175,7 @@ abstract class AbstractCompiler implements CompilerInterface
      * @param CompilableClause $query
      *
      * @return mixed
+     * @throws PrimeException
      */
     abstract protected function doCompileDelete(CompilableClause $query);
 
@@ -179,6 +185,7 @@ abstract class AbstractCompiler implements CompilerInterface
      * @param CompilableClause $query
      *
      * @return mixed
+     * @throws PrimeException
      */
     abstract protected function doCompileSelect(CompilableClause $query);
 }

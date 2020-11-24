@@ -136,6 +136,16 @@ class ResolverTest extends TestCase
     /**
      *
      */
+    public function test_drop_table_not_found_should_return_false()
+    {
+        $resolver = Customer::repository()->schema();
+
+        $this->assertFalse($resolver->drop());
+    }
+
+    /**
+     *
+     */
     public function test_functional_diff_table_not_present()
     {
         $resolver = Customer::repository()->schema();

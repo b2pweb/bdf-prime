@@ -4,6 +4,9 @@ namespace Bdf\Prime\Collection;
 
 use Bdf\Prime\Collection\Indexer\EntityIndexer;
 use Bdf\Prime\Entity\ImportableInterface;
+use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Relations\Relation;
 use Bdf\Prime\Repository\RepositoryInterface;
@@ -58,9 +61,11 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
      * @param array|string $relations The relations to load. Can be a string for load only one relation
      *
      * @return $this
+     * @throws PrimeException
      *
      * @todo Faut-il utiliser loadIfNotLoaded ?
      */
+    #[ReadOperation]
     public function load($relations)
     {
         foreach (Relation::sanitizeRelations((array)$relations) as $relationName => $meta) {
@@ -123,7 +128,9 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
      * /!\ The collection will not be cleared. The deleted entities can still be used
      *
      * @return $this
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function delete()
     {
         $this->repository->transaction(function (RepositoryInterface $repository) {
@@ -143,7 +150,9 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
      * Save all entities in the collection
      *
      * @return $this
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function save()
     {
         $this->repository->transaction(function (RepositoryInterface $repository) {
@@ -162,7 +171,9 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
      * @param string|array $relations The relations names
      *
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function saveAll($relations)
     {
         $relations = Relation::sanitizeRelations((array)$relations);
@@ -189,7 +200,9 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
      * @param string|array $relations The relations names
      *
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function deleteAll($relations)
     {
         $relations = Relation::sanitizeRelations((array)$relations);
@@ -233,7 +246,9 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
      * @param array $data Data to set (in form [attribute] => [value])
      *
      * @return $this
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function update(array $data)
     {
         foreach ($this as $entity) {
@@ -253,7 +268,9 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
      * /!\ Do not refresh each entities, but the entire collection. Do not store references if you want to refresh the collection
      *
      * @return $this
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function refresh()
     {
         $this->pushAll($this->query()->all());

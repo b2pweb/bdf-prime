@@ -2,7 +2,10 @@
 
 namespace Bdf\Prime\Entity;
 
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\PrimeSerializable;
+use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Relations\EntityRelation;
 use Bdf\Prime\Repository\EntityRepository;
@@ -21,6 +24,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * Exclude all properties from serialization
      *
      * @param ClassMetadataBuilder $builder
+     * @throws PrimeException
      */
     public static function loadSerializerMetadata($builder)
     {
@@ -109,7 +113,9 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * Save this entity
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function save()
     {
         return static::repository()->save($this);
@@ -121,7 +127,9 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param bool $ignore
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function insert($ignore = false)
     {
         return static::repository()->insert($this, $ignore);
@@ -133,7 +141,9 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param array $attributes
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function update(array $attributes = null)
     {
         return static::repository()->update($this, $attributes);
@@ -143,7 +153,9 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * Replace this entity
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function replace()
     {
         return static::repository()->replace($this);
@@ -153,7 +165,9 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * Duplicate this entity
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function duplicate()
     {
         return static::repository()->duplicate($this);
@@ -163,7 +177,9 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * Delete this entity
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function delete()
     {
         return static::repository()->delete($this);
@@ -179,9 +195,11 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param string|array $relations
      * 
      * @return $this
+     * @throws PrimeException
      *
      * @see Model::reload() For force loading
      */
+    #[ReadOperation]
     public function load($relations)
     {
         static::repository()->loadRelations($this, $relations);
@@ -195,7 +213,9 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param string|array $relations
      *
      * @return $this
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function reload($relations)
     {
         static::repository()->reloadRelations($this, $relations);
@@ -221,7 +241,9 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param string|array $relations
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function saveAll($relations)
     {
         return static::repository()->saveAll($this, $relations);
@@ -233,7 +255,9 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param string|array $relations
      * 
      * @return int
+     * @throws PrimeException
      */
+    #[WriteOperation]
     public function deleteAll($relations)
     {
         return static::repository()->deleteAll($this, $relations);

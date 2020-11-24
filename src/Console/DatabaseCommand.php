@@ -11,6 +11,7 @@ use Bdf\Prime\Connection\Factory\MasterSlaveConnectionFactory;
 use Bdf\Prime\Connection\Factory\ShardingConnectionFactory;
 use Bdf\Prime\ConnectionManager;
 use Bdf\Prime\ConnectionRegistryInterface;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\ServiceLocator;
 use Bdf\Util\Console\BdfStyle;
 use Doctrine\DBAL\Connection as DoctrineConnection;
@@ -150,6 +151,8 @@ abstract class DatabaseCommand extends Command
      *
      * @param ConnectionInterface $connection
      * @param string $dbName
+     *
+     * @throws PrimeException
      */
     abstract protected function interactWithDatabase($connection, $dbName);
 
@@ -158,6 +161,8 @@ abstract class DatabaseCommand extends Command
      *
      * @param ConnectionInterface $connection
      * @param string $dbName
+     *
+     * @throws PrimeException
      */
     abstract protected function interactWithNoDatabase($connection, $dbName);
 }

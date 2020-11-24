@@ -2,10 +2,13 @@
 
 namespace Bdf\Prime\Exception;
 
+use RuntimeException;
+use Throwable;
+
 /**
  * Exception for hydrators
  */
-class HydratorException extends \RuntimeException
+class HydratorException extends RuntimeException implements PrimeException
 {
     /**
      * @var string
@@ -17,9 +20,9 @@ class HydratorException extends \RuntimeException
      *
      * @param string $entityClass
      * @param string $message
-     * @param \Exception $previous
+     * @param Throwable|null $previous
      */
-    public function __construct($entityClass, $message = '', $previous = null)
+    public function __construct(string $entityClass, string $message = '', ?Throwable $previous = null)
     {
         parent::__construct($entityClass . ' : ' . $message, 0, $previous);
 
@@ -31,7 +34,7 @@ class HydratorException extends \RuntimeException
      *
      * @return string
      */
-    public function entityClass()
+    public function entityClass(): string
     {
         return $this->entityClass;
     }

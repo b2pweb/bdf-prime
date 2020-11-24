@@ -3,6 +3,8 @@
 namespace Bdf\Prime\Relations;
 
 use Bdf\Prime\Query\Contract\EntityJoinable;
+use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\ReadCommandInterface;
 
 /**
@@ -68,6 +70,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     protected function relations($keys, $with, $constraints, $without)
     {
         return $this->relationQuery($keys, $constraints)
@@ -157,6 +160,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function add($owner, $entity)
     {
         if ($this->isForeignKeyBarrier($owner)) {
@@ -171,6 +175,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function saveAll($owner, array $relations = [])
     {
         $entities = $this->getRelation($owner);
@@ -203,6 +208,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function deleteAll($owner, array $relations = [])
     {
         $entities = $this->getRelation($owner);

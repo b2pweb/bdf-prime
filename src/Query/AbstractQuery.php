@@ -4,6 +4,7 @@ namespace Bdf\Prime\Query;
 
 use Bdf\Prime\Query\Contract\Limitable;
 use Bdf\Prime\Query\Contract\Paginable;
+use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Extension\CompilableTrait;
 use Bdf\Prime\Query\Extension\ProjectionableTrait;
 use Bdf\Prime\Query\Extension\SimpleWhereTrait;
@@ -41,6 +42,7 @@ abstract class AbstractQuery extends AbstractReadCommand implements QueryInterfa
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function find(array $criteria, $attributes = null)
     {
         if ($attributes !== null) {
@@ -63,6 +65,7 @@ abstract class AbstractQuery extends AbstractReadCommand implements QueryInterfa
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function findOne(array $criteria, $attributes = null)
     {
         return $this->where($criteria)->first($attributes);

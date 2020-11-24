@@ -53,6 +53,7 @@ class OrmPreprocessor implements PreprocessorInterface
      * OrmPreprocessor constructor.
      *
      * @param RepositoryInterface $repository
+     * @throws \Bdf\Prime\Exception\PrimeException
      */
     public function __construct(RepositoryInterface $repository)
     {

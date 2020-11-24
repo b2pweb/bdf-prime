@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Query\Compiler;
 
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
@@ -23,9 +24,10 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Quote a value
      * 
-     * @param string $value
+     * @param mixed $value
      *
      * @return string
+     * @throws PrimeException
      */
     public function quote($value)
     {
@@ -51,6 +53,7 @@ class SqlCompiler extends AbstractCompiler
      * @param array $columns
      *
      * @return array
+     * @throws PrimeException
      */
     public function quoteIdentifiers(CompilableClause $query, array $columns)
     {
@@ -89,6 +92,7 @@ class SqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     protected function compileInsertData(CompilableClause $query)
     {
@@ -108,6 +112,7 @@ class SqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     protected function compileInsertSelect(CompilableClause $query)
     {
@@ -139,6 +144,7 @@ class SqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      *
      * @return array
+     * @throws PrimeException
      */
     protected function compileInsertValues(CompilableClause $query)
     {
@@ -184,6 +190,7 @@ class SqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      *
      * @return array
+     * @throws PrimeException
      */
     protected function compileUpdateValues(CompilableClause $query)
     {
@@ -297,6 +304,7 @@ class SqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     protected function compileComplexAggregate(CompilableClause $query)
     {
@@ -312,6 +320,7 @@ class SqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     protected function compileColumns(CompilableClause $query)
     {
@@ -353,6 +362,7 @@ class SqlCompiler extends AbstractCompiler
      * @param bool   $distinct  The distinct status
      *
      * @return string
+     * @throws PrimeException
      */
     protected function compileAggregate(CompilableClause $query, $function, $column, $distinct)
     {
@@ -394,6 +404,7 @@ class SqlCompiler extends AbstractCompiler
      * @param string $alias
      * 
      * @return string
+     * @throws PrimeException
      */
     protected function compileExpressionColumn(CompilableClause $query, $column, $alias = null)
     {
@@ -424,6 +435,7 @@ class SqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     protected function compileFrom(CompilableClause $query)
     {
@@ -452,6 +464,7 @@ class SqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     protected function compileJoins(CompilableClause $query)
     {
@@ -501,6 +514,7 @@ class SqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      * 
      * @return string
+     * @throws PrimeException
      */
     protected function compileWhere(CompilableClause $query)
     {
@@ -517,6 +531,7 @@ class SqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      * 
      * @return string
+     * @throws PrimeException
      */
     protected function compileHaving(CompilableClause $query)
     {
@@ -532,6 +547,7 @@ class SqlCompiler extends AbstractCompiler
      * @param array $clauses
      *
      * @return string
+     * @throws PrimeException
      */
     protected function compileCompilableClauses(CompilableClause $query, array &$clauses)
     {
@@ -591,6 +607,7 @@ class SqlCompiler extends AbstractCompiler
      * @return string  operator found
      * 
      * @throws UnexpectedValueException
+     * @throws PrimeException
      */
     protected function compileExpression(CompilableClause $query, $column, $operator, $value, $converted)
     {
@@ -724,6 +741,7 @@ class SqlCompiler extends AbstractCompiler
      * @param bool $converted Does the value is already converted to database ?
      * 
      * @return string
+     * @throws PrimeException
      */
     protected function compileExpressionValue(CompilableClause $query, $value, bool $converted)
     {
@@ -746,6 +764,7 @@ class SqlCompiler extends AbstractCompiler
      * @param TypeInterface|null $type The type. If null it will be resolved from value
      *
      * @return string
+     * @throws PrimeException
      */
     protected function compileTypedValue(CompilableClause $query, $value, ?TypeInterface $type)
     {
@@ -767,6 +786,7 @@ class SqlCompiler extends AbstractCompiler
      * @param mixed $value
      * 
      * @return string
+     * @throws PrimeException
      */
     protected function compileRawValue(CompilableClause $query, $value)
     {
@@ -789,6 +809,7 @@ class SqlCompiler extends AbstractCompiler
      * @param string $alias
      *
      * @return string  The sub query sql
+     * @throws PrimeException
      */
     protected function compileSubQuery(CompilableClause $clause, QueryInterface $query, $alias = null)
     {
@@ -814,6 +835,7 @@ class SqlCompiler extends AbstractCompiler
      * @param boolean $converted
      * 
      * @return string
+     * @throws PrimeException
      */
     protected function compileInExpression(CompilableClause $query, $values, string $column, string $operator = 'IN', bool $converted = false)
     {
@@ -868,6 +890,7 @@ class SqlCompiler extends AbstractCompiler
      * @param string $separator The expressions separators. By default set to OR, but should be AND on negative (NOT) expressions. See CompositeExpression
      *
      * @return string
+     * @throws PrimeException
      */
     public function compileIntoExpression(CompilableClause $query, array $values, $column, $operator, $converted, $separator = CompositeExpression::TYPE_OR)
     {
@@ -888,6 +911,7 @@ class SqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      * 
      * @return string
+     * @throws PrimeException
      */
     protected function compileGroup(CompilableClause $query)
     {
@@ -910,6 +934,7 @@ class SqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      * 
      * @return string
+     * @throws PrimeException
      */
     protected function compileOrder(CompilableClause $query)
     {
@@ -940,6 +965,7 @@ class SqlCompiler extends AbstractCompiler
      * @param CompilableClause $query
      *
      * @return string
+     * @throws PrimeException
      */
     protected function compileLock(CompilableClause $query)
     {
@@ -968,6 +994,7 @@ class SqlCompiler extends AbstractCompiler
      * @param QueryInterface $subQuery The sub query.
      *
      * @return $this This compiler instance.
+     * @throws PrimeException
      */
     protected function addQueryBindings(CompilableClause $clause, $subQuery)
     {
@@ -992,6 +1019,7 @@ class SqlCompiler extends AbstractCompiler
      * @param TypeInterface|null $type The type to bind, or null to resolve
      *
      * @return string
+     * @throws PrimeException
      */
     protected function bindTyped(CompilableClause $query, $value, ?TypeInterface $type)
     {

@@ -2,7 +2,9 @@
 
 namespace Bdf\Prime\Query\Extension;
 
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Query\Contract\ReadOperation;
 
 /**
  * Trait for provide execute() wrapper methods
@@ -10,16 +12,20 @@ use Bdf\Prime\Query\QueryInterface;
 trait ExecutableTrait
 {
     /**
+     * {@inheritdoc}
      * @see QueryInterface::all()
      */
+    #[ReadOperation]
     public function all($columns = null)
     {
         return $this->postProcessResult($this->execute($columns));
     }
 
     /**
+     * {@inheritdoc}
      * @see QueryInterface::first()
      */
+    #[ReadOperation]
     public function first($columns = null)
     {
         $result = $this->limit(1)->all($columns);
@@ -28,8 +34,10 @@ trait ExecutableTrait
     }
 
     /**
+     * {@inheritdoc}
      * @see QueryInterface::inRows()
      */
+    #[ReadOperation]
     public function inRows($column)
     {
         $result = [];
@@ -42,8 +50,10 @@ trait ExecutableTrait
     }
 
     /**
+     * {@inheritdoc}
      * @see QueryInterface::inRow()
      */
+    #[ReadOperation]
     public function inRow($column)
     {
         $result = $this->limit(1)->execute($column);
@@ -52,6 +62,8 @@ trait ExecutableTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * Post processors.
      * Wrap data with defined wrapper. Run the post processors on rows
      *
@@ -62,11 +74,15 @@ trait ExecutableTrait
     abstract public function postProcessResult($data);
 
     /**
+     * {@inheritdoc}
      * @see QueryInterface::execute()
+     * @throws PrimeException
      */
+    #[ReadOperation]
     abstract public function execute($columns = null);
 
     /**
+     * {@inheritdoc}
      * @see QueryInterface::limit()
      * @return $this
      */

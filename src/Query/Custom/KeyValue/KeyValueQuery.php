@@ -4,6 +4,7 @@ namespace Bdf\Prime\Query\Custom\KeyValue;
 
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Exception\DBALException;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\AbstractReadCommand;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
@@ -11,6 +12,8 @@ use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Contract\Limitable;
 use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
+use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Extension\CompilableTrait;
 use Bdf\Prime\Query\Extension\LimitableTrait;
 use Bdf\Prime\Query\Extension\PaginableTrait;
@@ -117,6 +120,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function count($column = null)
     {
         return (int) $this->aggregate(__FUNCTION__, $column);
@@ -125,6 +129,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function avg($column = null)
     {
         return (float) $this->aggregate(__FUNCTION__, $column);
@@ -133,6 +138,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function min($column = null)
     {
         return $this->aggregate(__FUNCTION__, $column);
@@ -141,6 +147,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function max($column = null)
     {
         return $this->aggregate(__FUNCTION__, $column);
@@ -149,6 +156,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function sum($column = null)
     {
         return (float) $this->aggregate(__FUNCTION__, $column);
@@ -157,6 +165,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function aggregate($function, $column = null)
     {
         $statements = $this->statements;
@@ -176,6 +185,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function paginationCount($columns = null)
     {
         $statements = $this->statements;
@@ -197,6 +207,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function execute($columns = null)
     {
         $this->setType(self::TYPE_SELECT);
@@ -205,40 +216,30 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
             $this->select($columns);
         }
 
-        try {
-            return $this->executeCached();
-        } catch (BaseDBALException $e) {
-            //Encapsulation des exceptions de la couche basse.
-            //Permet d'eviter la remonté des infos systèmes en cas de catch non intentionnel
-            throw new DBALException('dbal internal error has occurred', 0, $e);
-        }
+        return $this->executeCached();
     }
 
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function delete()
     {
         $this->setType(self::TYPE_DELETE);
 
-        try {
-            $count = $this->connection->execute($this)->count();
+        $count = $this->connection->execute($this)->count();
 
-            if ($count > 0) {
-                $this->clearCacheOnWrite();
-            }
-
-            return $count;
-        } catch (BaseDBALException $e) {
-            //Encapsulation des exceptions de la couche basse.
-            //Permet d'eviter la remonté des infos systèmes en cas de catch non intentionnel
-            throw new DBALException('dbal internal error has occurred', 0, $e);
+        if ($count > 0) {
+            $this->clearCacheOnWrite();
         }
+
+        return $count;
     }
 
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function update($values = null)
     {
         if ($values !== null) {
@@ -247,19 +248,13 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
 
         $this->setType(self::TYPE_UPDATE);
 
-        try {
-            $count = $this->connection->execute($this)->count();
+        $count = $this->connection->execute($this)->count();
 
-            if ($count > 0) {
-                $this->clearCacheOnWrite();
-            }
-
-            return $count;
-        } catch (BaseDBALException $e) {
-            //Encapsulation des exceptions de la couche basse.
-            //Permet d'eviter la remonté des infos systèmes en cas de catch non intentionnel
-            throw new DBALException('dbal internal error has occurred', 0, $e);
+        if ($count > 0) {
+            $this->clearCacheOnWrite();
         }
+
+        return $count;
     }
 
     /**
@@ -294,6 +289,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * Get the SQL query
      *
      * @return string
+     * @throws PrimeException
      */
     public function toSql()
     {

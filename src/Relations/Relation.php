@@ -3,6 +3,8 @@
 namespace Bdf\Prime\Relations;
 
 use Bdf\Prime\Collection\Indexer\EntityIndexerInterface;
+use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Relations\Util\ForeignKeyRelation;
 use Bdf\Prime\Repository\RepositoryInterface;
 
@@ -114,6 +116,7 @@ abstract class Relation extends AbstractRelation
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = [])
     {
         if ($collection->empty()) {
@@ -134,7 +137,9 @@ abstract class Relation extends AbstractRelation
      * @param array $without
      *
      * @return array  Entities
+     * @throws PrimeException
      */
+    #[ReadOperation]
     abstract protected function relations($keys, $with, $constraints, $without);
 
     /**

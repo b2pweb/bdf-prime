@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Schema\Manager;
 
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Schema\TableInterface;
 
 /**
@@ -47,6 +48,7 @@ interface TableManagerInterface
      * @return $this
      *
      * @see \Bdf\Prime\Schema\Builder\TypesHelperTableBuilder
+     * @throws PrimeException
      */
     public function table($tableName, callable $callback);
 
@@ -59,6 +61,7 @@ interface TableManagerInterface
      * @param TableInterface $table
      *
      * @return $this
+     * @throws PrimeException
      */
     public function add(TableInterface $table);
 
@@ -69,6 +72,7 @@ interface TableManagerInterface
      * @param  callable $callback
      *
      * @return $this
+     * @throws PrimeException
      */
     public function change($tableName, callable $callback);
 }

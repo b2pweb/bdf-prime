@@ -3,7 +3,10 @@
 namespace Bdf\Prime\Relations;
 
 use Bdf\Prime\Collection\Indexer\EntityIndexerInterface;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\EntityJoinable;
+use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 
@@ -75,7 +78,9 @@ interface RelationInterface
      * @param string[] $without The distant relations to unload (in case of eager load). Format is same as $with, expects that only leaf relation are unloaded
      *
      * @return void
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []);
 
     /**
@@ -101,9 +106,11 @@ interface RelationInterface
      * @param string[] $without The distant relations to unload (in case of eager load). Format is same as $with, expects that only leaf relation are unloaded
      *
      * @return void
+     * @throws PrimeException
      *
      * @see RelationInterface::load() The base loading method
      */
+    #[ReadOperation]
     public function loadIfNotLoaded(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []);
 
     /**
@@ -189,7 +196,9 @@ interface RelationInterface
      * @return int
      * 
      * @throws \InvalidArgumentException     If the owner is the foreign key barrier
+     * @throws PrimeException When cannot save entity
      */
+    #[WriteOperation]
     public function add($owner, $related);
 
     /**
@@ -199,7 +208,9 @@ interface RelationInterface
      * @param array  $relations
      *
      * @return int
+     * @throws PrimeException When cannot save entity
      */
+    #[WriteOperation]
     public function saveAll($owner, array $relations = []);
 
     /**
@@ -209,7 +220,9 @@ interface RelationInterface
      * @param array  $relations
      *
      * @return int
+     * @throws PrimeException When cannot delete entity
      */
+    #[WriteOperation]
     public function deleteAll($owner, array $relations = []);
 
     /**

@@ -2,8 +2,10 @@
 
 namespace Bdf\Prime\Schema;
 
+use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\Schema\Adapter\Doctrine\DoctrineTable as PrimeTableAdapter;
 use Bdf\Prime\Schema\Transformer\Doctrine\TableTransformer;
+use Doctrine\DBAL\DBALException as DoctrineDBALException;
 use Doctrine\DBAL\Schema\Schema as DoctrineSchema;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\SchemaDiff as DoctrineSchemaDiff;
@@ -114,8 +116,12 @@ class SchemaManager extends AbstractSchemaManager
      */
     public function hasDatabase($database)
     {
-        $databases = $this->getDoctrineManager()->listDatabases($database);
-        
+        try {
+            $databases = $this->getDoctrineManager()->listDatabases($database);
+        } catch (DoctrineDBALException $e) {
+            throw new DBALException($e->getMessage(), $e->getCode(), $e);
+        }
+
         return in_array(strtolower($database), array_map('strtolower', $databases));
     }
 
@@ -124,7 +130,11 @@ class SchemaManager extends AbstractSchemaManager
      */
     public function getDatabases()
     {
-        return $this->getDoctrineManager()->listDatabases();
+        try {
+            return $this->getDoctrineManager()->listDatabases();
+        } catch (DoctrineDBALException $e) {
+            throw new DBALException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
@@ -132,9 +142,13 @@ class SchemaManager extends AbstractSchemaManager
      */
     public function createDatabase($database)
     {
-        return $this->push(
-            $this->platform->grammar()->getCreateDatabaseSQL($database)
-        );
+        try {
+            return $this->push(
+                $this->platform->grammar()->getCreateDatabaseSQL($database)
+            );
+        } catch (DoctrineDBALException $e) {
+            throw new DBALException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
@@ -142,9 +156,13 @@ class SchemaManager extends AbstractSchemaManager
      */
     public function dropDatabase($database)
     {
-        return $this->push(
-            $this->platform->grammar()->getDropDatabaseSQL($database)
-        );
+        try {
+            return $this->push(
+                $this->platform->grammar()->getDropDatabaseSQL($database)
+            );
+        } catch (DoctrineDBALException $e) {
+            throw new DBALException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
@@ -152,7 +170,11 @@ class SchemaManager extends AbstractSchemaManager
      */
     public function hasTable($tableName)
     {
-        return $this->getDoctrineManager()->tablesExist($tableName);
+        try {
+            return $this->getDoctrineManager()->tablesExist($tableName);
+        } catch (DoctrineDBALException $e) {
+            throw new DBALException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
@@ -160,23 +182,27 @@ class SchemaManager extends AbstractSchemaManager
      */
     public function loadTable($tableName)
     {
-        $manager = $this->getDoctrineManager();
-        
-        $foreignKeys = [];
-        
-        if ($this->platform->grammar()->supportsForeignKeyConstraints()) {
-            $foreignKeys = $manager->listTableForeignKeys($tableName);
-        }
+        try {
+            $manager = $this->getDoctrineManager();
 
-        return new PrimeTableAdapter(
-            new DoctrineTable(
-                $tableName,
-                $manager->listTableColumns($tableName),
-                $manager->listTableIndexes($tableName),
-                $foreignKeys
-            ),
-            $this->connection->platform()->types()
-        );
+            $foreignKeys = [];
+
+            if ($this->platform->grammar()->supportsForeignKeyConstraints()) {
+                $foreignKeys = $manager->listTableForeignKeys($tableName);
+            }
+
+            return new PrimeTableAdapter(
+                new DoctrineTable(
+                    $tableName,
+                    $manager->listTableColumns($tableName),
+                    $manager->listTableIndexes($tableName),
+                    $foreignKeys
+                ),
+                $this->connection->platform()->types()
+            );
+        } catch (DoctrineDBALException $e) {
+            throw new DBALException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
@@ -184,9 +210,13 @@ class SchemaManager extends AbstractSchemaManager
      */
     public function drop($tableName)
     {
-        return $this->push(
-            $this->platform->grammar()->getDropTableSQL($tableName)
-        );
+        try {
+            return $this->push(
+                $this->platform->grammar()->getDropTableSQL($tableName)
+            );
+        } catch (DoctrineDBALException $e) {
+            throw new DBALException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
@@ -194,9 +224,13 @@ class SchemaManager extends AbstractSchemaManager
      */
     public function truncate($tableName, $cascade = false)
     {
-        return $this->push(
-            $this->platform->grammar()->getTruncateTableSQL($tableName, $cascade)
-        );
+        try {
+            return $this->push(
+                $this->platform->grammar()->getTruncateTableSQL($tableName, $cascade)
+            );
+        } catch (DoctrineDBALException $e) {
+            throw new DBALException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**
@@ -220,10 +254,14 @@ class SchemaManager extends AbstractSchemaManager
     {
         $diff = new DoctrineTableDiff($from);
         $diff->newName = $to;
-        
-        return $this->push(
-            $this->platform->grammar()->getAlterTableSQL($diff)
-        );
+
+        try {
+            return $this->push(
+                $this->platform->grammar()->getAlterTableSQL($diff)
+            );
+        } catch (DoctrineDBALException $e) {
+            throw new DBALException($e->getMessage(), $e->getCode(), $e);
+        }
     }
 
     /**

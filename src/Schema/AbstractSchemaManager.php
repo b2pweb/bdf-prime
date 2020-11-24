@@ -3,9 +3,12 @@
 namespace Bdf\Prime\Schema;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Exception\DBALException;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Schema\Builder\TableBuilder;
 use Bdf\Prime\Schema\Builder\TypesHelperTableBuilder;
+use Doctrine\DBAL\DBALException as DoctrineDBALException;
 
 /**
  * Class AbstractSchemaManager
@@ -42,11 +45,11 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     protected $autoFlush = true;
 
 
-
     /**
      * Create a new schema builder.
      *
-     * @param  ConnectionInterface $connection
+     * @param ConnectionInterface $connection
+     * @throws PrimeException
      */
     public function __construct(ConnectionInterface $connection)
     {
@@ -168,6 +171,10 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
             $this->connection->beginTransaction();
             $this->flush();
             $this->connection->commit();
+        } catch (DoctrineDBALException $e) {
+            $this->connection->rollBack();
+
+            throw new DBALException($e->getMessage(), $e->getCode(), $e);
         } catch (\Exception $e) {
             $this->connection->rollBack();
 

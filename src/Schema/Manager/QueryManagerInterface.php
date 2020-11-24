@@ -2,6 +2,10 @@
 
 namespace Bdf\Prime\Schema\Manager;
 
+use Bdf\Prime\Exception\PrimeException;
+use Closure;
+use Exception;
+
 /**
  * Handle schema manager queries, like buffering, simulation, transaction...
  */
@@ -13,6 +17,7 @@ interface QueryManagerInterface
      * @param mixed $queries Can be one or multiple queries. The type of the query depends of the platform.
      *
      * @return $this
+     * @throws PrimeException If auto flush is enabled and the query fail
      */
     public function push($queries);
 
@@ -33,11 +38,11 @@ interface QueryManagerInterface
      *
      * To perform operations, you should use @see SchemaManagerInterface::flush()
      *
-     * @param \Closure|null $operations Operations to perform, or null for create a buffered SchemaManager
+     * @param Closure|null $operations Operations to perform, or null for create a buffered SchemaManager
      *
      * @return static The simulated new SchemaManager
      */
-    public function simulate(\Closure $operations = null);
+    public function simulate(Closure $operations = null);
 
     /**
      * Do operations into a transaction.
@@ -50,11 +55,14 @@ interface QueryManagerInterface
      * });
      * </code>
      *
-     * @param \Closure $operations
+     * @param Closure $operations
      *
      * @return $this
+     *
+     * @throws PrimeException When transaction fail
+     * @throws Exception Rethrow $operations exception
      */
-    public function transaction(\Closure $operations);
+    public function transaction(Closure $operations);
 
     /**
      * Check if the SchemaManager use a buffer
@@ -83,6 +91,8 @@ interface QueryManagerInterface
      * @see SchemaManager::transaction()
      *
      * @return bool
+     *
+     * @throws PrimeException When a pending query fail
      */
     public function flush();
 

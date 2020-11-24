@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Migration;
 
+use Bdf\Prime\Exception\PrimeException;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\NullOutput;
@@ -86,6 +87,7 @@ class MigrationManager
      * @param string $stage
      *
      * @return string
+     * @throws PrimeException
      */
     public function createMigration(string $name, string $stage): string
     {
@@ -133,6 +135,7 @@ class MigrationManager
      * @param string|null $stage The migration stage, or null to not perform stage filter
      *
      * @return MigrationInterface[]
+     * @throws PrimeException
      */
     public function getDownMigrations(string $stage = null): array
     {
@@ -151,6 +154,7 @@ class MigrationManager
      * Get the upgraded migrations
      *
      * @return array
+     * @throws PrimeException
      */
     public function getVersions(): array
     {
@@ -163,6 +167,7 @@ class MigrationManager
      * A missing migration is an upgraded migration not available
      *
      * @return string[]
+     * @throws PrimeException
      */
     public function getMissingMigrations(): array
     {
@@ -181,6 +186,7 @@ class MigrationManager
      * Get the last upgraded version
      *
      * @return string
+     * @throws PrimeException
      */
     public function getCurrentVersion(): string
     {
@@ -193,6 +199,7 @@ class MigrationManager
      * @param string $stage The migration stage
      *
      * @return string|null
+     * @throws PrimeException
      */
     public function getMostRecentVersion(string $stage = MigrationInterface::STAGE_DEFAULT): ?string
     {
@@ -224,6 +231,7 @@ class MigrationManager
      * @param string $baseVersion
      *
      * @return bool
+     * @throws PrimeException
      */
     public function isOlder(string $version, string $baseVersion = null): bool
     {
@@ -254,6 +262,7 @@ class MigrationManager
      * @param string $version
      *
      * @return boolean
+     * @throws PrimeException
      */
     public function isUp(string $version): bool
     {
@@ -264,6 +273,7 @@ class MigrationManager
      * Upgrade a migration from its version
      *
      * @param string $version
+     * @throws PrimeException
      */
     public function up(string $version): void
     {
@@ -275,6 +285,7 @@ class MigrationManager
      * Downgrade a migration from its version
      *
      * @param string $version
+     * @throws PrimeException
      */
     public function down(string $version): void
     {
@@ -287,6 +298,8 @@ class MigrationManager
      *
      * @param string $endpoint A version
      * @param string $stage The migration stage
+     *
+     * @throws PrimeException
      */
     public function migrate(string $endpoint, string $stage = MigrationInterface::STAGE_DEFAULT): void
     {
@@ -309,6 +322,8 @@ class MigrationManager
      *
      * @param string $endpoint
      * @param string $stage The migration stage
+     *
+     * @throws PrimeException
      */
     public function rollback(string $endpoint, string $stage = MigrationInterface::STAGE_DEFAULT): void
     {

@@ -4,12 +4,14 @@ namespace Bdf\Prime\Repository;
 
 use Bdf\Prime\Cache\CacheInterface;
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Exception\QueryException;
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\OrmPreprocessor;
 use Bdf\Prime\Query\Contract\Cachable;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
+use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\QueryRepositoryExtension;
 use Bdf\Prime\Query\ReadCommandInterface;
@@ -80,9 +82,9 @@ class RepositoryQueryFactory
      * RepositoryQueryFactory constructor.
      *
      * @param RepositoryInterface $repository
-     * @param CacheInterface $resultCache
+     * @param CacheInterface|null $resultCache
      */
-    public function __construct(RepositoryInterface $repository, CacheInterface $resultCache = null)
+    public function __construct(RepositoryInterface $repository, ?CacheInterface $resultCache = null)
     {
         $this->repository = $repository;
         $this->resultCache = $resultCache;
@@ -127,7 +129,9 @@ class RepositoryQueryFactory
      * @param array|string $id The entity PK. Use an array for composite PK
      *
      * @return mixed The entity or null if not found
+     * @throws PrimeException When query fail
      */
+    #[ReadOperation]
     public function findById($id)
     {
         // Create a new query if cache is disabled
@@ -210,7 +214,9 @@ class RepositoryQueryFactory
      * @param mixed $value The search value
      *
      * @return int
+     * @throws PrimeException When query fail
      */
+    #[ReadOperation]
     public function countKeyValue($attribute = null, $value = null)
     {
         if (!$this->supportsKeyValue) {

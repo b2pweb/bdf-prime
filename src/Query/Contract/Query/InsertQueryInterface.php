@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Query\Contract\Query;
 
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Custom\BulkInsert\BulkInsertQuery;
 
 /**
@@ -159,6 +160,7 @@ interface InsertQueryInterface
      * @param mixed $columns Not used : only for compatibility with CommandInterface
      *
      * @return int The number of affected rows
+     * @throws PrimeException When execute fail
      */
     public function execute($columns = null);
 }

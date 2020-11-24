@@ -2,6 +2,9 @@
 
 namespace Bdf\Prime\Query\Contract;
 
+use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Query\Contract\ReadOperation;
+
 /**
  * Interface for query which are iterable and walkable
  * Most of Paginable queries should also be @see Limitable
@@ -17,7 +20,9 @@ interface Paginable extends \IteratorAggregate
      * @param string      $className  Classname of the paginator. Default the registered 'paginator'
      *
      * @return \Bdf\Prime\Query\Pagination\PaginatorInterface
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function paginate($maxRows = null, $page = null, $className = 'paginator');
 
     /**
@@ -27,7 +32,9 @@ interface Paginable extends \IteratorAggregate
      * @param int|null    $page
      *
      * @return \Bdf\Prime\Query\Pagination\PaginatorInterface
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function walk($maxRows = null, $page = null);
 
     /**
@@ -37,6 +44,8 @@ interface Paginable extends \IteratorAggregate
      * @param array|string $column
      *
      * @return int The whole number of rows (ignoring limit and offset)
+     * @throws PrimeException
      */
+    #[ReadOperation]
     public function paginationCount($column = null);
 }

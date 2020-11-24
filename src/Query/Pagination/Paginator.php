@@ -17,13 +17,15 @@ class Paginator extends AbstractPaginator implements \IteratorAggregate, Paginat
 {
     const DEFAULT_PAGE  = 1;
     const DEFAULT_LIMIT = 20;
-    
+
     /**
      * Create a query paginator
-     * 
+     *
      * @param ReadCommandInterface $query
-     * @param int            $maxRows
-     * @param int            $page
+     * @param int $maxRows
+     * @param int $page
+     *
+     * @throws \Bdf\Prime\Exception\PrimeException
      */
     public function __construct(ReadCommandInterface $query, $maxRows = null, $page = null)
     {

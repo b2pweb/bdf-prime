@@ -20,7 +20,7 @@ interface QueryFactoryInterface
      * </code>
      *
      * @param string $name The query name, or class name
-     * @param PreprocessorInterface $preprocessor
+     * @param PreprocessorInterface|null $preprocessor
      *
      * @return CommandInterface
      */

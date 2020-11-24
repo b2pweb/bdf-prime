@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 
 /**
@@ -48,6 +49,7 @@ interface CommandInterface extends CompilableClauseInterface
      * @param string|array $columns
      *
      * @return array
+     * @throws PrimeException When execute fail
      */
     public function execute($columns = null);
 

@@ -7,6 +7,8 @@ use Bdf\Prime\Collection\Indexer\EntityIndexerInterface;
 use Bdf\Prime\Mapper\SingleTableInheritanceMapper;
 use Bdf\Prime\Query\Contract\EntityJoinable;
 use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Relations\Util\ForeignKeyRelation;
 use Bdf\Prime\Repository\RepositoryInterface;
 
@@ -54,6 +56,7 @@ class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = [])
     {
         if ($collection->empty()) {
@@ -151,6 +154,7 @@ class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function add($owner, $related)
     {
         $this->updateDiscriminatorValue($owner);
@@ -161,6 +165,7 @@ class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function saveAll($owner, array $relations = [])
     {
         $relations = $this->rearrangeWith($relations);
@@ -172,6 +177,7 @@ class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function deleteAll($owner, array $relations = [])
     {
         $relations = $this->rearrangeWith($relations);

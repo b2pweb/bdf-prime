@@ -2,10 +2,14 @@
 
 namespace Bdf\Prime\Exception;
 
+use Bdf\Prime\Types\TypeInterface;
+use LogicException;
+use Throwable;
+
 /**
  * Exception raised on type errors
  */
-class TypeException extends \LogicException
+class TypeException extends LogicException implements PrimeException
 {
     /**
      * @var string
@@ -17,11 +21,11 @@ class TypeException extends \LogicException
      * TypeException constructor.
      *
      * @param string $type
-     * @param int $message
+     * @param string $message
      * @param int $code
-     * @param null $previous
+     * @param Throwable|null $previous
      */
-    public function __construct($type, $message, $code = 0, $previous = null)
+    public function __construct(string $type, string $message, int $code = 0, ?Throwable $previous = null)
     {
         parent::__construct($message, $code, $previous);
 
@@ -29,9 +33,12 @@ class TypeException extends \LogicException
     }
 
     /**
+     * Get the type name
+     *
+     * @see TypeInterface::name()
      * @return string
      */
-    public function type()
+    public function type(): string
     {
         return $this->type;
     }

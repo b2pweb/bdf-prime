@@ -7,6 +7,7 @@ use Bdf\Prime\Cache\CacheInterface;
 use Bdf\Prime\Entity\ImportableInterface;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
 use Bdf\Prime\Entity\Hydrator\MapperHydratorInterface;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Builder\IndexBuilder;
 use Bdf\Prime\Mapper\Info\MapperInfo;
 use Bdf\Prime\Platform\PlatformInterface;
@@ -438,8 +439,6 @@ abstract class Mapper
      * @param array  $attributes  Attribute should be flipped as ['key' => true]
      *
      * @return array
-     *
-     * @throws \Exception
      */
     public function prepareToRepository($entity, array $attributes = null)
     {
@@ -486,6 +485,7 @@ abstract class Mapper
      * Get the mapper info
      *
      * @return MapperInfo
+     * @throws PrimeException
      */
     public function info()
     {

@@ -125,6 +125,7 @@ trait CachableTrait
      * Retrieve data from cache, or execute the query and save into cache
      *
      * @return mixed
+     * @throws \Bdf\Prime\Exception\PrimeException
      */
     protected function executeCached()
     {

@@ -3,10 +3,13 @@
 namespace Bdf\Prime\Sharding\Query;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Exception\ShardingException;
 use Bdf\Prime\Query\AbstractReadCommand;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
+use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Extension\CachableTrait;
 use Bdf\Prime\Query\Extension\ExecutableTrait;
 use Bdf\Prime\Sharding\Extension\ShardPicker;
@@ -35,9 +38,9 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      * ShardingKeyValueQuery constructor.
      *
      * @param ShardingConnection $connection
-     * @param PreprocessorInterface $preprocessor
+     * @param PreprocessorInterface|null $preprocessor
      */
-    public function __construct(ShardingConnection $connection, PreprocessorInterface $preprocessor = null)
+    public function __construct(ShardingConnection $connection, ?PreprocessorInterface $preprocessor = null)
     {
         parent::__construct($connection, $preprocessor ?: new DefaultPreprocessor());
 
@@ -145,6 +148,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function count($column = null)
     {
         return (int) array_sum($this->aggregate(__FUNCTION__, $column));
@@ -153,6 +157,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function avg($column = null)
     {
         $results = $this->aggregate(__FUNCTION__, $column);
@@ -163,6 +168,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function min($column = null)
     {
         return (float) min($this->aggregate(__FUNCTION__, $column));
@@ -171,6 +177,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function max($column = null)
     {
         return (float) max($this->aggregate(__FUNCTION__, $column));
@@ -179,6 +186,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     /**
      * {@inheritdoc}
      */
+    #[ReadOperation]
     public function sum($column = null)
     {
         return (float) array_sum($this->aggregate(__FUNCTION__, $column));
@@ -189,6 +197,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      *
      * @return array
      */
+    #[ReadOperation]
     public function aggregate($function, $column = null)
     {
         $results = [];
@@ -205,6 +214,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      *
      * @todo execute cached with closure
      */
+    #[ReadOperation]
     public function execute($columns = null)
     {
         $results = [];
@@ -232,6 +242,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function update($values = null)
     {
         $count = 0;
@@ -250,6 +261,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function delete()
     {
         $count = 0;
@@ -266,11 +278,11 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     }
 
     /**
-     * Select the queriesvto use
+     * Select the queries to use
      *
      * @return KeyValueQueryInterface[]
      *
-     * @throws \Doctrine\DBAL\Sharding\ShardingException
+     * @throws ShardingException
      */
     private function selectQueries(): iterable
     {
@@ -306,7 +318,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      *
      * @return KeyValueQueryInterface
      *
-     * @throws \Doctrine\DBAL\Sharding\ShardingException
+     * @throws ShardingException
      */
     private function getQueryByShard($shardId)
     {

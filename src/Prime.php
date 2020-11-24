@@ -8,6 +8,7 @@ use Bdf\Prime\Connection\Factory\ChainFactory;
 use Bdf\Prime\Connection\Factory\ConnectionFactory;
 use Bdf\Prime\Connection\Factory\MasterSlaveConnectionFactory;
 use Bdf\Prime\Connection\Factory\ShardingConnectionFactory;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\MapperFactory;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Psr\Container\ContainerInterface;
@@ -84,6 +85,7 @@ class Prime
      * 
      * @param string|array|RepositoryInterface $repositories
      * @param boolean                          $force @see EntityRepository::schema
+     * @throws PrimeException
      */
     public static function create($repositories, $force = false)
     {
@@ -95,6 +97,7 @@ class Prime
      * 
      * @param string|array|RepositoryInterface $repositories
      * @param boolean                          $force @see EntityRepository::schema
+     * @throws PrimeException
      */
     public static function drop($repositories, $force = false)
     {
@@ -106,6 +109,7 @@ class Prime
      * 
      * @param string|array|RepositoryInterface $repositories
      * @param boolean                          $force @see EntityRepository::schema
+     * @throws PrimeException
      */
     public static function truncate($repositories, $force = false)
     {
@@ -118,6 +122,8 @@ class Prime
      * @param string  $method
      * @param mixed   $repositories
      * @param boolean $force
+     *
+     * @throws PrimeException
      */
     protected static function callSchemaResolverMethod($method, $repositories, $force)
     {
@@ -153,6 +159,8 @@ class Prime
      * 
      * @param mixed $repositoryName
      * @param mixed $entities
+     *
+     * @throws PrimeException
      */
     public static function push($repositoryName, $entities = null)
     {
@@ -178,6 +186,8 @@ class Prime
      * 
      * @param mixed $repositoryName
      * @param mixed $entities
+     *
+     * @throws PrimeException
      */
     public static function save($repositoryName, $entities = null)
     {
@@ -202,6 +212,8 @@ class Prime
      * 
      * @param mixed $repositoryName
      * @param mixed $entities
+     *
+     * @throws PrimeException
      */
     public static function remove($repositoryName, $entities = null)
     {
@@ -214,6 +226,8 @@ class Prime
      * @param string $method
      * @param mixed $repositoryName
      * @param mixed $entities
+     *
+     * @throws PrimeException
      */
     protected static function callRepositoryMethod($method, $repositoryName, $entities)
     {
@@ -244,6 +258,8 @@ class Prime
      * @param bool   $compare  Will compare entity with the expected one
      * 
      * @return bool
+     *
+     * @throws PrimeException
      */
     public static function exists($entity, $compare = true)
     {
@@ -277,6 +293,8 @@ class Prime
      * @param array|object                $criteria           Array of criteria. Optionnal if repository name is an object
      * 
      * @return object|array
+     *
+     * @throws PrimeException
      */
     public static function find($repositoryName, $criteria = null)
     {
@@ -303,6 +321,8 @@ class Prime
      * @param array|object                $criteria           Array of criteria. Optionnal if repository name is an object
      * 
      * @return object|array
+     *
+     * @throws PrimeException
      */
     public static function one($repositoryName, $criteria = null)
     {
@@ -323,6 +343,8 @@ class Prime
      * @param array  $additionnalCriteria  Criteria to add to primary key
      * 
      * @return object New refresh entity
+     *
+     * @throws PrimeException
      */
     public static function refresh($entity, $additionnalCriteria = [])
     {

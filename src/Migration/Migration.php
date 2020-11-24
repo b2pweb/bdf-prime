@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Migration;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Schema\SchemaManager;
 use Bdf\Prime\ServiceLocator;
@@ -187,6 +188,7 @@ class Migration implements MigrationInterface
      * @param string $connectionName
      *
      * @return \Doctrine\DBAL\Statement
+     * @throws PrimeException
      */
     public function query($sql, array $params = [], $connectionName = null)
     {
@@ -201,6 +203,7 @@ class Migration implements MigrationInterface
      * @param string $connectionName
      *
      * @return int
+     * @throws PrimeException
      */
     public function update($sql, array $params = [], $connectionName = null)
     {
@@ -213,6 +216,7 @@ class Migration implements MigrationInterface
      * @param string $connectionName
      *
      * @return SchemaManager
+     * @throws PrimeException
      */
     public function schema($connectionName = null)
     {
@@ -222,7 +226,7 @@ class Migration implements MigrationInterface
     /**
      * Get db connection
      *
-     * @param string $connectionName
+     * @param string|null $connectionName
      *
      * @return ConnectionInterface
      */

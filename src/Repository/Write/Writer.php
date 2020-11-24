@@ -5,6 +5,7 @@ namespace Bdf\Prime\Repository\Write;
 use Bdf\Event\EventNotifier;
 use Bdf\Prime\Events;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\ServiceLocator;
@@ -59,6 +60,7 @@ class Writer implements WriterInterface
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function insert($entity, array $options = [])
     {
         if ($this->repository->notify(Events::PRE_INSERT, [$entity, $this->repository]) === false) {
@@ -82,6 +84,7 @@ class Writer implements WriterInterface
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function update($entity, array $options = [])
     {
         $attributes = isset($options['attributes']) ? new \ArrayObject($options['attributes']) : null;
@@ -113,6 +116,7 @@ class Writer implements WriterInterface
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function delete($entity, array $options = [])
     {
         if ($this->repository->notify(Events::PRE_DELETE, [$entity, $this->repository]) === false) {

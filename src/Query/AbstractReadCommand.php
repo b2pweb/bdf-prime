@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query;
 
 use Bdf\Prime\Collection\CollectionFactory;
+use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\CompilerState;
@@ -158,7 +159,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
      *
      * @param array  $data
      *
-     * @return array
+     * @return array|CollectionInterface
      */
     public function postProcessResult($data)
     {

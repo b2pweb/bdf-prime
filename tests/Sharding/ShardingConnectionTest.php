@@ -6,6 +6,7 @@ use Bdf\Prime\Connection\ConnectionRegistry;
 use Bdf\Prime\Connection\Factory\ConnectionFactory;
 use Bdf\Prime\Connection\Factory\ShardingConnectionFactory;
 use Bdf\Prime\ConnectionManager;
+use Bdf\Prime\Exception\ShardingException;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
@@ -98,7 +99,7 @@ class ShardingConnectionTest extends TestCase
      */
     public function test_unknown_sub_connection()
     {
-        $this->expectException('Doctrine\DBAL\Sharding\ShardingException');
+        $this->expectException(ShardingException::class);
 
         $this->connections->getConnection('sharding')->getConnection('unknown');
     }

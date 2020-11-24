@@ -3,7 +3,6 @@
 namespace Bdf\Prime\Query\Custom\BulkInsert;
 
 use Bdf\Prime\Connection\ConnectionInterface;
-use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
@@ -13,8 +12,8 @@ use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Contract\Cachable;
 use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Extension\CachableTrait;
-use Doctrine\DBAL\DBALException as BaseDBALException;
 
 /**
  * Handle optimised insert query
@@ -68,7 +67,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
      * BulkInsertQuery constructor.
      *
      * @param ConnectionInterface $connection
-     * @param PreprocessorInterface $preprocessor
+     * @param PreprocessorInterface|null $preprocessor
      */
     public function __construct(ConnectionInterface $connection, PreprocessorInterface $preprocessor = null)
     {
@@ -125,21 +124,16 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * {@inheritdoc}
      */
+    #[WriteOperation]
     public function execute($columns = null)
     {
-        try {
-            $nb = $this->connection->execute($this)->count();
+        $nb = $this->connection->execute($this)->count();
 
-            if ($nb > 0) {
-                $this->clearCacheOnWrite();
-            }
-
-            return $nb;
-        } catch (BaseDBALException $e) {
-            //Encapsulation des exceptions de la couche basse.
-            //Permet d'eviter la remonté des infos systèmes en cas de catch non intentionnel
-            throw new DBALException('dbal internal error has occurred', 0, $e);
+        if ($nb > 0) {
+            $this->clearCacheOnWrite();
         }
+
+        return $nb;
     }
 
     /**
