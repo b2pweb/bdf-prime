@@ -142,6 +142,7 @@ class AliasResolverTest extends TestCase
 
         $this->assertEquals('my_alias.name_', $this->resolver->resolve('my_alias>name'));
 
+        // Resolve must register the root repository if it's not set manually
         $this->assertSame($this->repository->metadata(), $this->resolver->getMetadata('t0'));
     }
 
@@ -217,6 +218,17 @@ class AliasResolverTest extends TestCase
     {
         $this->assertEquals('my_alias', $this->resolver->registerMetadata(Customer::repository(), 'my_alias'));
         $this->assertSame(Customer::repository()->metadata(), $this->resolver->getMetadata('my_alias'));
+    }
+
+    /**
+     * @see https://github.com/b2pweb/bdf-prime/issues/15
+     */
+    public function test_registerMetadata_with_custom_alias_for_current_repository()
+    {
+        $this->assertEquals('my_alias', $this->resolver->registerMetadata($this->repository, 'my_alias'));
+        $this->assertSame($this->repository->metadata(), $this->resolver->getMetadata('my_alias'));
+        $this->assertEquals('my_alias.customer_id', $this->resolver->resolve('customerId'));
+        $this->assertNull($this->resolver->getMetadata('t0'));
     }
 
     /**
