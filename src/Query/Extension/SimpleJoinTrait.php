@@ -51,17 +51,17 @@ trait SimpleJoinTrait
     /**
      * @see Joinable::leftJoin()
      */
-    public function leftJoin($fromAlias, $join, $alias, $condition = null)
+    public function leftJoin($table, $key, $operator = null, $foreign = null)
     {
-        return $this->join($fromAlias, $join, $alias, $condition, Joinable::LEFT_JOIN);
+        return $this->join($table, $key, $operator, $foreign, Joinable::LEFT_JOIN);
     }
 
     /**
      * @see Joinable::rightJoin()
      */
-    public function rightJoin($fromAlias, $join, $alias, $condition = null)
+    public function rightJoin($table, $key, $operator = null, $foreign = null)
     {
-        return $this->join($fromAlias, $join, $alias, $condition, Joinable::RIGHT_JOIN);
+        return $this->join($table, $key, $operator, $foreign, Joinable::RIGHT_JOIN);
     }
 
     /**
