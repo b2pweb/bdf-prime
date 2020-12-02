@@ -228,7 +228,7 @@ class AliasResolverTest extends TestCase
         $this->assertEquals('my_alias', $this->resolver->registerMetadata($this->repository, 'my_alias'));
         $this->assertSame($this->repository->metadata(), $this->resolver->getMetadata('my_alias'));
         $this->assertEquals('my_alias.customer_id', $this->resolver->resolve('customerId'));
-        $this->assertNull($this->resolver->getMetadata('t0'));
+        $this->assertFalse($this->resolver->hasAlias('t0'));
     }
 
     /**
