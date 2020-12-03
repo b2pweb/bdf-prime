@@ -1115,4 +1115,22 @@ class QueryOrmTest extends TestCase
 
         return $connection;
     }
+
+    /**
+     * @see https://github.com/b2pweb/bdf-prime/issues/15
+     */
+    public function test_custom_alias_on_from()
+    {
+        /** @var Query $query */
+        $query = User::where('name', ':like', 'J%');
+
+        // Replace from
+        $query->statements['tables'] = [];
+        $query->from(User::metadata()->table, 'my_alias');
+
+        $this->assertEquals(
+            'SELECT my_alias.* FROM user_ my_alias WHERE my_alias.name_ LIKE ?',
+            $query->toSql()
+        );
+    }
 }

@@ -3,13 +3,10 @@
 namespace Bdf\Prime\Query\Compiler\AliasResolver;
 
 use Bdf\Prime\Mapper\Metadata;
-use Bdf\Prime\Query\CompilableClause;
-use Bdf\Prime\Query\Compiler\CompilerQuery;
 use Bdf\Prime\Query\Contract\EntityJoinable;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
 use Bdf\Prime\Repository\RepositoryInterface;
-use Bdf\Prime\Types\TypesRegistry;
 use Bdf\Prime\Types\TypesRegistryInterface;
 
 /**
@@ -77,6 +74,14 @@ class AliasResolver
      */
     protected $metadataByAlias = [];
 
+    /**
+     * Does the root repository (i.e. $this->repository) is already registered (i.e. has an alias)
+     * The root alias must be defined before resolving any fields, so use this field to auto register the repository if not yet done
+     *
+     * @var bool
+     */
+    private $rootRepositoryRegistered = false;
+
 
     /**
      * AliasResolver constructor.
@@ -94,9 +99,9 @@ class AliasResolver
     /**
      * Set the query instance
      *
-     * @param QueryInterface $query
+     * @param QueryInterface|null $query
      */
-    public function setQuery(QueryInterface $query = null)
+    public function setQuery(?QueryInterface $query = null)
     {
         $this->query = $query;
     }
@@ -110,6 +115,7 @@ class AliasResolver
         $this->relationAlias = [];
         $this->counter = 0;
         $this->metadataByAlias = [];
+        $this->rootRepositoryRegistered = false;
     }
 
     /**
@@ -130,7 +136,7 @@ class AliasResolver
     public function resolve($attribute, &$type = null)
     {
         // The root repository is not registered
-        if (empty($this->relationAlias)) {
+        if (!$this->rootRepositoryRegistered) {
             $this->registerMetadata($this->repository, null);
         }
 
@@ -188,12 +194,20 @@ class AliasResolver
             $this->aliasToPath[$alias] = $metadata->table;
         }
 
+        if (!isset($this->relationAlias[$metadata->table])) {
+            $this->relationAlias[$metadata->table] = $alias;
+        }
+
         if ($metadata->useQuoteIdentifier) {
             $this->query->useQuoteIdentifier(true);
         }
 
         $this->query->where($repository->constraints('$'.$alias));
         $this->metadataByAlias[$alias] = $metadata;
+
+        if ($repository === $this->repository) {
+            $this->rootRepositoryRegistered = true;
+        }
 
         return $alias;
     }
