@@ -2,8 +2,6 @@
 
 namespace Bdf\Prime\Query\Contract;
 
-use Closure;
-
 /**
  * Interface for join() methods
  */
@@ -17,17 +15,27 @@ interface Joinable
     /**
      * Creates and adds a join to the query.
      *
+     * Simple usage:
      * <code>
      *     $query
      *         ->select('u.name')
      *         ->from('users', 'u')
-     *         ->join(['phonenumbers', 'p'], 'p.id', '=', 'u.id');
+     *         ->join(['phonenumbers', 'p'], 'p.id', '=', new Attribute('u.id'));
      * </code>
      *
-     * @param string|array $table
-     * @param string|Closure $key
-     * @param string $operator
-     * @param string $foreign
+     * With subQuery:
+     * <code>
+     *     $subQuery = MyEntity::builder()->select(['bar' => 'foo'])->where(...);
+     *     $query
+     *         ->select('u.name')
+     *         ->from('users', 'u')
+     *         ->join([$subQuery, 's'], 's.bar', '=', new Attribute('u.id'));
+     * </code>
+     *
+     * @param string|\Bdf\Prime\Query\QueryInterface|array $table The joined table. Can also be a sub query. To defined an alias, use syntax [$table, $alias]
+     * @param string|callable(JoinClause):void $key The local key (fk), or the join clause configurator
+     * @param string|null $operator If $key is a string, the matching operator
+     * @param mixed|\Bdf\Prime\Query\Expression\ExpressionInterface|null $foreign If $key is a string, the foreign key value. Use new Attribute() to match with an attribute
      * @param string $type Type of join.
      *
      * @return $this This Query instance.
@@ -36,39 +44,61 @@ interface Joinable
 
     /**
      * Creates and adds a left join to the query.
+     * This is equivalent to call join() with type LEFT_JOIN as last parameter
      *
+     * Simple usage:
      * <code>
      *     $query
      *         ->select('u.name')
      *         ->from('users', 'u')
-     *         ->leftJoin(['phonenumbers', 'p'], 'p.id', '=', 'u.id');
+     *         ->leftJoin(['phonenumbers', 'p'], 'p.id', '=', new Attribute('u.id'));
      * </code>
      *
-     * @param string $fromAlias The alias that points to a from clause.
-     * @param string $join The table name to join.
-     * @param string $alias The alias of the join table.
-     * @param string $condition The condition for the join.
+     * With subQuery:
+     * <code>
+     *     $subQuery = MyEntity::builder()->select(['bar' => 'foo'])->where(...);
+     *     $query
+     *         ->select('u.name')
+     *         ->from('users', 'u')
+     *         ->leftJoin([$subQuery, 's'], 's.bar', '=', new Attribute('u.id'));
+     * </code>
+     *
+     * @param string|\Bdf\Prime\Query\QueryInterface|array $table The joined table. Can also be a sub query. To defined an alias, use syntax [$table, $alias]
+     * @param string|callable(JoinClause):void $key The local key (fk), or the join clause configurator
+     * @param string|null $operator If $key is a string, the matching operator
+     * @param mixed|\Bdf\Prime\Query\Expression\ExpressionInterface|null $foreign If $key is a string, the foreign key value. Use new Attribute() to match with an attribute
      *
      * @return $this This Query instance.
      */
-    public function leftJoin($fromAlias, $join, $alias, $condition = null);
+    public function leftJoin($table, $key, $operator = null, $foreign = null);
 
     /**
      * Creates and adds a right join to the query.
+     * This is equivalent to call join() with type RIGHT_JOIN as last parameter
      *
+     * Simple usage:
      * <code>
      *     $query
      *         ->select('u.name')
      *         ->from('users', 'u')
-     *         ->rightJoin(['phonenumbers', 'p'], 'p.id', '=', 'u.id');
+     *         ->leftJoin(['phonenumbers', 'p'], 'p.id', '=', new Attribute('u.id'));
      * </code>
      *
-     * @param string $fromAlias The alias that points to a from clause.
-     * @param string $join The table name to join.
-     * @param string $alias The alias of the join table.
-     * @param string $condition The condition for the join.
+     * With subQuery:
+     * <code>
+     *     $subQuery = MyEntity::builder()->select(['bar' => 'foo'])->where(...);
+     *     $query
+     *         ->select('u.name')
+     *         ->from('users', 'u')
+     *         ->leftJoin([$subQuery, 's'], 's.bar', '=', new Attribute('u.id'));
+     * </code>
+     *
+     * @param string|\Bdf\Prime\Query\QueryInterface|array $table The joined table. Can also be a sub query. To defined an alias, use syntax [$table, $alias]
+     * @param string|callable(JoinClause):void $key The local key (fk), or the join clause configurator
+     * @param string|null $operator If $key is a string, the matching operator
+     * @param mixed|\Bdf\Prime\Query\Expression\ExpressionInterface|null $foreign If $key is a string, the foreign key value. Use new Attribute() to match with an attribute
      *
      * @return $this This Query instance.
      */
-    public function rightJoin($fromAlias, $join, $alias, $condition = null);
+    public function rightJoin($table, $key, $operator = null, $foreign = null);
 }

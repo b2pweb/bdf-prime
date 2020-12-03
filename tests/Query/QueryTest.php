@@ -11,6 +11,7 @@ use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Contract\Compilable;
+use Bdf\Prime\Query\Expression\Attribute;
 use Bdf\Prime\Query\Expression\Like;
 use Bdf\Prime\Query\Expression\Now;
 use Bdf\Prime\Query\Expression\Raw;
@@ -1537,5 +1538,21 @@ class QueryTest extends TestCase
     public function test_fromAlias_redefine_alias()
     {
         $this->assertEquals('SELECT * FROM test_, no_primary my_alias', $this->query()->from('no_primary', 'np')->fromAlias('my_alias', 'np')->toSql());
+    }
+
+    /**
+     *
+     */
+    public function test_join_with_subQuery()
+    {
+        $subQuery = Prime::connection('test')->from('test_', 'sub')->select(['name' => 'sub.name', 'id' => new Raw('(sub.id * 2)')])->where('sub.date_insert', '>', 1000);
+        $query = Prime::connection('test')->from('test_', 'm')->addSelect(['m.*', 'jName' => 'j.name'])->join([$subQuery, 'j'], 'm.id', '=', new Attribute('j.id'))->where('m.name', ':like', '%foo%');
+
+        $this->assertEquals(
+            'SELECT m.*, j.name as jName FROM test_ m INNER JOIN (SELECT sub.name as name, (sub.id * 2) as id FROM test_ sub WHERE sub.date_insert > ?) as j ON m.id = j.id WHERE m.name LIKE ?',
+            $query->toSql()
+        );
+
+        $this->assertEquals([1000, '%foo%'], $query->getBindings());
     }
 }
