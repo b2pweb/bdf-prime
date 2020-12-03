@@ -5,6 +5,7 @@ namespace Bdf\Prime\Query\Compiler;
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Customer;
 use Bdf\Prime\Document;
+use Bdf\Prime\Exception\QueryException;
 use Bdf\Prime\Faction;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
@@ -565,5 +566,41 @@ class SqlCompilerTest extends TestCase
         );
 
         Prime::service()->connections()->removeConnection('mysql');
+    }
+
+    /**
+     *
+     */
+    public function test_compile_insert_missing_table()
+    {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('The insert table name is missing');
+
+        $query = new Query(Prime::connection('test'));
+        $this->compiler->compileInsert($query);
+    }
+
+    /**
+     *
+     */
+    public function test_compile_update_missing_table()
+    {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('The update table name is missing');
+
+        $query = new Query(Prime::connection('test'));
+        $this->compiler->compileUpdate($query);
+    }
+
+    /**
+     *
+     */
+    public function test_compile_delete_missing_table()
+    {
+        $this->expectException(QueryException::class);
+        $this->expectExceptionMessage('The delete table name is missing');
+
+        $query = new Query(Prime::connection('test'));
+        $this->compiler->compileDelete($query);
     }
 }

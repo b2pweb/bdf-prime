@@ -177,6 +177,12 @@ trait CachableTrait
      */
     protected function cacheNamespace()
     {
-        return $this->connection->getName().':'.(isset($this->statements['tables'][0]['table']) ? $this->statements['tables'][0]['table'] : '');
+        $ns = $this->connection->getName().':';
+
+        foreach ($this->statements['tables'] as $from) {
+            return $ns.$from['table'];
+        }
+
+        return $ns;
     }
 }

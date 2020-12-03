@@ -1514,4 +1514,28 @@ class QueryTest extends TestCase
         $this->assertEquals('other-key', $query->getCacheKey()->key());
         $this->assertEquals(500, $query->getCacheKey()->lifetime());
     }
+
+    /**
+     *
+     */
+    public function test_fromAlias_define_alias_for_last_table()
+    {
+        $this->assertEquals('SELECT * FROM test_ my_alias', $this->query()->fromAlias('my_alias')->toSql());
+    }
+
+    /**
+     *
+     */
+    public function test_fromAlias_with_table_name()
+    {
+        $this->assertEquals('SELECT * FROM no_primary, test_ my_alias', $this->query()->from('no_primary')->fromAlias('my_alias', 'test_')->toSql());
+    }
+
+    /**
+     *
+     */
+    public function test_fromAlias_redefine_alias()
+    {
+        $this->assertEquals('SELECT * FROM test_, no_primary my_alias', $this->query()->from('no_primary', 'np')->fromAlias('my_alias', 'np')->toSql());
+    }
 }
