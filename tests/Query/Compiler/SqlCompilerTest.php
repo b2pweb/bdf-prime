@@ -577,6 +577,7 @@ class SqlCompilerTest extends TestCase
         $this->expectExceptionMessage('The insert table name is missing');
 
         $query = new Query(Prime::connection('test'));
+        $query->values(['foo' => 'bar']);
         $this->compiler->compileInsert($query);
     }
 
@@ -589,6 +590,7 @@ class SqlCompilerTest extends TestCase
         $this->expectExceptionMessage('The update table name is missing');
 
         $query = new Query(Prime::connection('test'));
+        $query->values(['foo' => 'bar']);
         $this->compiler->compileUpdate($query);
     }
 
