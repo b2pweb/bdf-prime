@@ -439,25 +439,21 @@ class SqlCompiler extends AbstractCompiler
      */
     protected function compileFrom(CompilableClause $query)
     {
-        $sql = [];
-        $databasePrefix = $this->getDatabaseNamePrefix($query);
+        $sql = ' FROM ';
+        $isFirst = true;
 
         // Loop through all FROM clauses
-        foreach ($query->statements['tables'] as $from) {
-            if ($from['table'] instanceof QueryInterface) {
-                $sql[] = $this->compileSubQuery($query, $from['table'], $from['alias']);
+        foreach ($this->compileTableAndAliasClause($query, $query->statements['tables']) as $from) {
+            if (!$isFirst) {
+                $sql .= ', ';
             } else {
-                $from = $query->preprocessor()->table($from);
-
-                if ($from['alias'] === null) {
-                    $sql[$from['table']] = $this->quoteIdentifier($query, $databasePrefix.$from['table']);
-                } else {
-                    $sql[$from['alias']] = $this->quoteIdentifier($query, $databasePrefix.$from['table']) . ' ' . $this->quoteIdentifier($query, $from['alias']);
-                }
+                $isFirst = false;
             }
+
+            $sql .= $from['sql'];
         }
 
-        return ' FROM '.implode(', ', $sql);
+        return $sql;
     }
 
     /**
@@ -471,25 +467,55 @@ class SqlCompiler extends AbstractCompiler
         if (empty($query->statements['joins'])) {
             return '';
         }
-        
-        $sql = [];
+
+        $sql = '';
+
+        foreach ($this->compileTableAndAliasClause($query, $query->statements['joins']) as $join) {
+            $sql .= ' '.$join['type'].' JOIN '.$join['sql'].' ON '.$this->compileCompilableClauses($query, $join['on']);
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Compile clauses with 'table' and 'alias' keys
+     *
+     * The table name will be resolved, quoted, and generate the alias if present
+     * Duplicate table name or aliases will also be removed from result
+     *
+     * The compiled table expression will be returned into the 'sql' key
+     * All input parameter will be kept on the return value
+     *
+     * @param CompilableClause $query
+     * @param array $clauses
+     *
+     * @return array
+     *
+     * @throws PrimeException
+     */
+    protected function compileTableAndAliasClause(CompilableClause $query, array $clauses): array
+    {
         $databasePrefix = $this->getDatabaseNamePrefix($query);
+        $compiled = [];
 
-        foreach ($query->statements['joins'] as $join) {
-            $join = $query->preprocessor()->table($join);
-
-            if ($join['alias'] === null) {
-                $sql[$join['table']] = $join['type']
-                    . ' JOIN ' . $this->quoteIdentifier($query, $databasePrefix.$join['table'])
-                    . ' ON '   . $this->compileCompilableClauses($query, $join['on']);
+        foreach ($clauses as $from) {
+            if ($from['table'] instanceof QueryInterface) {
+                $from['sql'] = $this->compileSubQuery($query, $from['table'], $from['alias']);
+                $compiled[] = $from;
             } else {
-                $sql[$join['alias']] = $join['type']
-                    . ' JOIN ' . $this->quoteIdentifier($query, $databasePrefix.$join['table']).' '.$this->quoteIdentifier($query, $join['alias'])
-                    . ' ON '   . $this->compileCompilableClauses($query, $join['on']);
+                $from = $query->preprocessor()->table($from);
+
+                if ($from['alias'] === null) {
+                    $from['sql'] = $this->quoteIdentifier($query, $databasePrefix.$from['table']);
+                    $compiled[$from['table']] = $from;
+                } else {
+                    $from['sql'] = $this->quoteIdentifier($query, $databasePrefix.$from['table']) . ' ' . $this->quoteIdentifier($query, $from['alias']);
+                    $compiled[$from['alias']] = $from;
+                }
             }
         }
 
-        return ' '.implode(' ', $sql);
+        return $compiled;
     }
 
     /**
