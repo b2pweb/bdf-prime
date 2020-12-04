@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query\Contract;
 
 use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Query\Expression\Aggregate;
 
 /**
  * Query with aggregate operations
@@ -16,6 +17,8 @@ interface Aggregatable
      *
      * @return int
      * @throws PrimeException When execute fail
+     *
+     * @see Aggregate::count() For generate a count query
      */
     #[ReadOperation]
     public function count($column = null);
@@ -27,6 +30,8 @@ interface Aggregatable
      *
      * @return float
      * @throws PrimeException When execute fail
+     *
+     * @see Aggregate::avg() For generate a avg query
      */
     #[ReadOperation]
     public function avg($column = null);
@@ -38,6 +43,8 @@ interface Aggregatable
      *
      * @return float
      * @throws PrimeException When execute fail
+     *
+     * @see Aggregate::min() For generate a min query
      */
     #[ReadOperation]
     public function min($column = null);
@@ -49,6 +56,8 @@ interface Aggregatable
      *
      * @return float
      * @throws PrimeException When execute fail
+     *
+     * @see Aggregate::max() For generate a max query
      */
     #[ReadOperation]
     public function max($column = null);
@@ -60,6 +69,8 @@ interface Aggregatable
      *
      * @return float
      * @throws PrimeException When execute fail
+     *
+     * @see Aggregate::sum() For generate a sum query
      */
     #[ReadOperation]
     public function sum($column = null);
