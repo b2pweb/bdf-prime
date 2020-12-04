@@ -40,6 +40,14 @@ class KeyValueSqlCompilerTest extends TestCase
     /**
      *
      */
+    protected function tearDown(): void
+    {
+        $this->primeStop();
+    }
+
+    /**
+     *
+     */
     protected function declareTestData($pack)
     {
         $pack->declareEntity([TestEntity::class, User::class]);
