@@ -388,12 +388,53 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     public function from($from, $alias = null)
     {
         $this->compilerState->invalidate('from');
-        
-        $this->statements['tables'][] = [
+
+        $table = [
             'table' => $from,
             'alias' => $alias,
         ];
-        
+        $key = $alias ?: $from;
+
+        if (is_string($key)) {
+            $this->statements['tables'][$key] = $table;
+        } else {
+            $this->statements['tables'][] = $table;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Change a FROM alias for a table (or previously defined alias)
+     *
+     * Usage:
+     * <code>
+     * // Change alias of the current table : FROM my_table as my_alias
+     * $query->from('my_table')->fromAlias('my_alias');
+     *
+     * // Change alias of the foo table : FROM foo as my_alias, bar
+     * $query->from('foo')->from('bar')->fromAlias('my_alias', 'foo');
+     *
+     * // Redefine alias of foo : FROM foo as my_alias, bar
+     * $query->from('foo', 'f')->from('bar')->fromAlias('my_alias', 'f');
+     * </code>
+     *
+     * @param string $alias The new alias name
+     * @param string|null $table The last alias / table name. If null, will define the last table
+     *
+     * @return $this
+     */
+    public function fromAlias(string $alias, ?string $table = null)
+    {
+        $this->compilerState->invalidate('from');
+
+        $table = $table ?? key($this->statements['tables']);
+
+        $this->statements['tables'][$alias] = $this->statements['tables'][$table];
+        $this->statements['tables'][$alias]['alias'] = $alias;
+
+        unset($this->statements['tables'][$table]);
+
         return $this;
     }
 

@@ -95,7 +95,7 @@ class RepositoryQueryFactoryTest extends TestCase
         $this->assertInstanceOf(Query::class, $query);
         $this->assertSame($this->repository, $query->repository());
         $this->assertSame($this->cache, $query->cache());
-        $this->assertEquals('test_', $query->statements['tables'][0]['table']);
+        $this->assertEquals('test_', $query->statements['tables']['test_']['table']);
         $this->assertEquals(new OrmPreprocessor($this->repository), $query->preprocessor());
 
         $this->assertInstanceOf(KeyValueQuery::class, $this->factory->make(KeyValueQuery::class));
@@ -108,6 +108,18 @@ class RepositoryQueryFactoryTest extends TestCase
     {
         $this->assertInstanceOf(Query::class, $this->factory->builder());
         $this->assertEquals(new OrmPreprocessor($this->repository), $this->factory->builder()->preprocessor());
+    }
+
+    /**
+     *
+     */
+    public function test_fromAlias()
+    {
+        $query = $this->factory->fromAlias('alias');
+
+        $this->assertInstanceOf(Query::class, $query);
+        $this->assertEquals(new OrmPreprocessor($this->repository), $query->preprocessor());
+        $this->assertEquals('SELECT alias.* FROM test_ alias', $query->toSql());
     }
 
     /**

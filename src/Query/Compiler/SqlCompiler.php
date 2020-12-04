@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query\Compiler;
 
 use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Exception\QueryException;
 use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
@@ -83,7 +84,11 @@ class SqlCompiler extends AbstractCompiler
             $insert = 'INSERT INTO ';
         }
 
-        return $query->state()->compiled = $insert.$this->quoteIdentifier($query, $query->statements['tables'][0]['table']).$this->compileInsertData($query);
+        foreach ($query->statements['tables'] as $table) {
+            return $query->state()->compiled = $insert.$this->quoteIdentifier($query, $table['table']).$this->compileInsertData($query);
+        }
+
+        throw new QueryException('The insert table name is missing');
     }
 
     /**
@@ -178,10 +183,15 @@ class SqlCompiler extends AbstractCompiler
 
         $values = $this->compileUpdateValues($query);
 
-        return $query->state()->compiled = 'UPDATE '
-            . $this->quoteIdentifier($query, $query->statements['tables'][0]['table'])
-            . ' SET ' . implode(', ', $values)
-            . $this->compileWhere($query);
+        foreach ($query->statements['tables'] as $table) {
+            return $query->state()->compiled = 'UPDATE '
+                . $this->quoteIdentifier($query, $table['table'])
+                . ' SET ' . implode(', ', $values)
+                . $this->compileWhere($query)
+            ;
+        }
+
+        throw new QueryException('The update table name is missing');
     }
 
     /**
@@ -216,9 +226,14 @@ class SqlCompiler extends AbstractCompiler
     {
         $query->state()->currentPart = 0;
 
-        return $query->state()->compiled = 'DELETE FROM '
-            . $this->quoteIdentifier($query, $query->statements['tables'][0]['table'])
-            . $this->compileWhere($query);
+        foreach ($query->statements['tables'] as $table) {
+            return $query->state()->compiled = 'DELETE FROM '
+                . $this->quoteIdentifier($query, $table['table'])
+                . $this->compileWhere($query)
+            ;
+        }
+
+        throw new QueryException('The delete table name is missing');
     }
     
     /**

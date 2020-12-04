@@ -103,7 +103,21 @@ class RepositoryQueryFactory
      */
     public function builder()
     {
-        return $this->configure($this->connection->builder(new OrmPreprocessor($this->repository)));
+        return $this->fromAlias();
+    }
+
+    /**
+     * Get query builder with a defined table alias on FROM clause
+     *
+     * @param string|null $alias The FROM table alias
+     *
+     * @return QueryInterface
+     *
+     * @throws PrimeException
+     */
+    public function fromAlias(?string $alias = null)
+    {
+        return $this->configure($this->connection->builder(new OrmPreprocessor($this->repository)), $alias);
     }
 
     /**
@@ -299,17 +313,18 @@ class RepositoryQueryFactory
      * Configure the query for the current repository
      *
      * @param CommandInterface $query
+     * @param string|null $alias The FROM table alias
      *
      * @return CommandInterface
      */
-    private function configure(CommandInterface $query)
+    private function configure(CommandInterface $query, ?string $alias = null)
     {
         if ($this->metadata->useQuoteIdentifier) {
             $query->useQuoteIdentifier();
         }
 
         $query->setCustomFilters($this->repository->mapper()->filters());
-        $query->from($this->metadata->table);
+        $query->from($this->metadata->table, $alias);
 
         if ($query instanceof ReadCommandInterface) {
             $query->setCollectionFactory($this->repository->collectionFactory());
