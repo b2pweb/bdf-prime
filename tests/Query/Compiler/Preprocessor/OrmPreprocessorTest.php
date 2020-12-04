@@ -117,7 +117,7 @@ class OrmPreprocessorTest extends TestCase
         $this->assertNotEquals($selectQuery, $cloned);
         $this->assertEquals($baseQuery, $cloned);
 
-        $this->assertEquals('t0', $selectQuery->statements['tables'][0]['alias']);
+        $this->assertEquals('t0', $selectQuery->statements['tables']['faction_']['alias']);
     }
 
     /**

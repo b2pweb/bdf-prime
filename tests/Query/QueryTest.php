@@ -1519,6 +1519,30 @@ class QueryTest extends TestCase
     /**
      *
      */
+    public function test_fromAlias_define_alias_for_last_table()
+    {
+        $this->assertEquals('SELECT * FROM test_ my_alias', $this->query()->fromAlias('my_alias')->toSql());
+    }
+
+    /**
+     *
+     */
+    public function test_fromAlias_with_table_name()
+    {
+        $this->assertEquals('SELECT * FROM no_primary, test_ my_alias', $this->query()->from('no_primary')->fromAlias('my_alias', 'test_')->toSql());
+    }
+
+    /**
+     *
+     */
+    public function test_fromAlias_redefine_alias()
+    {
+        $this->assertEquals('SELECT * FROM test_, no_primary my_alias', $this->query()->from('no_primary', 'np')->fromAlias('my_alias', 'np')->toSql());
+    }
+
+    /**
+     *
+     */
     public function test_join_with_subQuery()
     {
         $subQuery = Prime::connection('test')->from('test_', 'sub')->select(['name' => 'sub.name', 'id' => new Raw('(sub.id * 2)')])->where('sub.date_insert', '>', 1000);

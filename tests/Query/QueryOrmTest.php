@@ -1133,4 +1133,15 @@ class QueryOrmTest extends TestCase
             $query->toSql()
         );
     }
+
+    /**
+     *
+     */
+    public function test_change_from_alias()
+    {
+        $this->assertEquals(
+            'SELECT my_alias.* FROM user_ my_alias WHERE my_alias.name_ LIKE ?',
+            User::fromAlias('my_alias')->where('name', ':like', 'J%')->toSql()
+        );
+    }
 }
