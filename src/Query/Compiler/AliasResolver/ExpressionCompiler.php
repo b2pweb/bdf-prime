@@ -148,7 +148,7 @@ class ExpressionCompiler
         $tokens = [];
 
         while ($pos < $len) {
-            switch ($expression{$pos}) {
+            switch ($expression[$pos]) {
                 case self::ALIAS_IDENTIFIER:
                     $tokens[] = $this->compileAlias($expression, $pos, $len);
                     break;
@@ -256,7 +256,7 @@ class ExpressionCompiler
      */
     protected function compileDynamic($expression, &$pos, $len)
     {
-        if ($expression{$pos} === self::DYN_SEPARATOR) {
+        if ($expression[$pos] === self::DYN_SEPARATOR) {
             ++$pos;
         }
 
@@ -267,7 +267,7 @@ class ExpressionCompiler
 
             if (
                 $pos >= $len
-                || $expression{$pos} !== self::DYN_SEPARATOR
+                || $expression[$pos] !== self::DYN_SEPARATOR
             ) {
                 break;
             }
@@ -297,7 +297,7 @@ class ExpressionCompiler
         $name = '';
 
         for (;$pos < $len; ++$pos) {
-            $chr = $expression{$pos};
+            $chr = $expression[$pos];
 
             if (array_key_exists($chr, self::RESERVED)) {
                 break;
