@@ -11,6 +11,19 @@ use Bdf\Prime\Query\Pagination\PaginatorFactory;
 trait PaginableTrait
 {
     /**
+     * @var PaginatorFactory|null
+     */
+    private $paginatorFactory;
+
+    /**
+     * @param PaginatorFactory $paginatorFactory
+     */
+    public function setPaginatorFactory(PaginatorFactory $paginatorFactory): void
+    {
+        $this->paginatorFactory = $paginatorFactory;
+    }
+
+    /**
      * SPL - IteratorAggregate
      *
      * {@inheritdoc}
@@ -25,7 +38,9 @@ trait PaginableTrait
      */
     public function paginate($maxRows = null, $page = null, $className = 'paginator')
     {
-        return PaginatorFactory::create($this, $className, $maxRows, $page);
+        $factory = $this->paginatorFactory ?? PaginatorFactory::instance();
+
+        return $factory->create($this, $className, $maxRows, $page);
     }
 
     /**

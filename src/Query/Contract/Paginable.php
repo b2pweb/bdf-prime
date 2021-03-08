@@ -4,6 +4,7 @@ namespace Bdf\Prime\Query\Contract;
 
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Pagination\PaginatorFactory;
 
 /**
  * Interface for query which are iterable and walkable
@@ -48,4 +49,11 @@ interface Paginable extends \IteratorAggregate
      */
     #[ReadOperation]
     public function paginationCount($column = null);
+
+    /**
+     * Define the paginator factory to use on the query
+     *
+     * @param PaginatorFactory $paginatorFactory
+     */
+    public function setPaginatorFactory(PaginatorFactory $paginatorFactory): void;
 }

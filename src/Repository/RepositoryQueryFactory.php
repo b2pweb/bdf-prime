@@ -10,8 +10,13 @@ use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\OrmPreprocessor;
 use Bdf\Prime\Query\Contract\Cachable;
+use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Pagination\PaginatorFactory;
+use Bdf\Prime\Query\Pagination\Walker;
+use Bdf\Prime\Query\Pagination\WalkStrategy\KeyWalkStrategy;
+use Bdf\Prime\Query\Pagination\WalkStrategy\MapperPrimaryKey;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\QueryRepositoryExtension;
 use Bdf\Prime\Query\ReadCommandInterface;
@@ -76,6 +81,13 @@ class RepositoryQueryFactory
      * @var QueryRepositoryExtension
      */
     private $extension;
+
+    /**
+     * Save paginator factory instance for optimisation
+     *
+     * @var PaginatorFactory
+     */
+    private $paginatorFactory;
 
 
     /**
@@ -335,6 +347,10 @@ class RepositoryQueryFactory
             $query->setCache($this->resultCache);
         }
 
+        if ($query instanceof Paginable) {
+            $query->setPaginatorFactory($this->paginatorFactory());
+        }
+
         return $query;
     }
 
@@ -350,6 +366,20 @@ class RepositoryQueryFactory
         }
 
         return clone $this->extension;
+    }
+
+    /**
+     * Get the paginator factory instance
+     *
+     * @return PaginatorFactory
+     */
+    private function paginatorFactory(): PaginatorFactory
+    {
+        if ($this->paginatorFactory) {
+            return $this->paginatorFactory;
+        }
+
+        return $this->paginatorFactory = new RepositoryPaginatorFactory($this->repository);
     }
 
     /**
