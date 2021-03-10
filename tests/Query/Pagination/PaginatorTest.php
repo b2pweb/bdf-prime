@@ -107,17 +107,7 @@ class PaginatorTest extends TestCase
         
         $this->assertTrue(is_array($wrapper), 'should be an array');
     }
-    
-    /**
-     * 
-     */
-    public function test_walker_wrapper()
-    {
-        $wrapper = Prime::repository(TestEntity::class)->walk([]);
-        
-        $this->assertInstanceOf('Bdf\Prime\Query\Pagination\Walker', $wrapper);
-    }
-    
+
     /**
      * 
      */

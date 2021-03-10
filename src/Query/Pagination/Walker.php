@@ -2,10 +2,15 @@
 
 namespace Bdf\Prime\Query\Pagination;
 
-use Bdf\Prime\Collection\CollectionInterface;
+use BadMethodCallException;
 use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\PrimeSerializable;
 use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Pagination\WalkStrategy\PaginationWalkStrategy;
+use Bdf\Prime\Query\Pagination\WalkStrategy\WalkCursor;
+use Bdf\Prime\Query\Pagination\WalkStrategy\WalkStrategyInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
+use LogicException;
 
 /**
  * Query Walker
@@ -19,7 +24,7 @@ use Bdf\Prime\Query\ReadCommandInterface;
  * @author  Seb
  * @package Bdf\Prime\Query\Pagination
  */
-class Walker extends AbstractPaginator implements \Iterator, PaginatorInterface
+class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
 {
     const DEFAULT_PAGE  = 1;
     const DEFAULT_LIMIT = 150;
@@ -39,6 +44,36 @@ class Walker extends AbstractPaginator implements \Iterator, PaginatorInterface
     protected $offset;
 
     /**
+     * @var array|null
+     */
+    private $collection;
+
+    /**
+     * @var WalkStrategyInterface
+     */
+    private $strategy;
+
+    /**
+     * @var WalkCursor
+     */
+    private $cursor;
+
+    /**
+     * @var ReadCommandInterface
+     */
+    private $query;
+
+    /**
+     * @var int
+     */
+    private $page;
+
+    /**
+     * @var int
+     */
+    private $maxRows;
+
+    /**
      * Create a query walker
      * 
      * @param ReadCommandInterface $query
@@ -54,6 +89,38 @@ class Walker extends AbstractPaginator implements \Iterator, PaginatorInterface
     }
 
     /**
+     * Change the walk strategy
+     *
+     * @param WalkStrategyInterface $strategy
+     *
+     * @return Walker
+     */
+    public function setStrategy(WalkStrategyInterface $strategy): self
+    {
+        if ($this->cursor !== null) {
+            throw new LogicException('Cannot change walk strategy during walk');
+        }
+
+        $this->strategy = $strategy;
+
+        return $this;
+    }
+
+    /**
+     * Get the current active walk strategy
+     *
+     * @return WalkStrategyInterface
+     */
+    public function getStrategy(): WalkStrategyInterface
+    {
+        if ($this->strategy) {
+            return $this->strategy;
+        }
+
+        return $this->strategy = new PaginationWalkStrategy();
+    }
+
+    /**
      * Load the first page of collection
      *
      * @throws PrimeException
@@ -62,19 +129,91 @@ class Walker extends AbstractPaginator implements \Iterator, PaginatorInterface
     public function load()
     {
         $this->page = $this->startPage;
+        $this->cursor = $this->getStrategy()->initialize($this->query, $this->maxRows, $this->page);
         $this->loadCollection();
     }
-    
+
+    /**
+     * @return ReadCommandInterface
+     */
+    public function query(): ReadCommandInterface
+    {
+        if ($this->cursor) {
+            return $this->cursor->query;
+        }
+
+        return $this->query;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function collection()
+    {
+        return $this->collection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function size()
+    {
+        return $this->query->paginationCount();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function order($attribute = null)
+    {
+        $orders = $this->query()->getOrders();
+
+        if ($attribute === null) {
+            return $orders;
+        }
+
+        return isset($orders[$attribute]) ? $orders[$attribute] : null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function limit()
+    {
+        return $this->cursor->query->getLimit();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offset()
+    {
+        return $this->cursor->query->getOffset();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function page()
+    {
+        return $this->page;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function pageMaxRows()
+    {
+        return $this->maxRows;
+    }
+
     /**
      * {@inheritdoc}
      */
     protected function loadCollection()
     {
-        parent::loadCollection();
-        
-        if ($this->collection instanceof CollectionInterface) {
-            $this->collection = $this->collection->all();
-        }
+        $this->cursor = $this->strategy->next($this->cursor);
+        $this->collection = $this->cursor->entities;
 
         // Test if the collection has numerical keys.
         // We have to add the offset to the numerical key.
@@ -148,20 +287,183 @@ class Walker extends AbstractPaginator implements \Iterator, PaginatorInterface
         if (($this->page == $this->startPage) && count($this->collection)) {
             reset($this->collection);
         } else {
-            $this->page = $this->startPage;
-            $this->loadCollection();
+            $this->load();
         }
     }
 
     /**
      * {@inheritdoc}
-     * 
-     * l'iterator force le count sql
-     *
-     * @throws PrimeException
      */
-    protected function buildSize()
+    public function count()
     {
-        $this->size = $this->query->paginationCount();
+        return count($this->collection);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function pushAll(array $items)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function push($item)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function put($key, $item)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function all()
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function get($key, $default = null)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function has($key)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function remove($key)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function keys()
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isEmpty()
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function map($callback)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function filter($callback = null)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function groupBy($groupBy, $mode = self::GROUPBY)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function contains($element)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function indexOf($value, $strict = false)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function merge($items)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function sort(callable $callback = null)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetExists($offset)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetGet($offset)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetSet($offset, $value)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function offsetUnset($offset)
+    {
+        throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }
 }

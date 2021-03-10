@@ -2,7 +2,6 @@
 
 namespace Bdf\Prime\Query\Pagination;
 
-use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
 
 /**
@@ -11,16 +10,50 @@ use Bdf\Prime\Query\ReadCommandInterface;
 class PaginatorFactory
 {
     /**
+     * @var PaginatorFactory
+     */
+    private static $instance;
+
+    /**
      * Mapping for paginator classes
      *
      * @var string[]
      */
-    static protected $paginatorAliases = [
+    private $paginatorAliases = [
         'walker'    => Walker::class,
         'paginator' => Paginator::class,
     ];
 
-    
+    /**
+     * The paginator factory
+     * Takes the class name as key and the factory function as value
+     *
+     * @var callable[]
+     */
+    private $paginatorFactories = [];
+
+    /**
+     * Register an alias for a paginator class
+     *
+     * @param string $className The paginator class name
+     * @param string $alias The alias
+     */
+    public function addAlias(string $className, string $alias): void
+    {
+        $this->paginatorAliases[$alias] = $className;
+    }
+
+    /**
+     * Register a factory for a paginator class
+     *
+     * @param string $className The paginator class name
+     * @param callable $factory The factory function
+     */
+    public function addFactory(string $className, callable $factory): void
+    {
+        $this->paginatorFactories[$className] = $factory;
+    }
+
     /**
      * Create the paginator instance
      *
@@ -31,12 +64,30 @@ class PaginatorFactory
      *
      * @return PaginatorInterface
      */
-    public static function create(ReadCommandInterface $query, $class = 'paginator', $maxRows = null, $page = null)
+    public function create(ReadCommandInterface $query, string $class = 'paginator', ?int $maxRows = null, ?int $page = null): PaginatorInterface
     {
-        if (isset(static::$paginatorAliases[$class])) {
-            $class = static::$paginatorAliases[$class];
+        if (isset($this->paginatorAliases[$class])) {
+            $class = $this->paginatorAliases[$class];
         }
 
-        return new $class($query, $maxRows, $page);
+        if (!isset($this->paginatorFactories[$class])) {
+            return new $class($query, $maxRows, $page);
+        }
+
+        return ($this->paginatorFactories[$class])($query, $maxRows, $page);
+    }
+
+    /**
+     * Get the paginator instance
+     *
+     * @return $this
+     */
+    public static function instance(): self
+    {
+        if (self::$instance) {
+            return self::$instance;
+        }
+
+        return self::$instance = new self;
     }
 }

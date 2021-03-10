@@ -12,6 +12,9 @@ use Bdf\Prime\Faction;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Compiler\Preprocessor\OrmPreprocessor;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
+use Bdf\Prime\Query\Pagination\Walker;
+use Bdf\Prime\Query\Pagination\WalkStrategy\KeyWalkStrategy;
+use Bdf\Prime\Query\Pagination\WalkStrategy\PaginationWalkStrategy;
 use Bdf\Prime\Query\Query;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Test\RepositoryAssertion;
@@ -333,5 +336,52 @@ class RepositoryQueryFactoryTest extends TestCase
         $this->assertInstanceOf(QueryInterface::class, $query);
         $this->assertNotSame($entities, $query->all());
         $this->assertEntities($entities, $query->all());
+    }
+
+    /**
+     *
+     */
+    public function test_walk_strategy()
+    {
+        $walker = $this->factory->builder()->walk();
+
+        $this->assertInstanceOf(Walker::class, $walker);
+        $this->assertInstanceOf(KeyWalkStrategy::class, $walker->getStrategy());
+        $walker->load();
+        $this->assertEquals(['id' => 'ASC'], $walker->query()->getOrders());
+
+        $walker = $this->factory->keyValue()->walk();
+
+        $this->assertInstanceOf(Walker::class, $walker);
+        $this->assertInstanceOf(PaginationWalkStrategy::class, $walker->getStrategy());
+
+        $walker = $this->factory->builder()->order('name')->walk();
+
+        $this->assertInstanceOf(Walker::class, $walker);
+        $this->assertInstanceOf(PaginationWalkStrategy::class, $walker->getStrategy());
+
+        $walker = $this->factory->builder()->order('id', 'desc')->walk();
+
+        $this->assertInstanceOf(Walker::class, $walker);
+        $this->assertInstanceOf(KeyWalkStrategy::class, $walker->getStrategy());
+        $walker->load();
+        $this->assertEquals(['id' => 'desc'], $walker->query()->getOrders());
+
+        $walker = $this->factory->builder()->walk(10, 3);
+
+        $this->assertInstanceOf(Walker::class, $walker);
+        $this->assertInstanceOf(PaginationWalkStrategy::class, $walker->getStrategy());
+    }
+
+    /**
+     *
+     */
+    public function test_walk_composite_pk()
+    {
+        $queries = new RepositoryQueryFactory(CompositePkEntity::repository());
+        $walker = $queries->builder()->walk();
+
+        $this->assertInstanceOf(Walker::class, $walker);
+        $this->assertInstanceOf(PaginationWalkStrategy::class, $walker->getStrategy());
     }
 }

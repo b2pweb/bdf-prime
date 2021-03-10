@@ -9,6 +9,9 @@ use Bdf\Prime\Query\Expression\ExpressionInterface;
  */
 interface Orderable
 {
+    const ORDER_ASC = 'ASC';
+    const ORDER_DESC = 'DESC';
+
     /**
      * Specifies an ordering for the query results.
      * Replaces any previously specified orderings, if any.

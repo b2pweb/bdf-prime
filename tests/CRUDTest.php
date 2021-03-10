@@ -304,6 +304,30 @@ class CRUDTest extends TestCase
     /**
      *
      */
+    public function test_walker_with_delete_should_not_skip_entities()
+    {
+        $entities = [];
+
+        for ($i = 1; $i <= 10; ++$i) {
+            $entities[] = new User(['id' => $i, 'name' => 'TEST'.$i, 'customer' => new Customer(['id' => '1']), 'roles' => ['2']]);
+        }
+
+        $this->pack()->nonPersist($entities);
+
+        $iterator = User::repository()->builder()->walk(3);
+
+        $actual = [];
+        foreach ($iterator as $entity) {
+            $actual[] = $entity;
+            $entity->delete();
+        }
+
+        $this->assertEquals($entities, $actual);
+    }
+
+    /**
+     *
+     */
     public function test_group_by()
     {
         $this->pack()->nonPersist([

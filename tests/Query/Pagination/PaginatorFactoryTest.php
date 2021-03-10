@@ -17,7 +17,7 @@ class PaginatorFactoryTest extends TestCase
     {
         $query = $this->createMock(SqlQueryInterface::class);
 
-        $paginator = PaginatorFactory::create($query);
+        $paginator = PaginatorFactory::instance()->create($query);
 
         $this->assertInstanceOf(Paginator::class, $paginator);
         $this->assertSame($query, $paginator->query());
@@ -30,7 +30,7 @@ class PaginatorFactoryTest extends TestCase
     {
         $query = $this->createMock(SqlQueryInterface::class);
 
-        $paginator = PaginatorFactory::create($query, 'walker');
+        $paginator = PaginatorFactory::instance()->create($query, 'walker');
 
         $this->assertInstanceOf(Walker::class, $paginator);
         $this->assertSame($query, $paginator->query());
@@ -43,8 +43,44 @@ class PaginatorFactoryTest extends TestCase
     {
         $query = $this->createMock(SqlQueryInterface::class);
 
-        $paginator = PaginatorFactory::create($query, EmptyPaginator::class);
+        $paginator = PaginatorFactory::instance()->create($query, EmptyPaginator::class);
 
         $this->assertInstanceOf(EmptyPaginator::class, $paginator);
+    }
+
+    /**
+     *
+     */
+    public function test_instance()
+    {
+        $this->assertEquals(new PaginatorFactory(), PaginatorFactory::instance());
+        $this->assertSame(PaginatorFactory::instance(), PaginatorFactory::instance());
+    }
+
+    /**
+     *
+     */
+    public function test_addAlias()
+    {
+        $query = $this->createMock(SqlQueryInterface::class);
+
+        $factory = new PaginatorFactory();
+        $factory->addAlias(EmptyPaginator::class, 'alias');
+        $paginator = $factory->create($query, 'alias');
+
+        $this->assertInstanceOf(EmptyPaginator::class, $paginator);
+    }
+
+    /**
+     *
+     */
+    public function test_addFactory()
+    {
+        $query = $this->createMock(SqlQueryInterface::class);
+
+        $factory = new PaginatorFactory();
+        $paginator = new EmptyPaginator();
+        $factory->addFactory(EmptyPaginator::class, function () use($paginator) { return $paginator; });
+        $this->assertSame($paginator, $factory->create($query, EmptyPaginator::class));
     }
 }
