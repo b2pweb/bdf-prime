@@ -9,6 +9,8 @@ use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Relations\Relation;
+use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Repository\Write\BufferedWriter;
 
@@ -134,6 +136,7 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
     public function delete()
     {
         $this->repository->transaction(function (RepositoryInterface $repository) {
+            /** @var RepositoryInterface&RepositoryEventsSubscriberInterface $repository */
             $writer = new BufferedWriter($repository);
 
             foreach ($this as $entity) {
@@ -512,8 +515,6 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
     public function offsetSet($offset, $value)
     {
         $this->storage->offsetSet($offset, $value);
-
-        return $this;
     }
 
     /**
@@ -522,8 +523,6 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
     public function offsetUnset($offset)
     {
         $this->storage->offsetUnset($offset);
-
-        return $this;
     }
 
     /**

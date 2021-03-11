@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Behaviors;
 
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
 
@@ -67,11 +68,12 @@ final class Timestampable extends Behavior
     /**
      * Get the field infos from option
      *
-     * @param mixed $field
+     * @param bool|string|[0:string,1:string} $field
+     * @param array $default
      *
      * @return null|array
      */
-    private function getFieldInfos($field, $default)
+    private function getFieldInfos($field, array $default): ?array
     {
         if ($field === true) {
             return $default;
@@ -94,7 +96,7 @@ final class Timestampable extends Behavior
     /**
      * {@inheritdoc}
      */
-    public function changeSchema(FieldBuilder $builder)
+    public function changeSchema(FieldBuilder $builder): void
     {
         if ($this->createdAt !== null && !isset($builder[$this->createdAt['name']])) {
             $builder->add($this->createdAt['name'], $this->type)->nillable();
@@ -165,7 +167,7 @@ final class Timestampable extends Behavior
     /**
      * {@inheritdoc}
      */
-    public function subscribe($notifier)
+    public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
     {
         if ($this->createdAt !== null) {
             $notifier->inserting([$this, 'beforeInsert']);

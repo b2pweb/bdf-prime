@@ -170,11 +170,13 @@ class Resolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function truncate($cascade =false)
+    public function truncate($cascade = false)
     {
-        return $this->schema()->truncate($this->metadata->table, $cascade);
+        $this->schema()->truncate($this->metadata->table, $cascade);
+
+        return true;
     }
-    
+
     /**
      * {@inheritdoc}
      */

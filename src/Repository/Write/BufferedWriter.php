@@ -6,6 +6,7 @@ use Bdf\Event\EventNotifier;
 use Bdf\Prime\Events;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
@@ -33,7 +34,7 @@ use Bdf\Prime\Repository\RepositoryInterface;
 class BufferedWriter implements WriterInterface
 {
     /**
-     * @var RepositoryInterface|EventNotifier
+     * @var RepositoryInterface&RepositoryEventsSubscriberInterface
      */
     private $repository;
 
@@ -61,7 +62,7 @@ class BufferedWriter implements WriterInterface
     /**
      * BufferedWriter constructor.
      *
-     * @param EventNotifier|RepositoryInterface $repository The owner repository where operation should be performed
+     * @param RepositoryEventsSubscriberInterface&RepositoryInterface $repository The owner repository where operation should be performed
      * @param WriterInterface|null $writer The base writer. If not provided, will use the repository writer
      */
     public function __construct(RepositoryInterface $repository, ?WriterInterface $writer = null)

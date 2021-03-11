@@ -13,6 +13,7 @@ use Bdf\Prime\Mapper\Info\MapperInfo;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
 use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\ServiceLocator;
 use Bdf\Prime\IdGenerators\GeneratorInterface;
@@ -712,9 +713,9 @@ abstract class Mapper
     /**
      * Register event on notifier
      * 
-     * @param \Bdf\Event\EventNotifier $notifier
+     * @param RepositoryEventsSubscriberInterface $notifier
      */
-    public function events($notifier)
+    public function events(RepositoryEventsSubscriberInterface $notifier)
     {
         $this->customEvents($notifier);
 
@@ -728,7 +729,7 @@ abstract class Mapper
      *
      * To overwrite.
      *
-     * @param \Bdf\Event\EventNotifier $notifier
+     * @param RepositoryEventsSubscriberInterface $notifier
      */
     public function customEvents($notifier)
     {

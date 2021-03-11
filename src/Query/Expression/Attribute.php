@@ -2,6 +2,9 @@
 
 namespace Bdf\Prime\Query\Expression;
 
+use Bdf\Prime\Query\CompilableClause;
+use Bdf\Prime\Query\Compiler\CompilerInterface;
+
 /**
  * Attribute
  * 
@@ -36,7 +39,7 @@ class Attribute implements ExpressionInterface
     /**
      * {@inheritdoc}
      */
-    public function build($query, $compiler)
+    public function build(CompilableClause $query, CompilerInterface $compiler)
     {
         return sprintf($this->pattern, $compiler->quoteIdentifier($query, $query->preprocessor()->field($this->attribute)));
     }

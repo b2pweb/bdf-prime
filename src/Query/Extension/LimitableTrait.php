@@ -9,15 +9,19 @@ use Bdf\Prime\Query\Contract\Limitable;
  * Trait for limits
  * @see Limitable
  *
+ * @psalm-require-implements Limitable
+ *
  * @property array $statements
  * @property CompilerInterface $compiler
  */
 trait LimitableTrait
 {
     /**
-     * @see Limitable::nul()
+     * {@inheritdoc}
+     *
+     * @see Limitable::limit()
      */
-    public function limit($limit, $offset = null)
+    public function limit(?int $limit, ?int $offset = null)
     {
         $this->compilerState->invalidate();
 
@@ -31,9 +35,11 @@ trait LimitableTrait
     }
 
     /**
-     * @see Limitable::= ()
+     * {@inheritdoc}
+     *
+     * @see Limitable::limitPage()
      */
-    public function limitPage($page, $rowCount = 1)
+    public function limitPage(int $page, int $rowCount = 1)
     {
         $page     = ($page > 0) ? $page : 1;
         $rowCount = ($rowCount > 0) ? $rowCount : 1;
@@ -44,29 +50,35 @@ trait LimitableTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Limitable::getPage()
      */
-    public function getPage()
+    public function getPage(): int
     {
         if ($this->statements['limit'] <= 0) {
             return 1;
         }
 
-        return ceil($this->statements['offset'] / $this->statements['limit']) + 1;
+        return (int) ceil($this->statements['offset'] / $this->statements['limit']) + 1;
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Limitable::getLimit()
      */
-    public function getLimit()
+    public function getLimit(): ?int
     {
         return $this->statements['limit'];
     }
 
     /**
-     * @see Limitable::$offse()
+     * {@inheritdoc}
+     *
+     * @see Limitable::offset()
      */
-    public function offset($offset)
+    public function offset(?int $offset)
     {
         $this->compilerState->invalidate();
 
@@ -76,25 +88,31 @@ trait LimitableTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Limitable::getOffset()
      */
-    public function getOffset()
+    public function getOffset(): ?int
     {
         return $this->statements['offset'];
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Limitable::isLimitQuery()
      */
-    public function isLimitQuery()
+    public function isLimitQuery(): bool
     {
         return $this->statements['limit'] !== null || $this->statements['offset'] !== null;
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Limitable::hasPagination()
      */
-    public function hasPagination()
+    public function hasPagination(): bool
     {
         return $this->statements['limit'] !== null && $this->statements['offset'] !== null;
     }

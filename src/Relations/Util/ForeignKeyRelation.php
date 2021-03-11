@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Relations\Util;
 
 use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Relations\AbstractRelation;
 use Bdf\Prime\Relations\RelationInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
@@ -28,9 +29,11 @@ trait ForeignKeyRelation
 
 
     /**
+     * {@inheritdoc}
+     *
      * @see AbstractRelation::applyWhereKeys()
      */
-    protected function applyWhereKeys(QueryInterface $query, $value)
+    protected function applyWhereKeys(ReadCommandInterface $query, $value): ReadCommandInterface
     {
         return $query->where($this->distantKey, $value);
     }
@@ -97,14 +100,18 @@ trait ForeignKeyRelation
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see RelationInterface::relationRepository()
      * @return RepositoryInterface
      */
-    abstract public function relationRepository();
+    abstract public function relationRepository(): RepositoryInterface;
 
     /**
+     * {@inheritdoc}
+     *
      * @see RelationInterface::localRepository()
      * @return RepositoryInterface
      */
-    abstract public function localRepository();
+    abstract public function localRepository(): RepositoryInterface;
 }

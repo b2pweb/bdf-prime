@@ -774,7 +774,7 @@ public function __construct(array $data = [])
      *
      * @return string
      */
-    protected function generateMethod($description, $methodName, $content = null)
+    protected function generateMethod(string $description, string $methodName, string $content)
     {
         if ($this->hasMethod($methodName)) {
             return '';

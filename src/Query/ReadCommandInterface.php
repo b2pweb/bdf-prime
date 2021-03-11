@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query;
 
 use Bdf\Prime\Collection\CollectionFactory;
+use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\Cachable;
 use Bdf\Prime\Query\Contract\ReadOperation;
@@ -81,7 +82,8 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      *
      * @param string|array $columns
      *
-     * @return array
+     * @return array|CollectionInterface
+     *
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]

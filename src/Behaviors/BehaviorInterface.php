@@ -2,14 +2,11 @@
 
 namespace Bdf\Prime\Behaviors;
 
-use Bdf\Event\EventNotifier;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
-use Bdf\Prime\ServiceLocator;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 
 /**
- * BehaviorInterface
- *
- * @package Bdf\Prime\Behaviors
+ * Change behavior of the repository
  */
 interface BehaviorInterface
 {
@@ -20,19 +17,19 @@ interface BehaviorInterface
      *
      * @return void
      */
-    public function changeSchema(FieldBuilder $builder);
+    public function changeSchema(FieldBuilder $builder): void;
 
     /**
      * Subscribe events on notifier
      *
-     * @param EventNotifier $notifier
+     * @param RepositoryEventsSubscriberInterface $notifier
      */
-    public function subscribe($notifier);
-    
+    public function subscribe(RepositoryEventsSubscriberInterface $notifier): void;
+
     /**
      * Get behavior constraints
      * 
      * @return array
      */
-    public function constraints();
+    public function constraints(): array;
 }

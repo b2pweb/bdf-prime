@@ -6,14 +6,17 @@ use Bdf\Prime\Collection\ArrayCollection;
 use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
+use IteratorAggregate;
 
 /**
  * Query Paginator
  * 
  * @author  Seb
  * @package Bdf\Prime\Query\Pagination
+ *
+ * @property CollectionInterface $collection protected
  */
-class Paginator extends AbstractPaginator implements \IteratorAggregate, PaginatorInterface
+class Paginator extends AbstractPaginator implements IteratorAggregate, PaginatorInterface
 {
     const DEFAULT_PAGE  = 1;
     const DEFAULT_LIMIT = 20;
@@ -53,7 +56,7 @@ class Paginator extends AbstractPaginator implements \IteratorAggregate, Paginat
      *
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): CollectionInterface
     {
         return $this->collection;
     }

@@ -51,7 +51,7 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
      * PlatformTypes constructor.
      *
      * @param PlatformInterface $platform
-     * @param PlatformTypesInterface[]|string[] $nativeTypes
+     * @param PlatformTypeInterface[]|string[] $nativeTypes
      * @param TypesRegistryInterface $commons
      */
     public function __construct(PlatformInterface $platform, array $nativeTypes, TypesRegistryInterface $commons)

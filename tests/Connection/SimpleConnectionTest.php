@@ -319,7 +319,7 @@ class SimpleConnectionTest extends TestCase
         ]);
 
         $query = new class implements Compilable {
-            public function compile($forceRecompile = false)
+            public function compile(bool $forceRecompile = false)
             {
                 return 'UPDATE test_ SET name = ? WHERE id = ?';
             }
@@ -329,7 +329,7 @@ class SimpleConnectionTest extends TestCase
                 return ['new-name', 10];
             }
 
-            public function type()
+            public function type(): string
             {
                 return self::TYPE_UPDATE;
             }
@@ -412,7 +412,7 @@ class SimpleConnectionTest extends TestCase
                 $this->connection = $connection;
             }
 
-            public function compile($forceRecompile = false)
+            public function compile(bool $forceRecompile = false)
             {
                 if (!$this->statement || $forceRecompile) {
                     $this->statement = $this->connection->prepare('SELECT * FROM test_ WHERE id = ?');
@@ -426,7 +426,7 @@ class SimpleConnectionTest extends TestCase
                 return [10];
             }
 
-            public function type()
+            public function type(): string
             {
                 return self::TYPE_SELECT;
             }
@@ -509,7 +509,7 @@ class SimpleConnectionTest extends TestCase
                 $this->connection = $connection;
             }
 
-            public function compile($forceRecompile = false)
+            public function compile(bool $forceRecompile = false)
             {
                 if (!$this->statement || $forceRecompile) {
                     $this->statement = $this->connection->prepare('SELECT 1 as dummy');
@@ -523,7 +523,7 @@ class SimpleConnectionTest extends TestCase
                 return [];
             }
 
-            public function type()
+            public function type(): string
             {
                 return self::TYPE_SELECT;
             }

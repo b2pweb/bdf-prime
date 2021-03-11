@@ -122,23 +122,23 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
     /**
      * {@inheritdoc}
      */
-    public function executeQuery($query, array $params = [], $types = [], QueryCacheProfile $qcp = null)
+    public function executeQuery($sql, array $params = [], $types = [], QueryCacheProfile $qcp = null)
     {
         if ($this->getTransactionNestingLevel() <= 0 && $this->force !== true) {
-            return $this->readConnection->executeQuery($query, $params, $types, $qcp);
+            return $this->readConnection->executeQuery($sql, $params, $types, $qcp);
         }
 
         $this->force = false;
 
-        return parent::executeQuery($query, $params, $types, $qcp);
+        return parent::executeQuery($sql, $params, $types, $qcp);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function quote($input, $type = null)
+    public function quote($value, $type = null)
     {
-        return $this->readConnection->quote($input, $type);
+        return $this->readConnection->quote($value, $type);
     }
 
     /**

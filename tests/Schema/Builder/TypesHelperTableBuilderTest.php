@@ -119,7 +119,7 @@ class TypesHelperTableBuilderTest extends TestCase
      */
     public function test_integer()
     {
-        $this->assertSame($this->builder, $this->builder->integer('number_', true, true));
+        $this->assertSame($this->builder, $this->builder->integer('number_')->autoincrement(true)->unsigned(true));
 
         $column = $this->builder->column()->build();
         $this->assertEquals('number_', $column->name());
@@ -133,7 +133,7 @@ class TypesHelperTableBuilderTest extends TestCase
      */
     public function test_tinyint()
     {
-        $this->assertSame($this->builder, $this->builder->tinyint('number_', true, true));
+        $this->assertSame($this->builder, $this->builder->tinyint('number_')->autoincrement(true)->unsigned(true));
 
         $column = $this->builder->column()->build();
         $this->assertEquals('number_', $column->name());
@@ -147,7 +147,7 @@ class TypesHelperTableBuilderTest extends TestCase
      */
     public function test_smallint()
     {
-        $this->assertSame($this->builder, $this->builder->smallint('number_', true, true));
+        $this->assertSame($this->builder, $this->builder->smallint('number_')->autoincrement(true)->unsigned(true));
 
         $column = $this->builder->column()->build();
         $this->assertEquals('number_', $column->name());
@@ -161,7 +161,7 @@ class TypesHelperTableBuilderTest extends TestCase
      */
     public function test_bigint()
     {
-        $this->assertSame($this->builder, $this->builder->bigint('number_', true, true));
+        $this->assertSame($this->builder, $this->builder->bigint('number_')->autoincrement(true)->unsigned(true));
 
         $column = $this->builder->column()->build();
         $this->assertEquals('number_', $column->name());
@@ -227,7 +227,7 @@ class TypesHelperTableBuilderTest extends TestCase
      */
     public function test_float()
     {
-        $this->assertSame($this->builder, $this->builder->float('number_', 5, 2));
+        $this->assertSame($this->builder, $this->builder->float('number_')->precision(5, 2));
 
         $column = $this->builder->column()->build();
         $this->assertEquals('number_', $column->name());
@@ -241,7 +241,7 @@ class TypesHelperTableBuilderTest extends TestCase
      */
     public function test_double()
     {
-        $this->assertSame($this->builder, $this->builder->double('number_', 5, 2));
+        $this->assertSame($this->builder, $this->builder->double('number_')->precision(5, 2));
 
         $column = $this->builder->column()->build();
         $this->assertEquals('number_', $column->name());

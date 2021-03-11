@@ -126,7 +126,7 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * @param array $criteria
      * @param string|array $attributes
      *
-     * @return object|null
+     * @return object|array|null
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]

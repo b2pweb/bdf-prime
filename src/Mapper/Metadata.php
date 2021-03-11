@@ -527,9 +527,9 @@ class Metadata
      *
      * @param string $className
      *
-     * @return null|string
+     * @return null|int
      */
-    private function getInstantiatorHint($className)
+    private function getInstantiatorHint($className): ?int
     {
         if ($className === stdClass::class) {
             return InstantiatorInterface::USE_CONSTRUCTOR_HINT;
@@ -701,12 +701,12 @@ class Metadata
      * Build Embedded meta
      * 
      * @param string $attribute
-     * @param string $class
-     * @param array $embeddedMeta
+     * @param class-string $class
+     * @param array|null $embeddedMeta
      *
      * @return array
      */
-    private function buildEmbedded($attribute, $class, $embeddedMeta)
+    private function buildEmbedded(string $attribute, string $class, ?array $embeddedMeta): array
     {
         if ($embeddedMeta === null) {
             $attributePath = $attribute;

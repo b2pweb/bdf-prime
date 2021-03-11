@@ -37,7 +37,7 @@ use PDO;
 /**
  * Connection
  *
- * @package Bdf\Prime
+ * @method \Bdf\Prime\Configuration getConfiguration()
  */
 class SimpleConnection extends BaseConnection implements ConnectionInterface
 {
@@ -81,6 +81,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
     {
         parent::__construct($params, $driver, $config, $eventManager);
 
+        /** @psalm-suppress InvalidArgument */
         $this->factory = new DefaultQueryFactory(
             $this,
             new SqlCompiler($this),
@@ -245,24 +246,24 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function executeQuery($query, array $params = [], $types = [], QueryCacheProfile $qcp = null)
+    public function executeQuery($sql, array $params = [], $types = [], QueryCacheProfile $qcp = null)
     {
         $this->prepareLogger();
 
-        return $this->runOrReconnect(function() use ($query, $params, $types, $qcp) {
-            return parent::executeQuery($query, $params, $types, $qcp);
+        return $this->runOrReconnect(function() use ($sql, $params, $types, $qcp) {
+            return parent::executeQuery($sql, $params, $types, $qcp);
         });
     }
 
     /**
      * {@inheritdoc}
      */
-    public function executeUpdate($query, array $params = [], array $types = [])
+    public function executeUpdate($sql, array $params = [], array $types = [])
     {
         $this->prepareLogger();
 
-        return $this->runOrReconnect(function() use ($query, $params, $types) {
-            return parent::executeUpdate($query, $params, $types);
+        return $this->runOrReconnect(function() use ($sql, $params, $types) {
+            return parent::executeUpdate($sql, $params, $types);
         });
     }
 
@@ -376,7 +377,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
     {
         $this->prepareLogger();
 
-        parent::beginTransaction();
+        return parent::beginTransaction();
     }
 
     /**
@@ -386,7 +387,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
     {
         $this->prepareLogger();
         
-        parent::commit();
+        return parent::commit();
     }
     
     /**

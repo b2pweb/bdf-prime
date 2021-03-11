@@ -48,7 +48,7 @@ interface CommandInterface extends CompilableClauseInterface
      *
      * @param string|array $columns
      *
-     * @return array
+     * @return mixed
      * @throws PrimeException When execute fail
      */
     public function execute($columns = null);

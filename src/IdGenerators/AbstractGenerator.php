@@ -103,7 +103,7 @@ abstract class AbstractGenerator implements GeneratorInterface
      * @param array            $data            By reference
      * @param ServiceLocator   $serviceLocator
      *
-     * @return string   Returns the generated id
+     * @return string|null   Returns the generated id
      * @throws PrimeException
      */
     protected function doGenerate($property, array &$data, ServiceLocator $serviceLocator)

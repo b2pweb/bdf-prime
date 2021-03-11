@@ -61,7 +61,7 @@ class FieldBuilder implements \ArrayAccess, \IteratorAggregate, TypesHelperInter
     /**
      * Specify the primary key(s) for the table.
      * 
-     * @param  string $type     Type of sequence
+     * @param Metadata::PK_* $type Type of sequence
      * 
      * @return $this
      */

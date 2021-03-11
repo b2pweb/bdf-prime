@@ -18,11 +18,13 @@ interface ExpressionInterface
     /**
      * Build the expression on query builder
      *
-     * @param CompilableClause $query
-     * @param CompilerInterface $compiler
+     * @param Q $query
+     * @param CompilerInterface<Q> $compiler
      *
      * @return string
      * @throws PrimeException
+     *
+     * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\Contract\Compilable
      */
-    public function build($query, $compiler);
+    public function build(CompilableClause $query, CompilerInterface $compiler);
 }

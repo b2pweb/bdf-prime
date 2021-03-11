@@ -12,7 +12,7 @@ class BelongsTo extends HasOne
     /**
      * {@inheritdoc}
      */
-    protected function getForeignInfos()
+    protected function getForeignInfos(): array
     {
         return [$this->local, $this->localKey];
     }

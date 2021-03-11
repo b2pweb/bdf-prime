@@ -7,6 +7,8 @@ use Bdf\Prime\Collection\Indexer\EntityIndexerInterface;
 use Bdf\Prime\Query\Contract\EntityJoinable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Query\ReadCommandInterface;
+use LogicException;
 
 /**
  * MorphTo
@@ -18,12 +20,12 @@ class MorphTo extends BelongsTo
      *
      * The alias should have #[sub entity] at its end
      */
-    public function join($query, $alias = null)
+    public function join(EntityJoinable $query, string $alias): void
     {
-        $parts = explode('#', (string)$alias);
+        $parts = explode('#', $alias);
 
         if (!isset($parts[1])) {
-            throw new \LogicException('Joins are not supported on polymorph without discriminator');
+            throw new LogicException('Joins are not supported on polymorph without discriminator');
         }
 
         $this->loadDistantFromType(end($parts));
@@ -38,9 +40,9 @@ class MorphTo extends BelongsTo
     /**
      * {@inheritdoc}
      */
-    public function joinRepositories(EntityJoinable $query, $alias = null, $discriminatorValue = null)
+    public function joinRepositories(EntityJoinable $query, string $alias, $discriminator = null): array
     {
-        $this->loadDistantFromType($discriminatorValue);
+        $this->loadDistantFromType($discriminator);
 
         return [
             $alias => $this->relationRepository()
@@ -51,7 +53,7 @@ class MorphTo extends BelongsTo
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = [])
+    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
     {
         if ($collection->empty()) {
             return;
@@ -79,7 +81,7 @@ class MorphTo extends BelongsTo
      *
      * @param object $owner
      */
-    public function link($owner)
+    public function link($owner): ReadCommandInterface
     {
         $this->loadDistantFrom($owner);
 
@@ -90,7 +92,7 @@ class MorphTo extends BelongsTo
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function saveAll($owner, array $relations = [])
+    public function saveAll($owner, array $relations = []): int
     {
         $relations = $this->rearrangeWith($relations);
         $this->loadDistantFrom($owner);
@@ -102,7 +104,7 @@ class MorphTo extends BelongsTo
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function deleteAll($owner, array $relations = [])
+    public function deleteAll($owner, array $relations = []): int
     {
         $relations = $this->rearrangeWith($relations);
         $this->loadDistantFrom($owner);
@@ -152,7 +154,7 @@ class MorphTo extends BelongsTo
     /**
      * {@inheritdoc}
      */
-    protected function relationQuery($keys, $constraints)
+    protected function relationQuery($keys, $constraints): ReadCommandInterface
     {
         return $this->query($keys, $constraints)->by($this->distantKey);
     }

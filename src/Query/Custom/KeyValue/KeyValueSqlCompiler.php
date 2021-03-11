@@ -11,6 +11,8 @@ use Doctrine\DBAL\Statement;
 
 /**
  * SQL compiler for KeyValueQuery
+ *
+ * @extends AbstractCompiler<KeyValueQuery>
  */
 class KeyValueSqlCompiler extends AbstractCompiler
 {

@@ -234,7 +234,7 @@ class MapperInfo
 
     /**
      * @param string $property
-     * @param iterable $relations
+     * @param \ArrayAccess|array $relations
      * @return ObjectPropertyInfo|null
      */
     private function buildObjectProperty(string $property, iterable $relations): ?ObjectPropertyInfo

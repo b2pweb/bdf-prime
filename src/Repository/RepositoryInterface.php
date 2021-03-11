@@ -10,7 +10,7 @@ use Bdf\Prime\Repository\Write\WriterInterface;
 /**
  * RepositoryInterface
  * 
- * @package Bdf\Prime\Repository
+ * @template E as object
  */
 interface RepositoryInterface
 {

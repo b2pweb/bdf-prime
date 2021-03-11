@@ -6,7 +6,7 @@ use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\AliasResolver\AliasResolver;
-use Bdf\Prime\Query\Contract\Joinable;
+use Bdf\Prime\Query\Contract\EntityJoinable;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Bdf\Prime\Query\Expression\ExpressionTransformerInterface;
 use Bdf\Prime\Query\Expression\TypedExpressionInterface;
@@ -115,7 +115,7 @@ class OrmPreprocessor implements PreprocessorInterface
     {
         $this->type = 'select';
 
-        if ($clause instanceof Joinable) {
+        if ($clause instanceof EntityJoinable && $clause instanceof QueryInterface) {
             $compilerQuery = clone $clause;
 
             if (!$this->aliasResolver) {
@@ -152,7 +152,7 @@ class OrmPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function field($attribute, &$type = null)
+    public function field(string $attribute, &$type = null): string
     {
         if ($this->type === 'select' && $this->aliasResolver !== null) {
             return $this->aliasResolver->resolve($attribute, $type);

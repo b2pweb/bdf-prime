@@ -59,7 +59,7 @@ interface KeyValueQueryInterface extends ReadCommandInterface, Projectionable, A
      *
      * /!\ NULL is not supported by SQL connections
      *
-     * @param string|array $field The field name, or list of fields, as array in form [field name] => [field value]
+     * @param string|array<string,mixed> $field The field name, or list of fields, as array in form [field name] => [field value]
      * @param mixed $value The field value. This parameter is ignored when first parameter is an array
      *
      * @return $this
@@ -83,7 +83,7 @@ interface KeyValueQueryInterface extends ReadCommandInterface, Projectionable, A
      *     ->update();
      * </code>
      *
-     * @param array $values Values to update in form [attribute] => [value]
+     * @param array<string,mixed> $values Values to update in form [attribute] => [value]
      * @param array $types Define attributes types in form [attribute] => [value type]. If not provided the type will be resolved from value or mapper
      *
      * @return $this

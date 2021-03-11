@@ -12,36 +12,44 @@ interface PreprocessorInterface
     /**
      * Prepare insert Query
      *
-     * @param CompilableClause $clause
+     * @param Q $clause
      *
-     * @return CompilableClause
+     * @return Q
+     *
+     * @template Q as CompilableClause
      */
     public function forInsert(CompilableClause $clause);
 
     /**
      * Prepare update Query
      *
-     * @param CompilableClause $clause
+     * @param Q $clause
      *
-     * @return CompilableClause
+     * @return Q
+     *
+     * @template Q as CompilableClause
      */
     public function forUpdate(CompilableClause $clause);
 
     /**
      * Prepare delete Query
      *
-     * @param CompilableClause $clause
+     * @param Q $clause
      *
-     * @return CompilableClause
+     * @return Q
+     *
+     * @template Q as CompilableClause
      */
     public function forDelete(CompilableClause $clause);
 
     /**
      * Prepare select Query
      *
-     * @param CompilableClause $clause
+     * @param Q $clause
      *
-     * @return CompilableClause
+     * @return Q
+     *
+     * @template Q as CompilableClause
      */
     public function forSelect(CompilableClause $clause);
 
@@ -53,7 +61,7 @@ interface PreprocessorInterface
      *
      * @return string
      */
-    public function field($attribute, &$type = null);
+    public function field(string $attribute, &$type = null): string;
 
     /**
      * Prepare the clause expression array

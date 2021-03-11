@@ -4,9 +4,12 @@ namespace Bdf\Prime\Query\Extension;
 
 use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\Pagination\PaginatorFactory;
+use Bdf\Prime\Query\Pagination\PaginatorInterface;
 
 /**
  * Trait for @see Paginable queries
+ *
+ * @psalm-require-implements Paginable
  */
 trait PaginableTrait
 {
@@ -34,9 +37,11 @@ trait PaginableTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Paginable::paginate()
      */
-    public function paginate($maxRows = null, $page = null, $className = 'paginator')
+    public function paginate(?int $maxRows = null, ?int $page = null, string $className = 'paginator'): PaginatorInterface
     {
         $factory = $this->paginatorFactory ?? PaginatorFactory::instance();
 
@@ -44,9 +49,11 @@ trait PaginableTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Paginable::walk()
      */
-    public function walk($maxRows = null, $page = null)
+    public function walk(?int $maxRows = null, ?int $page = null): PaginatorInterface
     {
         return $this->paginate($maxRows, $page, 'walker');
     }

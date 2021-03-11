@@ -68,11 +68,11 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
-    public function from($table, $alias = null)
+    public function from($from, $alias = null)
     {
-        if ($this->statements['table'] !== $table) {
+        if ($this->statements['table'] !== $from) {
             $this->compilerState->invalidate('columns');
-            $this->statements['table'] = $table;
+            $this->statements['table'] = $from;
         }
 
         return $this;
@@ -121,7 +121,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function count($column = null)
+    public function count(?string $column = null): int
     {
         return (int) $this->aggregate(__FUNCTION__, $column);
     }
@@ -130,7 +130,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function avg($column = null)
+    public function avg(?string $column = null): float
     {
         return (float) $this->aggregate(__FUNCTION__, $column);
     }
@@ -139,7 +139,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function min($column = null)
+    public function min(?string $column = null)
     {
         return $this->aggregate(__FUNCTION__, $column);
     }
@@ -148,7 +148,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function max($column = null)
+    public function max(?string $column = null)
     {
         return $this->aggregate(__FUNCTION__, $column);
     }
@@ -157,7 +157,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function sum($column = null)
+    public function sum(?string $column = null): float
     {
         return (float) $this->aggregate(__FUNCTION__, $column);
     }
@@ -166,7 +166,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function aggregate($function, $column = null)
+    public function aggregate(string $function, ?string $column = null)
     {
         $statements = $this->statements;
 
@@ -186,7 +186,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function paginationCount($columns = null)
+    public function paginationCount(?string $columns = null): int
     {
         $statements = $this->statements;
 
@@ -223,7 +223,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function delete()
+    public function delete(): int
     {
         $this->setType(self::TYPE_DELETE);
 
@@ -240,7 +240,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function update($values = null)
+    public function update($values = null): int
     {
         if ($values !== null) {
             $this->values($values);
@@ -260,7 +260,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
-    public function limit($limit, $offset = null)
+    public function limit(?int $limit, ?int $offset = null)
     {
         if ($this->statements['limit'] === $limit && $this->statements['offset'] === $offset) {
             return $this;
@@ -307,21 +307,17 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     }
 
     /**
-     * Get cache namespace
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    protected function cacheNamespace()
+    protected function cacheNamespace(): string
     {
         return $this->connection->getName().':'.$this->statements['table'];
     }
 
     /**
-     * Get the cache key
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    protected function cacheKey()
+    protected function cacheKey(): ?string
     {
         $sql = $this->toSql();
 

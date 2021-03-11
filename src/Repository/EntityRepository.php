@@ -5,6 +5,7 @@ namespace Bdf\Prime\Repository;
 use Bdf\Event\EventNotifier;
 use Bdf\Prime\Cache\CacheInterface;
 use Bdf\Prime\Collection\CollectionFactory;
+use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Collection\EntityCollection;
 use Bdf\Prime\Collection\Indexer\SingleEntityIndexer;
 use Bdf\Prime\Connection\Event\ConnectionClosedListenerInterface;
@@ -38,7 +39,7 @@ use Doctrine\Common\EventSubscriber;
  *
  * @mixin RepositoryQueryFactory
  */
-class EntityRepository implements RepositoryInterface, EventSubscriber, ConnectionClosedListenerInterface
+class EntityRepository implements RepositoryInterface, EventSubscriber, ConnectionClosedListenerInterface, RepositoryEventsSubscriberInterface
 {
     use EventNotifier;
     
@@ -260,13 +261,15 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Launch transactionnal queries
      * 
-     * @param Closure $work
-     * @return mixed
+     * @param callable(EntityRepository):R $work
+     * @return R
      * 
      * @throws \Exception
      * @throws PrimeException
+     *
+     * @template R
      */
-    public function transaction(Closure $work)
+    public function transaction(callable $work)
     {
         $connection = $this->connection();
 
@@ -533,6 +536,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
 
         $criteria += $this->mapper()->primaryCriteria($entity);
 
+        /** @psalm-suppress InvalidReturnStatement */
         return $this->builder()->where($criteria)->first();
     }
 
@@ -750,14 +754,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     //----- events
 
     /**
-     * Register post load event
-     *
-     * @param callable $listener
-     * @param bool     $once    Register on event once
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function loaded(callable $listener, $once = false)
+    public function loaded(callable $listener, bool $once = false)
     {
         if ($once) {
             $this->once(Events::POST_LOAD, $listener);
@@ -769,14 +768,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * Register pre save event
-     *
-     * @param callable $listener
-     * @param bool     $once    Register on event once
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function saving(callable $listener, $once = false)
+    public function saving(callable $listener, bool $once = false)
     {
         if ($once) {
             $this->once(Events::PRE_SAVE, $listener);
@@ -788,14 +782,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * Register post save event
-     *
-     * @param callable $listener
-     * @param bool     $once    Register on event once
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function saved(callable $listener, $once = false)
+    public function saved(callable $listener, bool $once = false)
     {
         if ($once) {
             $this->once(Events::POST_SAVE, $listener);
@@ -807,14 +796,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * Register post insert event
-     *
-     * @param callable $listener
-     * @param bool     $once    Register on event once
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function inserting(callable $listener, $once = false)
+    public function inserting(callable $listener, bool $once = false)
     {
         if ($once) {
             $this->once(Events::PRE_INSERT, $listener);
@@ -826,14 +810,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * Register post insert event
-     *
-     * @param callable $listener
-     * @param bool     $once    Register on event once
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function inserted(callable $listener, $once = false)
+    public function inserted(callable $listener, bool $once = false)
     {
         if ($once) {
             $this->once(Events::POST_INSERT, $listener);
@@ -845,14 +824,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * Register post update event
-     *
-     * @param callable $listener
-     * @param bool     $once    Register on event once
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function updating(callable $listener, $once = false)
+    public function updating(callable $listener, bool $once = false)
     {
         if ($once) {
             $this->once(Events::PRE_UPDATE, $listener);
@@ -864,14 +838,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * Register post update event
-     *
-     * @param callable $listener
-     * @param bool     $once    Register on event once
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function updated(callable $listener, $once = false)
+    public function updated(callable $listener, bool $once = false)
     {
         if ($once) {
             $this->once(Events::POST_UPDATE, $listener);
@@ -883,14 +852,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * Register post delete event
-     *
-     * @param callable $listener
-     * @param bool     $once    Register on event once
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function deleting(callable $listener, $once = false)
+    public function deleting(callable $listener, bool $once = false)
     {
         if ($once) {
             $this->once(Events::PRE_DELETE, $listener);
@@ -902,14 +866,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * Register post delete event
-     *
-     * @param callable $listener
-     * @param bool     $once    Register on event once
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function deleted(callable $listener, $once = false)
+    public function deleted(callable $listener, bool $once = false)
     {
         if ($once) {
             $this->once(Events::POST_DELETE, $listener);
@@ -989,7 +948,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param array $criteria
      * @param array $attributes
      * 
-     * @return array
+     * @return array|CollectionInterface
      * @throws PrimeException
      */
     #[ReadOperation]
@@ -997,20 +956,23 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     {
         return $this->builder()->find($criteria, $attributes);
     }
-    
+
     /**
      * @param array $criteria
      * @param array $attributes
      * 
      * @return object
      * @throws PrimeException
+     *
+     * @psalm-suppress InvalidReturnType
      */
     #[ReadOperation]
     public function findOne(array $criteria, $attributes = null)
     {
+        /** @psalm-suppress InvalidReturnStatement */
         return $this->builder()->findOne($criteria, $attributes);
     }
-    
+
     /**
      * @see QueryInterface::where
      * 

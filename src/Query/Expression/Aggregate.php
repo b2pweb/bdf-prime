@@ -2,6 +2,8 @@
 
 namespace Bdf\Prime\Query\Expression;
 
+use Bdf\Prime\Query\CompilableClause;
+use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
@@ -37,7 +39,7 @@ abstract class Aggregate implements ExpressionInterface
     /**
      * {@inheritdoc}
      */
-    final public function build($query, $compiler)
+    final public function build(CompilableClause $query, CompilerInterface $compiler)
     {
         return $this->expression(
             $compiler->platform()->grammar(),

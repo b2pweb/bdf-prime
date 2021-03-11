@@ -4,6 +4,7 @@ namespace Bdf\Prime\Behaviors;
 
 use Bdf\Prime\Events;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
 
@@ -52,11 +53,11 @@ class SoftDeleteable implements BehaviorInterface
     /**
      * Get the field infos from option
      *
-     * @param mixed $field
+     * @param bool|string|{0:string,1:string} $field
      *
-     * @return null|array
+     * @return array
      */
-    private function getFieldInfos($field)
+    private function getFieldInfos($field): array
     {
         if ($field === true) {
             return ['name' => 'deletedAt', 'alias' => 'deleted_at'];
@@ -75,7 +76,7 @@ class SoftDeleteable implements BehaviorInterface
     /**
      * {@inheritdoc}
      */
-    public function changeSchema(FieldBuilder $builder)
+    public function changeSchema(FieldBuilder $builder): void
     {
         if (!isset($builder[$this->deleted['name']])) {
             $builder->add($this->deleted['name'], $this->type)->nillable();
@@ -131,15 +132,15 @@ class SoftDeleteable implements BehaviorInterface
     /**
      * {@inheritdoc}
      */
-    public function subscribe($notifier)
+    public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
     {
         $notifier->deleting([$this, 'beforeDelete']);
     }
-    
+
     /**
      * {@inheritdoc}
      */
-    public function constraints()
+    public function constraints(): array
     {
         return [$this->deleted['name'] => null];
     }

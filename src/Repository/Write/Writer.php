@@ -5,8 +5,11 @@ namespace Bdf\Prime\Repository\Write;
 use Bdf\Event\EventNotifier;
 use Bdf\Prime\Events;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
+use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
+use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\ServiceLocator;
 
@@ -16,7 +19,7 @@ use Bdf\Prime\ServiceLocator;
 class Writer implements WriterInterface
 {
     /**
-     * @var RepositoryInterface|EventNotifier
+     * @var RepositoryInterface&RepositoryEventsSubscriberInterface
      */
     private $repository;
 
@@ -35,12 +38,12 @@ class Writer implements WriterInterface
     private $insertQuery;
 
     /**
-     * @var KeyValueQuery
+     * @var KeyValueQueryInterface|QueryInterface
      */
     private $deleteQuery;
 
     /**
-     * @var KeyValueQuery
+     * @var KeyValueQuery|QueryInterface
      */
     private $updateQuery;
 
@@ -48,7 +51,7 @@ class Writer implements WriterInterface
     /**
      * Writer constructor.
      *
-     * @param EventNotifier|RepositoryInterface $repository
+     * @param RepositoryEventsSubscriberInterface&RepositoryInterface $repository
      * @param ServiceLocator $serviceLocator
      */
     public function __construct(RepositoryInterface $repository, ServiceLocator $serviceLocator)
@@ -135,7 +138,7 @@ class Writer implements WriterInterface
      *
      * @return InsertQueryInterface
      */
-    private function insertQuery()
+    private function insertQuery(): InsertQueryInterface
     {
         if ($this->insertQuery) {
             return $this->insertQuery;
@@ -150,7 +153,7 @@ class Writer implements WriterInterface
     /**
      * Create the delete query
      *
-     * @return KeyValueQuery
+     * @return KeyValueQueryInterface|QueryInterface
      */
     private function deleteQuery()
     {
@@ -166,7 +169,7 @@ class Writer implements WriterInterface
     /**
      * Create the update query
      *
-     * @return KeyValueQuery
+     * @return KeyValueQueryInterface|QueryInterface
      */
     private function updateQuery()
     {

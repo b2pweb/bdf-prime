@@ -9,13 +9,17 @@ use Bdf\Prime\Query\Contract\Orderable;
  *
  * @property CompilerInterface $compiler
  * @property array $statements
+ *
+ * @psalm-require-implements Orderable
  */
 trait OrderableTrait
 {
     /**
+     * {@inheritdoc}
+     *
      * @see Orderable::order()
      */
-    public function order($sort, $order = null)
+    public function order($sort, ?string $order = null)
     {
         $this->compilerState->invalidate('orders');
 
@@ -28,12 +32,12 @@ trait OrderableTrait
         foreach ($sort as $column => $order) {
             if (is_int($column)) {
                 $column = $order;
-                $order = 'ASC';
+                $order = Orderable::ORDER_ASC;
             }
 
             $this->statements['orders'][] = [
                 'sort'  => $column,
-                'order' => !$order ? 'ASC' : $order,
+                'order' => !$order ? Orderable::ORDER_ASC : $order,
             ];
         }
 
@@ -41,9 +45,11 @@ trait OrderableTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Orderable::addOrder()
      */
-    public function addOrder($sort, $order = null)
+    public function addOrder($sort, ?string $order = null)
     {
         $this->compilerState->invalidate('orders');
 
@@ -54,12 +60,12 @@ trait OrderableTrait
         foreach ($sort as $column => $order) {
             if (is_int($column)) {
                 $column = $order;
-                $order = 'ASC';
+                $order = Orderable::ORDER_ASC;
             }
 
             $this->statements['orders'][] = [
                 'sort'  => $column,
-                'order' => !$order ? 'ASC' : $order,
+                'order' => !$order ? Orderable::ORDER_ASC : $order,
             ];
         }
 
@@ -67,9 +73,11 @@ trait OrderableTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Orderable::getOrders()
      */
-    public function getOrders()
+    public function getOrders(): array
     {
         $orders = [];
 

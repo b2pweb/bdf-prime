@@ -219,9 +219,13 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      * Get a shard connection by its id
      * Returns all connection if id is null
      *
-     * @param mixed $shardId
+     * @param null|string|int $shardId
      *
-     * @return SimpleConnection|SimpleConnection[]
+     * @return SimpleConnection[]|SimpleConnection
+     *
+     * @psalm-param S $shardId
+     * @psalm-return (S is null ? SimpleConnection[] : SimpleConnection)
+     * @template S as null|array-key
      *
      * @throws ShardingException   If the shard id is not known
      */
@@ -326,6 +330,8 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
 
     /**
      * {@inheritdoc}
+     *
+     * @psalm-suppress InvalidReturnType
      */
     public function query()
     {
@@ -341,6 +347,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
             $stmt->add($shard->query(...$args));
         }
 
+        /** @psalm-suppress InvalidReturnStatement */
         return $stmt;
     }
 
@@ -363,9 +370,13 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      */
     public function beginTransaction()
     {
+        $success = true;
+
         foreach ($this->getSelectedShards() as $shard) {
-            $shard->beginTransaction();
+            $success &= $shard->beginTransaction();
         }
+
+        return $success;
     }
 
     /**
@@ -373,9 +384,13 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      */
     public function commit()
     {
+        $success = true;
+
         foreach ($this->getSelectedShards() as $shard) {
-            $shard->commit();
+            $success &= $shard->commit();
         }
+
+        return $success;
     }
 
     /**
@@ -383,9 +398,13 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      */
     public function rollBack()
     {
+        $success = true;
+
         foreach ($this->getSelectedShards() as $shard) {
-            $shard->rollBack();
+            $success &= $shard->rollBack();
         }
+
+        return $success;
     }
 
     /**

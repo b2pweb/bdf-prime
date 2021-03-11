@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Behaviors;
 
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
@@ -52,7 +53,7 @@ class Versionable extends Behavior
     /**
      * {@inheritdoc}
      */
-    public function changeSchema(FieldBuilder $builder)
+    public function changeSchema(FieldBuilder $builder): void
     {
         $builder->integer(self::COLUMN_NAME, 0);
     }
@@ -135,7 +136,7 @@ class Versionable extends Behavior
     /**
      * {@inheritdoc}
      */
-    public function subscribe($notifier)
+    public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
     {
         $notifier->inserting([$this, 'beforeInsert']);
         $notifier->inserted([$this, 'afterInsert']);

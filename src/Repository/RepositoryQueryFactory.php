@@ -135,12 +135,19 @@ class RepositoryQueryFactory
     /**
      * Make a query
      *
-     * @param string $query The query name or class name to make
+     * @param class-string<Q> $query The query name or class name to make
      *
-     * @return CommandInterface
+     * @return Q
+     * @throws PrimeException When cannot create the query
+     *
+     * @template Q as object
+     *
+     * @todo typehint with CommandInterface
+     * @psalm-suppress InvalidReturnType
      */
-    public function make($query)
+    public function make(string $query)
     {
+        /** @psalm-suppress InvalidReturnStatement */
         return $this->configure($this->connection->make($query, new OrmPreprocessor($this->repository)));
     }
 
