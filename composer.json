@@ -41,7 +41,8 @@
   },
   "scripts": {
     "tests": "phpunit",
-    "tests-with-coverage": "phpunit --coverage-clover coverage.xml"
+    "tests-with-coverage": "phpunit --coverage-clover coverage.xml",
+    "psalm": "psalm --shepherd"
   },
   "extra": {
     "branch-alias": {

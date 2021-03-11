@@ -8,6 +8,13 @@ php:
   - 7.3
   - 7.4
 
+jobs:
+  include:
+    - stage: analysis
+      php: 7.2
+      script:
+        - composer psalm
+
 install:
   - travis_retry composer install
 

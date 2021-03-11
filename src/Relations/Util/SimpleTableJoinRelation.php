@@ -68,7 +68,7 @@ trait SimpleTableJoinRelation
     /**
      * @see AbstractRelation::query()
      */
-    abstract protected function query($value, $constraints = []);
+    abstract protected function query($value, $constraints = []): ReadCommandInterface;
 
     /**
      * @see AbstractRelation::applyConstraints()
