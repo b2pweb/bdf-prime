@@ -138,7 +138,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      *
      * @internal Use internally for optimise "first" query. The offset parameter is not used
      */
-    public function limit($limit, $offset = null)
+    public function limit(?int $limit, ?int $offset = null)
     {
         $this->statements['limit'] = $limit;
 
