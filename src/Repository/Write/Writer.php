@@ -9,6 +9,7 @@ use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\ServiceLocator;
@@ -66,6 +67,7 @@ class Writer implements WriterInterface
     #[WriteOperation]
     public function insert($entity, array $options = [])
     {
+        /** @var EntityRepository $this->repository */
         if ($this->repository->notify(Events::PRE_INSERT, [$entity, $this->repository]) === false) {
             return 0;
         }
@@ -90,6 +92,7 @@ class Writer implements WriterInterface
     #[WriteOperation]
     public function update($entity, array $options = [])
     {
+        /** @var EntityRepository $this->repository */
         $attributes = isset($options['attributes']) ? new \ArrayObject($options['attributes']) : null;
 
         if ($this->repository->notify(Events::PRE_UPDATE, [$entity, $this->repository, $attributes]) === false) {
@@ -122,6 +125,7 @@ class Writer implements WriterInterface
     #[WriteOperation]
     public function delete($entity, array $options = [])
     {
+        /** @var EntityRepository $this->repository */
         if ($this->repository->notify(Events::PRE_DELETE, [$entity, $this->repository]) === false) {
             return 0;
         }

@@ -140,7 +140,7 @@ class Blameable extends Behavior
     public function beforeInsert($entity, RepositoryInterface $repository)
     {
         $resolver = $this->userResolver;
-        $repository->hydrateOne($entity, $this->createdBy['name'], $resolver());
+        $repository->mapper()->hydrateOne($entity, $this->createdBy['name'], $resolver());
     }
 
     /**
@@ -159,7 +159,7 @@ class Blameable extends Behavior
         }
 
         $resolver = $this->userResolver;
-        $repository->hydrateOne($entity, $this->updatedBy['name'], $resolver());
+        $repository->mapper()->hydrateOne($entity, $this->updatedBy['name'], $resolver());
     }
 
     /**

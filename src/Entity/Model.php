@@ -38,6 +38,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
             $groups = ['all'];
 
             if ($property->isObject()) {
+                /** @var \Bdf\Prime\Mapper\Info\ObjectPropertyInfo $property */
                 if (!$property->belongsToRoot()) {
                     continue;
                 }
@@ -55,6 +56,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
                     }
                 }
             } else {
+                /** @var \Bdf\Prime\Mapper\Info\PropertyInfo $property */
                 $type = $property->phpType();
 
                 if ($property->isPrimary()) {

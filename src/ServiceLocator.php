@@ -156,9 +156,12 @@ class ServiceLocator
     /**
      * Get mapper for specified entity
      *
-     * @param string|object $entityClass Name of Entity object to load mapper for
+     * @param class-string<T>|T $entityClass Name of Entity object to load mapper for
      * 
-     * @return RepositoryInterface
+     * @return RepositoryInterface|null
+     * @template T as object
+     *
+     * @psalm-ignore-nullable-return
      */
     public function repository($entityClass)
     {

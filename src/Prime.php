@@ -69,7 +69,7 @@ class Prime
      * 
      * @param string|object|RepositoryInterface $repository
      *
-     * @return RepositoryInterface
+     * @return RepositoryInterface|null
      */
     public static function repository($repository)
     {
@@ -265,7 +265,7 @@ class Prime
     {
         $repository = static::repository($entity);
         
-        $expected = $repository->findOne($repository->mapper()->primaryCriteria($entity));
+        $expected = $repository->refresh($entity);
         
         if ($expected === null) {
             return false;
@@ -305,7 +305,7 @@ class Prime
             $criteria = $repository->mapper()->prepareToRepository($repositoryName);
         }
         
-        return $repository->find($criteria);
+        return $repository->queries()->builder()->where($criteria)->all();
     }
 
     /**
@@ -320,9 +320,10 @@ class Prime
      * @param string|RepositoryInterface  $repositoryName     Repo name or Entity instance
      * @param array|object                $criteria           Array of criteria. Optionnal if repository name is an object
      * 
-     * @return object|array
+     * @return object|null
      *
      * @throws PrimeException
+     * @psalm-suppress InvalidReturnType
      */
     public static function one($repositoryName, $criteria = null)
     {
@@ -332,8 +333,9 @@ class Prime
         if (is_object($repositoryName) && !$repositoryName instanceof RepositoryInterface) {
             $criteria = $repository->mapper()->prepareToRepository($repositoryName);
         }
-        
-        return $repository->findOne($criteria);
+
+        /** @psalm-suppress InvalidReturnStatement */
+        return $repository->queries()->builder()->where($criteria)->first();
     }
 
     /**
@@ -342,7 +344,7 @@ class Prime
      * @param object $entity
      * @param array  $additionnalCriteria  Criteria to add to primary key
      * 
-     * @return object New refresh entity
+     * @return object|null New refresh entity
      *
      * @throws PrimeException
      */
@@ -350,7 +352,7 @@ class Prime
     {
         $repository = static::repository($entity);
         
-        return $repository->findOne($repository->mapper()->primaryCriteria($entity) + $additionnalCriteria);
+        return $repository->refresh($entity, $additionnalCriteria);
     }
     
     //

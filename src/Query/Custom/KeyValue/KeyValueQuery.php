@@ -32,6 +32,11 @@ use Doctrine\DBAL\DBALException as BaseDBALException;
  *     ->first()
  * ;
  * </code>
+ *
+ * @template C as \Bdf\Prime\Connection\ConnectionInterface
+ *
+ * @implements KeyValueQueryInterface<C>
+ * @extends AbstractReadCommand<C>
  */
 class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterface, Compilable, Paginable, Limitable
 {
@@ -44,7 +49,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * KeyValueQuery constructor.
      *
-     * @param ConnectionInterface $connection
+     * @param C $connection
      * @param PreprocessorInterface|null $preprocessor
      */
     public function __construct(ConnectionInterface $connection, PreprocessorInterface $preprocessor = null)
@@ -288,7 +293,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * Get the SQL query
      *
-     * @return string
+     * @return string|false
      * @throws PrimeException
      */
     public function toSql()

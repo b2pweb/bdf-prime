@@ -14,6 +14,9 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 /**
  * Interface for SQL queries
+ *
+ * @template C as \Bdf\Prime\Connection\ConnectionInterface
+ * @extends QueryInterface<C>
  */
 interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Orderable, Joinable, Lockable, EntityJoinable
 {

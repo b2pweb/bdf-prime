@@ -12,6 +12,10 @@ use Bdf\Prime\Query\Extension\SimpleWhereTrait;
 /**
  * Abstract query class
  * Define standard behaviors for OrmCompiler
+ *
+ * @template C as \Bdf\Prime\Connection\ConnectionInterface
+ * @extends AbstractReadCommand<C>
+ * @implements QueryInterface<C>
  */
 abstract class AbstractQuery extends AbstractReadCommand implements QueryInterface
 {

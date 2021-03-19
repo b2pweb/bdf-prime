@@ -10,6 +10,16 @@ use Bdf\Prime\Query\Contract\ReadOperation;
 
 /**
  * Base type for "read" operation commands
+ *
+ * @method $this by(string $attribute, bool $combine = false) Indexing entities by an attribute value. Use combine for multiple entities with same attribute value
+ * @method $this with(string|string[] $relations) Relations to load
+ * @method $this without(string|string[] $relations) Relations to discard
+ * @method object|null get($pk) Get one entity by its identifier
+ * @method object getOrFail($pk) Get one entity or throws when entity is not found
+ * @method object getOrNew($pk) Get one entity or return a new one if not found in repository
+ *
+ * @template C as \Bdf\Prime\Connection\ConnectionInterface
+ * @extends CommandInterface<C>
  */
 interface ReadCommandInterface extends CommandInterface, Cachable
 {

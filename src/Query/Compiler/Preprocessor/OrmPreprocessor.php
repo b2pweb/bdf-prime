@@ -256,7 +256,7 @@ class OrmPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function root()
+    public function root(): ?string
     {
         if ($this->aliasResolver) {
             return $this->aliasResolver->getPathAlias();

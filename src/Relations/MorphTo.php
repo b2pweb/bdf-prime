@@ -8,6 +8,7 @@ use Bdf\Prime\Query\Contract\EntityJoinable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\ReadCommandInterface;
+use InvalidArgumentException;
 use LogicException;
 
 /**
@@ -78,11 +79,13 @@ class MorphTo extends BelongsTo
      * {@inheritdoc}
      *
      * @fixme Do not works with EntityCollection
-     *
-     * @param object $owner
      */
     public function link($owner): ReadCommandInterface
     {
+        if (is_array($owner)) {
+            throw new InvalidArgumentException('MorphTo relation do not supports querying on collection');
+        }
+
         $this->loadDistantFrom($owner);
 
         return parent::link($owner);

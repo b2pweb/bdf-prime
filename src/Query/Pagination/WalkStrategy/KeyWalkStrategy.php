@@ -65,8 +65,11 @@ final class KeyWalkStrategy implements WalkStrategyInterface
         }
 
         if ($cursor->cursor !== null) {
-            $operator = $cursor->query->getOrders()[$this->key->name()] === Orderable::ORDER_ASC ? '>' : '<';
-            $cursor->query->where($this->key->name(), $operator, $cursor->cursor);
+            /** @var ReadCommandInterface&Orderable&Whereable $query */
+            $query = $cursor->query;
+            $operator = $query->getOrders()[$this->key->name()] === Orderable::ORDER_ASC ? '>' : '<';
+
+            $query->where($this->key->name(), $operator, $cursor->cursor);
         }
 
         $cursor->entities = $cursor->query->all();

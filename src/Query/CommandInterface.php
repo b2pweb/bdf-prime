@@ -8,6 +8,8 @@ use Bdf\Prime\Query\Compiler\CompilerInterface;
 
 /**
  * Base type for perform an SGBD command
+ *
+ * @template C as ConnectionInterface
  */
 interface CommandInterface extends CompilableClauseInterface
 {
@@ -16,7 +18,7 @@ interface CommandInterface extends CompilableClauseInterface
      *
      * @return CompilerInterface
      */
-    public function compiler();
+    public function compiler(): CompilerInterface;
 
     /**
      * Set the query language compiler
@@ -30,14 +32,14 @@ interface CommandInterface extends CompilableClauseInterface
     /**
      * Gets the associated DBAL Connection for this command
      *
-     * @return ConnectionInterface
+     * @return C
      */
-    public function connection();
+    public function connection(): ConnectionInterface;
 
     /**
      * Set connection
      *
-     * @param ConnectionInterface $connection
+     * @param C $connection
      *
      * @return $this
      */

@@ -20,6 +20,9 @@ use Bdf\Prime\Query\ReadCommandInterface;
  *     ->first()
  * ;
  * </code>
+ *
+ * @template C as \Bdf\Prime\Connection\ConnectionInterface
+ * @extends ReadCommandInterface<C>
  */
 interface KeyValueQueryInterface extends ReadCommandInterface, Projectionable, Aggregatable, Deletable
 {

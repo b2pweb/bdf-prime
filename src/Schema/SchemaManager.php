@@ -14,6 +14,9 @@ use Doctrine\DBAL\Schema\Table as DoctrineTable;
 
 /**
  * SchemaManager using doctrine schemas
+ *
+ * @extends AbstractSchemaManager<\Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection>
+ * @property \Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection $connection protected
  */
 class SchemaManager extends AbstractSchemaManager
 {
@@ -77,7 +80,7 @@ class SchemaManager extends AbstractSchemaManager
             $lastResult = $this->connection->exec($query);
         }
         
-        return $lastResult;
+        return (bool) $lastResult;
     }
 
     /**

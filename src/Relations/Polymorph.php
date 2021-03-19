@@ -208,6 +208,6 @@ trait Polymorph
      */
     protected function updateDiscriminatorValue($entity): void
     {
-        $this->discriminatorValue = $this->local->extractOne($entity, $this->discriminator);
+        $this->discriminatorValue = $this->local->mapper()->extractOne($entity, $this->discriminator);
     }
 }

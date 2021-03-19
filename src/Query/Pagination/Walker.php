@@ -5,6 +5,9 @@ namespace Bdf\Prime\Query\Pagination;
 use BadMethodCallException;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\PrimeSerializable;
+use Bdf\Prime\Query\Contract\Limitable;
+use Bdf\Prime\Query\Contract\Orderable;
+use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Pagination\WalkStrategy\PaginationWalkStrategy;
 use Bdf\Prime\Query\Pagination\WalkStrategy\WalkCursor;
@@ -39,14 +42,14 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
     /**
      * The current offset
      *
-     * @var int
+     * @var int|null
      */
     protected $offset;
 
     /**
-     * @var array|null
+     * @var array
      */
-    private $collection;
+    private $collection = [];
 
     /**
      * @var WalkStrategyInterface
@@ -158,6 +161,10 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
      */
     public function size()
     {
+        if (!$this->query instanceof Paginable) {
+            throw new BadMethodCallException(__METHOD__.' should be called with a Paginable query');
+        }
+
         return $this->query->paginationCount();
     }
 
@@ -166,29 +173,43 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
      */
     public function order($attribute = null)
     {
-        $orders = $this->query()->getOrders();
+        $query = $this->query();
+
+        if (!$query instanceof Orderable) {
+            return $attribute ? null : [];
+        }
+
+        $orders = $query->getOrders();
 
         if ($attribute === null) {
             return $orders;
         }
 
-        return isset($orders[$attribute]) ? $orders[$attribute] : null;
+        return $orders[$attribute] ?? null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function limit()
+    public function limit(): ?int
     {
-        return $this->cursor->query->getLimit();
+        if ($this->cursor->query instanceof Limitable) {
+            return $this->cursor->query->getLimit();
+        }
+
+        return 0;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offset()
+    public function offset(): ?int
     {
-        return $this->cursor->query->getOffset();
+        if ($this->cursor->query instanceof Limitable) {
+            return $this->cursor->query->getOffset();
+        }
+
+        return 0;
     }
 
     /**

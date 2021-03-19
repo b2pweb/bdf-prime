@@ -129,8 +129,14 @@ class Versionable extends Behavior
      */
     public function deleteAllVersions($entity, $repository)
     {
-        $repository->repository($this->versionClass)
-            ->deleteBy($repository->mapper()->primaryCriteria($entity));
+        $queries = $repository->repository($this->versionClass)->queries();
+        $criteria = $repository->mapper()->primaryCriteria($entity);
+
+        if ($query = $queries->keyValue($criteria)) {
+            $query->delete();
+        } else {
+            $queries->builder()->where($criteria)->delete();
+        }
     }
 
     /**
@@ -157,10 +163,12 @@ class Versionable extends Behavior
      */
     protected function incrementVersion($entity, $repository)
     {
-        $repository->hydrateOne(
+        $mapper = $repository->mapper();
+
+        $mapper->hydrateOne(
             $entity,
             self::COLUMN_NAME,
-            $repository->extractOne($entity, self::COLUMN_NAME) + 1
+            $mapper->extractOne($entity, self::COLUMN_NAME) + 1
         );
     }
 

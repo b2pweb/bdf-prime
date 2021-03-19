@@ -11,6 +11,7 @@ use Bdf\Prime\Sharding\Extension\ShardPicker;
  * ShardingQuery
  *
  * @property ShardingConnection $connection protected
+ * @extends Query<ShardingConnection>
  */
 class ShardingQuery extends Query
 {

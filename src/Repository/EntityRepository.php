@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Repository;
 
+use BadMethodCallException;
 use Bdf\Event\EventNotifier;
 use Bdf\Prime\Cache\CacheInterface;
 use Bdf\Prime\Collection\CollectionFactory;
@@ -9,10 +10,12 @@ use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Collection\EntityCollection;
 use Bdf\Prime\Collection\Indexer\SingleEntityIndexer;
 use Bdf\Prime\Connection\Event\ConnectionClosedListenerInterface;
+use Bdf\Prime\Connection\TransactionManagerInterface;
 use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Events;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Mapper;
+use Bdf\Prime\Query\Contract\Aggregatable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\QueryInterface;
@@ -27,6 +30,7 @@ use Bdf\Prime\Schema\Resolver;
 use Bdf\Prime\ServiceLocator;
 use Closure;
 use Doctrine\Common\EventSubscriber;
+use Exception;
 
 /**
  * Db repository
@@ -257,14 +261,14 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
         
         return $this;
     }
-    
+
     /**
-     * Launch transactionnal queries
+     * Launch transactional queries
      * 
      * @param callable(EntityRepository):R $work
      * @return R
      * 
-     * @throws \Exception
+     * @throws Exception
      * @throws PrimeException
      *
      * @template R
@@ -273,27 +277,31 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     {
         $connection = $this->connection();
 
+        if (!$connection instanceof TransactionManagerInterface) {
+            throw new BadMethodCallException('Transactions are not supported by the connection '.$connection->getName());
+        }
+
         // @todo handle Doctrine DBAL Exception ?
         // @todo transaction method on connection ?
         try {
             $connection->beginTransaction();
-            
+
             $result = $work($this);
-            
+
             if ($result === false) {
                 $connection->rollback();
             } else {
                 $connection->commit();
             }
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $connection->rollback();
-            
+
             throw $e;
         }
-        
+
         return $result;
     }
-    
+
     /**
      * Load relations on given entity
      * If the relation is already loaded, the relation will not be reloaded
@@ -368,16 +376,10 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * Save entity and its relations
-     *
-     * @param object         $entity
-     * @param string|array   $relations
-     *
-     * @return int
-     * @throws PrimeException
+     * {@inheritdoc}
      */
     #[WriteOperation]
-    public function saveAll($entity, $relations)
+    public function saveAll($entity, $relations): int
     {
         $relations = Relation::sanitizeRelations((array)$relations);
 
@@ -393,16 +395,10 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * Delete entity and its relations
-     *
-     * @param object         $entity
-     * @param string|array   $relations
-     *
-     * @return int
-     * @throws PrimeException
+     * {@inheritdoc}
      */
     #[WriteOperation]
-    public function deleteAll($entity, $relations)
+    public function deleteAll($entity, $relations): int
     {
         $relations = Relation::sanitizeRelations((array)$relations);
 
@@ -499,8 +495,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function count(array $criteria = [], $attributes = null)
+    public function count(array $criteria = [], $attributes = null): int
     {
+        /** @psalm-suppress UndefinedInterfaceMethod */
         return $this->builder()->where($criteria)->count($attributes);
     }
 
@@ -513,19 +510,13 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function exists($entity)
+    public function exists($entity): bool
     {
         return $this->queries->countKeyValue($this->mapper()->primaryCriteria($entity)) > 0;
     }
 
     /**
-     * Refresh the entity form the repository
-     *
-     * @param object $entity
-     * @param array  $criteria
-     *
-     * @return object The refreshed object
-     * @throws PrimeException
+     * {@inheritdoc}
      */
     #[ReadOperation]
     public function refresh($entity, array $criteria = [])
@@ -547,7 +538,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      *
      * @return bool|null     Retuns null if entity is composite primary
      */
-    public function isNew($entity)
+    public function isNew($entity): ?bool
     {
         $metadata = $this->mapper->metadata();
 
@@ -573,7 +564,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function save($entity)
+    public function save($entity): int
     {
         $isNew = $this->isNew($entity);
 
@@ -604,7 +595,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function replace($entity)
+    public function replace($entity): int
     {
         $isNew = $this->isNew($entity);
 
@@ -625,7 +616,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function duplicate($entity)
+    public function duplicate($entity): int
     {
         $this->mapper()->setId($entity, null);
         
@@ -642,7 +633,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function insert($entity, $ignore = false)
+    public function insert($entity, $ignore = false): int
     {
         return $this->writer->insert($entity, ['ignore' => $ignore]);
     }
@@ -656,7 +647,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function insertIgnore($entity)
+    public function insertIgnore($entity): int
     {
         return $this->insert($entity, true);
     }
@@ -671,7 +662,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function update($entity, array $attributes = null)
+    public function update($entity, array $attributes = null): int
     {
         return $this->writer->update($entity, ['attributes' => $attributes]);
     }
@@ -686,7 +677,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function updateBy(array $attributes, array $criteria = [])
+    public function updateBy(array $attributes, array $criteria = []): int
     {
         return $this->builder()->where($criteria)->update($attributes);
     }
@@ -700,7 +691,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function delete($entity)
+    public function delete($entity): int
     {
         return $this->writer->delete($entity);
     }
@@ -714,7 +705,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function deleteBy(array $criteria)
+    public function deleteBy(array $criteria): int
     {
         return $this->builder()->where($criteria)->delete();
     }
@@ -961,7 +952,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param array $criteria
      * @param array $attributes
      * 
-     * @return object
+     * @return object|null
      * @throws PrimeException
      *
      * @psalm-suppress InvalidReturnType
@@ -1055,6 +1046,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     {
         $this->connection()->getEventManager()->removeEventSubscriber($this);
 
+        /** @var string $original */
         $original = $this->mapper->metadata()->connection;
         $this->mapper->metadata()->connection = $connectionName;
 

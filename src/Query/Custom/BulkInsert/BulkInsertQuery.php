@@ -43,6 +43,9 @@ use Bdf\Prime\Query\Extension\CachableTrait;
  *     ->execute()
  * ;
  * </code>
+ *
+ * @template C as \Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection
+ * @implements CommandInterface<C>
  */
 class BulkInsertQuery extends CompilableClause implements CommandInterface, Compilable, Cachable, InsertQueryInterface
 {
@@ -51,7 +54,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * The DBAL Connection.
      *
-     * @var ConnectionInterface
+     * @var C
      */
     protected $connection;
 
@@ -66,7 +69,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * BulkInsertQuery constructor.
      *
-     * @param ConnectionInterface $connection
+     * @param C $connection
      * @param PreprocessorInterface|null $preprocessor
      */
     public function __construct(ConnectionInterface $connection, PreprocessorInterface $preprocessor = null)
@@ -87,7 +90,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * {@inheritdoc}
      */
-    public function compiler()
+    public function compiler(): CompilerInterface
     {
         return $this->compiler;
     }
@@ -116,7 +119,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * {@inheritdoc}
      */
-    public function connection()
+    public function connection(): ConnectionInterface
     {
         return $this->connection;
     }

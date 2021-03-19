@@ -105,7 +105,7 @@ class MapperInfo
     /**
      * Get the connection name
      * 
-     * @return string
+     * @return string|null
      */
     public function connection()
     {
@@ -165,7 +165,9 @@ class MapperInfo
     }
 
     /**
-     * 
+     * @psalm-assert !null $this->properties
+     * @psalm-assert !null $this->embedded
+     * @psalm-assert !null $this->primaries
      */
     private function buildProperties()
     {
@@ -218,9 +220,9 @@ class MapperInfo
         
         return $this->objects;
     }
-    
+
     /**
-     * 
+     * @psalm-assert !null $this->objects
      */
     private function buildObjectProperties()
     {

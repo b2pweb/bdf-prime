@@ -126,7 +126,7 @@ final class Timestampable extends Behavior
     public function beforeInsert($entity, $repository)
     {
         $now = $this->createDate($this->createdAt['name'], $repository);
-        $repository->hydrateOne($entity, $this->createdAt['name'], $now);
+        $repository->mapper()->hydrateOne($entity, $this->createdAt['name'], $now);
     }
 
     /**
@@ -145,7 +145,7 @@ final class Timestampable extends Behavior
         }
 
         $now = $this->createDate($this->updatedAt['name'], $repository);
-        $repository->hydrateOne($entity, $this->updatedAt['name'], $now);
+        $repository->mapper()->hydrateOne($entity, $this->updatedAt['name'], $now);
     }
 
     /**

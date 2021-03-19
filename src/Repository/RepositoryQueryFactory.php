@@ -292,17 +292,18 @@ class RepositoryQueryFactory
     public function entities(array $entities)
     {
         $query = $this->repository->queries()->builder();
+        $mapper = $this->repository->mapper();
 
-        if ($this->repository->mapper()->metadata()->isCompositePrimaryKey()) {
+        if ($mapper->metadata()->isCompositePrimaryKey()) {
             foreach ($entities as $entity) {
-                $query->orWhere($this->repository->mapper()->primaryCriteria($entity));
+                $query->orWhere($mapper->primaryCriteria($entity));
             }
         } else {
-            $attribute = $this->repository->mapper()->metadata()->primary['attributes'][0];
+            $attribute = $mapper->metadata()->primary['attributes'][0];
             $keys = [];
 
             foreach ($entities as $entity) {
-                $keys[] = $this->repository->extractOne($entity, $attribute);
+                $keys[] = $mapper->extractOne($entity, $attribute);
             }
 
             $query->where($attribute, 'in', $keys);

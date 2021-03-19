@@ -12,8 +12,6 @@ use Bdf\Prime\Query\Contract\Cachable;
  *
  * @see Cachable
  *
- * @property ConnectionInterface $connection
- *
  * @psalm-require-implements Cachable
  *
  * @todo Cache statement instead of assoc array result ?

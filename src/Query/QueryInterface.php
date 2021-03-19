@@ -14,6 +14,9 @@ use Bdf\Prime\Query\Pagination\PaginatorInterface;
 
 /**
  * QueryInterface
+ *
+ * @template C as \Bdf\Prime\Connection\ConnectionInterface
+ * @extends ReadCommandInterface<C>
  */
 interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable, Compilable, Deletable
 {

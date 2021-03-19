@@ -2,7 +2,9 @@
 
 namespace Bdf\Prime\Schema;
 
+use BadMethodCallException;
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Connection\TransactionManagerInterface;
 use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Platform\PlatformInterface;
@@ -12,13 +14,16 @@ use Doctrine\DBAL\DBALException as DoctrineDBALException;
 
 /**
  * Class AbstractSchemaManager
+ *
+ * @template C as ConnectionInterface
+ * @implements SchemaManagerInterface<C>
  */
 abstract class AbstractSchemaManager implements SchemaManagerInterface
 {
     /**
      * The database connection instance.
      *
-     * @var ConnectionInterface
+     * @var C
      */
     protected $connection;
 
@@ -48,7 +53,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * Create a new schema builder.
      *
-     * @param ConnectionInterface $connection
+     * @param C $connection
      * @throws PrimeException
      */
     public function __construct(ConnectionInterface $connection)
@@ -145,7 +150,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function simulate(\Closure $operations = null)
+    public function simulate(callable $operations = null)
     {
         $newSchema = clone $this;
         $newSchema->autoFlush = false;
@@ -160,10 +165,14 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function transaction(\Closure $operations)
+    public function transaction(callable $operations)
     {
         $last = $this->autoFlush;
         $this->autoFlush = false;
+
+        if (!$this->connection instanceof TransactionManagerInterface) {
+            throw new BadMethodCallException('The connection '.$this->connection->getName().' do not handle transactions');
+        }
 
         try {
             $operations($this);

@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Platform;
 
 use Bdf\Prime\Exception\TypeException;
+use Bdf\Prime\Types\FacadeTypeInterface;
 use Bdf\Prime\Types\TypeInterface;
 use Bdf\Prime\Types\TypesRegistry;
 use Bdf\Prime\Types\TypesRegistryInterface;
@@ -95,6 +96,7 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
             return $type;
         }
 
+        /** @var FacadeTypeInterface $type */
         return $type->toPlatformType($this->platform);
     }
 

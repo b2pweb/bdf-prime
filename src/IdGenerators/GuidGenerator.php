@@ -8,6 +8,8 @@ use Bdf\Prime\ServiceLocator;
  * GUID generator
  * 
  * generate guid from UUID expression
+ *
+ * @extends AbstractGenerator<\Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection>
  */
 class GuidGenerator extends AbstractGenerator
 {
@@ -21,6 +23,6 @@ class GuidGenerator extends AbstractGenerator
 
         $stmt = $connection->query('SELECT '.$grammar->getGuidExpression());
 
-        return $data[$property] = $stmt->fetchColumn(0);
+        return $data[$property] = (string) $stmt->fetchColumn(0);
     }
 }

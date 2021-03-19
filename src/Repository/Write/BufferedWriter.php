@@ -6,6 +6,7 @@ use Bdf\Event\EventNotifier;
 use Bdf\Prime\Events;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 
@@ -173,6 +174,7 @@ class BufferedWriter implements WriterInterface
      */
     private function flushDelete()
     {
+        /** @var EntityRepository $this->repository */
         if (empty($this->delete)) {
             return 0;
         }

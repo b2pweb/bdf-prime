@@ -3,6 +3,8 @@
 namespace Bdf\Prime\Types;
 
 use Bdf\Prime\Types\Helpers\DateTimeHelper;
+use DateTime;
+use DateTimeInterface;
 
 /**
  * Type that maps a SQL TIMESTAMP to a PHP DateTime Object
@@ -17,7 +19,7 @@ class TimestampType extends AbstractFacadeType
      * @param string $name
      * @param string $className
      */
-    public function __construct($name = self::TIMESTAMP, string $className = \DateTime::class)
+    public function __construct($name = self::TIMESTAMP, string $className = DateTime::class)
     {
         parent::__construct($name);
 
@@ -27,8 +29,6 @@ class TimestampType extends AbstractFacadeType
 
     /**
      * {@inheritdoc}
-     *
-     * @param string|\DateTimeInterface $value
      */
     public function toDatabase($value)
     {
@@ -37,7 +37,7 @@ class TimestampType extends AbstractFacadeType
         }
 
         // If the date is formatted, it can be considered as a simple string
-        if (!$value instanceof \DateTimeInterface) {
+        if (!$value instanceof DateTimeInterface) {
             return $value;
         }
 

@@ -7,6 +7,7 @@ use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Collection\Indexer\EntityIndexerInterface;
 use Bdf\Prime\Collection\Indexer\EntitySetIndexer;
 use Bdf\Prime\Locatorizable;
+use Bdf\Prime\Query\Contract\Deletable;
 use Bdf\Prime\Query\Contract\Whereable;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
@@ -44,7 +45,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * The distant repository
      *
-     * @var RepositoryInterface|null
+     * @var RepositoryInterface
      */
     protected $distant;
 
@@ -180,7 +181,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * Get the query's result wrapper
      *
-     * @return string|callable
+     * @return string|callable|null
      */
     public function getWrapper()
     {
@@ -304,12 +305,12 @@ abstract class AbstractRelation implements RelationInterface
      * @param string|array $value
      * @param mixed        $constraints
      *
-     * @return ReadCommandInterface
+     * @return ReadCommandInterface&Deletable
      */
     protected function query($value, $constraints = []): ReadCommandInterface
     {
         return $this->applyConstraints(
-            $this->applyWhereKeys($this->distant->builder(), $value),
+            $this->applyWhereKeys($this->distant->queries()->builder(), $value),
             $constraints
         );
     }
@@ -346,7 +347,7 @@ abstract class AbstractRelation implements RelationInterface
             $relation = $this->distant->collectionFactory()->wrap((array) $relation, $this->wrapper);
         }
 
-        $this->local->hydrateOne($entity, $this->attributeAim, $relation);
+        $this->local->mapper()->hydrateOne($entity, $this->attributeAim, $relation);
 
         if ($relation !== null) {
             $this->relationInfo->markAsLoaded($entity);
@@ -360,7 +361,7 @@ abstract class AbstractRelation implements RelationInterface
      *
      * @param object $entity
      *
-     * @return object|object[] The relation object. Can be an array on many relation
+     * @return object|object[]|null The relation object. Can be an array on many relation
      */
     protected function getRelation($entity)
     {
@@ -368,7 +369,7 @@ abstract class AbstractRelation implements RelationInterface
             return null;
         }
 
-        $relation = $this->local->extractOne($entity, $this->attributeAim);
+        $relation = $this->local->mapper()->extractOne($entity, $this->attributeAim);
 
         if ($relation === null) {
             return null;
@@ -393,6 +394,7 @@ abstract class AbstractRelation implements RelationInterface
     protected function getLocalAlias(ReadCommandInterface $query)
     {
         // @todo works ?
+        /** @psalm-suppress UndefinedInterfaceMethod */
         if ($this->local === $query->repository()) {
             return '';
         }

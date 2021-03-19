@@ -20,7 +20,8 @@ use UnexpectedValueException;
 /**
  * Base compiler for SQL queries
  *
- * @extends AbstractCompiler<\Bdf\Prime\Query\SqlQueryInterface&CompilableClause>
+ * @template C as \Doctrine\DBAL\Connection
+ * @extends AbstractCompiler<\Bdf\Prime\Query\SqlQueryInterface&CompilableClause, \Doctrine\DBAL\Connection&\Bdf\Prime\Connection\ConnectionInterface>
  */
 class SqlCompiler extends AbstractCompiler
 {
@@ -36,7 +37,7 @@ class SqlCompiler extends AbstractCompiler
     {
         return $this->connection->quote($this->autoConvertValue($value));
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -48,7 +49,7 @@ class SqlCompiler extends AbstractCompiler
 
         return $this->platform()->grammar()->quoteIdentifier($column);
     }
-    
+
     /**
      * Quote a identifier on multiple columns
      *

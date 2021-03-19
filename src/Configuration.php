@@ -112,6 +112,7 @@ class Configuration extends BaseConfiguration
      * Set common type registry
      *
      * @param TypesRegistryInterface $types
+     * @psalm-assert TypesRegistryInterface $this->_attributes['types']
      */
     public function setTypes(TypesRegistryInterface $types)
     {

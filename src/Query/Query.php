@@ -24,6 +24,11 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
  * @package Bdf\Prime\Query
  * 
  * @todo comment reset un statement (ex ecraser les orders). Prendre en compte le reset du compiler
+ *
+ * @template C as \Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection
+ *
+ * @extends AbstractQuery<C>
+ * @implements SqlQueryInterface<C>
  */
 class Query extends AbstractQuery implements SqlQueryInterface, Paginable
 {
@@ -37,7 +42,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * Initializes a new <tt>Query</tt>.
      *
-     * @param ConnectionInterface $connection The DBAL Connection.
+     * @param C $connection The DBAL Connection.
      * @param PreprocessorInterface|null $preprocessor
      */
     public function __construct(ConnectionInterface $connection, PreprocessorInterface $preprocessor = null)
@@ -84,7 +89,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
      */
     public function quote($value, $type = null)
     {
-        return $this->compiler->quote($value, $type);
+        return $this->connection->quote($value, $type);
     }
 
     /**

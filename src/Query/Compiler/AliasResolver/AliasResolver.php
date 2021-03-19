@@ -62,7 +62,7 @@ class AliasResolver
      *  t2 => customer.driver
      * ]
      *
-     * @var string[]
+     * @var array<string, string>
      */
     protected $aliasToPath = [];
 

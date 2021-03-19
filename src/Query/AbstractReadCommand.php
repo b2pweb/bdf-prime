@@ -13,6 +13,9 @@ use Bdf\Prime\Query\Extension\ExecutableTrait;
 
 /**
  * Abstract class for read operations
+ *
+ * @template C as ConnectionInterface
+ * @implements ReadCommandInterface<C>
  */
 abstract class AbstractReadCommand extends CompilableClause implements ReadCommandInterface
 {
@@ -22,7 +25,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * The DBAL Connection.
      *
-     * @var ConnectionInterface
+     * @var C
      */
     protected $connection;
 
@@ -64,7 +67,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * AbstractReadCommand constructor.
      *
-     * @param ConnectionInterface $connection
+     * @param C $connection
      * @param PreprocessorInterface $preprocessor
      */
     public function __construct(ConnectionInterface $connection, PreprocessorInterface $preprocessor)
@@ -77,7 +80,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * {@inheritdoc}
      */
-    public function compiler()
+    public function compiler(): CompilerInterface
     {
         return $this->compiler;
     }
@@ -117,7 +120,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * {@inheritdoc}
      */
-    public function connection()
+    public function connection(): ConnectionInterface
     {
         return $this->connection;
     }

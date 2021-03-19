@@ -73,7 +73,7 @@ class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function root()
+    public function root(): ?string
     {
         return null;
     }

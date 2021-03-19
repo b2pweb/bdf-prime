@@ -5,6 +5,9 @@ namespace Bdf\Prime\Query\Pagination;
 use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\PrimeSerializable;
+use Bdf\Prime\Query\Contract\Limitable;
+use Bdf\Prime\Query\Contract\Orderable;
+use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\QueryInterface;
 
 /**
@@ -22,14 +25,14 @@ abstract class AbstractPaginator extends PrimeSerializable
 {
     const DEFAULT_PAGE  = 1;
     const DEFAULT_LIMIT = 20;
-    
+
     /**
      * Current query
      * 
-     * @var QueryInterface
+     * @var QueryInterface&Limitable&Orderable&Paginable
      */
     protected $query;
-    
+
     /**
      * Current collection
      * 
@@ -57,8 +60,8 @@ abstract class AbstractPaginator extends PrimeSerializable
      * @var int
      */
     protected $maxRows;
-    
-    
+
+
     /**
      * {@inheritdoc}
      */
@@ -66,7 +69,7 @@ abstract class AbstractPaginator extends PrimeSerializable
     {
         return $this->collection;
     }
-    
+
     /**
      * Get the query
      * 
@@ -108,7 +111,7 @@ abstract class AbstractPaginator extends PrimeSerializable
     /**
      * {@inheritdoc}
      */
-    public function limit()
+    public function limit(): ?int
     {
         return $this->query->getLimit();
     }
@@ -116,7 +119,7 @@ abstract class AbstractPaginator extends PrimeSerializable
     /**
      * {@inheritdoc}
      */
-    public function offset()
+    public function offset(): ?int
     {
         return $this->query->getOffset();
     }

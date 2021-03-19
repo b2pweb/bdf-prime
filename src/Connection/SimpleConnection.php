@@ -39,7 +39,7 @@ use PDO;
  *
  * @method \Bdf\Prime\Configuration getConfiguration()
  */
-class SimpleConnection extends BaseConnection implements ConnectionInterface
+class SimpleConnection extends BaseConnection implements ConnectionInterface, TransactionManagerInterface
 {
     use LostConnection;
     use SchemaChanged;
@@ -373,7 +373,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function beginTransaction()
+    public function beginTransaction(): bool
     {
         $this->prepareLogger();
 
@@ -383,7 +383,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function commit()
+    public function commit(): bool
     {
         $this->prepareLogger();
         
@@ -393,7 +393,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function rollBack()
+    public function rollBack(): bool
     {
         $this->prepareLogger();
         

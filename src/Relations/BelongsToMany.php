@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Relations;
 
 use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Query\Contract\Deletable;
 use Bdf\Prime\Query\Contract\EntityJoinable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
@@ -186,10 +187,14 @@ class BelongsToMany extends Relation
      */
     public function link($owner): ReadCommandInterface
     {
-        return $this->distant->queries()->builder()
+        /** @var QueryInterface&EntityJoinable $query */
+        $query = $this->distant->queries()->builder();
+
+        return $query
             ->joinEntity($this->through->entityName(), $this->throughDistant, $this->distantKey, $this->attributeAim.'Through')
             ->where($this->attributeAim.'Through.'.$this->throughLocal, $this->getLocalKeyValue($owner))
-            ->where($this->allConstraints);
+            ->where($this->allConstraints)
+        ;
     }
 
     /**
@@ -198,7 +203,7 @@ class BelongsToMany extends Relation
      * @param string|array  $key
      * @param array $constraints
      *
-     * @return ReadCommandInterface
+     * @return ReadCommandInterface&Deletable
      */
     protected function throughQuery($key, $constraints = []): ReadCommandInterface
     {

@@ -19,6 +19,8 @@ use Bdf\Prime\Sharding\ShardingConnection;
 /**
  * Handle INSERT operations on Sharding connection set
  * The shard will be choosed using inserted data value, and the operation will be delegated to the shard connection
+ *
+ * @implements CommandInterface<ShardingConnection>
  */
 class ShardingInsertQuery extends CompilableClause implements InsertQueryInterface, CommandInterface, Cachable
 {
@@ -81,7 +83,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function compiler()
+    public function compiler(): CompilerInterface
     {
         throw new BadMethodCallException('Cannot directly compile a sharding query');
     }
@@ -97,7 +99,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function connection()
+    public function connection(): ConnectionInterface
     {
         return $this->connection;
     }

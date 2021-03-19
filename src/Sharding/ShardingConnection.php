@@ -8,6 +8,7 @@ use Bdf\Prime\Exception\ShardingException;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
+use Bdf\Prime\Query\Factory\DefaultQueryFactory;
 use Bdf\Prime\Sharding\Query\ShardingInsertQuery;
 use Bdf\Prime\Sharding\Query\ShardingKeyValueQuery;
 use Doctrine\Common\EventManager;
@@ -123,8 +124,11 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
 
         parent::__construct($params, $driver, $config, $eventManager);
 
-        $this->factory()->alias(InsertQueryInterface::class, ShardingInsertQuery::class);
-        $this->factory()->alias(KeyValueQueryInterface::class, ShardingKeyValueQuery::class);
+        /** @var DefaultQueryFactory $queryFactory */
+        $queryFactory = $this->factory();
+
+        $queryFactory->alias(InsertQueryInterface::class, ShardingInsertQuery::class);
+        $queryFactory->alias(KeyValueQueryInterface::class, ShardingKeyValueQuery::class);
     }
 
     /**
@@ -368,7 +372,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function beginTransaction()
+    public function beginTransaction(): bool
     {
         $success = true;
 
@@ -382,7 +386,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function commit()
+    public function commit(): bool
     {
         $success = true;
 
@@ -396,7 +400,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function rollBack()
+    public function rollBack(): bool
     {
         $success = true;
 

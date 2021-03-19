@@ -6,6 +6,8 @@ use Bdf\Prime\ServiceLocator;
 
 /**
  * AutoIncrementGenerator
+ *
+ * @extends AbstractGenerator<\Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection>
  */
 class AutoIncrementGenerator extends AbstractGenerator
 {

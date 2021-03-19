@@ -21,6 +21,9 @@ use Bdf\Prime\Sharding\ShardingConnection;
  * In other case, all shards will be queried on
  *
  * @property ShardingConnection $connection
+ *
+ * @implements KeyValueQueryInterface<ShardingConnection>
+ * @extends AbstractReadCommand<ShardingConnection>
  */
 class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterface
 {
@@ -322,17 +325,19 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      */
     private function getQueryByShard($shardId)
     {
-        /** @var KeyValueQueryInterface $query */
         if (isset($this->queries[$shardId])) {
             $query = $this->queries[$shardId];
+            /** @var KeyValueQueryInterface $query */
         } else {
             $this->queries[$shardId] = $query = $this->connection->getShardConnection($shardId)->make(KeyValueQueryInterface::class, $this->preprocessor());
+            /** @var KeyValueQueryInterface $query */
             $query->setExtension($this->extension);
         }
 
         $query->from($this->statements['table']);
 
         if (!empty($this->statements['limit'])) {
+            /** @var KeyValueQueryInterface&\Bdf\Prime\Query\Contract\Limitable $query */
             $query->limit($this->statements['limit']);
         }
 

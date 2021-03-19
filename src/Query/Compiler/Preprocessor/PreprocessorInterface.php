@@ -84,9 +84,9 @@ interface PreprocessorInterface
     /**
      * Get the root table name
      *
-     * @return string
+     * @return string|null
      */
-    public function root();
+    public function root(): ?string;
 
     /**
      * Clear the preprocessor state after each compilations

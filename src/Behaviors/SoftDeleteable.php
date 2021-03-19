@@ -4,6 +4,7 @@ namespace Bdf\Prime\Behaviors;
 
 use Bdf\Prime\Events;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
@@ -93,7 +94,7 @@ class SoftDeleteable implements BehaviorInterface
      * We stop the before delete event and update the deleted at date.
      *
      * @param object                 $entity
-     * @param RepositoryInterface    $repository
+     * @param EntityRepository $repository
      */
     public function beforeDelete($entity, $repository)
     {
@@ -104,7 +105,7 @@ class SoftDeleteable implements BehaviorInterface
 
         $now = $this->createDate($this->deleted['name'], $repository);
 
-        $repository->hydrateOne($entity, $this->deleted['name'], $now);
+        $repository->mapper()->hydrateOne($entity, $this->deleted['name'], $now);
         $count = $repository->update($entity, [$this->deleted['name']]);
 
         $repository->notify(Events::POST_DELETE, [$entity, $repository, $count]);

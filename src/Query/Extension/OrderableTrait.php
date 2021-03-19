@@ -8,7 +8,7 @@ use Bdf\Prime\Query\Contract\Orderable;
  * Trait for @see Orderable
  *
  * @property CompilerInterface $compiler
- * @property array $statements
+ * @property array{orders:array<array{sort:string,order:Orderable::ORDER_*}>} $statements
  *
  * @psalm-require-implements Orderable
  */
@@ -76,6 +76,7 @@ trait OrderableTrait
      * {@inheritdoc}
      *
      * @see Orderable::getOrders()
+     * @return array<string, Orderable::ORDER_*>
      */
     public function getOrders(): array
     {

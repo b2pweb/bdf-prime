@@ -23,10 +23,11 @@ final class PaginationWalkStrategy implements WalkStrategyInterface
             throw new InvalidArgumentException('The query must be an instance of '.Limitable::class);
         }
 
-        $cursor = new WalkCursor(clone $query);
+        $query = clone $query;
+        $cursor = new WalkCursor($query);
 
         $cursor->cursor = ($startPage - 1) * $chunkSize;
-        $cursor->query->limit($chunkSize);
+        $query->limit($chunkSize);
 
         return $cursor;
     }

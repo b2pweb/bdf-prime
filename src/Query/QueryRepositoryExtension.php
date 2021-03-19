@@ -9,7 +9,9 @@ use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
+use Bdf\Prime\Query\Contract\Whereable;
 use Bdf\Prime\Relations\Relation;
+use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
@@ -88,11 +90,12 @@ class QueryRepositoryExtension extends QueryCompatExtension
     /**
      * Get one entity by identifier
      *
-     * @param ReadCommandInterface $query
+     * @param ReadCommandInterface&Whereable $query
      * @param mixed         $id
      * @param null|string|array  $attributes
      *
      * @return object|null
+     * @psalm-suppress InvalidReturnType
      */
     public function get(ReadCommandInterface $query, $id, $attributes = null)
     {
@@ -105,15 +108,16 @@ class QueryRepositoryExtension extends QueryCompatExtension
             $id = [$identifierName => $id];
         }
 
+        /** @psalm-suppress InvalidReturnStatement */
         return $query->where($id)->first($attributes);
     }
 
     /**
      * Get one entity or throws entity not found
      *
-     * @param ReadCommandInterface $query
-     * @param mixed         $id
-     * @param null|string|array  $attributes
+     * @param ReadCommandInterface&Whereable $query
+     * @param mixed $id
+     * @param null|string|array $attributes
      *
      * @return object
      *
@@ -133,9 +137,9 @@ class QueryRepositoryExtension extends QueryCompatExtension
     /**
      * Get one entity or return a new one if not found in repository
      *
-     * @param ReadCommandInterface $query
-     * @param mixed         $id
-     * @param null|string|array  $attributes
+     * @param ReadCommandInterface&Whereable $query
+     * @param mixed $id
+     * @param null|string|array $attributes
      *
      * @return object
      */
@@ -194,7 +198,8 @@ class QueryRepositoryExtension extends QueryCompatExtension
     }
 
     /**
-     * Collect entities by attribute
+     * Indexing entities by an attribute value
+     * Use combine for multiple entities with same attribute value
      *
      * @param ReadCommandInterface $query
      * @param string  $attribute
@@ -222,7 +227,9 @@ class QueryRepositoryExtension extends QueryCompatExtension
      */
     public function processEntities(array $data)
     {
-        $hasLoadEvent  = $this->repository->hasListeners(Events::POST_LOAD);
+        /** @var EntityRepository $repository */
+        $repository = $this->repository;
+        $hasLoadEvent = $repository->hasListeners(Events::POST_LOAD);
 
         // Save into local vars to ensure that value will not be changed during execution
         $withRelations = $this->withRelations;
@@ -245,15 +252,15 @@ class QueryRepositoryExtension extends QueryCompatExtension
         }
 
         foreach ($data as $result) {
-            $entities->push($entity = $this->mapper->prepareFromRepository($result, $this->repository->connection()->platform()));
+            $entities->push($entity = $this->mapper->prepareFromRepository($result, $repository->connection()->platform()));
 
-            if ($hasLoadEvent === true) {
-                $this->repository->notify(Events::POST_LOAD, [$entity, $this->repository]);
+            if ($hasLoadEvent) {
+                $repository->notify(Events::POST_LOAD, [$entity, $repository]);
             }
         }
 
         foreach ($withRelations as $relationName => $relationInfos) {
-            $this->repository->relation($relationName)->load(
+            $repository->relation($relationName)->load(
                 $entities,
                 $relationInfos['relations'],
                 $relationInfos['constraints'],
@@ -284,10 +291,11 @@ class QueryRepositoryExtension extends QueryCompatExtension
      */
     public function __call($name, $arguments)
     {
+        /** @var EntityRepository $this->repository */
         $scopes = $this->repository->scopes();
 
         if (!isset($scopes[$name])) {
-            throw new BadMethodCallException('Method "' . get_class($this->repository) . '::' . $name . '" not found');
+            throw new BadMethodCallException('Scope "' . get_class($this->mapper) . '::' . $name . '" not found');
         }
 
         return $scopes[$name](...$arguments);

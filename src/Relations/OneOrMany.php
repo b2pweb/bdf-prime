@@ -76,12 +76,13 @@ abstract class OneOrMany extends Relation
     #[ReadOperation]
     protected function relations($keys, $with, $constraints, $without): array
     {
+        /** @var object[] */
         return $this->relationQuery($keys, $constraints)
             ->with($with)
             ->without($without)
             ->all();
     }
-    
+
     /**
      * Set the relation in a collection of entities
      * 
@@ -277,13 +278,17 @@ abstract class OneOrMany extends Relation
      */
     private function setForeignKeyValue($entity, $id): void
     {
+        /**
+         * @var RepositoryInterface $repository
+         * @var string $key
+         */
         list($repository, $key) = $this->getForeignInfos();
 
         if ($repository->entityClass() === get_class($entity)) {
-            $repository->hydrateOne($entity, $key, $id);
+            $repository->mapper()->hydrateOne($entity, $key, $id);
 
             if ($this->isPolymorphic()) {
-                $repository->hydrateOne($entity, $this->discriminator, $this->discriminatorValue);
+                $repository->mapper()->hydrateOne($entity, $this->discriminator, $this->discriminatorValue);
             }
         }
     }

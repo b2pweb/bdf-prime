@@ -4,24 +4,25 @@ namespace Bdf\Prime\Mapper;
 
 use Bdf\Prime\Behaviors\BehaviorInterface;
 use Bdf\Prime\Cache\CacheInterface;
-use Bdf\Prime\Entity\ImportableInterface;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
 use Bdf\Prime\Entity\Hydrator\MapperHydratorInterface;
+use Bdf\Prime\Entity\ImportableInterface;
 use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\IdGenerators\AutoIncrementGenerator;
+use Bdf\Prime\IdGenerators\GeneratorInterface;
+use Bdf\Prime\IdGenerators\NullGenerator;
+use Bdf\Prime\IdGenerators\TableGenerator;
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Mapper\Builder\IndexBuilder;
 use Bdf\Prime\Mapper\Info\MapperInfo;
 use Bdf\Prime\Platform\PlatformInterface;
+use Bdf\Prime\Relations\Builder\RelationBuilder;
 use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\ServiceLocator;
-use Bdf\Prime\IdGenerators\GeneratorInterface;
-use Bdf\Prime\IdGenerators\AutoIncrementGenerator;
-use Bdf\Prime\IdGenerators\NullGenerator;
-use Bdf\Prime\IdGenerators\TableGenerator;
-use Bdf\Prime\Mapper\Builder\FieldBuilder;
-use Bdf\Prime\Relations\Builder\RelationBuilder;
+use Bdf\Serializer\PropertyAccessor\PropertyAccessorInterface;
 use Bdf\Serializer\PropertyAccessor\ReflectionAccessor;
 use LogicException;
 
@@ -69,14 +70,14 @@ abstract class Mapper
     /**
      * The real name of entity class. Could be an none existing class
      * 
-     * @var string
+     * @var class-string
      */
     private $entityClass;
 
     /**
      * The property accessor class name to use by default
      *
-     * @var string
+     * @var string<PropertyAccessorInterface>
      */
     private $propertyAccessorClass = ReflectionAccessor::class;
 
@@ -164,7 +165,7 @@ abstract class Mapper
     /**
      * Get entity class
      * 
-     * @return string
+     * @return class-string
      */
     public function getEntityClass()
     {
@@ -184,7 +185,7 @@ abstract class Mapper
     /**
      * Set property accessor class name
      * 
-     * @param string $className
+     * @param class-string<PropertyAccessorInterface> $className
      */
     public function setPropertyAccessorClass($className)
     {
@@ -194,7 +195,7 @@ abstract class Mapper
     /**
      * Get property accessor class name
      * 
-     * @return string
+     * @return class-string<PropertyAccessorInterface>
      */
     public function getPropertyAccessorClass()
     {
@@ -539,7 +540,7 @@ abstract class Mapper
      *  ];
      * </code>
      * 
-     * @return array|null
+     * @return array
      */
     abstract public function schema();
     

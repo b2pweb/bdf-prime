@@ -10,6 +10,8 @@ use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
  * Adds foreign key accessor helpers for relations based on single foreign key
+ *
+ * @psalm-require-extends AbstractRelation
  */
 trait ForeignKeyRelation
 {
@@ -31,6 +33,12 @@ trait ForeignKeyRelation
     /**
      * {@inheritdoc}
      *
+     * @param Q $query
+     * @param mixed $value
+     * @return Q
+     * @template Q as \Bdf\Prime\Query\Contract\Whereable&ReadCommandInterface
+     * @psalm-suppress InvalidReturnType
+     *
      * @see AbstractRelation::applyWhereKeys()
      */
     protected function applyWhereKeys(ReadCommandInterface $query, $value): ReadCommandInterface
@@ -48,14 +56,16 @@ trait ForeignKeyRelation
      */
     protected function getLocalKeyValue($entity)
     {
+        $mapper = $this->localRepository()->mapper();
+
         if (!is_array($entity)) {
-            return $this->localRepository()->extractOne($entity, $this->localKey);
+            return $mapper->extractOne($entity, $this->localKey);
         }
 
         $keys = [];
 
         foreach ($entity as $e) {
-            $keys[] = $this->localRepository()->extractOne($e, $this->localKey);
+            $keys[] = $mapper->extractOne($e, $this->localKey);
         }
 
         return $keys;
@@ -67,11 +77,11 @@ trait ForeignKeyRelation
      * @param object $entity
      * @param mixed  $id
      *
-     * @return mixed
+     * @return void
      */
-    protected function setLocalKeyValue($entity, $id)
+    protected function setLocalKeyValue($entity, $id): void
     {
-        return $this->localRepository()->hydrateOne($entity, $this->localKey, $id);
+        $this->localRepository()->mapper()->hydrateOne($entity, $this->localKey, $id);
     }
 
     /**
@@ -83,7 +93,7 @@ trait ForeignKeyRelation
      */
     protected function getDistantKeyValue($entity)
     {
-        return $this->relationRepository()->extractOne($entity, $this->distantKey);
+        return $this->relationRepository()->mapper()->extractOne($entity, $this->distantKey);
     }
 
     /**
@@ -92,11 +102,11 @@ trait ForeignKeyRelation
      * @param object $entity
      * @param mixed  $id
      *
-     * @return mixed
+     * @return void
      */
-    protected function setDistantKeyValue($entity, $id)
+    protected function setDistantKeyValue($entity, $id): void
     {
-        return $this->relationRepository()->hydrateOne($entity, $this->distantKey, $id);
+        $this->relationRepository()->mapper()->hydrateOne($entity, $this->distantKey, $id);
     }
 
     /**

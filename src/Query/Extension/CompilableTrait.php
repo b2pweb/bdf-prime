@@ -45,6 +45,8 @@ trait CompilableTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @return Compilable::TYPE_*
      */
     public function type(): string
     {
