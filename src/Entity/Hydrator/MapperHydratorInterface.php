@@ -33,8 +33,8 @@ interface MapperHydratorInterface
      * Extract attributes from the entity. The result array if a single dimensional array.
      * To extract with multi-dimensional array, use @see HydratorInterface::extract()
      *
-     * @param object $object
-     * @param string[] $attributes
+     * @param object $object The entity to extract
+     * @param array<string, mixed> $attributes Attributes to extract. The attribute name is the array key, the value is the metadata
      *
      * @return array
      */

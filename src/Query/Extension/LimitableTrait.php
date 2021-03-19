@@ -44,7 +44,7 @@ trait LimitableTrait
         $page     = ($page > 0) ? $page : 1;
         $rowCount = ($rowCount > 0) ? $rowCount : 1;
 
-        $this->limit((int) $rowCount, (int) $rowCount * ($page - 1));
+        $this->limit($rowCount, $rowCount * ($page - 1));
 
         return $this;
     }

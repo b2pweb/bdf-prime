@@ -187,7 +187,7 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
             foreach ($this as $entity) {
                 $nb += $repository->save($entity);
 
-                foreach ((array) $relations as $relationName => $info) {
+                foreach ($relations as $relationName => $info) {
                     $nb += $repository->relation($relationName)->saveAll($entity, $info['relations']);
                 }
             }
@@ -216,7 +216,7 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
             foreach ($this as $entity) {
                 $nb += $repository->delete($entity);
 
-                foreach ((array) $relations as $relationName => $info) {
+                foreach ($relations as $relationName => $info) {
                     $nb += $repository->relation($relationName)->deleteAll($entity, $info['relations']);
                 }
             }

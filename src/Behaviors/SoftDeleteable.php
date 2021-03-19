@@ -54,7 +54,7 @@ class SoftDeleteable implements BehaviorInterface
     /**
      * Get the field infos from option
      *
-     * @param bool|string|{0:string,1:string} $field
+     * @param bool|string|array{0:string,1:string} $field
      *
      * @return array
      */
@@ -117,8 +117,10 @@ class SoftDeleteable implements BehaviorInterface
     /**
      * Get the field infos from option
      *
-     * @return string $name
-     * @return RepositoryInterface $repository
+     * @param string $name
+     * @param RepositoryInterface $repository
+     *
+     * @return \DateTimeInterface|int
      */
     private function createDate($name, $repository)
     {
@@ -126,6 +128,7 @@ class SoftDeleteable implements BehaviorInterface
             return time();
         }
 
+        /** @psalm-suppress UndefinedInterfaceMethod */
         $className = $repository->mapper()->info()->property($name)->phpType();
         return new $className;
     }

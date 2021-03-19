@@ -125,9 +125,9 @@ trait Polymorph
     /**
      * Resolve the entity name for meta relation
      *
-     * @param string|array{entity:class-string,distantKey:string,?constraints:mixed} $value
+     * @param string|array{entity:class-string,distantKey:string,constraints?:mixed} $value
      *
-     * @return array{entity:class-string,distantKey:string,?constraints:mixed}
+     * @return array{entity:class-string,distantKey:string,constraints?:mixed}
      */
     protected function resolveEntity(&$value): array
     {

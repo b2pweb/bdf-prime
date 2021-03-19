@@ -127,8 +127,8 @@ interface CollectionInterface extends Countable, ArrayAccess, Traversable
      * 2. combine and preservee key
      * 3. custom injection in the new collection. The callback has to be a callable
      * 
-     * @param  callable|string  $groupBy
-     * @param  int              $mode    
+     * @param callable(mixed,array-key,array)|string $groupBy
+     * @param int $mode
      * 
      * @return static
      * 

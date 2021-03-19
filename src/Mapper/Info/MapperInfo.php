@@ -239,7 +239,7 @@ class MapperInfo
      * @param \ArrayAccess|array $relations
      * @return ObjectPropertyInfo|null
      */
-    private function buildObjectProperty(string $property, iterable $relations): ?ObjectPropertyInfo
+    private function buildObjectProperty(string $property, $relations): ?ObjectPropertyInfo
     {
         if (!isset($this->metadata->embeddeds[$property])) {
             return null;

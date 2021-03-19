@@ -77,7 +77,7 @@ abstract class Mapper
     /**
      * The property accessor class name to use by default
      *
-     * @var string<PropertyAccessorInterface>
+     * @var class-string<PropertyAccessorInterface>
      */
     private $propertyAccessorClass = ReflectionAccessor::class;
 

@@ -263,6 +263,7 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
     public function key()
     {
         if ($this->offset !== null) {
+            /** @var array<int, mixed> $this->collection */
             return $this->offset + key($this->collection);
         }
 

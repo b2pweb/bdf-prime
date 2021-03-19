@@ -467,7 +467,7 @@ abstract class AbstractRelation implements RelationInterface
      */
     public function loadIfNotLoaded(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
     {
-        if (empty($collection)) {
+        if ($collection->empty()) {
             return;
         }
 

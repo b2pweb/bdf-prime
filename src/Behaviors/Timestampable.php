@@ -68,7 +68,7 @@ final class Timestampable extends Behavior
     /**
      * Get the field infos from option
      *
-     * @param bool|string|[0:string,1:string} $field
+     * @param bool|string|array{0:string,1:string} $field
      * @param array $default
      *
      * @return null|array
@@ -151,8 +151,10 @@ final class Timestampable extends Behavior
     /**
      * Get the field infos from option
      *
-     * @return string $name
-     * @return RepositoryInterface $repository
+     * @param string $name
+     * @param RepositoryInterface $repository
+     *
+     * @return int|\DateTimeInterface
      */
     private function createDate($name, $repository)
     {
@@ -160,6 +162,7 @@ final class Timestampable extends Behavior
             return time();
         }
 
+        /** @psalm-suppress UndefinedInterfaceMethod */
         $className = $repository->mapper()->info()->property($name)->phpType();
         return new $className;
     }

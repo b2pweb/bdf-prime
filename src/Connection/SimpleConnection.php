@@ -143,6 +143,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
             try {
                 $this->platform = new SqlPlatform($this->getDatabasePlatform(), $this->getConfiguration()->getTypes());
             } catch (DoctrineDBALException $e) {
+                /** @psalm-suppress InvalidScalarArgument */
                 throw new DBALException($e->getMessage(), $e->getCode(), $e);
             }
         }
@@ -219,7 +220,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      */
     public function insert($table, array $data, array $types = array())
     {
-        return $this->from($table)->insert($data, $types);
+        return $this->from($table)->insert($data);
     }
 
     /**
@@ -328,6 +329,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
 
             return new UpdateResultSet($this->executeUpdate($statement, $query->getBindings()));
         } catch (DoctrineDBALException $e) {
+            /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException('Error on execute : '.$e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -415,6 +417,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      */
     protected function prepareLogger()
     {
+        /** @psalm-suppress InternalMethod */
         $logger = $this->getConfiguration()->getSQLLogger();
 
         if ($logger && $logger instanceof ConnectionAwareInterface) {
@@ -450,6 +453,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
                 throw $exception;
             }
         } catch (DoctrineDBALException $e) {
+            /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException('Error on execute : '.$e->getMessage(), $e->getCode(), $e);
         }
     }

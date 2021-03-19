@@ -82,7 +82,7 @@ class Blameable extends Behavior
     /**
      * Get the field infos from option
      *
-     * @param bool|string|{0:string,1:string} $field
+     * @param bool|string|array{0:string,1:string} $field
      * @param array $default
      *
      * @return null|array

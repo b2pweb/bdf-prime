@@ -210,7 +210,7 @@ class HydratorGenerationCommand extends Command
     ]
 }
 JSON
-            ], 'comment', true);
+            ], 'comment');
         }
 
         $content .= "\$registry->setHydrators([\n".implode("\n", $hydrators)."\n]);\n";

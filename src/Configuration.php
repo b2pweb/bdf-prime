@@ -10,6 +10,8 @@ use Psr\SimpleCache\CacheInterface;
 
 /**
  * Configuration
+ *
+ * @psalm-suppress InternalClass
  */
 class Configuration extends BaseConfiguration
 {
@@ -20,13 +22,15 @@ class Configuration extends BaseConfiguration
      */
     public function __construct(array $options = [])
     {
+        /** @psalm-suppress InternalProperty */
         $this->_attributes = $options + [
             'sqlLogger'         => isset($options['logger']) ? $options['logger'] : null,
             'resultCache'       => null,
             'metadataCache'     => null,
             'dbConfig'          => null,
         ];
-        
+
+        /** @psalm-suppress InternalProperty */
         unset($this->_attributes['logger']);
     }
     
@@ -37,6 +41,7 @@ class Configuration extends BaseConfiguration
      */
     public function setResultCache($cache)
     {
+        /** @psalm-suppress InternalProperty */
         $this->_attributes['resultCache'] = $cache;
     }
     
@@ -45,6 +50,7 @@ class Configuration extends BaseConfiguration
      */
     public function getResultCache()
     {
+        /** @psalm-suppress InternalProperty */
         return $this->_attributes['resultCache'];
     }
     
@@ -55,6 +61,7 @@ class Configuration extends BaseConfiguration
      */
     public function setMetadataCache($cache)
     {
+        /** @psalm-suppress InternalProperty */
         $this->_attributes['metadataCache'] = $cache;
     }
     
@@ -63,6 +70,7 @@ class Configuration extends BaseConfiguration
      */
     public function getMetadataCache()
     {
+        /** @psalm-suppress InternalProperty */
         return $this->_attributes['metadataCache'];
     }
     
@@ -79,6 +87,7 @@ class Configuration extends BaseConfiguration
     {
         @trigger_error(__METHOD__.' is deprecated since 1.1 and will be removed in 1.2. Use ConnectionRegistry to declare your connections.', E_USER_DEPRECATED);
 
+        /** @psalm-suppress InternalProperty */
         $this->_attributes['dbConfig'] = $config;
     }
     
@@ -98,13 +107,16 @@ class Configuration extends BaseConfiguration
         }
 
         if (is_callable($this->_attributes['dbConfig'])) {
+            /** @psalm-suppress InternalProperty */
             $this->_attributes['dbConfig'] = $this->_attributes['dbConfig']($this);
         }
 
         if (! $this->_attributes['dbConfig'] instanceof ConnectionConfig) {
+            /** @psalm-suppress InternalProperty */
             $this->_attributes['dbConfig'] = new ConnectionConfig((array) $this->_attributes['dbConfig']);
         }
 
+        /** @psalm-suppress InternalProperty */
         return $this->_attributes['dbConfig'];
     }
 
@@ -116,6 +128,7 @@ class Configuration extends BaseConfiguration
      */
     public function setTypes(TypesRegistryInterface $types)
     {
+        /** @psalm-suppress InternalProperty */
         $this->_attributes['types'] = $types;
     }
 

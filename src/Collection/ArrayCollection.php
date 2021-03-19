@@ -226,7 +226,7 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
                 throw new \LogicException('Custom mode should only used with callable callback');
             }
             
-            $groupBy = function($item) use($groupBy) {
+            $groupBy = function($item, $key, $results) use($groupBy) {
                 return $this->getDataFromItem($item, $groupBy);
             };
         }

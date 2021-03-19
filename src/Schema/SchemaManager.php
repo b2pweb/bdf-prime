@@ -120,8 +120,9 @@ class SchemaManager extends AbstractSchemaManager
     public function hasDatabase($database)
     {
         try {
-            $databases = $this->getDoctrineManager()->listDatabases($database);
+            $databases = $this->getDoctrineManager()->listDatabases();
         } catch (DoctrineDBALException $e) {
+            /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException($e->getMessage(), $e->getCode(), $e);
         }
 
@@ -136,6 +137,7 @@ class SchemaManager extends AbstractSchemaManager
         try {
             return $this->getDoctrineManager()->listDatabases();
         } catch (DoctrineDBALException $e) {
+            /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -150,6 +152,7 @@ class SchemaManager extends AbstractSchemaManager
                 $this->platform->grammar()->getCreateDatabaseSQL($database)
             );
         } catch (DoctrineDBALException $e) {
+            /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -164,6 +167,7 @@ class SchemaManager extends AbstractSchemaManager
                 $this->platform->grammar()->getDropDatabaseSQL($database)
             );
         } catch (DoctrineDBALException $e) {
+            /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -176,6 +180,7 @@ class SchemaManager extends AbstractSchemaManager
         try {
             return $this->getDoctrineManager()->tablesExist($tableName);
         } catch (DoctrineDBALException $e) {
+            /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -204,6 +209,7 @@ class SchemaManager extends AbstractSchemaManager
                 $this->connection->platform()->types()
             );
         } catch (DoctrineDBALException $e) {
+            /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -218,6 +224,7 @@ class SchemaManager extends AbstractSchemaManager
                 $this->platform->grammar()->getDropTableSQL($tableName)
             );
         } catch (DoctrineDBALException $e) {
+            /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -232,6 +239,7 @@ class SchemaManager extends AbstractSchemaManager
                 $this->platform->grammar()->getTruncateTableSQL($tableName, $cascade)
             );
         } catch (DoctrineDBALException $e) {
+            /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException($e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -263,6 +271,7 @@ class SchemaManager extends AbstractSchemaManager
                 $this->platform->grammar()->getAlterTableSQL($diff)
             );
         } catch (DoctrineDBALException $e) {
+            /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException($e->getMessage(), $e->getCode(), $e);
         }
     }

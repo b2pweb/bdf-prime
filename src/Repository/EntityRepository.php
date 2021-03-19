@@ -386,7 +386,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
         return $this->transaction(function() use($entity, $relations) {
             $nb = $this->save($entity);
 
-            foreach ((array)$relations as $relationName => $info) {
+            foreach ($relations as $relationName => $info) {
                 $nb += $this->relation($relationName)->saveAll($entity, $info['relations']);
             }
 
@@ -405,7 +405,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
         return $this->transaction(function() use($entity, $relations) {
             $nb = $this->delete($entity);
 
-            foreach ((array)$relations as $relationName => $info) {
+            foreach ($relations as $relationName => $info) {
                 $nb += $this->relation($relationName)->deleteAll($entity, $info['relations']);
             }
 

@@ -377,7 +377,9 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
         $success = true;
 
         foreach ($this->getSelectedShards() as $shard) {
-            $success &= $shard->beginTransaction();
+            if (!$shard->beginTransaction()) {
+                $success = false;
+            }
         }
 
         return $success;
@@ -391,7 +393,9 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
         $success = true;
 
         foreach ($this->getSelectedShards() as $shard) {
-            $success &= $shard->commit();
+            if (!$shard->commit()) {
+                $success = false;
+            }
         }
 
         return $success;
@@ -405,7 +409,9 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
         $success = true;
 
         foreach ($this->getSelectedShards() as $shard) {
-            $success &= $shard->rollBack();
+            if (!$shard->rollBack()) {
+                $success = false;
+            }
         }
 
         return $success;

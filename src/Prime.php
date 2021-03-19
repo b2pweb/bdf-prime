@@ -289,8 +289,8 @@ class Prime
      *  Prime::find($repository, ['id' => '...']);
      * </code>
      * 
-     * @param string|RepositoryInterface  $repositoryName     Repo name or Entity instance
-     * @param array|object                $criteria           Array of criteria. Optionnal if repository name is an object
+     * @param string|RepositoryInterface|object $repositoryName Repo name or Entity instance
+     * @param array|object|null $criteria Array of criteria. Optionnal if repository name is an object
      * 
      * @return object|array
      *
@@ -317,8 +317,8 @@ class Prime
      *  Prime::one($repository, ['id' => '...']);
      * </code>
      * 
-     * @param string|RepositoryInterface  $repositoryName     Repo name or Entity instance
-     * @param array|object                $criteria           Array of criteria. Optionnal if repository name is an object
+     * @param string|RepositoryInterface|object $repositoryName Repo name or Entity instance
+     * @param array|object|null $criteria Array of criteria. Optionnal if repository name is an object
      * 
      * @return object|null
      *
@@ -422,6 +422,7 @@ class Prime
         );
 
         if ($logger = static::$config['logger'] ?? null) {
+            /** @psalm-suppress InternalMethod */
             $registry->getDefaultConfiguration()->setSQLLogger($logger);
         }
 

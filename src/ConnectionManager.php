@@ -61,6 +61,7 @@ class ConnectionManager implements ConnectionRegistryInterface
         if (!$connection instanceof ConnectionInterface) {
             @trigger_error(__METHOD__.' signature change. Use addParameter to add lazy loading conenction info.', E_USER_DEPRECATED);
 
+            /** @psalm-suppress InvalidScalarArgument */
             $this->declareConnection($connection, $default);
 
             return $this->getConnection($connection);

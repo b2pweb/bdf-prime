@@ -40,7 +40,7 @@ class Graphviz extends AbstractVisitor
      */
     public function acceptSchema(Schema $schema)
     {
-        $this->output  = 'digraph "' . sha1(mt_rand()) . '" {' . "\n";
+        $this->output  = 'digraph "' . sha1((string) mt_rand()) . '" {' . "\n";
         $this->output .= 'graph [fontname="helvetica", fontsize=12];' . "\n";
         $this->output .= 'node [fontname="helvetica", fontsize=12];' . "\n";
         $this->output .= 'edge [fontname="helvetica", fontsize=12];' . "\n";
@@ -91,7 +91,7 @@ class Graphviz extends AbstractVisitor
                     . $columnName
                 . '</td>'
                 . '<td border="0" align="left">'
-                    . '<font point-size="10">'.lcfirst($column->getType()).'</font>'
+                    . '<font point-size="10">'.lcfirst((string) $column->getType()).'</font>'
                 . '</td>'
             . '</tr>';
         }

@@ -742,7 +742,7 @@ class SqlCompiler extends AbstractCompiler
                 if (is_array($value)) {
                     return $this->platform()->grammar()->getBetweenExpression($this->quoteIdentifier($query, $column), $this->compileExpressionValue($query, $value[0], $converted), $this->compileExpressionValue($query, $value[1], $converted));
                 }
-                return $this->platform()->grammar()->getBetweenExpression($this->quoteIdentifier($query, $column), 0, $this->compileExpressionValue($query, $value, $converted));
+                return $this->platform()->grammar()->getBetweenExpression($this->quoteIdentifier($query, $column), '0', $this->compileExpressionValue($query, $value, $converted));
 
             // Not between
             case '!between':

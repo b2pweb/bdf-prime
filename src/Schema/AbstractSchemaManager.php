@@ -183,6 +183,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
         } catch (DoctrineDBALException $e) {
             $this->connection->rollBack();
 
+            /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException($e->getMessage(), $e->getCode(), $e);
         } catch (\Exception $e) {
             $this->connection->rollBack();

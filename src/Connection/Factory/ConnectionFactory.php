@@ -33,9 +33,7 @@ class ConnectionFactory implements ConnectionFactoryInterface
         $connection = $this->createConnection($parameters, $config);
 
         // Store connection and return adapter instance
-        if ($connection instanceof ConnectionInterface) {
-            $connection->setName($connectionName);
-        }
+        $connection->setName($connectionName);
 
         return $connection;
     }
@@ -85,6 +83,7 @@ class ConnectionFactory implements ConnectionFactoryInterface
         try {
             return DriverManager::getConnection($parameters, $config, $eventManager);
         } catch (DoctrineDBALException $e) {
+            /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException('Cannot create the connection : '.$e->getMessage(), $e->getCode(), $e);
         }
     }
