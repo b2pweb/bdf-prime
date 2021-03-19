@@ -377,7 +377,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     {
         $this->prepareLogger();
 
-        return parent::beginTransaction();
+        return parent::beginTransaction() ?? true;
     }
 
     /**
@@ -387,7 +387,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     {
         $this->prepareLogger();
         
-        return parent::commit();
+        return parent::commit() ?? true;
     }
     
     /**
@@ -397,7 +397,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     {
         $this->prepareLogger();
         
-        return parent::rollBack();
+        return parent::rollBack() ?? true;
     }
 
     /**
