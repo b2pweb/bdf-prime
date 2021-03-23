@@ -6,18 +6,21 @@ use Bdf\Prime\Mapper\Mapper;
 
 /**
  * Entity primary key extracted from the Mapper
+ *
+ * @template E as object
+ * @implements KeyInterface<E>
  */
 final class MapperPrimaryKey implements KeyInterface
 {
     /**
-     * @var Mapper
+     * @var Mapper<E>
      */
     private $mapper;
 
     /**
      * EntityPrimaryKey constructor.
      *
-     * @param Mapper $mapper
+     * @param Mapper<E> $mapper
      */
     public function __construct(Mapper $mapper)
     {

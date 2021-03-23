@@ -69,10 +69,12 @@ class CollectionFactory
     /**
      * Wrap data with a wrapper class
      *
-     * @param array $data
+     * @param T[] $data
      * @param string|callable $wrapper
      *
-     * @return CollectionInterface
+     * @return CollectionInterface<T>
+     *
+     * @template T
      */
     public function wrap(array $data, $wrapper = 'array')
     {

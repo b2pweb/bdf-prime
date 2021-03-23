@@ -9,8 +9,10 @@ use Traversable;
 /**
  * CollectionInterface
  * 
- * @author  Seb
- * @package Bdf\Prime\Collection
+ * @template E
+ *
+ * @implements ArrayAccess<array-key, E>
+ * @implements Traversable<array-key, E>
  */
 interface CollectionInterface extends Countable, ArrayAccess, Traversable
 {
@@ -22,52 +24,52 @@ interface CollectionInterface extends Countable, ArrayAccess, Traversable
     /**
      * Replace all items
      * 
-     * @param array $items
+     * @param E[] $items
      * 
-     * @return self
+     * @return $this
      */
     public function pushAll(array $items);
     
     /**
      * Push an item onto the end of the collection.
      *
-     * @param  mixed  $item
+     * @param E $item
      * 
-     * @return self
+     * @return $this
      */
     public function push($item);
     
     /**
      * Put an item in the collection by key.
      *
-     * @param  mixed  $key
-     * @param  mixed  $item
+     * @param array-key|null $key
+     * @param E $item
      * 
-     * @return self
+     * @return $this
      */
     public function put($key, $item);
     
     /**
      * Get all of the items in the collection.
      *
-     * @return array
+     * @return E[]
      */
     public function all();
     
     /**
      * Get an item from the collection by key.
      *
-     * @param  mixed  $key
-     * @param  mixed  $default
+     * @param array-key $key
+     * @param E|null $default
      * 
-     * @return mixed
+     * @return E|null
      */
     public function get($key, $default = null);
     
     /**
      * Determine if an item exists in the collection by key.
      *
-     * @param  mixed  $key
+     * @param array-key $key
      * @return bool
      */
     public function has($key);
@@ -75,23 +77,23 @@ interface CollectionInterface extends Countable, ArrayAccess, Traversable
     /**
      * Remove an item from the collection by key.
      *
-     * @param  mixed  $key
+     * @param array-key $key
      * 
-     * @return self
+     * @return $this
      */
     public function remove($key);
     
     /**
      * Clear the collection
      * 
-     * @return self
+     * @return $this
      */
     public function clear();
     
     /**
      * Get the keys of the collection items.
      *
-     * @return array
+     * @return list<array-key>
      */
     public function keys();
     
@@ -105,16 +107,18 @@ interface CollectionInterface extends Countable, ArrayAccess, Traversable
     /**
      * Runs a callback to every items
      *
-     * @param callable $callback The function to run
-     * @return self              The new collection
+     * @param callable(E):R $callback The function to run
+     * @return self<R> The new collection
+     *
+     * @template R
      */
     public function map($callback);
     
     /**
      * Filter every entites with a callback
      *
-     * @param callable $callback The function to run
-     * @return self              The new filtered collection
+     * @param callable(E):bool $callback The function to run
+     * @return static The new filtered collection
      */
     public function filter($callback = null);
     
@@ -130,8 +134,8 @@ interface CollectionInterface extends Countable, ArrayAccess, Traversable
      * @param callable(mixed,array-key,array)|string $groupBy
      * @param int $mode
      * 
-     * @return static
-     * 
+     * @return self
+     *
      * @throws \LogicException if the mode custom is set and the callback is not a callable
      */
     public function groupBy($groupBy, $mode = self::GROUPBY);
@@ -148,18 +152,18 @@ interface CollectionInterface extends Countable, ArrayAccess, Traversable
     /**
      * Search the collection for a given value and return the corresponding key if successful.
      *
-     * @param  mixed  $value
-     * @param  bool   $strict
+     * @param mixed $value
+     * @param bool $strict
      * 
-     * @return mixed
+     * @return array-key|false
      */
     public function indexOf($value, $strict = false);
     
     /**
      * Merge the collection with the given items.
      *
-     * @param  mixed  $items
-     * @return static
+     * @param E[]|CollectionInterface<E> $items
+     * @return self<E>
      */
     public function merge($items);
     
@@ -167,14 +171,14 @@ interface CollectionInterface extends Countable, ArrayAccess, Traversable
      * Sort through each item with a callback.
      *
      * @param  callable|null  $callback
-     * @return static
+     * @return self<E>
      */
     public function sort(callable $callback = null);
 
     /**
      * Export entity's properties in array
      *
-     * @return array
+     * @return E[]
      */
     public function toArray();
 }

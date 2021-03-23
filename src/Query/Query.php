@@ -30,6 +30,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
  *
  * @extends AbstractQuery<C, R>
  * @implements SqlQueryInterface<C, R>
+ * @implements Paginable<R>
  */
 class Query extends AbstractQuery implements SqlQueryInterface, Paginable
 {

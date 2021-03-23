@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query\Pagination;
 
 use BadMethodCallException;
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\PrimeSerializable;
 use Bdf\Prime\Query\Contract\Limitable;
@@ -13,6 +14,7 @@ use Bdf\Prime\Query\Pagination\WalkStrategy\PaginationWalkStrategy;
 use Bdf\Prime\Query\Pagination\WalkStrategy\WalkCursor;
 use Bdf\Prime\Query\Pagination\WalkStrategy\WalkStrategyInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
+use Iterator;
 use LogicException;
 
 /**
@@ -24,10 +26,12 @@ use LogicException;
  * 
  * Attention, le walker ne gère pas les objects collection
  *
- * @author  Seb
- * @package Bdf\Prime\Query\Pagination
+ * @template R as array|object
+ *
+ * @implements PaginatorInterface<R>
+ * @implements Iterator<array-key, R>
  */
-class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
+class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
 {
     const DEFAULT_PAGE  = 1;
     const DEFAULT_LIMIT = 150;
@@ -47,22 +51,22 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
     protected $offset;
 
     /**
-     * @var array
+     * @var R[]
      */
     private $collection = [];
 
     /**
-     * @var WalkStrategyInterface
+     * @var WalkStrategyInterface<R>
      */
     private $strategy;
 
     /**
-     * @var WalkCursor
+     * @var WalkCursor<R>
      */
     private $cursor;
 
     /**
-     * @var ReadCommandInterface
+     * @var ReadCommandInterface<ConnectionInterface, R>
      */
     private $query;
 
@@ -79,7 +83,7 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
     /**
      * Create a query walker
      * 
-     * @param ReadCommandInterface $query
+     * @param ReadCommandInterface<ConnectionInterface, R> $query
      * @param int            $maxRows
      * @param int            $page
      */
@@ -94,9 +98,9 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
     /**
      * Change the walk strategy
      *
-     * @param WalkStrategyInterface $strategy
+     * @param WalkStrategyInterface<R> $strategy
      *
-     * @return Walker
+     * @return $this
      */
     public function setStrategy(WalkStrategyInterface $strategy): self
     {
@@ -112,7 +116,7 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
     /**
      * Get the current active walk strategy
      *
-     * @return WalkStrategyInterface
+     * @return WalkStrategyInterface<R>
      */
     public function getStrategy(): WalkStrategyInterface
     {
@@ -120,6 +124,10 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
             return $this->strategy;
         }
 
+        /**
+         * @var WalkStrategyInterface<R>
+         * @psalm-suppress InvalidPropertyAssignmentValue
+         */
         return $this->strategy = new PaginationWalkStrategy();
     }
 
@@ -137,7 +145,7 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
     }
 
     /**
-     * @return ReadCommandInterface
+     * @return ReadCommandInterface<ConnectionInterface, R>
      */
     public function query(): ReadCommandInterface
     {

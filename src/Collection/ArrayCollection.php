@@ -10,15 +10,17 @@ use IteratorAggregate;
 /**
  * Basic array collection
  *
- * @author  Seb
- * @package Bdf\Prime\Collection
+ * @template E
+ *
+ * @implements CollectionInterface<E>
+ * @implements IteratorAggregate<array-key, E>
  */
 class ArrayCollection extends PrimeSerializable implements IteratorAggregate, CollectionInterface
 {
     /**
      * Container of items
      * 
-     * @var array
+     * @var E[]
      */
     private $items = [];
     
@@ -26,7 +28,7 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
     /**
      * Create a collection
      * 
-     * @param mixed $items
+     * @param E[]|CollectionInterface<E>|null $items
      */
     public function __construct($items = [])
     {

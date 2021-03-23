@@ -94,7 +94,7 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      *
      * @param string|array $columns
      *
-     * @return R[]|CollectionInterface
+     * @return R[]|CollectionInterface<R>
      *
      * @throws PrimeException When execute fail
      */

@@ -6,9 +6,9 @@ use Bdf\Prime\Collection\ArrayCollection;
 
 /**
  * A empty paginator
- * 
- * @author  Seb
- * @package Bdf\Prime\Query\Pagination
+ *
+ * @template R as array|object
+ * @extends Paginator<R>
  */
 class EmptyPaginator extends Paginator
 {

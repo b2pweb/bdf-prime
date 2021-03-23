@@ -40,6 +40,7 @@ trait PaginableTrait
      * {@inheritdoc}
      *
      * @see Paginable::paginate()
+     * @psalm-suppress LessSpecificImplementedReturnType
      */
     public function paginate(?int $maxRows = null, ?int $page = null, string $className = 'paginator'): PaginatorInterface
     {
@@ -52,6 +53,7 @@ trait PaginableTrait
      * {@inheritdoc}
      *
      * @see Paginable::walk()
+     * @psalm-suppress LessSpecificImplementedReturnType
      */
     public function walk(?int $maxRows = null, ?int $page = null): PaginatorInterface
     {

@@ -6,12 +6,16 @@ use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Pagination\PaginatorFactory;
 use Bdf\Prime\Query\Pagination\PaginatorInterface;
+use IteratorAggregate;
 
 /**
  * Interface for query which are iterable and walkable
  * Most of Paginable queries should also be @see Limitable
+ *
+ * @template R as array|object
+ * @implements IteratorAggregate<array-key, R>
  */
-interface Paginable extends \IteratorAggregate
+interface Paginable extends IteratorAggregate
 {
     /**
      * Get entity collection iterator
@@ -21,7 +25,7 @@ interface Paginable extends \IteratorAggregate
      * @param int|null $page
      * @param string $className  Classname of the paginator. Default the registered 'paginator'
      *
-     * @return PaginatorInterface
+     * @return PaginatorInterface<R>
      * @throws PrimeException
      */
     #[ReadOperation]
@@ -33,7 +37,7 @@ interface Paginable extends \IteratorAggregate
      * @param int|null $maxRows
      * @param int|null $page
      *
-     * @return PaginatorInterface
+     * @return PaginatorInterface<R>
      * @throws PrimeException
      */
     #[ReadOperation]

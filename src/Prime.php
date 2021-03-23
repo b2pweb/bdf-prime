@@ -295,7 +295,7 @@ class Prime
      * @param class-string<T>|RepositoryInterface<T>|T $repositoryName Repo name or Entity instance
      * @param array|object|null $criteria Array of criteria. Optional if repository name is an object
      * 
-     * @return T[]|\Bdf\Prime\Collection\CollectionInterface
+     * @return T[]|\Bdf\Prime\Collection\CollectionInterface<T>
      *
      * @throws PrimeException
      *

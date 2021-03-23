@@ -3,12 +3,14 @@
 namespace Bdf\Prime\Query\Pagination;
 
 use Bdf\Prime\Collection\CollectionInterface;
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\PrimeSerializable;
 use Bdf\Prime\Query\Contract\Limitable;
 use Bdf\Prime\Query\Contract\Orderable;
 use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Query\ReadCommandInterface;
 
 /**
  * Abstract paginator
@@ -20,6 +22,8 @@ use Bdf\Prime\Query\QueryInterface;
  * 
  * 
  * @todo retourner une nouvelle instance du paginator sur les methodes de collection ?
+ *
+ * @template R as array|object
  */
 abstract class AbstractPaginator extends PrimeSerializable
 {
@@ -29,14 +33,14 @@ abstract class AbstractPaginator extends PrimeSerializable
     /**
      * Current query
      * 
-     * @var QueryInterface&Limitable&Orderable&Paginable
+     * @var ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable
      */
     protected $query;
 
     /**
      * Current collection
      * 
-     * @var array|CollectionInterface
+     * @var R[]|CollectionInterface<R>
      */
     protected $collection = [];
     
@@ -73,7 +77,7 @@ abstract class AbstractPaginator extends PrimeSerializable
     /**
      * Get the query
      * 
-     * @return QueryInterface
+     * @return ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable
      */
     public function query()
     {
@@ -87,6 +91,7 @@ abstract class AbstractPaginator extends PrimeSerializable
      */
     protected function loadCollection()
     {
+        /** @var ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable $this->query */
         if ($this->maxRows > -1) {
             $this->query->limitPage($this->page, $this->maxRows);
         }

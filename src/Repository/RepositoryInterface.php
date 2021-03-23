@@ -98,8 +98,7 @@ interface RepositoryInterface
      *
      * @param E[] $entities
      *
-     * @return EntityCollection
-     * @todo template on collection
+     * @return EntityCollection<E>
      */
     public function collection(array $entities = []): CollectionInterface;
 

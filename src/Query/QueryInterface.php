@@ -119,7 +119,7 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * @param array $criteria
      * @param string|array $attributes
      *
-     * @return R[]|CollectionInterface|PaginatorInterface
+     * @return R[]|CollectionInterface<R>|PaginatorInterface
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]

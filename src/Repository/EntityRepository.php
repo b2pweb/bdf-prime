@@ -924,7 +924,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param array $criteria
      * @param array $attributes
      * 
-     * @return array|CollectionInterface
+     * @return array|CollectionInterface<E>
      * @throws PrimeException
      */
     #[ReadOperation]

@@ -8,15 +8,15 @@ use Bdf\Prime\Query\Contract\Orderable;
 /**
  * PaginatorInterface
  * 
- * @author  Seb
- * @package Bdf\Prime\Query\Pagination
+ * @template R as array|object
+ * @implements CollectionInterface<R>
  */
 interface PaginatorInterface extends CollectionInterface
 {
     /**
      * Get the current collection
      * 
-     * @return array|CollectionInterface
+     * @return R[]|CollectionInterface<R>
      */
     public function collection();
 

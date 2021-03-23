@@ -37,6 +37,7 @@ use Doctrine\DBAL\DBALException as BaseDBALException;
  * @template R as object|array
  *
  * @implements KeyValueQueryInterface<C, R>
+ * @implements Paginable<R>
  * @extends AbstractReadCommand<C, R>
  */
 class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterface, Compilable, Paginable, Limitable

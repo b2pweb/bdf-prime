@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query\Pagination\WalkStrategy;
 
 use Bdf\Prime\Collection\CollectionInterface;
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Query\Contract\Limitable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\ReadCommandInterface;
@@ -11,6 +12,9 @@ use InvalidArgumentException;
 /**
  * Simple walk strategy using pagination
  * This strategy do not handle write on entities during the walk (like delete entities)
+ *
+ * @template R as array|object
+ * @implements WalkStrategyInterface<R>
  */
 final class PaginationWalkStrategy implements WalkStrategyInterface
 {
@@ -39,7 +43,7 @@ final class PaginationWalkStrategy implements WalkStrategyInterface
     public function next(WalkCursor $cursor): WalkCursor
     {
         $cursor = clone $cursor;
-        /** @var Limitable&ReadCommandInterface $query */
+        /** @var Limitable&ReadCommandInterface<ConnectionInterface, R> $query */
         $query = $cursor->query;
 
         $query->offset($cursor->cursor);

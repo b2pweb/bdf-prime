@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query\Pagination\WalkStrategy;
 
 use Bdf\Prime\Collection\CollectionInterface;
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Query\Contract\Limitable;
 use Bdf\Prime\Query\Contract\Orderable;
 use Bdf\Prime\Query\Contract\ReadOperation;
@@ -14,17 +15,21 @@ use InvalidArgumentException;
  * Walk strategy using a primary key (or any unique key) as cursor
  * This strategy supports deleting entities during the walk, but the entity must contains a single primary key, and the query must be ordered by this key
  * Any sort on other attribute are not supported
+ *
+ * @template E as object
+ * @implements WalkStrategyInterface<E>
  */
 final class KeyWalkStrategy implements WalkStrategyInterface
 {
     /**
-     * @var KeyInterface
+     * @var KeyInterface<E>
      */
     private $key;
 
     /**
      * PrimaryKeyWalkStrategy constructor.
-     * @param KeyInterface $key
+     *
+     * @param KeyInterface<E> $key
      */
     public function __construct(KeyInterface $key)
     {
@@ -40,7 +45,7 @@ final class KeyWalkStrategy implements WalkStrategyInterface
             throw new InvalidArgumentException('KeyWalkStrategy is not supported by this query');
         }
 
-        /** @var Limitable&Orderable&ReadCommandInterface $query */
+        /** @var Limitable&Orderable&ReadCommandInterface<ConnectionInterface, E> $query */
         $query = clone $query;
 
         if (!isset($query->getOrders()[$this->key->name()])) {
@@ -49,6 +54,7 @@ final class KeyWalkStrategy implements WalkStrategyInterface
 
         $query->limit($chunkSize);
 
+        /** @var WalkCursor<E> */
         return new WalkCursor($query);
     }
 
@@ -65,7 +71,7 @@ final class KeyWalkStrategy implements WalkStrategyInterface
         }
 
         if ($cursor->cursor !== null) {
-            /** @var ReadCommandInterface&Orderable&Whereable $query */
+            /** @var ReadCommandInterface<ConnectionInterface, E>&Orderable&Whereable $query */
             $query = $cursor->query;
             $operator = $query->getOrders()[$this->key->name()] === Orderable::ORDER_ASC ? '>' : '<';
 

@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Collection;
 
 use Bdf\Prime\Collection\Indexer\EntityIndexer;
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Entity\ImportableInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\ReadOperation;
@@ -13,6 +14,7 @@ use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Repository\Write\BufferedWriter;
+use IteratorAggregate;
 
 /**
  * Collection of entities
@@ -28,16 +30,21 @@ use Bdf\Prime\Repository\Write\BufferedWriter;
  * </code>
  *
  * @todo Optimize bulk insert query
+ *
+ * @template E as object
+ *
+ * @implements CollectionInterface<E>
+ * @implements IteratorAggregate<array-key, E>
  */
-class EntityCollection implements \IteratorAggregate, CollectionInterface, ImportableInterface
+class EntityCollection implements IteratorAggregate, CollectionInterface, ImportableInterface
 {
     /**
-     * @var RepositoryInterface
+     * @var RepositoryInterface<E>
      */
     private $repository;
 
     /**
-     * @var CollectionInterface
+     * @var CollectionInterface<E>
      */
     private $storage;
 
@@ -45,8 +52,8 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
     /**
      * RelationCollection constructor.
      *
-     * @param RepositoryInterface $repository The entity repository
-     * @param CollectionInterface|array|null $storage
+     * @param RepositoryInterface<E> $repository The entity repository
+     * @param CollectionInterface<E>|E[]|null $storage
      *
      * @internal Should not be created manually
      */
@@ -117,7 +124,7 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
      * This method will configure query like :
      * SELECT * FROM entity WHERE pk IN (entity1.pk, entity2.pk, ...)
      *
-     * @return QueryInterface
+     * @return QueryInterface<ConnectionInterface, E>
      */
     public function query()
     {
@@ -284,7 +291,7 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
     /**
      * Get the related repository
      *
-     * @return RepositoryInterface
+     * @return RepositoryInterface<E>
      */
     public function repository()
     {
@@ -431,9 +438,13 @@ class EntityCollection implements \IteratorAggregate, CollectionInterface, Impor
 
     /**
      * {@inheritdoc}
+     *
+     * @psalm-suppress InvalidReturnType
      */
     public function map($callback)
     {
+        // @fixme does return static make sense ?
+        /** @psalm-suppress InvalidReturnStatement */
         return new static($this->repository, $this->storage->map($callback));
     }
 
