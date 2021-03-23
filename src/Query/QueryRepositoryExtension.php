@@ -4,6 +4,7 @@ namespace Bdf\Prime\Query;
 
 use BadMethodCallException;
 use Bdf\Prime\Collection\Indexer\EntityIndexer;
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Events;
 use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\PrimeException;
@@ -16,11 +17,13 @@ use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
  * QueryRepositoryExtension
+ *
+ * @template E as object
  */
 class QueryRepositoryExtension extends QueryCompatExtension
 {
     /**
-     * @var RepositoryInterface
+     * @var RepositoryInterface<E>
      */
     protected $repository;
 
@@ -30,7 +33,7 @@ class QueryRepositoryExtension extends QueryCompatExtension
     protected $metadata;
 
     /**
-     * @var Mapper
+     * @var Mapper<E>
      */
     protected $mapper;
 
@@ -61,7 +64,7 @@ class QueryRepositoryExtension extends QueryCompatExtension
     /**
      * QueryRepositoryExtension constructor.
      *
-     * @param RepositoryInterface $repository
+     * @param RepositoryInterface<E> $repository
      */
     public function __construct(RepositoryInterface $repository)
     {
@@ -73,10 +76,10 @@ class QueryRepositoryExtension extends QueryCompatExtension
     /**
      * Gets associated repository
      *
-     * @param ReadCommandInterface $query
+     * @param ReadCommandInterface<ConnectionInterface, E> $query
      * @param null|string $name
      *
-     * @return RepositoryInterface
+     * @return RepositoryInterface|null
      */
     public function repository(ReadCommandInterface $query, $name = null)
     {
@@ -90,12 +93,11 @@ class QueryRepositoryExtension extends QueryCompatExtension
     /**
      * Get one entity by identifier
      *
-     * @param ReadCommandInterface&Whereable $query
+     * @param ReadCommandInterface<ConnectionInterface, E>&Whereable $query
      * @param mixed         $id
      * @param null|string|array  $attributes
      *
-     * @return object|null
-     * @psalm-suppress InvalidReturnType
+     * @return E|null
      */
     public function get(ReadCommandInterface $query, $id, $attributes = null)
     {
@@ -108,18 +110,17 @@ class QueryRepositoryExtension extends QueryCompatExtension
             $id = [$identifierName => $id];
         }
 
-        /** @psalm-suppress InvalidReturnStatement */
         return $query->where($id)->first($attributes);
     }
 
     /**
      * Get one entity or throws entity not found
      *
-     * @param ReadCommandInterface&Whereable $query
+     * @param ReadCommandInterface<ConnectionInterface, E>&Whereable $query
      * @param mixed $id
      * @param null|string|array $attributes
      *
-     * @return object
+     * @return E
      *
      * @throws EntityNotFoundException  If entity is not found
      */
@@ -137,11 +138,11 @@ class QueryRepositoryExtension extends QueryCompatExtension
     /**
      * Get one entity or return a new one if not found in repository
      *
-     * @param ReadCommandInterface&Whereable $query
+     * @param ReadCommandInterface<ConnectionInterface, E>&Whereable $query
      * @param mixed $id
      * @param null|string|array $attributes
      *
-     * @return object
+     * @return E
      */
     public function getOrNew(ReadCommandInterface $query, $id, $attributes = null)
     {
@@ -170,10 +171,10 @@ class QueryRepositoryExtension extends QueryCompatExtension
      * $query->with('target#customer.packs');
      * </code>
      *
-     * @param ReadCommandInterface $query
+     * @param ReadCommandInterface<ConnectionInterface, E> $query
      * @param string|array $relations
      *
-     * @return ReadCommandInterface
+     * @return ReadCommandInterface<ConnectionInterface, E>
      */
     public function with(ReadCommandInterface $query, $relations)
     {
@@ -185,10 +186,10 @@ class QueryRepositoryExtension extends QueryCompatExtension
     /**
      * Relations to discard
      *
-     * @param ReadCommandInterface $query
+     * @param ReadCommandInterface<ConnectionInterface, E> $query
      * @param string|array $relations
      *
-     * @return ReadCommandInterface
+     * @return ReadCommandInterface<ConnectionInterface, E>
      */
     public function without(ReadCommandInterface $query, $relations)
     {
@@ -201,11 +202,11 @@ class QueryRepositoryExtension extends QueryCompatExtension
      * Indexing entities by an attribute value
      * Use combine for multiple entities with same attribute value
      *
-     * @param ReadCommandInterface $query
+     * @param ReadCommandInterface<ConnectionInterface, E> $query
      * @param string  $attribute
      * @param boolean $combine
      *
-     * @return ReadCommandInterface
+     * @return ReadCommandInterface<ConnectionInterface, E>
      */
     public function by(ReadCommandInterface $query, $attribute, $combine = false)
     {

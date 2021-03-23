@@ -3,13 +3,18 @@
 namespace Bdf\Prime\Repository;
 
 use Bdf\Prime\Collection\CollectionFactory;
+use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Collection\EntityCollection;
 use Bdf\Prime\Connection\ConnectionInterface;
-use Bdf\Prime\Events;
+use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Mapper\Mapper;
+use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Relations\RelationInterface;
 use Bdf\Prime\Repository\Write\WriterInterface;
+use Bdf\Prime\Schema\ResolverInterface;
 
 /**
  * RepositoryInterface
@@ -21,55 +26,56 @@ interface RepositoryInterface
     /**
      * Get a repository
      * 
-     * @param string|object $entity
+     * @param class-string<T>|T $entity
      * 
-     * @return \Bdf\Prime\Repository\RepositoryInterface
+     * @return RepositoryInterface<T>
+     * @template T as object
      */
-    public function repository($entity);
-    
+    public function repository($entity): ?RepositoryInterface;
+
     /**
      * Get mapper
      * 
-     * @return \Bdf\Prime\Mapper\Mapper
+     * @return Mapper<E>
      */
-    public function mapper();
+    public function mapper(): Mapper;
     
     /**
      * Get the metadata
      * 
-     * @return \Bdf\Prime\Mapper\Metadata
+     * @return Metadata
      */
-    public function metadata();
+    public function metadata(): Metadata;
 
     /**
      * Get DBAL connection
      * 
      * @return ConnectionInterface
      */
-    public function connection();
+    public function connection(): ConnectionInterface;
 
     /**
      * Check if repository is read only
      *
      * @return boolean
      */
-    public function isReadOnly();
+    public function isReadOnly(): bool;
 
     /**
      * Instanciate entity criteria
      * 
      * @param array $criteria
      * 
-     * @return \Bdf\Prime\Entity\Criteria
+     * @return Criteria
      */
-    public function criteria(array $criteria = []);
+    public function criteria(array $criteria = []): Criteria;
     
     /**
      * Instanciate entity
      *
      * @param array $data
      *
-     * @return object
+     * @return E
      */
     public function entity(array $data = []);
 
@@ -83,25 +89,26 @@ interface RepositoryInterface
     /**
      * Get the entity class name to use
      *
-     * @return string
+     * @return class-string<E>
      */
     public function entityClass();
 
     /**
      * Create an EntityCollection
      *
-     * @param array $entities
+     * @param E[] $entities
      *
      * @return EntityCollection
+     * @todo template on collection
      */
-    public function collection(array $entities = []);
+    public function collection(array $entities = []): CollectionInterface;
 
     /**
      * Get the CollectionFactory of the repository
      *
      * @return CollectionFactory
      */
-    public function collectionFactory();
+    public function collectionFactory(): CollectionFactory;
 
     /**
      * Get defined relation
@@ -110,9 +117,10 @@ interface RepositoryInterface
      *
      * @param string $relationName
      *
-     * @return \Bdf\Prime\Relations\RelationInterface
+     * @return RelationInterface
+     * @todo template ?
      */
-    public function relation($relationName);
+    public function relation(string $relationName): RelationInterface;
 
     /**
      * Get the repository constraints
@@ -121,30 +129,30 @@ interface RepositoryInterface
      *
      * @return array
      */
-    public function constraints($context = null);
+    public function constraints(?string $context = null): array;
 
     /**
      * Get schema manager of this repository
      *
      * @param bool $force Allowed user to force schema resolver
      *
-     * @return \Bdf\Prime\Schema\ResolverInterface
+     * @return ResolverInterface
      */
-    public function schema($force = false);
+    public function schema(bool $force = false): ResolverInterface;
 
     /**
      * Get the repository queries
      *
-     * @return RepositoryQueryFactory
+     * @return RepositoryQueryFactory<E>
      */
-    public function queries();
+    public function queries(): RepositoryQueryFactory;
 
     /**
      * Get the repository writer
      *
-     * @return WriterInterface
+     * @return WriterInterface<E>
      */
-    public function writer();
+    public function writer(): WriterInterface;
 
     /**
      * Count entity
@@ -161,7 +169,7 @@ interface RepositoryInterface
     /**
      * Assert that entity exists in repository
      *
-     * @param object $entity
+     * @param E $entity
      *
      * @return boolean
      * @throws PrimeException
@@ -172,10 +180,10 @@ interface RepositoryInterface
     /**
      * Refresh the entity form the repository
      *
-     * @param object $entity The entity to refresh
+     * @param E $entity The entity to refresh
      * @param array $criteria Additional criteria
      *
-     * @return object|null The refreshed object or null if not exists
+     * @return E|null The refreshed object or null if not exists
      * @throws PrimeException
      */
     #[ReadOperation]
@@ -184,7 +192,7 @@ interface RepositoryInterface
     /**
      * Insert or update an entity
      *
-     * @param object $entity
+     * @param E $entity
      *
      * @return int Number of affected entities
      * @throws PrimeException
@@ -195,19 +203,19 @@ interface RepositoryInterface
     /**
      * Insert an entity
      *
-     * @param object $entity
-     * @param bool   $ignore
+     * @param E $entity
+     * @param bool $ignore
      *
      * @return int Number of affected entities
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function insert($entity, $ignore = false): int;
+    public function insert($entity, bool $ignore = false): int;
 
     /**
      * Update an entity
      *
-     * @param object $entity
+     * @param E $entity
      * @param string[]|null $attributes
      *
      * @return int Number of affected entities
@@ -219,7 +227,7 @@ interface RepositoryInterface
     /**
      * Remove a entity
      *
-     * @param object $entity
+     * @param E $entity
      *
      * @return int Number of affected entities
      * @throws PrimeException
@@ -230,8 +238,8 @@ interface RepositoryInterface
     /**
      * Save entity and its relations
      *
-     * @param object         $entity
-     * @param string|array   $relations
+     * @param E $entity
+     * @param string|array $relations
      *
      * @return int
      * @throws PrimeException
@@ -242,8 +250,8 @@ interface RepositoryInterface
     /**
      * Delete entity and its relations
      *
-     * @param object         $entity
-     * @param string|array   $relations
+     * @param E $entity
+     * @param string|array $relations
      *
      * @return int
      * @throws PrimeException

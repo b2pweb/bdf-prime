@@ -217,11 +217,11 @@ class AliasResolver
      *
      * @param mixed $search
      *
-     * @return RepositoryInterface
+     * @return RepositoryInterface|null
      *
      * @todo find repository from table name
      */
-    protected function findRepository($search)
+    protected function findRepository($search): ?RepositoryInterface
     {
         if ($this->metadata->table === $search) {
             return $this->repository;

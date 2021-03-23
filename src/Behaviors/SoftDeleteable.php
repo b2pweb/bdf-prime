@@ -16,7 +16,8 @@ use Bdf\Prime\Types\TypeInterface;
  * filtering them at SELECT time by marking them as with a timestamp,
  * but not explicitly removing them from the database.
  *
- * @package Bdf\Prime\Behaviors
+ * @template E as object
+ * @implements BehaviorInterface<E>
  */
 class SoftDeleteable implements BehaviorInterface
 {
@@ -93,8 +94,8 @@ class SoftDeleteable implements BehaviorInterface
      *
      * We stop the before delete event and update the deleted at date.
      *
-     * @param object                 $entity
-     * @param EntityRepository $repository
+     * @param E $entity
+     * @param EntityRepository<E> $repository
      */
     public function beforeDelete($entity, $repository)
     {
@@ -118,7 +119,7 @@ class SoftDeleteable implements BehaviorInterface
      * Get the field infos from option
      *
      * @param string $name
-     * @param RepositoryInterface $repository
+     * @param RepositoryInterface<E> $repository
      *
      * @return \DateTimeInterface|int
      */

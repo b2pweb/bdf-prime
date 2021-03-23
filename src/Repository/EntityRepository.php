@@ -9,13 +9,14 @@ use Bdf\Prime\Collection\CollectionFactory;
 use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Collection\EntityCollection;
 use Bdf\Prime\Collection\Indexer\SingleEntityIndexer;
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\Event\ConnectionClosedListenerInterface;
 use Bdf\Prime\Connection\TransactionManagerInterface;
 use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Events;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Mapper;
-use Bdf\Prime\Query\Contract\Aggregatable;
+use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\QueryInterface;
@@ -27,6 +28,7 @@ use Bdf\Prime\Repository\Write\Writer;
 use Bdf\Prime\Repository\Write\WriterInterface;
 use Bdf\Prime\Schema\NullResolver;
 use Bdf\Prime\Schema\Resolver;
+use Bdf\Prime\Schema\ResolverInterface;
 use Bdf\Prime\ServiceLocator;
 use Closure;
 use Doctrine\Common\EventSubscriber;
@@ -41,14 +43,18 @@ use Exception;
  *
  * @package Bdf\Prime\Repository
  *
- * @mixin RepositoryQueryFactory
+ * @template E as object
+ * @implements RepositoryInterface<E>
+ * @implements RepositoryEventsSubscriberInterface<E>
+ *
+ * @mixin RepositoryQueryFactory<E>
  */
 class EntityRepository implements RepositoryInterface, EventSubscriber, ConnectionClosedListenerInterface, RepositoryEventsSubscriberInterface
 {
     use EventNotifier;
     
     /**
-     * @var Mapper 
+     * @var Mapper<E>
      */
     protected $mapper;
     
@@ -86,12 +92,12 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     protected $collectionFactory;
 
     /**
-     * @var RepositoryQueryFactory
+     * @var RepositoryQueryFactory<E>
      */
     protected $queries;
 
     /**
-     * @var WriterInterface
+     * @var WriterInterface<E>
      */
     protected $writer;
 
@@ -99,7 +105,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Constructor
      * 
-     * @param Mapper         $mapper
+     * @param Mapper<E> $mapper
      * @param ServiceLocator $serviceLocator
      * @param CacheInterface|null $cache
      */
@@ -120,15 +126,15 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function repository($entity)
+    public function repository($entity): ?RepositoryInterface
     {
         return $this->serviceLocator->repository($entity);
     }
-    
+
     /**
      * {@inheritdoc}
      */
-    public function mapper()
+    public function mapper(): Mapper
     {
         return $this->mapper;
     }
@@ -136,7 +142,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function metadata()
+    public function metadata(): Metadata
     {
         return $this->mapper->metadata();
     }
@@ -144,7 +150,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function isReadOnly()
+    public function isReadOnly(): bool
     {
         return $this->mapper->isReadOnly();
     }
@@ -152,7 +158,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function criteria(array $criteria = [])
+    public function criteria(array $criteria = []): Criteria
     {
         return new Criteria($criteria);
     }
@@ -168,7 +174,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function entityName()
+    public function entityName(): string
     {
         return $this->mapper->metadata()->entityName;
     }
@@ -176,7 +182,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function entityClass()
+    public function entityClass(): string
     {
         return $this->mapper->metadata()->entityClass;
     }
@@ -184,7 +190,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function collection(array $entities = [])
+    public function collection(array $entities = []): CollectionInterface
     {
         return new EntityCollection($this, $entities);
     }
@@ -192,7 +198,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function collectionFactory()
+    public function collectionFactory(): CollectionFactory
     {
         return $this->collectionFactory;
     }
@@ -200,7 +206,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Hydrate on property value of an entity
      *
-     * @param object $entity
+     * @param E $entity
      * @param string $property
      * @param mixed  $value
      *
@@ -208,7 +214,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      *
      * @see Mapper::hydrateOne()
      */
-    public function hydrateOne($entity, $property, $value)
+    public function hydrateOne($entity, string $property, $value): void
     {
         $this->mapper->hydrateOne($entity, $property, $value);
     }
@@ -216,14 +222,14 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Get attribute value of an entity
      *
-     * @param object $entity
+     * @param E $entity
      * @param string $property
      *
      * @return mixed
      *
      * @see Mapper::extractOne()
      */
-    public function extractOne($entity, $property)
+    public function extractOne($entity, string $property)
     {
         return $this->mapper->extractOne($entity, $property);
     }
@@ -231,7 +237,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function connection()
+    public function connection(): ConnectionInterface
     {
         return $this->serviceLocator->connection($this->mapper->metadata()->connection);
     }
@@ -307,8 +313,8 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * If the relation is already loaded, the relation will not be reloaded
      * Use reloadRelation for force loading
      * 
-     * @param object          $entity
-     * @param string|array    $relations
+     * @param E $entity
+     * @param string|array $relations
      *
      * @return void
      * @throws PrimeException
@@ -316,7 +322,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @see EntityRepository::reloadRelations() For force load relations
      */
     #[ReadOperation]
-    public function loadRelations($entity, $relations)
+    public function loadRelations($entity, $relations): void
     {
         foreach (Relation::sanitizeRelations((array)$relations) as $relationName => $meta) {
             $this->relation($relationName)->loadIfNotLoaded(
@@ -330,8 +336,8 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Force loading relations on given entity
      *
-     * @param object          $entity
-     * @param string|array    $relations
+     * @param E $entity
+     * @param string|array $relations
      *
      * @return void
      * @throws PrimeException
@@ -339,7 +345,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @see EntityRepository::loadRelations() For loading relation only if not yet loaded
      */
     #[ReadOperation]
-    public function reloadRelations($entity, $relations)
+    public function reloadRelations($entity, $relations): void
     {
         foreach (Relation::sanitizeRelations((array)$relations) as $relationName => $meta) {
             $this->relation($relationName)->load(
@@ -353,12 +359,13 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Get a entity relation wrapper linked to the entity
      *
-     * @param string   $relationName
-     * @param object   $entity
+     * @param string $relationName
+     * @param E $entity
      *
      * @return EntityRelation
+     * @todo template
      */
-    public function onRelation($relationName, $entity)
+    public function onRelation(string $relationName, $entity): EntityRelation
     {
         return new EntityRelation($entity, $this->relation($relationName));
     }
@@ -366,7 +373,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function relation($relationName)
+    public function relation(string $relationName): RelationInterface
     {
         if (!isset($this->relations[$relationName])) {
             $this->relations[$relationName] = Relation::make($this, $relationName, $this->mapper->relation($relationName));
@@ -416,7 +423,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function constraints($context = null)
+    public function constraints(string $context = null): array
     {
         if ($this->withoutConstraints === true) {
             $this->withoutConstraints = false;
@@ -454,7 +461,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      *
      * @return bool
      */
-    public function isWithoutConstraints()
+    public function isWithoutConstraints(): bool
     {
         return $this->withoutConstraints;
     }
@@ -462,7 +469,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Get query builder
      * 
-     * @return QueryInterface
+     * @return QueryInterface<ConnectionInterface, E>
      */
     public function builder()
     {
@@ -472,7 +479,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function queries()
+    public function queries(): RepositoryQueryFactory
     {
         return $this->queries;
     }
@@ -480,7 +487,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function writer()
+    public function writer(): WriterInterface
     {
         return $this->writer;
     }
@@ -502,12 +509,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * Assert that entity exists in repository
-     *
-     * @param object $entity
-     *
-     * @return boolean
-     * @throws PrimeException
+     * {@inheritdoc}
      */
     #[ReadOperation]
     public function exists($entity): bool
@@ -527,16 +529,15 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
 
         $criteria += $this->mapper()->primaryCriteria($entity);
 
-        /** @psalm-suppress InvalidReturnStatement */
         return $this->builder()->where($criteria)->first();
     }
 
     /**
      * Check if the entity is new
      *
-     * @param object $entity
+     * @param E $entity
      *
-     * @return bool|null     Retuns null if entity is composite primary
+     * @return bool|null Returns null if entity is composite primary
      */
     public function isNew($entity): ?bool
     {
@@ -556,12 +557,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * Insert or update an entity
-     * 
-     * @param object $entity
-     * 
-     * @return int
-     * @throws PrimeException
+     * {@inheritdoc}
      */
     #[WriteOperation]
     public function save($entity): int
@@ -589,7 +585,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Replace an entity
      *
-     * @param object $entity
+     * @param E $entity
      *
      * @return int  Returns 2 if updated and 1 if inserting
      * @throws PrimeException
@@ -610,7 +606,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * Duplicate an entity
      * remove primary key and launch insertion
      * 
-     * @param object $entity
+     * @param E $entity
      * 
      * @return int
      * @throws PrimeException
@@ -626,14 +622,14 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Insert an entity
      * 
-     * @param object $entity
-     * @param bool   $ignore
+     * @param E $entity
+     * @param bool $ignore
      * 
      * @return int
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function insert($entity, $ignore = false): int
+    public function insert($entity, bool $ignore = false): int
     {
         return $this->writer->insert($entity, ['ignore' => $ignore]);
     }
@@ -641,7 +637,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Insert ignore
      * 
-     * @param object $entity
+     * @param E $entity
      * 
      * @return int
      * @throws PrimeException
@@ -653,13 +649,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
     
     /**
-     * Update an entity
-     *
-     * @param object $entity
-     * @param array  $attributes
-     *
-     * @return int
-     * @throws PrimeException
+     * {@inheritdoc}
      */
     #[WriteOperation]
     public function update($entity, array $attributes = null): int
@@ -683,12 +673,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
     
     /**
-     * Remove a entity
-     * 
-     * @param object $entity
-     * 
-     * @return int
-     * @throws PrimeException
+     * {@inheritdoc}
      */
     #[WriteOperation]
     public function delete($entity): int
@@ -713,7 +698,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function schema($force = false)
+    public function schema(bool $force = false): ResolverInterface
     {
         if (!$this->mapper->hasSchemaManager() && !$force) {
             return new NullResolver();
@@ -891,7 +876,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * 
      * @param string|array $relations
      * 
-     * @return QueryInterface
+     * @return QueryInterface<ConnectionInterface, E>
      */
     public function with($relations)
     {
@@ -903,7 +888,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      *
      * @param string|array $relations
      *
-     * @return QueryInterface
+     * @return QueryInterface<ConnectionInterface, E>
      */
     public function without($relations)
     {
@@ -916,7 +901,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param string|array $attribute
      * @param boolean      $combine
      * 
-     * @return QueryInterface
+     * @return QueryInterface<ConnectionInterface, E>
      */
     public function by($attribute, $combine = false)
     {
@@ -928,7 +913,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * 
      * @param string $wrapperClass
      * 
-     * @return QueryInterface
+     * @return QueryInterface<ConnectionInterface, E>
      */
     public function wrapAs($wrapperClass)
     {
@@ -952,15 +937,12 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param array $criteria
      * @param array $attributes
      * 
-     * @return object|null
+     * @return E|null
      * @throws PrimeException
-     *
-     * @psalm-suppress InvalidReturnType
      */
     #[ReadOperation]
     public function findOne(array $criteria, $attributes = null)
     {
-        /** @psalm-suppress InvalidReturnStatement */
         return $this->builder()->findOne($criteria, $attributes);
     }
 
@@ -969,7 +951,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * 
      * @param string|array $relations
      * 
-     * @return QueryInterface
+     * @return QueryInterface<ConnectionInterface, E>
      */
     public function where($column, $operator = null, $value = null)
     {
@@ -996,7 +978,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * Free metadata information on the given entity
      * Note: This method is called by the model destructor
      *
-     * @param object $entity
+     * @param E $entity
      *
      * @return void
      */

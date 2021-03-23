@@ -10,8 +10,12 @@ use Bdf\Prime\Sharding\Extension\ShardPicker;
 /**
  * ShardingQuery
  *
+ * @template R as object|array
+ *
  * @property ShardingConnection $connection protected
- * @extends Query<ShardingConnection>
+ * @template R as object|array
+ *
+ * @extends Query<ShardingConnection, R>
  */
 class ShardingQuery extends Query
 {

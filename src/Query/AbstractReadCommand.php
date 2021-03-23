@@ -15,7 +15,9 @@ use Bdf\Prime\Query\Extension\ExecutableTrait;
  * Abstract class for read operations
  *
  * @template C as ConnectionInterface
- * @implements ReadCommandInterface<C>
+ * @template R as object|array
+ *
+ * @implements ReadCommandInterface<C, R>
  */
 abstract class AbstractReadCommand extends CompilableClause implements ReadCommandInterface
 {

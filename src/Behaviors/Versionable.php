@@ -11,7 +11,8 @@ use Bdf\Prime\Repository\RepositoryInterface;
  *
  * The versionable behavior allows you to keep an history of your model objects.
  *
- * @package Bdf\Prime\Behaviors
+ * @template E as object
+ * @extends Behavior<E>
  */
 class Versionable extends Behavior
 {
@@ -63,8 +64,8 @@ class Versionable extends Behavior
      *
      * we increment version number on entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      */
     public function beforeInsert($entity, $repository)
     {
@@ -76,8 +77,8 @@ class Versionable extends Behavior
      *
      * we historicize entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      * @param integer $count
      */
     public function afterInsert($entity, $repository, $count)
@@ -92,9 +93,9 @@ class Versionable extends Behavior
      *
      * we increment version number on entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
-     * @param null|\ArrayObject      $attributes
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
+     * @param null|\ArrayObject $attributes
      */
     public function beforeUpdate($entity, $repository, $attributes)
     {
@@ -110,8 +111,8 @@ class Versionable extends Behavior
      *
      * we historicize entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      * @param integer $count
      */
     public function afterUpdate($entity, $repository, $count)
@@ -124,8 +125,8 @@ class Versionable extends Behavior
     /**
      * Remove entity versions
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      */
     public function deleteAllVersions($entity, $repository)
     {
@@ -158,8 +159,8 @@ class Versionable extends Behavior
     /**
      * Increment version number on entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      */
     protected function incrementVersion($entity, $repository)
     {
@@ -175,8 +176,8 @@ class Versionable extends Behavior
     /**
      * Historicize entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      */
     protected function insertVersion($entity, $repository)
     {

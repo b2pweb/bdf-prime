@@ -239,9 +239,11 @@ class Migration implements MigrationInterface
     /**
      * Get entity repository
      *
-     * @param string|object $entity
+     * @param class-string<E>|E $entity
      *
-     * @return RepositoryInterface
+     * @return RepositoryInterface<E>
+     *
+     * @template E as object
      */
     public function repository($entity)
     {

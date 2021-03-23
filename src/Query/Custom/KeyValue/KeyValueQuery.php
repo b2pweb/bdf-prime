@@ -34,9 +34,10 @@ use Doctrine\DBAL\DBALException as BaseDBALException;
  * </code>
  *
  * @template C as \Bdf\Prime\Connection\ConnectionInterface
+ * @template R as object|array
  *
- * @implements KeyValueQueryInterface<C>
- * @extends AbstractReadCommand<C>
+ * @implements KeyValueQueryInterface<C, R>
+ * @extends AbstractReadCommand<C, R>
  */
 class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterface, Compilable, Paginable, Limitable
 {

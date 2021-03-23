@@ -33,7 +33,7 @@ use LogicException;
  * 
  * @todo Convertir la donnée avec le type approprié sur les methodes setId, hydrateOne
  *
- * @package Bdf\Prime\Mapper
+ * @template E as object
  */
 abstract class Mapper
 {
@@ -63,14 +63,14 @@ abstract class Mapper
     protected $generator;
     
     /**
-     * @var string
+     * @var class-string
      */
     private $repositoryClass = EntityRepository::class;
     
     /**
      * The real name of entity class. Could be an none existing class
      * 
-     * @var class-string
+     * @var class-string<E>
      */
     private $entityClass;
 
@@ -114,7 +114,7 @@ abstract class Mapper
     /**
      * The collection of behaviors
      *
-     * @var BehaviorInterface[]
+     * @var BehaviorInterface<E>[]
      */
     private $behaviors;
 
@@ -135,12 +135,12 @@ abstract class Mapper
      * Mapper constructor
      *
      * @param ServiceLocator $serviceLocator
-     * @param string $entityClass
+     * @param class-string<E> $entityClass
      * @param Metadata|null $metadata
      * @param MapperHydratorInterface|null $hydrator
      * @param CacheInterface|null $resultCache
      */
-    public function __construct(ServiceLocator $serviceLocator, $entityClass, $metadata = null, MapperHydratorInterface $hydrator = null, CacheInterface $resultCache = null)
+    public function __construct(ServiceLocator $serviceLocator, string $entityClass, ?Metadata $metadata = null, MapperHydratorInterface $hydrator = null, CacheInterface $resultCache = null)
     {
         $this->entityClass = $entityClass;
         $this->metadata = $metadata ?: new Metadata();
@@ -167,7 +167,7 @@ abstract class Mapper
      * 
      * @return class-string
      */
-    public function getEntityClass()
+    public function getEntityClass(): string
     {
         return $this->entityClass;
     }
@@ -177,7 +177,7 @@ abstract class Mapper
      * 
      * @return Metadata
      */
-    public function metadata()
+    public function metadata(): Metadata
     {
         return $this->metadata;
     }
@@ -187,7 +187,7 @@ abstract class Mapper
      * 
      * @param class-string<PropertyAccessorInterface> $className
      */
-    public function setPropertyAccessorClass($className)
+    public function setPropertyAccessorClass(string $className): void
     {
         $this->propertyAccessorClass = $className;
     }
@@ -197,7 +197,7 @@ abstract class Mapper
      * 
      * @return class-string<PropertyAccessorInterface>
      */
-    public function getPropertyAccessorClass()
+    public function getPropertyAccessorClass(): string
     {
         return $this->propertyAccessorClass;
     }
@@ -205,9 +205,9 @@ abstract class Mapper
     /**
      * Set repository class name
      *
-     * @param string $className
+     * @param class-string $className
      */
-    public function setRepositoryClass($className)
+    public function setRepositoryClass(string $className): void
     {
         $this->repositoryClass = $className;
     }
@@ -215,9 +215,9 @@ abstract class Mapper
     /**
      * Get repository class name
      *
-     * @return string
+     * @return class-string
      */
-    public function getRepositoryClass()
+    public function getRepositoryClass(): string
     {
         return $this->repositoryClass;
     }
@@ -227,9 +227,9 @@ abstract class Mapper
      * 
      * @param bool $flag
      */
-    public function setReadOnly($flag)
+    public function setReadOnly(bool $flag): void
     {
-        $this->readOnly = (bool)$flag;
+        $this->readOnly = $flag;
     }
     
     /**
@@ -237,7 +237,7 @@ abstract class Mapper
      * 
      * @return bool
      */
-    public function isReadOnly()
+    public function isReadOnly(): bool
     {
         return $this->readOnly;
     }
@@ -245,7 +245,7 @@ abstract class Mapper
     /**
      * Disable schema manager on repository
      */
-    public function disableSchemaManager()
+    public function disableSchemaManager(): void
     {
         $this->useSchemaManager = false;
     }
@@ -255,7 +255,7 @@ abstract class Mapper
      * 
      * @return bool
      */
-    public function hasSchemaManager()
+    public function hasSchemaManager(): bool
     {
         return $this->useSchemaManager;
     }
@@ -265,9 +265,9 @@ abstract class Mapper
      *
      * @param bool $flag
      */
-    public function setQuoteIdentifier($flag)
+    public function setQuoteIdentifier(bool $flag): void
     {
-        $this->useQuoteIdentifier = (bool)$flag;
+        $this->useQuoteIdentifier = $flag;
     }
 
     /**
@@ -275,7 +275,7 @@ abstract class Mapper
      *
      * @return bool
      */
-    public function hasQuoteIdentifier()
+    public function hasQuoteIdentifier(): bool
     {
         return $this->useQuoteIdentifier;
     }
@@ -285,7 +285,7 @@ abstract class Mapper
      * 
      * @param string|GeneratorInterface $generator
      */
-    public function setGenerator($generator)
+    public function setGenerator($generator): void
     {
         if (!is_string($generator) && !$generator instanceof GeneratorInterface) {
             throw new LogicException('Trying to set an invalid generator in "' . get_class($this) . '"');
@@ -297,9 +297,10 @@ abstract class Mapper
     /**
      * Get generator ID
      * 
-     * @return object
+     * @return GeneratorInterface
+     * @psalm-assert GeneratorInterface $this->generator
      */
-    public function generator()
+    public function generator(): GeneratorInterface
     {
         if ($this->generator === null) {
             if ($this->metadata->isAutoIncrementPrimaryKey()) {
@@ -320,7 +321,7 @@ abstract class Mapper
     /**
      * @return MapperHydratorInterface
      */
-    public function hydrator()
+    public function hydrator(): MapperHydratorInterface
     {
         return $this->hydrator;
     }
@@ -343,7 +344,7 @@ abstract class Mapper
      * Set ID value en entity
      * Only sequenceable attribute is set (the first one)
      *
-     * @param object $entity
+     * @param E $entity
      * @param mixed $value
      */
     public function setId($entity, $value)
@@ -355,7 +356,7 @@ abstract class Mapper
      * Get ID value of an entity
      * Only sequenceable attribute is get (the first one)
      * 
-     * @param object $entity
+     * @param E $entity
      *
      * @return mixed
      */
@@ -367,12 +368,12 @@ abstract class Mapper
     /**
      * Get attribute value of an entity
      * 
-     * @param object $entity
+     * @param E $entity
      * @param string $attribute
      *
      * @return mixed
      */
-    public function extractOne($entity, $attribute)
+    public function extractOne($entity, string $attribute)
     {
         return $this->hydrator->extractOne($entity, $attribute);
     }
@@ -380,11 +381,11 @@ abstract class Mapper
     /**
      * Hydrate on property value of an entity
      * 
-     * @param object $entity
+     * @param E $entity
      * @param string $attribute
      * @param mixed  $value
      */
-    public function hydrateOne($entity, $attribute, $value)
+    public function hydrateOne($entity, string $attribute, $value): void
     {
         $this->hydrator->hydrateOne($entity, $attribute, $value);
     }
@@ -392,11 +393,11 @@ abstract class Mapper
     /**
      * Get primary key criteria
      * 
-     * @param object $entity
+     * @param E $entity
      *
      * @return array
      */
-    public function primaryCriteria($entity)
+    public function primaryCriteria($entity): array
     {
         return $this->hydrator->flatExtract($entity, array_flip($this->metadata->primary['attributes']));
     }
@@ -404,10 +405,11 @@ abstract class Mapper
     /**
      * Instanciate the related class entity
      *
-     * @return object
+     * @return E
      */
     public function instantiate()
     {
+        /** @var E */
         return $this->serviceLocator->instantiator()
             ->instantiate($this->metadata->entityClass, $this->metadata->instantiatorHint);
     }
@@ -417,7 +419,7 @@ abstract class Mapper
      * 
      * @param array $data
      *
-     * @return object
+     * @return E
      */
     public function entity(array $data)
     {
@@ -437,12 +439,12 @@ abstract class Mapper
     /**
      * Transform entity to db one dimension array
      * 
-     * @param object $entity      Entity object
-     * @param array  $attributes  Attribute should be flipped as ['key' => true]
+     * @param E $entity Entity object
+     * @param array|null $attributes  Attribute should be flipped as ['key' => true]
      *
      * @return array
      */
-    public function prepareToRepository($entity, array $attributes = null)
+    public function prepareToRepository($entity, array $attributes = null): array
     {
         return $this->hydrator->flatExtract($entity, $attributes);
     }
@@ -460,7 +462,7 @@ abstract class Mapper
      * @param array             $data  Db data
      * @param PlatformInterface $platform
      *
-     * @return object
+     * @return E
      */
     public function prepareFromRepository(array $data, PlatformInterface $platform)
     {
@@ -474,9 +476,9 @@ abstract class Mapper
     /**
      * Get the repository
      * 
-     * @return RepositoryInterface
+     * @return RepositoryInterface<E>
      */
-    public function repository()
+    public function repository(): RepositoryInterface
     {
         $className = $this->repositoryClass;
 
@@ -489,7 +491,7 @@ abstract class Mapper
      * @return MapperInfo
      * @throws PrimeException
      */
-    public function info()
+    public function info(): MapperInfo
     {
         $platform = $this->serviceLocator->connection($this->metadata()->connection)->platform();
 
@@ -507,7 +509,7 @@ abstract class Mapper
      *
      * @throws \RuntimeException  If relation or type does not exist
      */
-    public function relation($relationName)
+    public function relation(string $relationName): array
     {
         $relations = $this->relations();
         
@@ -714,7 +716,7 @@ abstract class Mapper
     /**
      * Register event on notifier
      * 
-     * @param RepositoryEventsSubscriberInterface $notifier
+     * @param RepositoryEventsSubscriberInterface<E> $notifier
      */
     public function events(RepositoryEventsSubscriberInterface $notifier)
     {
@@ -730,7 +732,7 @@ abstract class Mapper
      *
      * To overwrite.
      *
-     * @param RepositoryEventsSubscriberInterface $notifier
+     * @param RepositoryEventsSubscriberInterface<E> $notifier
      */
     public function customEvents($notifier)
     {
@@ -740,7 +742,7 @@ abstract class Mapper
     /**
      * Get all behaviors
      *
-     * @return BehaviorInterface[]
+     * @return BehaviorInterface<E>[]
      */
     final public function behaviors()
     {
@@ -756,7 +758,7 @@ abstract class Mapper
      *
      * To overwrite.
      *
-     * @return BehaviorInterface[]
+     * @return BehaviorInterface<E>[]
      */
     public function getDefinedBehaviors()
     {
@@ -831,7 +833,7 @@ abstract class Mapper
      *
      * @internal
      */
-    public function destroy()
+    public function destroy(): void
     {
         $this->serviceLocator = null;
         $this->generator = null;

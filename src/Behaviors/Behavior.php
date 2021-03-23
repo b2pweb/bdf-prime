@@ -7,6 +7,9 @@ use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 
 /**
  * Default implementation for Behavior classes
+ *
+ * @template E as object
+ * @implements BehaviorInterface<E>
  */
 class Behavior implements BehaviorInterface
 {

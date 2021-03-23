@@ -2,7 +2,6 @@
 
 namespace Bdf\Prime\Repository\Write;
 
-use Bdf\Event\EventNotifier;
 use Bdf\Prime\Events;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
@@ -16,11 +15,14 @@ use Bdf\Prime\ServiceLocator;
 
 /**
  * Base implementation of repository writer
+ *
+ * @template E as object
+ * @implements WriterInterface<E>
  */
 class Writer implements WriterInterface
 {
     /**
-     * @var RepositoryInterface&RepositoryEventsSubscriberInterface
+     * @var RepositoryInterface<E>&RepositoryEventsSubscriberInterface<E>
      */
     private $repository;
 
@@ -52,7 +54,7 @@ class Writer implements WriterInterface
     /**
      * Writer constructor.
      *
-     * @param RepositoryEventsSubscriberInterface&RepositoryInterface $repository
+     * @param RepositoryEventsSubscriberInterface<E>&RepositoryInterface<E> $repository
      * @param ServiceLocator $serviceLocator
      */
     public function __construct(RepositoryInterface $repository, ServiceLocator $serviceLocator)
@@ -65,9 +67,9 @@ class Writer implements WriterInterface
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function insert($entity, array $options = [])
+    public function insert($entity, array $options = []): int
     {
-        /** @var EntityRepository $this->repository */
+        /** @var EntityRepository<E> $this->repository */
         if ($this->repository->notify(Events::PRE_INSERT, [$entity, $this->repository]) === false) {
             return 0;
         }
@@ -90,9 +92,9 @@ class Writer implements WriterInterface
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function update($entity, array $options = [])
+    public function update($entity, array $options = []): int
     {
-        /** @var EntityRepository $this->repository */
+        /** @var EntityRepository<E> $this->repository */
         $attributes = isset($options['attributes']) ? new \ArrayObject($options['attributes']) : null;
 
         if ($this->repository->notify(Events::PRE_UPDATE, [$entity, $this->repository, $attributes]) === false) {
@@ -123,9 +125,9 @@ class Writer implements WriterInterface
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function delete($entity, array $options = [])
+    public function delete($entity, array $options = []): int
     {
-        /** @var EntityRepository $this->repository */
+        /** @var EntityRepository<E> $this->repository */
         if ($this->repository->notify(Events::PRE_DELETE, [$entity, $this->repository]) === false) {
             return 0;
         }

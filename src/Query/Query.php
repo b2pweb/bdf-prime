@@ -26,9 +26,10 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
  * @todo comment reset un statement (ex ecraser les orders). Prendre en compte le reset du compiler
  *
  * @template C as \Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection
+ * @template R as object|array
  *
- * @extends AbstractQuery<C>
- * @implements SqlQueryInterface<C>
+ * @extends AbstractQuery<C, R>
+ * @implements SqlQueryInterface<C, R>
  */
 class Query extends AbstractQuery implements SqlQueryInterface, Paginable
 {

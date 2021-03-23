@@ -22,7 +22,9 @@ use Bdf\Prime\Query\ReadCommandInterface;
  * </code>
  *
  * @template C as \Bdf\Prime\Connection\ConnectionInterface
- * @extends ReadCommandInterface<C>
+ * @template R as object|array
+ *
+ * @extends ReadCommandInterface<C, R>
  */
 interface KeyValueQueryInterface extends ReadCommandInterface, Projectionable, Aggregatable, Deletable
 {

@@ -31,6 +31,9 @@ use Bdf\Prime\Repository\RepositoryInterface;
  *
  * Note 1: If there is pending operations, there were flushed by the object destructor
  * Note 2: Because operations will be performed later, the WriterInterface methods will always returns 1
+ *
+ * @template E as object
+ * @implements WriterInterface<E>
  */
 class BufferedWriter implements WriterInterface
 {
@@ -75,7 +78,7 @@ class BufferedWriter implements WriterInterface
     /**
      * {@inheritdoc}
      */
-    public function insert($entity, array $options = [])
+    public function insert($entity, array $options = []): int
     {
         $this->insert[] = [$entity, $options];
 
@@ -85,7 +88,7 @@ class BufferedWriter implements WriterInterface
     /**
      * {@inheritdoc}
      */
-    public function update($entity, array $options = [])
+    public function update($entity, array $options = []): int
     {
         $this->update[] = [$entity, $options];
 
@@ -95,7 +98,7 @@ class BufferedWriter implements WriterInterface
     /**
      * {@inheritdoc}
      */
-    public function delete($entity, array $options = [])
+    public function delete($entity, array $options = []): int
     {
         $this->delete[] = [$entity, $options];
 
@@ -107,7 +110,7 @@ class BufferedWriter implements WriterInterface
      *
      * @return int
      */
-    public function pending()
+    public function pending(): int
     {
         return count($this->insert) + count($this->update) + count($this->delete);
     }
@@ -119,7 +122,7 @@ class BufferedWriter implements WriterInterface
      * @throws PrimeException When pending query fail
      */
     #[WriteOperation]
-    public function flush()
+    public function flush(): int
     {
         try {
             return $this->flushInsert() + $this->flushUpdate() + $this->flushDelete();
@@ -131,7 +134,7 @@ class BufferedWriter implements WriterInterface
     /**
      * Clear pending operations
      */
-    public function clear()
+    public function clear(): void
     {
         $this->insert = [];
         $this->update = [];

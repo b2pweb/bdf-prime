@@ -67,13 +67,16 @@ class Prime
     /**
      * Get a repository
      * 
-     * @param string|object|RepositoryInterface $repository
+     * @param class-string<T>|RepositoryInterface<T>|T $repository
      *
-     * @return RepositoryInterface|null
+     * @return RepositoryInterface<T>|null
+     *
+     * @template T as object
      */
     public static function repository($repository)
     {
         if ($repository instanceof RepositoryInterface) {
+            /** @var RepositoryInterface<T> $repository */
             return $repository;
         }
 
@@ -289,12 +292,14 @@ class Prime
      *  Prime::find($repository, ['id' => '...']);
      * </code>
      * 
-     * @param string|RepositoryInterface|object $repositoryName Repo name or Entity instance
-     * @param array|object|null $criteria Array of criteria. Optionnal if repository name is an object
+     * @param class-string<T>|RepositoryInterface<T>|T $repositoryName Repo name or Entity instance
+     * @param array|object|null $criteria Array of criteria. Optional if repository name is an object
      * 
-     * @return object|array
+     * @return T[]|\Bdf\Prime\Collection\CollectionInterface
      *
      * @throws PrimeException
+     *
+     * @template T as object
      */
     public static function find($repositoryName, $criteria = null)
     {
@@ -317,13 +322,14 @@ class Prime
      *  Prime::one($repository, ['id' => '...']);
      * </code>
      * 
-     * @param string|RepositoryInterface|object $repositoryName Repo name or Entity instance
-     * @param array|object|null $criteria Array of criteria. Optionnal if repository name is an object
+     * @param class-string<T>|RepositoryInterface<T>|T $repositoryName Repo name or Entity instance
+     * @param array|object|null $criteria Array of criteria. Optional if repository name is an object
      * 
-     * @return object|null
+     * @return T|null
      *
      * @throws PrimeException
-     * @psalm-suppress InvalidReturnType
+     *
+     * @template T as object
      */
     public static function one($repositoryName, $criteria = null)
     {
@@ -334,25 +340,26 @@ class Prime
             $criteria = $repository->mapper()->prepareToRepository($repositoryName);
         }
 
-        /** @psalm-suppress InvalidReturnStatement */
         return $repository->queries()->builder()->where($criteria)->first();
     }
 
     /**
      * Refresh entity from repository
      * 
-     * @param object $entity
-     * @param array  $additionnalCriteria  Criteria to add to primary key
+     * @param T $entity
+     * @param array $additionalCriteria  Criteria to add to primary key
      * 
-     * @return object|null New refresh entity
+     * @return T|null New refresh entity
      *
      * @throws PrimeException
+     *
+     * @template T as object
      */
-    public static function refresh($entity, $additionnalCriteria = [])
+    public static function refresh($entity, $additionalCriteria = [])
     {
         $repository = static::repository($entity);
         
-        return $repository->refresh($entity, $additionnalCriteria);
+        return $repository->refresh($entity, $additionalCriteria);
     }
     
     //

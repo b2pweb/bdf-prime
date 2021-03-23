@@ -11,6 +11,9 @@ use Bdf\Prime\Types\TypeInterface;
  * Timestampable
  *
  * The timestampable behavior allows you to keep track of the date of creation and last update of your model objects.
+ *
+ * @template E as object
+ * @extends Behavior<E>
  */
 final class Timestampable extends Behavior
 {
@@ -120,8 +123,8 @@ final class Timestampable extends Behavior
      *
      * we set the new date created on the entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      */
     public function beforeInsert($entity, $repository)
     {
@@ -134,9 +137,9 @@ final class Timestampable extends Behavior
      *
      * we set the new date updated on entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
-     * @param null|\ArrayObject      $attributes
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
+     * @param null|\ArrayObject $attributes
      */
     public function beforeUpdate($entity, $repository, $attributes)
     {

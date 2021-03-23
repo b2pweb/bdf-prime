@@ -22,8 +22,10 @@ use Bdf\Prime\Sharding\ShardingConnection;
  *
  * @property ShardingConnection $connection
  *
- * @implements KeyValueQueryInterface<ShardingConnection>
- * @extends AbstractReadCommand<ShardingConnection>
+ * @template R as object|array
+ *
+ * @implements KeyValueQueryInterface<ShardingConnection, R>
+ * @extends AbstractReadCommand<ShardingConnection, R>
  */
 class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterface
 {

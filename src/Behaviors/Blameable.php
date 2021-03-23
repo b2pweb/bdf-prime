@@ -15,7 +15,8 @@ use Bdf\Prime\Types\TypeInterface;
  * It simply inserts the current user id into the fields created_by and updated_by.
  * That way every time a model gets created, updated or deleted, you can see who did it (or who blame for that).
  *
- * @package Bdf\Prime\Behaviors
+ * @template E as object
+ * @extends Behavior<E>
  */
 class Blameable extends Behavior
 {
@@ -134,8 +135,8 @@ class Blameable extends Behavior
      *
      * we set the user that created the entity
      * 
-     * @param object $entity
-     * @param RepositoryInterface $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      */
     public function beforeInsert($entity, RepositoryInterface $repository)
     {
@@ -148,9 +149,9 @@ class Blameable extends Behavior
      *
      * we set the user that updated the entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
-     * @param null|\ArrayObject      $attributes
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
+     * @param null|\ArrayObject $attributes
      */
     public function beforeUpdate($entity, $repository, $attributes)
     {

@@ -267,7 +267,7 @@ class BelongsToMany extends Relation
      *
      * @return Q
      *
-     * @template Q as ReadCommandInterface&\Bdf\Prime\Query\Contract\Whereable
+     * @template Q as ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, object>&\Bdf\Prime\Query\Contract\Whereable
      */
     protected function applyThroughConstraints(ReadCommandInterface $query, $constraints = [], ?string $context = null): ReadCommandInterface
     {

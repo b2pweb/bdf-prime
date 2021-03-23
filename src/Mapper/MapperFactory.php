@@ -46,9 +46,10 @@ class MapperFactory
      * Get associated entity mapper
      *
      * @param ServiceLocator $serviceLocator
-     * @param class-string $entityClass
+     * @param class-string<E> $entityClass
      *
-     * @return Mapper|null
+     * @return Mapper<E>|null
+     * @template E as object
      */
     public function build(ServiceLocator $serviceLocator, $entityClass): ?Mapper
     {
@@ -60,9 +61,10 @@ class MapperFactory
      *
      * @param ServiceLocator $serviceLocator
      * @param class-string<Mapper> $mapperClass
-     * @param class-string|null $entityClass
+     * @param class-string<E>|null $entityClass
      *
-     * @return Mapper|null
+     * @return Mapper<E>|null
+     * @template E as object
      */
     public function createMapper(ServiceLocator $serviceLocator, $mapperClass, $entityClass = null): ?Mapper
     {
@@ -106,6 +108,7 @@ class MapperFactory
      * @param string $className
      *
      * @return bool
+     * @psalm-assert-if-true class-string<Mapper> $className
      */
     public function isMapper($className)
     {

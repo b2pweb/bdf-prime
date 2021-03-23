@@ -7,6 +7,8 @@ use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 
 /**
  * Change behavior of the repository
+ *
+ * @template E as object
  */
 interface BehaviorInterface
 {
@@ -22,7 +24,7 @@ interface BehaviorInterface
     /**
      * Subscribe events on notifier
      *
-     * @param RepositoryEventsSubscriberInterface $notifier
+     * @param RepositoryEventsSubscriberInterface<E> $notifier
      */
     public function subscribe(RepositoryEventsSubscriberInterface $notifier): void;
 

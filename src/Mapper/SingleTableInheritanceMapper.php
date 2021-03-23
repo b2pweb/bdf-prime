@@ -3,7 +3,6 @@
 namespace Bdf\Prime\Mapper;
 
 use Bdf\Prime\Platform\PlatformInterface;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Bdf\Prime\Relations\Relation;
 
 /**
@@ -47,7 +46,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
     /**
      * {@inheritdoc}
      */
-    public function relation($relationName)
+    public function relation(string $relationName): array
     {
         $relation = parent::relation($relationName);
         

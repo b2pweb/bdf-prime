@@ -25,7 +25,7 @@ class ServiceLocator
     private $connectionManager;
     
     /**
-     * @var RepositoryInterface[]
+     * @var class-string-map<T, RepositoryInterface<T>>
      */
     private $repositories = [];
     
@@ -64,9 +64,9 @@ class ServiceLocator
     /**
      * SericeLocator constructor.
      *
-     * @param ConnectionManager $connectionManager
-     * @param MapperFactory  $mapperFactory
-     * @param InstantiatorInterface $instantiator
+     * @param ConnectionManager|null $connectionManager
+     * @param MapperFactory|null $mapperFactory
+     * @param InstantiatorInterface|null $instantiator
      */
     public function __construct(ConnectionManager $connectionManager = null, MapperFactory $mapperFactory = null, InstantiatorInterface $instantiator = null)
     {
@@ -131,11 +131,15 @@ class ServiceLocator
     /**
      * Register a repository
      *
-     * @param string $entityClass
-     * @param RepositoryInterface $repository
+     * @param class-string<E> $entityClass
+     * @param RepositoryInterface<E> $repository
+     *
+     * @template E as object
      */
     public function registerRepository($entityClass, RepositoryInterface $repository)
     {
+        // https://github.com/vimeo/psalm/issues/4460
+        /** @psalm-suppress InvalidPropertyAssignmentValue */
         $this->repositories[$entityClass] = $repository;
     }
     
@@ -158,12 +162,12 @@ class ServiceLocator
      *
      * @param class-string<T>|T $entityClass Name of Entity object to load mapper for
      * 
-     * @return RepositoryInterface|null
+     * @return RepositoryInterface<T>|null
      * @template T as object
      *
      * @psalm-ignore-nullable-return
      */
-    public function repository($entityClass)
+    public function repository($entityClass): ?RepositoryInterface
     {
         if (is_object($entityClass)) {
             $entityClass = get_class($entityClass);
