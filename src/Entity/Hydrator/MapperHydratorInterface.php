@@ -12,6 +12,8 @@ use Bdf\Prime\Platform\PlatformTypesInterface;
  *
  * Do not forget to call @see MapperHydratorInterface::setMetadata()
  * Do not forget to call @see MapperHydratorInterface::setInstantiator()
+ *
+ * @template E as object
  */
 interface MapperHydratorInterface
 {
@@ -33,7 +35,7 @@ interface MapperHydratorInterface
      * Extract attributes from the entity. The result array if a single dimensional array.
      * To extract with multi-dimensional array, use @see HydratorInterface::extract()
      *
-     * @param object $object The entity to extract
+     * @param E $object The entity to extract
      * @param array<string, mixed> $attributes Attributes to extract. The attribute name is the array key, the value is the metadata
      *
      * @return array
@@ -46,7 +48,7 @@ interface MapperHydratorInterface
      * /!\ This method IS NOT the inverted operation of flatExtract().
      *     This method fill from DATABASE FIELDS, whereas flatExtract() extract using ATTRIBUTES
      *
-     * @param object $object
+     * @param E $object
      * @param array $data
      * @param PlatformTypesInterface $types
      */
@@ -60,7 +62,7 @@ interface MapperHydratorInterface
      *
      * If the attribute is an embedded attribute, and one of its ascendant is null, this method will return null
      *
-     * @param object $object
+     * @param E $object
      * @param string $attribute
      *
      * @return mixed
@@ -79,7 +81,7 @@ interface MapperHydratorInterface
      *
      * If the attribute is an embedded attribute, all null ascendant will be instantiated
      *
-     * @param object $object
+     * @param E $object
      * @param string $attribute
      * @param mixed $value
      *

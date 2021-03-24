@@ -55,6 +55,7 @@ use stdClass;
  * }&array<string, string>
  *
  * @psalm-import-type FieldDefinition from \Bdf\Prime\Mapper\Builder\FieldBuilder
+ * @psalm-import-type RelationDefinition from RelationBuilder
  */
 class Metadata
 {
@@ -627,7 +628,7 @@ class Metadata
      * Builds fields metadata
      *
      * @param iterable<string, FieldDefinition> $fields
-     * @param array|null $embeddedMeta
+     * @param EmbeddedMetadata|null $embeddedMeta
      */
     private function buildFields(iterable $fields, $embeddedMeta = null): void
     {
@@ -752,7 +753,7 @@ class Metadata
      * @param class-string $class
      * @param array|null $embeddedMeta
      *
-     * @return array
+     * @return EmbeddedMetadata
      */
     private function buildEmbedded(string $attribute, string $class, ?array $embeddedMeta): array
     {
@@ -782,7 +783,7 @@ class Metadata
      * @param array $meta
      * @param array|null $embeddedMeta
      *
-     * @return array
+     * @return EmbeddedMetadata
      */
     private function buildPolymorph($attribute, array $meta, ?array $embeddedMeta): array
     {
@@ -816,7 +817,7 @@ class Metadata
      * @todo  parcourir la map pour construire les differents embeddeds 'attribute-discriminatorValue'
      *
      * @param string $attribute
-     * @param array  $map
+     * @param string[] $map
      * @param string $discriminator
      * @param array  $embeddedMeta
      */
@@ -836,12 +837,11 @@ class Metadata
     /**
      * Build embedded relations missing in embedded
      * 
-     * @param array|RelationBuilder $relations
+     * @param iterable<string, RelationDefinition> $relations
      */
-    private function buildRelations($relations): void
+    private function buildRelations(iterable $relations): void
     {
         foreach ($relations as $attribute => $relation) {
-
             // il est possible de déclarer des relations sans attribut sur l'entity (cas de grosse collection)
             if (!empty($relation['detached'])) {
                 continue;
@@ -880,8 +880,8 @@ class Metadata
      * Build field meta
      * 
      * @param string $attribute
-     * @param array $meta
-     * @param array|null $embeddedMeta
+     * @param FieldDefinition $meta
+     * @param EmbeddedMetadata|null $embeddedMeta
      */
     private function buildField($attribute, $meta, ?array $embeddedMeta): void
     {

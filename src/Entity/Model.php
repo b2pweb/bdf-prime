@@ -91,7 +91,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Get the associated repository
      * 
-     * @return EntityRepository
+     * @return EntityRepository<static>
      */
     public static function repository()
     {
@@ -230,7 +230,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * 
      * @param string $relation
      * 
-     * @return EntityRelation
+     * @return EntityRelation<static, object>
      */
     public function relation($relation)
     {
@@ -289,7 +289,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param callable $listener
      * @param bool     $once    Register on event once
      *
-     * @return EntityRepository
+     * @return EntityRepository<static>
      */
     public static function loaded(callable $listener, $once = true)
     {
@@ -302,7 +302,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param callable $listener
      * @param bool     $once    Register on event once
      *
-     * @return EntityRepository
+     * @return EntityRepository<static>
      */
     public static function saving(callable $listener, $once = true)
     {
@@ -315,7 +315,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param callable $listener
      * @param bool     $once    Register on event once
      *
-     * @return EntityRepository
+     * @return EntityRepository<static>
      */
     public static function saved(callable $listener, $once = true)
     {
@@ -328,7 +328,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param callable $listener
      * @param bool     $once    Register on event once
      *
-     * @return EntityRepository
+     * @return EntityRepository<static>
      */
     public static function inserting(callable $listener, $once = true)
     {
@@ -341,7 +341,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param callable $listener
      * @param bool     $once    Register on event once
      *
-     * @return EntityRepository
+     * @return EntityRepository<static>
      */
     public static function inserted(callable $listener, $once = true)
     {
@@ -354,7 +354,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param callable $listener
      * @param bool     $once    Register on event once
      *
-     * @return EntityRepository
+     * @return EntityRepository<static>
      */
     public static function updating(callable $listener, $once = true)
     {
@@ -367,7 +367,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param callable $listener
      * @param bool     $once    Register on event once
      *
-     * @return EntityRepository
+     * @return EntityRepository<static>
      */
     public static function updated(callable $listener, $once = true)
     {
@@ -380,7 +380,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param callable $listener
      * @param bool     $once    Register on event once
      *
-     * @return EntityRepository
+     * @return EntityRepository<static>
      */
     public static function deleting(callable $listener, $once = true)
     {
@@ -393,7 +393,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param callable $listener
      * @param bool     $once    Register on event once
      *
-     * @return EntityRepository
+     * @return EntityRepository<static>
      */
     public static function deleted(callable $listener, $once = true)
     {

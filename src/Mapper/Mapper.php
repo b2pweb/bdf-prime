@@ -126,7 +126,7 @@ abstract class Mapper
     protected $serviceLocator;
 
     /**
-     * @var MapperHydratorInterface
+     * @var MapperHydratorInterface<E>
      */
     protected $hydrator;
 
@@ -137,7 +137,7 @@ abstract class Mapper
      * @param ServiceLocator $serviceLocator
      * @param class-string<E> $entityClass
      * @param Metadata|null $metadata
-     * @param MapperHydratorInterface|null $hydrator
+     * @param MapperHydratorInterface<E>|null $hydrator
      * @param CacheInterface|null $resultCache
      */
     public function __construct(ServiceLocator $serviceLocator, string $entityClass, ?Metadata $metadata = null, MapperHydratorInterface $hydrator = null, CacheInterface $resultCache = null)
@@ -319,7 +319,7 @@ abstract class Mapper
     }
 
     /**
-     * @return MapperHydratorInterface
+     * @return MapperHydratorInterface<E>
      */
     public function hydrator(): MapperHydratorInterface
     {
@@ -327,7 +327,7 @@ abstract class Mapper
     }
 
     /**
-     * @param MapperHydratorInterface $hydrator
+     * @param MapperHydratorInterface<E> $hydrator
      *
      * @return $this
      */

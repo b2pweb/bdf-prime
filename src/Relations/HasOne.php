@@ -7,8 +7,11 @@ use Bdf\Prime\Query\ReadCommandInterface;
 
 /**
  * HasOne
- * 
- * @package Bdf\Prime\Relations
+ *
+ * @template L as object
+ * @template R as object
+ *
+ * @extends OneOrMany<L, R>
  */
 class HasOne extends OneOrMany
 {
@@ -20,7 +23,7 @@ class HasOne extends OneOrMany
     /**
      * Store the relation query for optimisation purpose
      *
-     * @var KeyValueQuery
+     * @var KeyValueQuery<\Bdf\Prime\Connection\ConnectionInterface, R>|null
      */
     private $relationQuery;
 

@@ -7,8 +7,11 @@ use Bdf\Prime\Query\ReadCommandInterface;
 
 /**
  * HasMany
- * 
- * @package Bdf\Prime\Relations
+ *
+ * @template L as object
+ * @template R as object
+ *
+ * @extends OneOrMany<L, R>
  */
 class HasMany extends OneOrMany
 {

@@ -116,7 +116,7 @@ final class EntityIndexer implements EntityIndexerInterface
      * @param Mapper<T> $mapper
      * @param T[] $entities
      *
-     * @return EntityIndexer
+     * @return EntityIndexer<T>
      *
      * @template T as object
      */

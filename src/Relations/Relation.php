@@ -13,10 +13,17 @@ use RuntimeException;
  * Relation
  *
  * @todo Mettre le saveStrategy en trait + supprimer ou deprécier cette classe
+ *
+ * @template L as object
+ * @template R as object
+ *
+ * @extends AbstractRelation<L, R>
  */
 abstract class Relation extends AbstractRelation
 {
+    /** @use Polymorph<L> */
     use Polymorph;
+    /** @use ForeignKeyRelation<L, R> */
     use ForeignKeyRelation;
 
     // save strategies
@@ -35,9 +42,9 @@ abstract class Relation extends AbstractRelation
      * Set the relation info
      *
      * @param string $attributeAim  The property name that hold the relation
-     * @param RepositoryInterface $local
+     * @param RepositoryInterface<L> $local
      * @param string $localKey
-     * @param RepositoryInterface|null $distant
+     * @param RepositoryInterface<R>|null $distant
      * @param string|null $distantKey
      */
     public function __construct(string $attributeAim, RepositoryInterface $local, string $localKey, ?RepositoryInterface $distant = null, ?string $distantKey = null)
@@ -146,7 +153,7 @@ abstract class Relation extends AbstractRelation
     /**
      * Set the relation in a collection of entities
      *
-     * @param array $collection
+     * @param L[][] $collection
      * @param array $relations
      */
     abstract protected function match($collection, $relations): void;
@@ -156,13 +163,15 @@ abstract class Relation extends AbstractRelation
      *
      * Build object relation defined by user
      *
-     * @param RepositoryInterface $repository
+     * @param RepositoryInterface<T> $repository
      * @param string              $relationName
      * @param array               $relationMeta
      *
-     * @return RelationInterface
+     * @return RelationInterface<T, object>
      *
      * @throws RuntimeException If relation type does not exist
+     *
+     * @template T as object
      */
     public static function make(RepositoryInterface $repository, string $relationName, array $relationMeta): RelationInterface
     {

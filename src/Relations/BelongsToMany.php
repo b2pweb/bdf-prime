@@ -31,6 +31,11 @@ use Bdf\Prime\Repository\RepositoryInterface;
  * @package Bdf\Prime\Relations
  *
  * @todo Voir pour gérer la table de through dynamiquement. Si cette relation est une HasManyThrough, elle doit etre en readonly
+ *
+ * @template L as object
+ * @template R as object
+ *
+ * @extends Relation<L, R>
  */
 class BelongsToMany extends Relation
 {
@@ -411,8 +416,8 @@ class BelongsToMany extends Relation
     /**
      * Check whether the owner has a distant entity relation
      *
-     * @param object          $owner
-     * @param string|object   $entity
+     * @param L $owner
+     * @param string|R $entity
      *
      * @return boolean
      * @throws PrimeException
@@ -434,8 +439,8 @@ class BelongsToMany extends Relation
     /**
      * Attach a distant entity to an entity
      *
-     * @param object                    $owner
-     * @param string|array|object       $entities
+     * @param L $owner
+     * @param string|R[]|R $entities
      *
      * @return int
      * @throws PrimeException
@@ -474,8 +479,8 @@ class BelongsToMany extends Relation
     /**
      * Detach a distant entity of an entity
      *
-     * @param object                $owner
-     * @param string|array|object   $entities
+     * @param L $owner
+     * @param string|R[]|R $entities
      *
      * @return int
      * @throws PrimeException

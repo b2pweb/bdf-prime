@@ -18,6 +18,11 @@ use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
  * Base class for define common methods for relations
+ *
+ * @template L as object
+ * @template R as object
+ *
+ * @implements RelationInterface<L, R>
  */
 abstract class AbstractRelation implements RelationInterface
 {
@@ -31,7 +36,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * The local repository of this relation
      *
-     * @var RepositoryInterface
+     * @var RepositoryInterface<L>
      */
     protected $local;
 
@@ -45,7 +50,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * The distant repository
      *
-     * @var RepositoryInterface
+     * @var RepositoryInterface<R>
      */
     protected $distant;
 
@@ -82,9 +87,9 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * Set the relation info
      *
-     * @param string              $attributeAim  The property name that hold the relation
-     * @param RepositoryInterface $local
-     * @param RepositoryInterface|null $distant
+     * @param string $attributeAim  The property name that hold the relation
+     * @param RepositoryInterface<L> $local
+     * @param RepositoryInterface<R>|null $distant
      */
     public function __construct($attributeAim, RepositoryInterface $local, ?RepositoryInterface $distant = null)
     {
@@ -305,7 +310,7 @@ abstract class AbstractRelation implements RelationInterface
      * @param string|array $value
      * @param mixed        $constraints
      *
-     * @return ReadCommandInterface&Deletable
+     * @return ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>&Deletable
      */
     protected function query($value, $constraints = []): ReadCommandInterface
     {
@@ -323,7 +328,7 @@ abstract class AbstractRelation implements RelationInterface
      *
      * @return Q
      *
-     * @template Q as \Bdf\Prime\Query\Contract\Whereable&ReadCommandInterface
+     * @template Q as \Bdf\Prime\Query\Contract\Whereable&ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>
      */
     abstract protected function applyWhereKeys(ReadCommandInterface $query, $value): ReadCommandInterface;
 
@@ -334,8 +339,8 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * Set the relation value of an entity
      *
-     * @param object $entity The relation owner
-     * @param object|object[]|null $relation The entity to set to the owner. Can be an array of entities
+     * @param L $entity The relation owner
+     * @param R|R[]|null $relation The entity to set to the owner. Can be an array of entities
      */
     protected function setRelation($entity, $relation): void
     {
@@ -359,9 +364,9 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * Get the relation value of an entity
      *
-     * @param object $entity
+     * @param L $entity
      *
-     * @return object|object[]|null The relation object. Can be an array on many relation
+     * @return R|R[]|null The relation object. Can be an array on many relation
      */
     protected function getRelation($entity)
     {
@@ -488,7 +493,9 @@ abstract class AbstractRelation implements RelationInterface
         $indexer = new EntitySetIndexer($this->distant->mapper());
 
         foreach ($collection->all() as $owner) {
-            $relationValue = $this->getRelation($owner);
+            if (!$relationValue = $this->getRelation($owner)) {
+                continue; // The owner has no relation : skip
+            }
 
             if (is_array($relationValue)) {
                 foreach ($relationValue as $entity) {
@@ -507,7 +514,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * Check if all entities has loaded the relation
      *
-     * @param array $collection
+     * @param L[] $collection
      *
      * @return bool
      */

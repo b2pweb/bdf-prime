@@ -15,8 +15,11 @@ use Bdf\Prime\Query\ReadCommandInterface;
  * 
  * @package Bdf\Prime\Relations
  *
+ * @template E as object
+ * @template R as object
+ *
  * @api
- * @mixin ReadCommandInterface
+ * @mixin ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, E>
  * @noinspection PhpHierarchyChecksInspection
  */
 class EntityRelation
@@ -24,22 +27,22 @@ class EntityRelation
     /**
      * The entity owner of the relation
      *
-     * @var object
+     * @var E
      */
     protected $owner;
 
     /**
      * The relation
      *
-     * @var RelationInterface
+     * @var RelationInterface<E, R>
      */
     protected $relation;
 
     /**
      * EntityRelation constructor.
      *
-     * @param object                 $owner     The relation owner
-     * @param RelationInterface      $relation  The relation
+     * @param E $owner     The relation owner
+     * @param RelationInterface<E, R> $relation  The relation
      */
     public function __construct($owner, RelationInterface $relation)
     {
@@ -63,9 +66,9 @@ class EntityRelation
      *
      * Only foreign key barrier can associate an entity
      *
-     * @param object $entity The related entity data
+     * @param R $entity The related entity data
      *
-     * @return object Returns the owner entity instance
+     * @return E Returns the owner entity instance
      */
     public function associate($entity)
     {
@@ -81,7 +84,7 @@ class EntityRelation
      *
      * Only foreign key barrier can dissociate an entity
      *
-     * @return object Returns the owner entity instance
+     * @return E Returns the owner entity instance
      */
     public function dissociate()
     {
@@ -104,7 +107,7 @@ class EntityRelation
      *
      * @param array $data The related entity data
      *
-     * @return object Returns the related entity instance
+     * @return R Returns the related entity instance
      */
     public function create(array $data = [])
     {
@@ -122,7 +125,7 @@ class EntityRelation
      * $foo->getOwnerId() === $entity->id(); // Should be true
      * </code>
      *
-     * @param object $related
+     * @param R $related
      *
      * @return int
      * @throws PrimeException
@@ -137,7 +140,7 @@ class EntityRelation
      * Check whether the owner has a distant entity relation
      * Note: only works with BelongsToMany relation
      *
-     * @param string|object $related
+     * @param string|R $related
      *
      * @return boolean
      * @throws PrimeException
@@ -153,7 +156,7 @@ class EntityRelation
      * Attach a distant entity to an entity
      * Note: only works with BelongsToMany relation
      *
-     * @param string|array|object $related
+     * @param string|R[]|R $related
      *
      * @return int
      * @throws PrimeException
@@ -161,7 +164,7 @@ class EntityRelation
     #[WriteOperation]
     public function attach($related): int
     {
-        /** @var BelongsToMany $this->relation */
+        /** @var BelongsToMany<E, R> $this->relation */
         return $this->relation->attach($this->owner, $related);
     }
 
@@ -169,13 +172,13 @@ class EntityRelation
      * Detach a distant entity of an entity
      * Note: only works with BelongsToMany relation
      *
-     * @param string|array|object $related
+     * @param string|R[]|R $related
      *
      * @return int
      */
     public function detach($related): int
     {
-        /** @var BelongsToMany $this->relation */
+        /** @var BelongsToMany<E, R> $this->relation */
         return $this->relation->detach($this->owner, $related);
     }
 
@@ -187,7 +190,7 @@ class EntityRelation
      * $entity->relation('foo')->where(['foo' => 'bar'])->get();
      * </code>
      *
-     * @return ReadCommandInterface
+     * @return ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>
      */
     public function query(): ReadCommandInterface
     {

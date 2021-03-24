@@ -18,18 +18,24 @@ use LogicException;
  * ByInheritance
  *
  * @todo options ?
+ *
+ * @template L as object
+ *
+ * @extends AbstractRelation<L, object>
  */
 class ByInheritance extends AbstractRelation
 {
+    /** @use Polymorph<L> */
     use Polymorph;
+    /** @use ForeignKeyRelation<L, object> */
     use ForeignKeyRelation;
 
     /**
      * Set inheritance relation
      * 
-     * @param string              $attributeAim
-     * @param RepositoryInterface $local
-     * @param string              $localKey
+     * @param string $attributeAim
+     * @param RepositoryInterface<L> $local
+     * @param string $localKey
      */
     public function __construct(string $attributeAim, RepositoryInterface $local, string $localKey)
     {
@@ -191,10 +197,11 @@ class ByInheritance extends AbstractRelation
     /**
      * Get the delagated sub relation
      *
-     * @return RelationInterface
+     * @return RelationInterface<L, object>
      */
     protected function subRelation(): RelationInterface
     {
+        /** @var array{entity:class-string<L>} $infos */
         $infos = $this->map($this->discriminatorValue);
 
         $relation = $this->local->repository($infos['entity'])

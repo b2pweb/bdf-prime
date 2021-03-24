@@ -15,6 +15,11 @@ use InvalidArgumentException;
  * @package Bdf\Prime\Relations
  * 
  * @todo possibilité de désactiver les constraints globales
+ *
+ * @template L as object
+ * @template R as object
+ *
+ * @extends Relation<L, R>
  */
 abstract class OneOrMany extends Relation
 {
@@ -76,7 +81,7 @@ abstract class OneOrMany extends Relation
     #[ReadOperation]
     protected function relations($keys, $with, $constraints, $without): array
     {
-        /** @var object[] */
+        /** @var R[] */
         return $this->relationQuery($keys, $constraints)
             ->with($with)
             ->without($without)
@@ -84,10 +89,7 @@ abstract class OneOrMany extends Relation
     }
 
     /**
-     * Set the relation in a collection of entities
-     * 
-     * @param array $collection
-     * @param array $relations
+     * {@inheritdoc}
      */
     protected function match($collection, $relations): void
     {

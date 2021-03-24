@@ -116,8 +116,7 @@ interface RepositoryInterface
      *
      * @param string $relationName
      *
-     * @return RelationInterface
-     * @todo template ?
+     * @return RelationInterface<E, object>
      */
     public function relation(string $relationName): RelationInterface;
 

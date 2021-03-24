@@ -362,8 +362,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param string $relationName
      * @param E $entity
      *
-     * @return EntityRelation
-     * @todo template
+     * @return EntityRelation<E, object>
      */
     public function onRelation(string $relationName, $entity): EntityRelation
     {

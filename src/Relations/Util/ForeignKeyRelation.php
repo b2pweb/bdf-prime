@@ -12,6 +12,9 @@ use Bdf\Prime\Repository\RepositoryInterface;
  * Adds foreign key accessor helpers for relations based on single foreign key
  *
  * @psalm-require-extends AbstractRelation
+ *
+ * @template L as object
+ * @template R as object
  */
 trait ForeignKeyRelation
 {
@@ -50,7 +53,7 @@ trait ForeignKeyRelation
      * Get the local key value from an entity
      * If an array is given, get array of key value
      *
-     * @param object|object[] $entity
+     * @param L|L[] $entity
      *
      * @return mixed
      */
@@ -74,7 +77,7 @@ trait ForeignKeyRelation
     /**
      * Set the local key value on an entity
      *
-     * @param object $entity
+     * @param L $entity
      * @param mixed  $id
      *
      * @return void
@@ -87,25 +90,27 @@ trait ForeignKeyRelation
     /**
      * Get the local key value from an entity
      *
-     * @param object $entity
+     * @param R $entity
      *
      * @return mixed
      */
     protected function getDistantKeyValue($entity)
     {
+        /** @psalm-suppress InvalidArgument */
         return $this->relationRepository()->mapper()->extractOne($entity, $this->distantKey);
     }
 
     /**
      * Get the distance key value on an entity
      *
-     * @param object $entity
-     * @param mixed  $id
+     * @param R $entity
+     * @param mixed $id
      *
      * @return void
      */
     protected function setDistantKeyValue($entity, $id): void
     {
+        /** @psalm-suppress InvalidArgument */
         $this->relationRepository()->mapper()->hydrateOne($entity, $this->distantKey, $id);
     }
 
@@ -113,7 +118,7 @@ trait ForeignKeyRelation
      * {@inheritdoc}
      *
      * @see RelationInterface::relationRepository()
-     * @return RepositoryInterface
+     * @return RepositoryInterface<R>
      */
     abstract public function relationRepository(): RepositoryInterface;
 
@@ -121,7 +126,7 @@ trait ForeignKeyRelation
      * {@inheritdoc}
      *
      * @see RelationInterface::localRepository()
-     * @return RepositoryInterface
+     * @return RepositoryInterface<L>
      */
     abstract public function localRepository(): RepositoryInterface;
 }

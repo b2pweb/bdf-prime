@@ -12,6 +12,9 @@ use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
  * RelationInterface
+ *
+ * @template L as object
+ * @template R as object
  */
 interface RelationInterface
 {
@@ -29,14 +32,14 @@ interface RelationInterface
      * For standard relation, this is the distant repository (i.e. related entity)
      * For polymorphic relation, this is the local repository (i.e. declarer)
      *
-     * @return RepositoryInterface
+     * @return RepositoryInterface<R>
      */
     public function relationRepository(): RepositoryInterface;
 
     /**
      * Get the local (owner) repository
      *
-     * @return RepositoryInterface
+     * @return RepositoryInterface<L>
      */
     public function localRepository(): RepositoryInterface;
 
@@ -72,7 +75,7 @@ interface RelationInterface
      * $relation->load($users, [], [], ['packs']); // Do not load packs (if marked as eager)
      * </code>
      *
-     * @param EntityIndexerInterface $collection Relation owners entities
+     * @param EntityIndexerInterface<L> $collection Relation owners entities
      * @param string[] $with The distant relations to load. The array is in form : [ 'subrelation', 'other.subsubrelation', ... ]
      * @param mixed $constraints The distant constraints. Should be a criteria array, using relation attributes
      * @param string[] $without The distant relations to unload (in case of eager load). Format is same as $with, expects that only leaf relation are unloaded
@@ -100,7 +103,7 @@ interface RelationInterface
      * $relation->loadIfNotLoaded($users, ['packs']); // Loading customers packs into customers, but customers will not be reloaded
      * </code>
      *
-     * @param EntityIndexerInterface $collection Relation owners entities
+     * @param EntityIndexerInterface<L> $collection Relation owners entities
      * @param string[] $with The distant relations to load. The array is in form : [ 'subrelation', 'other.subsubrelation', ... ]
      * @param mixed $constraints The distant constraints. Should be a criteria array, using relation attributes
      * @param string[] $without The distant relations to unload (in case of eager load). Format is same as $with, expects that only leaf relation are unloaded
@@ -117,9 +120,9 @@ interface RelationInterface
      * Get the distant query linked to the entity
      * The result query can be used to requests related entities
      *
-     * @param object|object[] $owner The relation owner, or collection of owners
+     * @param L|L[] $owner The relation owner, or collection of owners
      *
-     * @return ReadCommandInterface
+     * @return ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>
      */
     public function link($owner): ReadCommandInterface;
 
@@ -161,10 +164,10 @@ interface RelationInterface
      *
      * Only foreign key barrier can associate an entity
      *
-     * @param object $owner  The relation owner
-     * @param object $entity The related entity data
+     * @param L $owner  The relation owner
+     * @param R $entity The related entity data
      *
-     * @return object Returns the owner entity instance
+     * @return L Returns the owner entity instance
      * 
      * @throws \InvalidArgumentException If the owner is not a foreign key barrier
      */
@@ -179,9 +182,9 @@ interface RelationInterface
      *
      * Only foreign key barrier can dissociate an entity
      * 
-     * @param object $owner  The relation owner
+     * @param L $owner  The relation owner
      *
-     * @return object Returns the owner entity instance
+     * @return L Returns the owner entity instance
      * 
      * @throws \InvalidArgumentException If the owner is not a foreign key barrier
      */
@@ -199,8 +202,8 @@ interface RelationInterface
      * $related->getOwnerId() === $entity->id(); // Should be true
      * </code>
      *
-     * @param object $owner
-     * @param object $related
+     * @param L $owner
+     * @param R $related
      *
      * @return int
      *
@@ -223,10 +226,10 @@ interface RelationInterface
      *
      * Only non foreign key barrier can create an entity
      *
-     * @param object $owner The relation owner
+     * @param L $owner The relation owner
      * @param array $data The related entity data
      *
-     * @return object Returns the related entity instance
+     * @return R Returns the related entity instance
      *
      * @throws \InvalidArgumentException If the owner is the foreign key barrier
      */
@@ -237,7 +240,7 @@ interface RelationInterface
      *
      * Note: This method can only works with attached entities
      *
-     * @param object $owner
+     * @param L $owner
      * @param array $relations sub-relation names to save
      *
      * @return int Number of updated / inserted entities
@@ -251,7 +254,7 @@ interface RelationInterface
      *
      * Note: This method can only works with attached entities
      *
-     * @param object $owner
+     * @param L $owner
      * @param array $relations sub-relation names to delete
      *
      * @return int Number of deleted entities
@@ -263,7 +266,7 @@ interface RelationInterface
     /**
      * Check if the relation is loaded into the given entity
      *
-     * @param object $entity
+     * @param L $entity
      *
      * @return boolean
      */
@@ -271,6 +274,8 @@ interface RelationInterface
 
     /**
      * Clear relation entity data of the entity
+     *
+     * @param L $entity
      *
      * @internal
      */

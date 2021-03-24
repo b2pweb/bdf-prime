@@ -6,6 +6,8 @@ use InvalidArgumentException;
 
 /**
  * Polymorph
+ *
+ * @template E as object
  */
 trait Polymorph
 {
@@ -202,12 +204,13 @@ trait Polymorph
     /**
      * Get the discriminator value from an entity
      *
-     * @param object $entity
+     * @param E $entity
      *
      * @return void
      */
     protected function updateDiscriminatorValue($entity): void
     {
+        /** @psalm-suppress InvalidArgument */
         $this->discriminatorValue = $this->local->mapper()->extractOne($entity, $this->discriminator);
     }
 }
