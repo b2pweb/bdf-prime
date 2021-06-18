@@ -74,14 +74,6 @@ class ServiceLocator
         $this->mapperFactory = $mapperFactory ?: new MapperFactory();
         $this->instantiator = $instantiator ?: new RegistryInstantiator();
         $this->hydrators = new HydratorRegistry();
-
-        // TODO Legacy. Should be removed
-        if ($cache = $this->connectionManager->config()->getMetadataCache()) {
-            $this->mapperFactory->setMetadataCache($cache);
-        }
-        if ($cache = $this->connectionManager->config()->getResultCache()) {
-            $this->mapperFactory->setResultCache($cache);
-        }
     }
 
     /**

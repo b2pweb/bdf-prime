@@ -91,11 +91,6 @@ class ConnectionRegistry implements ConnectionRegistryInterface
      */
     public function getConnectionNames(): array
     {
-        // TODO Legacy: will be removed
-        if (empty($this->parametersMap)) {
-            return array_keys($this->defaultConfig->getDbConfig()->all());
-        }
-
         return array_keys($this->parametersMap);
     }
 
@@ -118,11 +113,6 @@ class ConnectionRegistry implements ConnectionRegistryInterface
      */
     private function getConnectionParameters(string $connectionName): array
     {
-        // TODO Legacy: will be removed
-        if (empty($this->parametersMap)) {
-            $this->parametersMap = $this->defaultConfig->getDbConfig()->all();
-        }
-
         if (!isset($this->parametersMap[$connectionName])) {
             throw new DBALException('Connection name "' . $connectionName . '" is not set');
         }

@@ -162,7 +162,7 @@ class ResolverTest extends TestCase
      */
     public function test_functional_migrate_with_cross_connection_sequence()
     {
-        $this->prime()->connections()->addConnection('sequence', [
+        $this->prime()->connections()->declareConnection('sequence', [
             'adapter' => 'sqlite',
             'memory' => true
         ]);

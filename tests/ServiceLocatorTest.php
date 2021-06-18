@@ -2,7 +2,6 @@
 
 namespace Bdf\Prime;
 
-use Bdf\Prime\Connection\ConnectionRegistry;
 use Bdf\Prime\Entity\Hydrator\HydratorInterface;
 use Bdf\Prime\Entity\Hydrator\HydratorRegistry;
 use Bdf\Prime\Entity\InitializableInterface;
@@ -10,7 +9,6 @@ use Bdf\Prime\Entity\Instantiator\Instantiator;
 use Bdf\Prime\Entity\Instantiator\RegistryInstantiator;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Serializer\SerializerInterface;
-use Cache\Adapter\PHPArray\ArrayCachePool;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
@@ -88,21 +86,6 @@ class ServiceLocatorTest extends TestCase
         $service = new ServiceLocator();
         
         $this->assertInstanceOf(Configuration::class, $service->config());
-    }
-    
-    /**
-     * 
-     */
-    public function test_meta_cache()
-    {
-        $cache = new ArrayCachePool();
-
-        $registry = new ConnectionRegistry([], null, new Configuration([
-            'metadataCache' => $cache,
-        ]));
-        $service = new ServiceLocator(new ConnectionManager($registry));
-        
-        $this->assertEquals($cache, $service->mappers()->getMetadataCache());
     }
     
     /**

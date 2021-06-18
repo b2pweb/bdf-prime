@@ -455,7 +455,7 @@ class EntityRepositoryTest extends TestCase
      */
     public function test_on_connection()
     {
-        Prime::service()->connections()->addConnection('slave', [
+        Prime::service()->connections()->declareConnection('slave', [
             'adapter' => 'sqlite',
             'memory'  => true
         ]);
@@ -487,7 +487,7 @@ class EntityRepositoryTest extends TestCase
      */
     public function test_on_connection_release_connection_on_failure()
     {
-        Prime::service()->connections()->addConnection('slave', [
+        Prime::service()->connections()->declareConnection('slave', [
             'adapter' => 'sqlite',
             'memory'  => true
         ]);
@@ -516,7 +516,7 @@ class EntityRepositoryTest extends TestCase
      */
     public function test_on_connection_should_reset_old_queries()
     {
-        Prime::service()->connections()->addConnection('slave', [
+        Prime::service()->connections()->declareConnection('slave', [
             'adapter' => 'sqlite',
             'memory'  => true
         ]);
@@ -546,7 +546,7 @@ class EntityRepositoryTest extends TestCase
      */
     public function test_on_connection_with_closure_should_reset_old_queries()
     {
-        Prime::service()->connections()->addConnection('slave', [
+        Prime::service()->connections()->declareConnection('slave', [
             'adapter' => 'sqlite',
             'memory'  => true
         ]);
@@ -575,7 +575,7 @@ class EntityRepositoryTest extends TestCase
      */
     public function test_on_connection_should_listen_connection_closed()
     {
-        Prime::service()->connections()->addConnection('slave', [
+        Prime::service()->connections()->declareConnection('slave', [
             'adapter' => 'sqlite',
             'memory'  => true
         ]);

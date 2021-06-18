@@ -55,17 +55,8 @@ class ConnectionManager implements ConnectionRegistryInterface
      *
      * @throws LogicException if connection exists
      */
-    public function addConnection(/* ConnectionInterface */ $connection, /* bool */ $default = false)
+    public function addConnection(ConnectionInterface $connection, bool $default = false)
     {
-        // Legacy
-        if (!$connection instanceof ConnectionInterface) {
-            @trigger_error(__METHOD__.' signature change. Use addParameter to add lazy loading conenction info.', E_USER_DEPRECATED);
-
-            $this->declareConnection($connection, $default);
-
-            return $this->getConnection($connection);
-        }
-
         // Connection name must be unique
         if (isset($this->connections[$connection->getName()])) {
             throw new LogicException('Connection for "'.$connection->getName().'" already exists. Connection name must be unique.');

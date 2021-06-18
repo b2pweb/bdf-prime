@@ -468,13 +468,14 @@ class SimpleConnectionTest extends TestCase
      */
     public function test_reconnection()
     {
-        $connection = Prime::service()->connections()->addConnection('test_reconnection', [
+        Prime::service()->connections()->declareConnection('test_reconnection', [
             'driver' => 'mysqli',
             'user' => 'root',
             'host' => '127.0.0.1',
 //            'adapter' => 'sqlite',
 //            'memory' => true
         ]);
+        $connection = Prime::service()->connections()->getConnection('test_reconnection');
         Prime::service()->connections()->removeConnection('test_reconnection');
         $connection->exec('SET SESSION wait_timeout=1');
 
@@ -490,13 +491,14 @@ class SimpleConnectionTest extends TestCase
      */
     public function test_reconnection_on_prepared_query()
     {
-        $connection = Prime::service()->connections()->addConnection('test_reconnection', [
+        Prime::service()->connections()->declareConnection('test_reconnection', [
             'driver' => 'mysqli',
             'user' => 'root',
             'host' => '127.0.0.1',
 //            'adapter' => 'sqlite',
 //            'memory' => true
         ]);
+        $connection = Prime::service()->connections()->getConnection('test_reconnection');
         Prime::service()->connections()->removeConnection('test_reconnection');
         $connection->exec('SET SESSION wait_timeout=1');
 
@@ -543,7 +545,7 @@ class SimpleConnectionTest extends TestCase
     public function test_should_not_connect_if_no_query_is_executed()
     {
         // Use MySQL because Doctrine resolve the server version when getting the platform
-        $this->prime()->connections()->addConnection('other_connection', ['adapter' => 'mysql']);
+        $this->prime()->connections()->declareConnection('other_connection', ['adapter' => 'mysql']);
 
         $connection = $this->prime()->connection('other_connection');
 

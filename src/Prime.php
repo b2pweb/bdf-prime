@@ -423,15 +423,6 @@ class Prime
             $registry->getDefaultConfiguration()->setSQLLogger($logger);
         }
 
-        // TODO remove in 1.2. Inject caches for legacy usage
-        if ($cache = static::$config['resultCache'] ?? null) {
-            $registry->getDefaultConfiguration()->setResultCache($cache);
-        }
-
-        if ($cache = static::$config['metadataCache'] ?? null) {
-            $registry->getDefaultConfiguration()->setMetadataCache($cache);
-        }
-
         if ($serializer = static::$config['serializer'] ?? null) {
             static::$serviceLocator->setSerializer($serializer);
         }

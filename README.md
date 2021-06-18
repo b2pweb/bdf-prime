@@ -24,7 +24,7 @@ use Bdf\Prime\ServiceLocator;
 
 // declare your connexion manager
 $connexions = new ConnectionManager();
-$connexions->addConnection('myDB', [
+$connexions->declareConnection('myDB', [
     'adapter' => 'mysql',
     'host'    => 'localhost',
 ]);
@@ -47,9 +47,9 @@ use Bdf\Prime\ConnectionManager;
 // declare your connexion manager
 $connexions = new ConnectionManager();
 // MySQL
-$connexions->addConnection('mysql', 'mysql://user:password@localhost/database');
+$connexions->declareConnection('mysql', 'mysql://user:password@localhost/database');
 // Sqlite
-$connexions->addConnection('sqlite', 'sqlite://path/to/database.sqlite');
+$connexions->declareConnection('sqlite', 'sqlite://path/to/database.sqlite');
 ```
 
 You can also use [DBAL-compatible configuration arrays](http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html) instead of DSN strings if you prefer:
@@ -59,7 +59,7 @@ You can also use [DBAL-compatible configuration arrays](http://docs.doctrine-pro
 use Bdf\Prime\ConnectionManager;
 
 $connexions = new ConnectionManager();
-$connexions->addConnection('mysql', [
+$connexions->declareConnection('mysql', [
     'dbname'   => 'mydb',
     'user'     => 'user',
     'password' => 'secret',

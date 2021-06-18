@@ -39,21 +39,4 @@ class CreateDatabaseCommandTest extends TestCase
 
         $this->assertStringContainsString('Connection test is ignored.', $tester->getDisplay());
     }
-
-    /**
-     *
-     */
-    public function test_legacy_constructor()
-    {
-        $this->command = new CreateDatabaseCommand($prime = new ServiceLocator());
-        $prime->config()->getDbConfig()->set('test', [
-            'url' => 'sqlite::memory:',
-            'ignore' => '1'
-        ]);
-
-        $tester = new CommandTester($this->command);
-        $tester->execute([]);
-
-        $this->assertStringContainsString('Connection test is ignored.', $tester->getDisplay());
-    }
 }
