@@ -5,7 +5,8 @@ namespace Bdf\Prime\Connection\Factory;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Exception\DBALException;
-use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\MongoDB\Driver\MongoConnection;
+use Bdf\Prime\MongoDB\Driver\MongoDriver;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\DBALException as DoctrineDBALException;
@@ -21,9 +22,11 @@ class ConnectionFactory implements ConnectionFactoryInterface
     /**
      * The drivers map
      *
-     * @var array
+     * @var array<string, array{0: class-string<\Doctrine\DBAL\Driver>, 1: class-string<\Doctrine\DBAL\Driver\Connection>}>
      */
-    static private $driversMap;
+    static private $driversMap = [
+        'mongodb' => [MongoDriver::class, MongoConnection::class],
+    ];
 
     /**
      * {@inheritDoc}
