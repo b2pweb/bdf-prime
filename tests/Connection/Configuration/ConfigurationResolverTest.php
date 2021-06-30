@@ -16,7 +16,7 @@ class ConfigurationResolverTest extends TestCase
     public function test_default_config()
     {
         $configuration = new Configuration();
-        $resolver = new ConfigurationResolver(null, $configuration);
+        $resolver = new ConfigurationResolver([], $configuration);
 
         $this->assertSame($configuration, $resolver->getConfiguration('unknown'));
         $this->assertSame($configuration, $resolver->getConfiguration('unknown'));

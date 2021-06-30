@@ -31,7 +31,7 @@ class ShardingConnectionFactory implements ConnectionFactoryInterface
     /**
      * {@inheritDoc}
      */
-    public function create(string $connectionName, array $parameters, Configuration $config = null): ConnectionInterface
+    public function create(string $connectionName, array $parameters, ?Configuration $config = null): ConnectionInterface
     {
         $allParameters = $parameters['shards'];
         unset($parameters['shards']);

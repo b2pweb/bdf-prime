@@ -21,7 +21,7 @@ interface ConnectionFactoryInterface
      * @return ConnectionInterface
      * @throws DBALException
      */
-    public function create(string $connectionName, array $parameters, Configuration $config = null): ConnectionInterface;
+    public function create(string $connectionName, array $parameters, ?Configuration $config = null): ConnectionInterface;
 
     /**
      * Check whether this factory can create the requested connection

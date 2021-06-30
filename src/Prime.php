@@ -407,7 +407,7 @@ class Prime
                 new ShardingConnectionFactory($factory),
                 $factory,
             ]),
-            new ConfigurationResolver(null, $configuration = new Configuration())
+            new ConfigurationResolver([], $configuration = new Configuration())
         );
 
         $mapperFactory = new MapperFactory(

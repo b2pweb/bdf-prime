@@ -64,8 +64,8 @@ class ConnectionRegistry implements ConnectionRegistryInterface
     public function __construct(array $parametersMap = [], ConnectionFactoryInterface $connectionFactory = null, ConfigurationResolverInterface $configResolver = null)
     {
         $this->parametersMap = $parametersMap;
-        $this->connectionFactory = $connectionFactory ?: new ConnectionFactory();
-        $this->configResolver = $configResolver ?: new ConfigurationResolver();
+        $this->connectionFactory = $connectionFactory ?? new ConnectionFactory();
+        $this->configResolver = $configResolver ?? new ConfigurationResolver();
     }
     
     /**

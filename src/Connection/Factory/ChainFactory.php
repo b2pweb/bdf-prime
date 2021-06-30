@@ -25,7 +25,7 @@ class ChainFactory implements ConnectionFactoryInterface
     /**
      * {@inheritDoc}
      */
-    public function create(string $connectionName, array $parameters, Configuration $config = null): ConnectionInterface
+    public function create(string $connectionName, array $parameters, ?Configuration $config = null): ConnectionInterface
     {
         foreach ($this->factories as $connectionFactory) {
             if ($connectionFactory->support($connectionName, $parameters)) {

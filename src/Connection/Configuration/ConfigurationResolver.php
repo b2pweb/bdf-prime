@@ -4,6 +4,9 @@ namespace Bdf\Prime\Connection\Configuration;
 
 use Bdf\Prime\Configuration;
 
+/**
+ * Allows declaration of configuration custom by connection. Use a default connection if the configuration is not set.
+ */
 class ConfigurationResolver implements ConfigurationResolverInterface
 {
     /**
@@ -12,36 +15,28 @@ class ConfigurationResolver implements ConfigurationResolverInterface
     private $configurations;
 
     /**
-     * @var Configuration
+     * @var Configuration|null
      */
     private $default;
 
     /**
      * ConfigurationResolver constructor.
      *
-     * @param Configuration[]|null $configurations
+     * @param Configuration[] $configurations
      * @param Configuration|null $default
      */
-    public function __construct(array $configurations = null, Configuration $default = null)
+    public function __construct(array $configurations = [], ?Configuration $default = null)
     {
         $this->configurations = $configurations;
         $this->default = $default;
     }
 
     /**
-     * Get the configuration of the connection
-     *
-     * @param string $connectionName
-     *
-     * @return Configuration
+     * {@inheritDoc}
      */
     public function getConfiguration(string $connectionName): ?Configuration
     {
-        if (isset($this->configurations[$connectionName])) {
-            return $this->configurations[$connectionName];
-        }
-
-        return $this->default;
+        return $this->configurations[$connectionName] ?? $this->default;
     }
 
     /**
