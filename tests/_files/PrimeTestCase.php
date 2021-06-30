@@ -54,11 +54,19 @@ trait PrimeTestCase
                         ],
                     ]
                 ],
+                'types' => [
+                    'searchable_array' => ArrayType::class,
+                    new JsonType(),
+                    new ArrayObjectType(),
+                    new ObjectType(),
+                    new ArrayType(),
+                    'date_utc' => new DateTimeType('date_utc', 'Y-m-d H:i:s', \DateTimeImmutable::class, new \DateTimeZone('UTC')),
+                    TypeInterface::TIMESTAMP => TimestampType::class,
+                ]
             ]);
 
             $serializer = SerializerBuilder::create()
                 ->build();
-
             $serializer->getLoader()
                 ->addNormalizer(new PrimeCollectionNormalizer(Prime::service()))
                 ->addNormalizer(new PaginatorNormalizer())
@@ -66,13 +74,6 @@ trait PrimeTestCase
             ;
 
             Prime::service()->setSerializer($serializer);
-            Prime::service()->types()->register(ArrayType::class, 'searchable_array');
-            Prime::service()->types()->register(new JsonType());
-            Prime::service()->types()->register(new ArrayObjectType());
-            Prime::service()->types()->register(new ObjectType());
-            Prime::service()->types()->register(new ArrayType());
-            Prime::service()->types()->register(new DateTimeType('date_utc', 'Y-m-d H:i:s', \DateTimeImmutable::class, new \DateTimeZone('UTC')), 'date_utc');
-            Prime::service()->types()->register(TimestampType::class, TypeInterface::TIMESTAMP);
 
             Model::configure(function() { return Prime::service(); });
         }

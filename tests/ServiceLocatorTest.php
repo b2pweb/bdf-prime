@@ -25,7 +25,6 @@ class ServiceLocatorTest extends TestCase
         $service = new ServiceLocator();
 
         $this->assertInstanceOf(ConnectionManager::class, $service->connections());
-        $this->assertInstanceOf(Configuration::class, $service->config());
         $this->assertInstanceOf(HydratorRegistry::class, $service->hydrators());
         $this->assertInstanceOf(RegistryInstantiator::class, $service->instantiator());
     }
@@ -78,16 +77,6 @@ class ServiceLocatorTest extends TestCase
         $this->assertSame($instantiator, $service->instantiator());
     }
 
-    /**
-     * 
-     */
-    public function test_config()
-    {
-        $service = new ServiceLocator();
-        
-        $this->assertInstanceOf(Configuration::class, $service->config());
-    }
-    
     /**
      * 
      */

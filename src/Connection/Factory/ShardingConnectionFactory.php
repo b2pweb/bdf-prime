@@ -2,9 +2,9 @@
 
 namespace Bdf\Prime\Connection\Factory;
 
+use Bdf\Prime\Configuration;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Sharding\ShardingConnection;
-use Doctrine\DBAL\Configuration;
 
 /**
  * ShardingConnection
@@ -31,7 +31,7 @@ class ShardingConnectionFactory implements ConnectionFactoryInterface
     /**
      * {@inheritDoc}
      */
-    public function create(string $connectionName, array $parameters, Configuration $config): ConnectionInterface
+    public function create(string $connectionName, array $parameters, Configuration $config = null): ConnectionInterface
     {
         $allParameters = $parameters['shards'];
         unset($parameters['shards']);
