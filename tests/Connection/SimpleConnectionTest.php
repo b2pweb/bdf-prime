@@ -19,6 +19,12 @@ use Bdf\Prime\Query\Custom\KeyValue\KeyValueSqlCompiler;
 use Bdf\Prime\Query\Query;
 use PHPUnit\Framework\TestCase;
 
+// Declare read timeout in case the extension musqli does not support this constant.
+// Doctrine will fail if this constant does not exist.
+if (!defined('MYSQLI_OPT_READ_TIMEOUT')) {
+    define('MYSQLI_OPT_READ_TIMEOUT', 11);
+}
+
 /**
  *
  */
