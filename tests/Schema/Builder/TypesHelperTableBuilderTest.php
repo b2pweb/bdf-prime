@@ -37,7 +37,7 @@ class TypesHelperTableBuilderTest extends TestCase
     {
         $this->primeStart();
 
-        $this->prime()->types()
+        $this->prime()->connection('test')->getConfiguration()->getTypes()
             ->register(new ArrayType())
             ->register(new JsonType())
         ;

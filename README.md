@@ -3,7 +3,7 @@
 Prime is a Data mapper ORM based on doctrine DBAL. 
 The goal of prime is to lightweight usage of data mapper and doctrine DBAL.
 
-[![Build Status](https://travis-ci.org/b2pweb/bdf-prime.svg?branch=master)](https://travis-ci.org/b2pweb/bdf-prime)
+[![Build Status](https://travis-ci.com/b2pweb/bdf-prime.svg?branch=master)](https://travis-ci.com/b2pweb/bdf-prime)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/b2pweb/bdf-prime/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/b2pweb/bdf-prime/?branch=master)
 [![Packagist Version](https://img.shields.io/packagist/v/b2pweb/bdf-prime.svg)](https://packagist.org/packages/b2pweb/bdf-prime)
 [![Total Downloads](https://img.shields.io/packagist/dt/b2pweb/bdf-prime.svg)](https://packagist.org/packages/b2pweb/bdf-prime)
@@ -25,7 +25,7 @@ use Bdf\Prime\ServiceLocator;
 
 // declare your connexion manager
 $connexions = new ConnectionManager();
-$connexions->addConnection('myDB', [
+$connexions->declareConnection('myDB', [
     'adapter' => 'mysql',
     'host'    => 'localhost',
 ]);
@@ -48,9 +48,9 @@ use Bdf\Prime\ConnectionManager;
 // declare your connexion manager
 $connexions = new ConnectionManager();
 // MySQL
-$connexions->addConnection('mysql', 'mysql://user:password@localhost/database');
+$connexions->declareConnection('mysql', 'mysql://user:password@localhost/database');
 // Sqlite
-$connexions->addConnection('sqlite', 'sqlite://path/to/database.sqlite');
+$connexions->declareConnection('sqlite', 'sqlite://path/to/database.sqlite');
 ```
 
 You can also use [DBAL-compatible configuration arrays](http://docs.doctrine-project.org/projects/doctrine-dbal/en/latest/reference/configuration.html) instead of DSN strings if you prefer:
@@ -60,7 +60,7 @@ You can also use [DBAL-compatible configuration arrays](http://docs.doctrine-pro
 use Bdf\Prime\ConnectionManager;
 
 $connexions = new ConnectionManager();
-$connexions->addConnection('mysql', [
+$connexions->declareConnection('mysql', [
     'dbname'   => 'mydb',
     'user'     => 'user',
     'password' => 'secret',

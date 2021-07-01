@@ -2,8 +2,9 @@
 
 namespace Bdf\Prime;
 
-use Bdf\Prime\Connection\ConnectionConfig;
+use Bdf\Prime\Types\TypesRegistry;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\NullLogger;
 
 /**
  *
@@ -17,76 +18,32 @@ class ConfigurationTest extends TestCase
     {
         $configuration = new Configuration();
         
-        $this->assertNull($configuration->getResultCache());
-        $this->assertNull($configuration->getMetadataCache());
-        
-        $this->assertEquals(new ConnectionConfig(), $configuration->getDbConfig());
+        $this->assertEquals(new TypesRegistry(), $configuration->getTypes());
+        $this->assertNull($configuration->getSQLLogger());
     }
     
     /**
-     * @todo
+     *
      */
     public function test_set_parameters_from_constructor()
     {
-        $configuration = new Configuration($values = [
-            'resultCache'       => 'cache object',
-            'metadataCache'     => 'cache object',
-            'dbConfig'          => ['foo' => 'bar'],
-            'environment'       => 'prod',
+        $configuration = new Configuration([
+            'logger' => $logger = new NullLogger()
         ]);
         
-        $this->assertEquals('cache object', $configuration->getResultCache());
-        $this->assertEquals('cache object', $configuration->getMetadataCache());
-        $this->assertEquals(new ConnectionConfig(['foo' => 'bar']), $configuration->getDbConfig());
+        $this->assertSame($logger, $configuration->getSQLLogger());
     }
-    
+
     /**
-     * 
+     *
      */
-    public function test_set_get_result_cache()
+    public function test_set_get_types()
     {
+        $types = new TypesRegistry();
+
         $configuration = new Configuration();
-        $configuration->setResultCache('cache object');
-        
-        $this->assertEquals('cache object', $configuration->getResultCache());
-    }
-    
-    /**
-     * 
-     */
-    public function test_set_get_metadata_cache()
-    {
-        $configuration = new Configuration();
-        $configuration->setMetadataCache('cache object');
-        
-        $this->assertEquals('cache object', $configuration->getMetadataCache());
-    }
-    
-    /**
-     * 
-     */
-    public function test_set_get_object_config()
-    {
-        $config = new ConnectionConfig();
-        
-        $configuration = new Configuration();
-        $configuration->setDbConfig($config);
-        
-        $this->assertSame($config, $configuration->getDbConfig());
-    }
-    
-    /**
-     * 
-     */
-    public function test_set_get_array_config()
-    {
-        $config = new ConnectionConfig($values = [
-            'foo' => 'bar'
-        ]);
-        
-        $configuration = new Configuration();
-        $configuration->setDbConfig($values);
-        
-        $this->assertEquals($config, $configuration->getDbConfig());
+        $configuration->setTypes($types);
+
+        $this->assertSame($types, $configuration->getTypes());
     }
 }

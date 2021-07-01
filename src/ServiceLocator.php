@@ -10,7 +10,6 @@ use Bdf\Prime\Entity\Instantiator\RegistryInstantiator;
 use Bdf\Prime\Mapper\MapperFactory;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryInterface;
-use Bdf\Prime\Types\TypesRegistryInterface;
 use Bdf\Serializer\SerializerInterface;
 use Psr\Container\ContainerInterface;
 
@@ -74,14 +73,6 @@ class ServiceLocator
         $this->mapperFactory = $mapperFactory ?: new MapperFactory();
         $this->instantiator = $instantiator ?: new RegistryInstantiator();
         $this->hydrators = new HydratorRegistry();
-
-        // TODO Legacy. Should be removed
-        if ($cache = $this->connectionManager->config()->getMetadataCache()) {
-            $this->mapperFactory->setMetadataCache($cache);
-        }
-        if ($cache = $this->connectionManager->config()->getResultCache()) {
-            $this->mapperFactory->setResultCache($cache);
-        }
     }
 
     /**
@@ -102,18 +93,6 @@ class ServiceLocator
     public function mappers()
     {
         return $this->mapperFactory;
-    }
-    
-    /**
-     * Returns connection manager config
-     * 
-     * @return Configuration
-     *
-     * @deprecated Since 1.1.
-     */
-    public function config()
-    {
-        return $this->connectionManager->config();
     }
     
     /**
@@ -264,18 +243,6 @@ class ServiceLocator
     public function instantiator()
     {
         return $this->instantiator;
-    }
-
-    /**
-     * Get the types registry
-     *
-     * @return TypesRegistryInterface
-     *
-     * @deprecated Since 1.1.
-     */
-    public function types()
-    {
-        return $this->connectionManager->config()->getTypes();
     }
 
     /**

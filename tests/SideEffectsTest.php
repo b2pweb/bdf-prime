@@ -48,7 +48,7 @@ class SideEffectsTest extends TestCase
         // Create a SQLite file connection
         $file = tempnam(sys_get_temp_dir(), 'sqlite_');
 
-        $this->prime()->connections()->addConnection('test', [
+        $this->prime()->connections()->declareConnection('test', [
             'adapter' => 'sqlite',
             'path' => $file
         ]);

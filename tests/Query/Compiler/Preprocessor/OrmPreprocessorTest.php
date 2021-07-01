@@ -260,7 +260,7 @@ class OrmPreprocessorTest extends TestCase
 
         $typed->expects($this->once())
             ->method('setType')
-            ->with(Prime::service()->types()->get('array'))
+            ->with($this->prime()->connection('test')->getConfiguration()->getTypes()->get('array'))
         ;
 
         $this->assertEquals([

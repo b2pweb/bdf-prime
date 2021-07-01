@@ -491,7 +491,8 @@ class SqlCompilerTest extends TestCase
      */
     public function test_subquery_x_db()
     {
-        $mysql = Prime::service()->connections()->addConnection('mysql', ['adapter' => 'mysql', 'serverVersion' => '5.6']);
+        Prime::service()->connections()->declareConnection('mysql', ['adapter' => 'mysql', 'serverVersion' => '5.6']);
+        $mysql = Prime::service()->connections()->getConnection('mysql');
 
         $connection = $this->getMockBuilder(SimpleConnection::class)
             ->disableOriginalConstructor()
@@ -534,7 +535,8 @@ class SqlCompilerTest extends TestCase
      */
     public function test_insert_select_x_db()
     {
-        $mysql = Prime::service()->connections()->addConnection('mysql', ['adapter' => 'mysql', 'serverVersion' => '5.6']);
+        Prime::service()->connections()->declareConnection('mysql', ['adapter' => 'mysql', 'serverVersion' => '5.6']);
+        $mysql = Prime::service()->connections()->getConnection('mysql');
 
         $connection = $this->getMockBuilder(SimpleConnection::class)
             ->disableOriginalConstructor()

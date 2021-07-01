@@ -55,18 +55,8 @@ class ConnectionManager implements ConnectionRegistryInterface
      *
      * @throws LogicException if connection exists
      */
-    public function addConnection(/* ConnectionInterface */ $connection, /* bool */ $default = false)
+    public function addConnection(ConnectionInterface $connection, bool $default = false)
     {
-        // Legacy
-        if (!$connection instanceof ConnectionInterface) {
-            @trigger_error(__METHOD__.' signature change. Use addParameter to add lazy loading conenction info.', E_USER_DEPRECATED);
-
-            /** @psalm-suppress InvalidScalarArgument */
-            $this->declareConnection($connection, $default);
-
-            return $this->getConnection($connection);
-        }
-
         // Connection name must be unique
         if (isset($this->connections[$connection->getName()])) {
             throw new LogicException('Connection for "'.$connection->getName().'" already exists. Connection name must be unique.');
@@ -142,24 +132,6 @@ class ConnectionManager implements ConnectionRegistryInterface
     }
 
     /**
-     * Get global config
-     *
-     * @return Configuration
-     *
-     * @deprecated Every connection should have its config.
-     */
-    public function config(): Configuration
-    {
-        @trigger_error(__METHOD__.' is deprecated since 1.1 and will be removed in 1.2. Every connection should have its config.', E_USER_DEPRECATED);
-
-        if ($this->registry instanceof ConnectionRegistry) {
-            return $this->registry->getDefaultConfiguration();
-        }
-
-        return new Configuration();
-    }
-
-    /**
      * Get all connections
      *
      * @return ConnectionInterface[] Array of connection objects
@@ -175,17 +147,6 @@ class ConnectionManager implements ConnectionRegistryInterface
     public function getConnectionNames(): array
     {
         return array_unique(array_merge($this->getCurrentConnectionNames(), $this->registry->getConnectionNames()));
-    }
-    /**
-     * Get the loaded connection name
-     *
-     * @return string[] Array of connection name
-     *
-     * @deprecated Since 1.1 use getConnectionNames
-     */
-    public function connectionNames(): array
-    {
-        return $this->getConnectionNames();
     }
 
     /**

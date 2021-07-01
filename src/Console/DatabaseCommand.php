@@ -47,22 +47,10 @@ abstract class DatabaseCommand extends Command
      * @param ConnectionRegistryInterface $registry
      * @param ConnectionFactoryInterface $connectionFactory
      */
-    public function __construct(/* ConnectionRegistryInterface */ $registry, ConnectionFactoryInterface $connectionFactory = null)
+    public function __construct(ConnectionRegistryInterface $registry, ConnectionFactoryInterface $connectionFactory = null)
     {
         $this->registry = $registry;
         $this->connectionFactory = $connectionFactory;
-
-        if ($registry instanceof ServiceLocator) {
-            @trigger_error(__METHOD__.' signature has changed since 1.1. Inject instances '.ConnectionRegistryInterface::class.' '.ConnectionFactoryInterface::class);
-
-            $factory = new ConnectionFactory();
-            $this->connectionFactory = new ChainFactory([
-                new MasterSlaveConnectionFactory($factory),
-                new ShardingConnectionFactory($factory),
-                $factory,
-            ]);
-            $this->registry = new ConnectionRegistry([], $this->connectionFactory, $registry->config());
-        }
 
         parent::__construct(static::$defaultName);
     }

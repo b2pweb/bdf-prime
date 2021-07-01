@@ -16,27 +16,6 @@ class ConnectionManagerTest extends TestCase
     /**
      * 
      */
-    public function test_simple_constructor()
-    {
-        $manager = new ConnectionManager();
-        
-        $this->assertEquals(new Configuration(), $manager->config());
-    }
-    
-    /**
-     * 
-     */
-    public function test_constructor_with_config()
-    {
-        $registry = new ConnectionRegistry([], null, new Configuration(['resultCache' => 'cache']));
-        $manager = new ConnectionManager($registry);
-        
-        $this->assertEquals('cache', $manager->config()->getResultCache());
-    }
-    
-    /**
-     * 
-     */
     public function test_set_get_default_connection()
     {
         $manager = new ConnectionManager();
@@ -259,6 +238,5 @@ class ConnectionManagerTest extends TestCase
 
         $this->assertSame(['bar'], $manager->getCurrentConnectionNames());
         $this->assertSame(['bar', 'foo'], $manager->getConnectionNames());
-        $this->assertSame(['bar', 'foo'], $manager->connectionNames());
     }
 }
