@@ -55,7 +55,7 @@ class ValueTest extends TestCase
         $compiler = $this->createMock(CompilerInterface::class);
 
         $value->setContext($compiler, 'col', '=');
-        $value->setType($this->prime()->types()->get('searchable_array'));
+        $value->setType($this->prime()->connection('test')->getConfiguration()->getTypes()->get('searchable_array'));
 
         $this->assertSame(',1,2,5,', $value->getValue());
     }

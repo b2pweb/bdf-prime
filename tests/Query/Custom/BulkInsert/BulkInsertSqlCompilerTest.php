@@ -258,7 +258,7 @@ class BulkInsertSqlCompilerTest extends TestCase
      */
     public function test_compile_with_custom_null_type($bulk)
     {
-        $this->prime()->types()->register(new FooType());
+        $this->prime()->connection('test')->getConfiguration()->getTypes()->register(new FooType());
         $this->pack()->declareEntity(MyCustomNullableEntity::class);
 
         $query = new BulkInsertQuery($this->connection, new OrmPreprocessor(MyCustomNullableEntity::repository()));

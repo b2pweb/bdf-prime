@@ -2,8 +2,8 @@
 
 namespace Bdf\Prime\Connection\Factory;
 
+use Bdf\Prime\Configuration;
 use Bdf\Prime\Connection\ConnectionInterface;
-use Doctrine\DBAL\Configuration;
 
 /**
  * ChainFactory
@@ -25,7 +25,7 @@ class ChainFactory implements ConnectionFactoryInterface
     /**
      * {@inheritDoc}
      */
-    public function create(string $connectionName, array $parameters, Configuration $config): ConnectionInterface
+    public function create(string $connectionName, array $parameters, ?Configuration $config = null): ConnectionInterface
     {
         foreach ($this->factories as $connectionFactory) {
             if ($connectionFactory->support($connectionName, $parameters)) {

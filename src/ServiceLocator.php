@@ -10,7 +10,6 @@ use Bdf\Prime\Entity\Instantiator\RegistryInstantiator;
 use Bdf\Prime\Mapper\MapperFactory;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryInterface;
-use Bdf\Prime\Types\TypesRegistryInterface;
 use Bdf\Serializer\SerializerInterface;
 use Psr\Container\ContainerInterface;
 
@@ -64,9 +63,9 @@ class ServiceLocator
     /**
      * SericeLocator constructor.
      *
-     * @param ConnectionManager $connectionManager
-     * @param MapperFactory  $mapperFactory
-     * @param InstantiatorInterface $instantiator
+     * @param ConnectionManager|null $connectionManager
+     * @param MapperFactory|null  $mapperFactory
+     * @param InstantiatorInterface|null $instantiator
      */
     public function __construct(ConnectionManager $connectionManager = null, MapperFactory $mapperFactory = null, InstantiatorInterface $instantiator = null)
     {
@@ -94,18 +93,6 @@ class ServiceLocator
     public function mappers()
     {
         return $this->mapperFactory;
-    }
-    
-    /**
-     * Returns connection manager config
-     * 
-     * @return Configuration
-     *
-     * @deprecated Since 1.1.
-     */
-    public function config()
-    {
-        return $this->connectionManager->config();
     }
     
     /**
@@ -249,18 +236,6 @@ class ServiceLocator
     public function instantiator()
     {
         return $this->instantiator;
-    }
-
-    /**
-     * Get the types registry
-     *
-     * @return TypesRegistryInterface
-     *
-     * @deprecated Since 1.1.
-     */
-    public function types()
-    {
-        return $this->connectionManager->config()->getTypes();
     }
 
     /**

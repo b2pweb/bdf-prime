@@ -3,7 +3,8 @@
 namespace Bdf\Prime\Connection;
 
 use Bdf\Dsn\Dsn;
-use Bdf\Prime\Configuration;
+use Bdf\Prime\Connection\Configuration\ConfigurationResolver;
+use Bdf\Prime\Connection\Configuration\ConfigurationResolverInterface;
 use Bdf\Prime\Connection\Factory\ConnectionFactory;
 use Bdf\Prime\Connection\Factory\ConnectionFactoryInterface;
 use Bdf\Prime\ConnectionRegistryInterface;
@@ -22,11 +23,11 @@ class ConnectionRegistry implements ConnectionRegistryInterface
     private $connectionFactory;
 
     /**
-     * Default configuration to use
+     * The configuration resolver
      *
-     * @var Configuration
+     * @var ConfigurationResolverInterface
      */
-    private $defaultConfig;
+    private $configResolver;
 
     /**
      * The configuration map
@@ -57,14 +58,14 @@ class ConnectionRegistry implements ConnectionRegistryInterface
      * Set default configuration
      *
      * @param array $parametersMap
-     * @param ConnectionFactoryInterface $connectionFactory
-     * @param Configuration|null $defaultConfig
+     * @param ConnectionFactoryInterface|null $connectionFactory
+     * @param ConfigurationResolverInterface|null $configResolver
      */
-    public function __construct(array $parametersMap = [], ConnectionFactoryInterface $connectionFactory = null, Configuration $defaultConfig = null)
+    public function __construct(array $parametersMap = [], ConnectionFactoryInterface $connectionFactory = null, ConfigurationResolverInterface $configResolver = null)
     {
         $this->parametersMap = $parametersMap;
-        $this->connectionFactory = $connectionFactory ?: new ConnectionFactory();
-        $this->defaultConfig = $defaultConfig ?: new Configuration();
+        $this->connectionFactory = $connectionFactory ?? new ConnectionFactory();
+        $this->configResolver = $configResolver ?? new ConfigurationResolver();
     }
     
     /**
@@ -72,7 +73,7 @@ class ConnectionRegistry implements ConnectionRegistryInterface
      */
     public function getConnection(string $name): ConnectionInterface
     {
-        return $this->connectionFactory->create($name, $this->getConnectionParameters($name), $this->defaultConfig);
+        return $this->connectionFactory->create($name, $this->getConnectionParameters($name), $this->configResolver->getConfiguration($name));
     }
 
     /**
@@ -92,16 +93,6 @@ class ConnectionRegistry implements ConnectionRegistryInterface
     public function getConnectionNames(): array
     {
         return array_keys($this->parametersMap);
-    }
-
-    /**
-     * Get the global config
-     *
-     * @return Configuration
-     */
-    public function getDefaultConfiguration(): Configuration
-    {
-        return $this->defaultConfig;
     }
 
     /**

@@ -510,7 +510,7 @@ class CRUDTest extends TestCase
      */
     public function test_custom_nullable_type()
     {
-        $this->prime()->types()->register(new FooType());
+        $this->prime()->connection('test')->getConfiguration()->getTypes()->register(new FooType());
         $this->pack()->declareEntity(MyCustomNullableEntity::class);
 
         // Simple insert

@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Connection\Configuration\ConfigurationResolver;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\ConnectionRegistry;
 use Bdf\Prime\Connection\Factory\ChainFactory;
@@ -405,7 +406,8 @@ class Prime
                 new MasterSlaveConnectionFactory($factory),
                 new ShardingConnectionFactory($factory),
                 $factory,
-            ])
+            ]),
+            new ConfigurationResolver([], $configuration = new Configuration())
         );
 
         $mapperFactory = new MapperFactory(
@@ -420,7 +422,13 @@ class Prime
         );
 
         if ($logger = static::$config['logger'] ?? null) {
-            $registry->getDefaultConfiguration()->setSQLLogger($logger);
+            $configuration->setSQLLogger($logger);
+        }
+
+        if ($types = static::$config['types'] ?? null) {
+            foreach ($types as $alias => $type) {
+                $configuration->getTypes()->register($type, is_string($alias) ? $alias : null);
+            }
         }
 
         if ($serializer = static::$config['serializer'] ?? null) {

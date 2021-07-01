@@ -18,11 +18,13 @@ class Configuration extends BaseConfiguration
      */
     public function __construct(array $options = [])
     {
-        $this->_attributes = $options + [
-            'sqlLogger' => isset($options['logger']) ? $options['logger'] : null,
-        ];
-        
-        unset($this->_attributes['logger']);
+        $this->_attributes = $options;
+
+        if (isset($options['logger'])) {
+            $this->_attributes['sqlLogger'] = $options['logger'];
+
+            unset($this->_attributes['logger']);
+        }
     }
 
     /**
