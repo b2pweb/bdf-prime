@@ -14,6 +14,11 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 /**
  * Interface for SQL queries
+ *
+ * @template C as \Bdf\Prime\Connection\ConnectionInterface
+ * @template R as object|array
+ *
+ * @extends QueryInterface<C, R>
  */
 interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Orderable, Joinable, Lockable, EntityJoinable
 {
@@ -205,14 +210,13 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
 
     /**
      * Get the count of the query for pagination
-     * Column could be an array if DISTINCT is on
      *
-     * @param array|string $column
+     * @param string|null $column
      *
      * @return int
      * @throws PrimeException When execute fail
      */
-    public function paginationCount($column = null);
+    public function paginationCount(?string $column = null): int;
 
     /**
      * Gets the complete SQL string formed by the current specifications of this query.

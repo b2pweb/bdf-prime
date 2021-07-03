@@ -32,7 +32,7 @@ class AliasResolver
     protected $types;
 
     /**
-     * @var QueryInterface|EntityJoinable
+     * @var QueryInterface&EntityJoinable
      */
     protected $query;
 
@@ -62,7 +62,7 @@ class AliasResolver
      *  t2 => customer.driver
      * ]
      *
-     * @var string[]
+     * @var array<string, string>
      */
     protected $aliasToPath = [];
 
@@ -99,9 +99,9 @@ class AliasResolver
     /**
      * Set the query instance
      *
-     * @param QueryInterface|null $query
+     * @param QueryInterface&EntityJoinable|null $query
      */
-    public function setQuery(?QueryInterface $query = null)
+    public function setQuery(?QueryInterface $query = null): void
     {
         $this->query = $query;
     }
@@ -169,11 +169,11 @@ class AliasResolver
      * If the alias is null, the method will create one
      *
      * @param string|Metadata|RepositoryInterface $repository
-     * @param string                              $alias
+     * @param string|null $alias
      *
-     * @return string  Returns the metadata alias
+     * @return string|null Returns the metadata alias, or null is the first parameter is a DBAL value
      */
-    public function registerMetadata($repository, $alias)
+    public function registerMetadata($repository, ?string $alias): ?string
     {
         if (!$repository instanceof RepositoryInterface) {
             $repository = $this->findRepository($repository);
@@ -217,11 +217,11 @@ class AliasResolver
      *
      * @param mixed $search
      *
-     * @return RepositoryInterface
+     * @return RepositoryInterface|null
      *
      * @todo find repository from table name
      */
-    protected function findRepository($search)
+    protected function findRepository($search): ?RepositoryInterface
     {
         if ($this->metadata->table === $search) {
             return $this->repository;

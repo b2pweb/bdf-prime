@@ -3,24 +3,26 @@
 namespace Bdf\Prime\Query\Extension;
 
 use Bdf\Prime\Query\Clause;
-use Bdf\Prime\Query\Contract\Joinable;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
+use Bdf\Prime\Query\Contract\Joinable;
 use Bdf\Prime\Query\JoinClause;
-use Closure;
 
 /**
  * Trait for join() method
  *
  * @see Joinable
+ * @psalm-require-implements Joinable
  *
  * @property CompilerInterface $compiler
  */
 trait SimpleJoinTrait
 {
     /**
+     * {@inheritdoc}
+     *
      * @see Joinable::join()
      */
-    public function join($table, $key, $operator = null, $foreign = null, $type = Joinable::INNER_JOIN)
+    public function join($table, $key, ?string $operator = null, $foreign = null, string $type = Joinable::INNER_JOIN)
     {
         $this->compilerState->invalidate('joins');
 
@@ -32,7 +34,7 @@ trait SimpleJoinTrait
 
         $join = new JoinClause();
 
-        if ($key instanceof Closure) {
+        if (is_callable($key)) {
             $key($join);
         } else {
             $join->on($key, $operator, $foreign);
@@ -49,23 +51,29 @@ trait SimpleJoinTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Joinable::leftJoin()
      */
-    public function leftJoin($table, $key, $operator = null, $foreign = null)
+    public function leftJoin($table, $key, ?string $operator = null, $foreign = null)
     {
         return $this->join($table, $key, $operator, $foreign, Joinable::LEFT_JOIN);
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Joinable::rightJoin()
      */
-    public function rightJoin($table, $key, $operator = null, $foreign = null)
+    public function rightJoin($table, $key, ?string $operator = null, $foreign = null)
     {
         return $this->join($table, $key, $operator, $foreign, Joinable::RIGHT_JOIN);
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Clause::addStatement()
      */
-    abstract public function addStatement($name, $values);
+    abstract public function addStatement(string $name, $values): void;
 }

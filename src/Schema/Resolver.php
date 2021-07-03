@@ -156,10 +156,12 @@ class Resolver implements ResolverInterface
         if (!$this->metadata->isSequencePrimaryKey()) {
             return;
         }
-        
+
+        /** @var ConnectionInterface&\Doctrine\DBAL\Connection $connection */
         $connection = $this->connection($this->metadata->sequence['connection']);
         $table  = $this->metadata->sequence['table'];
-        
+
+        /** @psalm-suppress UndefinedInterfaceMethod */
         $nb = $connection->from($table)->count();
         
         if ($nb == 0) {
@@ -170,11 +172,13 @@ class Resolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function truncate($cascade =false)
+    public function truncate($cascade = false)
     {
-        return $this->schema()->truncate($this->metadata->table, $cascade);
+        $this->schema()->truncate($this->metadata->table, $cascade);
+
+        return true;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -215,7 +219,7 @@ class Resolver implements ResolverInterface
     /**
      * Get the schema builder for sequence
      *
-     * @return SchemaManagerInterface
+     * @return SchemaManagerInterface|null
      * @throws PrimeException
      */
     protected function schemaSequence()

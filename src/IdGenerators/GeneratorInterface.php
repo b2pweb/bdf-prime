@@ -8,16 +8,18 @@ use Bdf\Prime\ServiceLocator;
 
 /**
  * GeneratorInterface
+ *
+ * @template C as ConnectionInterface
  */
 interface GeneratorInterface
 {
     /**
      * Set the current connection
      * 
-     * @param ConnectionInterface $connection
+     * @param C $connection
      */
     public function setCurrentConnection(ConnectionInterface $connection);
-    
+
     /**
      * Generate ID
      *
@@ -27,7 +29,7 @@ interface GeneratorInterface
      * @throws PrimeException
      */
     public function generate(array &$data, ServiceLocator $serviceLocator);
-    
+
     /**
      * Modify entity after insertion
      * 

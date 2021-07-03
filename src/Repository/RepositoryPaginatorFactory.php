@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Repository;
 
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Query\Pagination\PaginatorFactory;
 use Bdf\Prime\Query\Pagination\Walker;
 use Bdf\Prime\Query\Pagination\WalkStrategy\KeyWalkStrategy;
@@ -10,18 +11,20 @@ use Bdf\Prime\Query\ReadCommandInterface;
 
 /**
  * Paginator factory for a repository query
+ *
+ * @template E as object
  */
 class RepositoryPaginatorFactory extends PaginatorFactory
 {
     /**
-     * @var RepositoryInterface
+     * @var RepositoryInterface<E>
      */
     private $repository;
 
     /**
      * RepositoryPaginatorFactory constructor.
      *
-     * @param RepositoryInterface $repository
+     * @param RepositoryInterface<E> $repository
      */
     public function __construct(RepositoryInterface $repository)
     {
@@ -33,11 +36,11 @@ class RepositoryPaginatorFactory extends PaginatorFactory
     /**
      * Create the walker instance for the given query
      *
-     * @param ReadCommandInterface $query
+     * @param ReadCommandInterface<ConnectionInterface, E> $query
      * @param int|null $limit
      * @param int|null $page
      *
-     * @return Walker
+     * @return Walker<E>
      */
     protected function createWalker(ReadCommandInterface $query, ?int $limit, ?int $page): Walker
     {

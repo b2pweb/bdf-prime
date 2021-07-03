@@ -2,12 +2,18 @@
 
 namespace Bdf\Prime\Query\Expression;
 
+use Bdf\Prime\Query\CompilableClause;
+use Bdf\Prime\Query\Compiler\CompilerInterface;
+
 /**
  * Match
  * 
  * The fulltext search expression
  * 
  * @package Bdf\Prime\Query\Expression
+ *
+ * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\SqlQueryInterface
+ * @implements ExpressionInterface<Q, \Bdf\Prime\Query\Compiler\SqlCompiler>
  */
 class Match implements ExpressionInterface
 {
@@ -39,22 +45,22 @@ class Match implements ExpressionInterface
         $this->value = $value;
         $this->booleanMode = $booleanMode;
     }
-    
+
     /**
      * FULLTEXT search
      * 
      * {@inheritdoc}
      */
-    public function build($query, $compiler)
+    public function build(CompilableClause $query, CompilerInterface $compiler)
     {
         $sql = 'MATCH('.$compiler->quoteIdentifier($query, $query->preprocessor()->field($this->search)).' AGAINST('.$compiler->quote($this->value).')';
-        
+
         if ($this->booleanMode) {
             $sql .= ' IN BOOLEAN MODE)';
         } else {
             $sql .= ')';
         }
-        
+
         return $sql;
     }
 }

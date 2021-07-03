@@ -15,7 +15,7 @@ interface Cachable
      *
      * @return CacheInterface|null
      */
-    public function cache();
+    public function cache(): ?CacheInterface;
 
     /**
      * Set a cache to the query

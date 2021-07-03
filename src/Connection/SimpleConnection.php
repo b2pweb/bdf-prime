@@ -37,9 +37,9 @@ use PDO;
 /**
  * Connection
  *
- * @package Bdf\Prime
+ * @method \Bdf\Prime\Configuration getConfiguration()
  */
-class SimpleConnection extends BaseConnection implements ConnectionInterface
+class SimpleConnection extends BaseConnection implements ConnectionInterface, TransactionManagerInterface
 {
     use LostConnection;
     use SchemaChanged;
@@ -81,6 +81,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
     {
         parent::__construct($params, $driver, $config, $eventManager);
 
+        /** @psalm-suppress InvalidArgument */
         $this->factory = new DefaultQueryFactory(
             $this,
             new SqlCompiler($this),
@@ -142,6 +143,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
             try {
                 $this->platform = new SqlPlatform($this->getDatabasePlatform(), $this->getConfiguration()->getTypes());
             } catch (DoctrineDBALException $e) {
+                /** @psalm-suppress InvalidScalarArgument */
                 throw new DBALException($e->getMessage(), $e->getCode(), $e);
             }
         }
@@ -218,7 +220,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
      */
     public function insert($table, array $data, array $types = array())
     {
-        return $this->from($table)->insert($data, $types);
+        return $this->from($table)->insert($data);
     }
 
     /**
@@ -245,24 +247,24 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function executeQuery($query, array $params = [], $types = [], QueryCacheProfile $qcp = null)
+    public function executeQuery($sql, array $params = [], $types = [], QueryCacheProfile $qcp = null)
     {
         $this->prepareLogger();
 
-        return $this->runOrReconnect(function() use ($query, $params, $types, $qcp) {
-            return parent::executeQuery($query, $params, $types, $qcp);
+        return $this->runOrReconnect(function() use ($sql, $params, $types, $qcp) {
+            return parent::executeQuery($sql, $params, $types, $qcp);
         });
     }
 
     /**
      * {@inheritdoc}
      */
-    public function executeUpdate($query, array $params = [], array $types = [])
+    public function executeUpdate($sql, array $params = [], array $types = [])
     {
         $this->prepareLogger();
 
-        return $this->runOrReconnect(function() use ($query, $params, $types) {
-            return parent::executeUpdate($query, $params, $types);
+        return $this->runOrReconnect(function() use ($sql, $params, $types) {
+            return parent::executeUpdate($sql, $params, $types);
         });
     }
 
@@ -327,6 +329,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
 
             return new UpdateResultSet($this->executeUpdate($statement, $query->getBindings()));
         } catch (DoctrineDBALException $e) {
+            /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException('Error on execute : '.$e->getMessage(), $e->getCode(), $e);
         }
     }
@@ -372,31 +375,31 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function beginTransaction()
+    public function beginTransaction(): bool
     {
         $this->prepareLogger();
 
-        parent::beginTransaction();
+        return parent::beginTransaction() ?? true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function commit()
+    public function commit(): bool
     {
         $this->prepareLogger();
         
-        parent::commit();
+        return parent::commit() ?? true;
     }
     
     /**
      * {@inheritdoc}
      */
-    public function rollBack()
+    public function rollBack(): bool
     {
         $this->prepareLogger();
         
-        return parent::rollBack();
+        return parent::rollBack() ?? true;
     }
 
     /**
@@ -414,6 +417,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
      */
     protected function prepareLogger()
     {
+        /** @psalm-suppress InternalMethod */
         $logger = $this->getConfiguration()->getSQLLogger();
 
         if ($logger && $logger instanceof ConnectionAwareInterface) {
@@ -449,6 +453,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface
                 throw $exception;
             }
         } catch (DoctrineDBALException $e) {
+            /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException('Error on execute : '.$e->getMessage(), $e->getCode(), $e);
         }
     }

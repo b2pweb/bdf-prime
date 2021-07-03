@@ -3,12 +3,18 @@
 namespace Bdf\Prime\Relations\Util;
 
 use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Relations\AbstractRelation;
 use Bdf\Prime\Relations\RelationInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
  * Adds foreign key accessor helpers for relations based on single foreign key
+ *
+ * @psalm-require-extends AbstractRelation
+ *
+ * @template L as object
+ * @template R as object
  */
 trait ForeignKeyRelation
 {
@@ -28,9 +34,17 @@ trait ForeignKeyRelation
 
 
     /**
+     * {@inheritdoc}
+     *
+     * @param Q $query
+     * @param mixed $value
+     * @return Q
+     * @template Q as \Bdf\Prime\Query\Contract\Whereable&ReadCommandInterface
+     * @psalm-suppress InvalidReturnType
+     *
      * @see AbstractRelation::applyWhereKeys()
      */
-    protected function applyWhereKeys(QueryInterface $query, $value)
+    protected function applyWhereKeys(ReadCommandInterface $query, $value): ReadCommandInterface
     {
         return $query->where($this->distantKey, $value);
     }
@@ -39,20 +53,22 @@ trait ForeignKeyRelation
      * Get the local key value from an entity
      * If an array is given, get array of key value
      *
-     * @param object|object[] $entity
+     * @param L|L[] $entity
      *
      * @return mixed
      */
     protected function getLocalKeyValue($entity)
     {
+        $mapper = $this->localRepository()->mapper();
+
         if (!is_array($entity)) {
-            return $this->localRepository()->extractOne($entity, $this->localKey);
+            return $mapper->extractOne($entity, $this->localKey);
         }
 
         $keys = [];
 
         foreach ($entity as $e) {
-            $keys[] = $this->localRepository()->extractOne($e, $this->localKey);
+            $keys[] = $mapper->extractOne($e, $this->localKey);
         }
 
         return $keys;
@@ -61,50 +77,56 @@ trait ForeignKeyRelation
     /**
      * Set the local key value on an entity
      *
-     * @param object $entity
+     * @param L $entity
      * @param mixed  $id
      *
-     * @return mixed
+     * @return void
      */
-    protected function setLocalKeyValue($entity, $id)
+    protected function setLocalKeyValue($entity, $id): void
     {
-        return $this->localRepository()->hydrateOne($entity, $this->localKey, $id);
+        $this->localRepository()->mapper()->hydrateOne($entity, $this->localKey, $id);
     }
 
     /**
      * Get the local key value from an entity
      *
-     * @param object $entity
+     * @param R $entity
      *
      * @return mixed
      */
     protected function getDistantKeyValue($entity)
     {
-        return $this->relationRepository()->extractOne($entity, $this->distantKey);
+        /** @psalm-suppress InvalidArgument */
+        return $this->relationRepository()->mapper()->extractOne($entity, $this->distantKey);
     }
 
     /**
      * Get the distance key value on an entity
      *
-     * @param object $entity
-     * @param mixed  $id
+     * @param R $entity
+     * @param mixed $id
      *
-     * @return mixed
+     * @return void
      */
-    protected function setDistantKeyValue($entity, $id)
+    protected function setDistantKeyValue($entity, $id): void
     {
-        return $this->relationRepository()->hydrateOne($entity, $this->distantKey, $id);
+        /** @psalm-suppress InvalidArgument */
+        $this->relationRepository()->mapper()->hydrateOne($entity, $this->distantKey, $id);
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see RelationInterface::relationRepository()
-     * @return RepositoryInterface
+     * @return RepositoryInterface<R>
      */
-    abstract public function relationRepository();
+    abstract public function relationRepository(): RepositoryInterface;
 
     /**
+     * {@inheritdoc}
+     *
      * @see RelationInterface::localRepository()
-     * @return RepositoryInterface
+     * @return RepositoryInterface<L>
      */
-    abstract public function localRepository();
+    abstract public function localRepository(): RepositoryInterface;
 }

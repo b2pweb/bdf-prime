@@ -4,6 +4,8 @@ namespace Bdf\Prime\Query\Contract;
 
 /**
  * Query which can restrict the returning data (or columns) by performing a projection
+ *
+ * @psalm-type ColumnType = string|\Bdf\Prime\Query\Expression\ExpressionInterface|\Bdf\Prime\Query\QueryInterface
  */
 interface Projectionable
 {
@@ -11,7 +13,7 @@ interface Projectionable
      * Perform a projection
      * This method is an alias of select()
      *
-     * @param mixed $columns The selection expressions
+     * @param ColumnType|ColumnType[]|null $columns The selection expressions
      *
      * @return $this
      *
@@ -47,7 +49,7 @@ interface Projectionable
      *         ;
      * </code>
      *
-     * @param mixed $columns The selection expressions.
+     * @param ColumnType|ColumnType[]|null $columns The selection expressions.
      *
      * @return $this This Query instance.
      */
@@ -67,7 +69,7 @@ interface Projectionable
      *         ->from('users', 'u');
      * </code>
      *
-     * @param mixed $columns The selection expression.
+     * @param ColumnType|ColumnType[]|null $columns The selection expression.
      *
      * @return $this This Query instance.
      * @see Projectionable::select() for exemples

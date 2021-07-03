@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Behaviors;
 
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
@@ -10,7 +11,8 @@ use Bdf\Prime\Repository\RepositoryInterface;
  *
  * The versionable behavior allows you to keep an history of your model objects.
  *
- * @package Bdf\Prime\Behaviors
+ * @template E as object
+ * @extends Behavior<E>
  */
 class Versionable extends Behavior
 {
@@ -52,7 +54,7 @@ class Versionable extends Behavior
     /**
      * {@inheritdoc}
      */
-    public function changeSchema(FieldBuilder $builder)
+    public function changeSchema(FieldBuilder $builder): void
     {
         $builder->integer(self::COLUMN_NAME, 0);
     }
@@ -62,8 +64,8 @@ class Versionable extends Behavior
      *
      * we increment version number on entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      */
     public function beforeInsert($entity, $repository)
     {
@@ -75,8 +77,8 @@ class Versionable extends Behavior
      *
      * we historicize entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      * @param integer $count
      */
     public function afterInsert($entity, $repository, $count)
@@ -91,9 +93,9 @@ class Versionable extends Behavior
      *
      * we increment version number on entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
-     * @param null|\ArrayObject      $attributes
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
+     * @param null|\ArrayObject $attributes
      */
     public function beforeUpdate($entity, $repository, $attributes)
     {
@@ -109,8 +111,8 @@ class Versionable extends Behavior
      *
      * we historicize entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      * @param integer $count
      */
     public function afterUpdate($entity, $repository, $count)
@@ -123,19 +125,25 @@ class Versionable extends Behavior
     /**
      * Remove entity versions
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      */
     public function deleteAllVersions($entity, $repository)
     {
-        $repository->repository($this->versionClass)
-            ->deleteBy($repository->mapper()->primaryCriteria($entity));
+        $queries = $repository->repository($this->versionClass)->queries();
+        $criteria = $repository->mapper()->primaryCriteria($entity);
+
+        if ($query = $queries->keyValue($criteria)) {
+            $query->delete();
+        } else {
+            $queries->builder()->where($criteria)->delete();
+        }
     }
 
     /**
      * {@inheritdoc}
      */
-    public function subscribe($notifier)
+    public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
     {
         $notifier->inserting([$this, 'beforeInsert']);
         $notifier->inserted([$this, 'afterInsert']);
@@ -151,23 +159,25 @@ class Versionable extends Behavior
     /**
      * Increment version number on entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      */
     protected function incrementVersion($entity, $repository)
     {
-        $repository->hydrateOne(
+        $mapper = $repository->mapper();
+
+        $mapper->hydrateOne(
             $entity,
             self::COLUMN_NAME,
-            $repository->extractOne($entity, self::COLUMN_NAME) + 1
+            $mapper->extractOne($entity, self::COLUMN_NAME) + 1
         );
     }
 
     /**
      * Historicize entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      */
     protected function insertVersion($entity, $repository)
     {

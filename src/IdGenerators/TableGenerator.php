@@ -11,6 +11,8 @@ use Bdf\Prime\ServiceLocator;
  * Sequence table
  * 
  * generate sequence from table.
+ *
+ * @extends AbstractGenerator<\Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection>
  */
 class TableGenerator extends AbstractGenerator
 {
@@ -35,7 +37,7 @@ class TableGenerator extends AbstractGenerator
     /**
      * Increment and return the new sequence id
      * 
-     * @param ConnectionInterface $connection
+     * @param \Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection $connection
      * @param Metadata   $metadata
      *
      * @return string  Return the new sequence id
@@ -54,11 +56,11 @@ class TableGenerator extends AbstractGenerator
             case 'sqlite':
                 $connection->executeUpdate('UPDATE '.$metadata->sequence['table']
                     .' SET '.$metadata->sequence['column'].' = '.$metadata->sequence['column'].'+1');
-                return $connection->executeQuery('SELECT '.$metadata->sequence['column']
+                return (string) $connection->executeQuery('SELECT '.$metadata->sequence['column']
                     .' FROM '.$metadata->sequence['table'])->fetchColumn(0);
             
             default:
-                return $connection->executeQuery(
+                return (string) $connection->executeQuery(
                     $platform->grammar()->getSequenceNextValSQL($metadata->sequence['table'])
                 )->fetchColumn(0);
         }

@@ -11,7 +11,8 @@ use Doctrine\DBAL\Schema\Table as DoctrineTable;
 /**
  * Schema manager
  *
- * @author seb
+ * @template C as \Bdf\Prime\Connection\ConnectionInterface
+ * @extends DatabaseManagerInterface<C>
  */
 interface SchemaManagerInterface extends DatabaseManagerInterface, TableManagerInterface, QueryManagerInterface
 {

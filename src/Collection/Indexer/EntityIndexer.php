@@ -6,18 +6,21 @@ use Bdf\Prime\Mapper\Mapper;
 
 /**
  * Base implementation of EntityIndexer
+ *
+ * @template E as object
+ * @implements EntityIndexerInterface<E>
  */
 final class EntityIndexer implements EntityIndexerInterface
 {
     /**
-     * @var Mapper
+     * @var Mapper<E>
      */
     private $mapper;
 
     /**
      * All indexed entities
      *
-     * @var object[]
+     * @var E[]
      */
     private $entities = [];
 
@@ -25,7 +28,7 @@ final class EntityIndexer implements EntityIndexerInterface
      * Map of indexes
      * Indexes are indexed by the key name, and store entities in mode "group by combine"
      *
-     * @var object[][][]
+     * @var E[][][]
      */
     private $indexed = [];
 
@@ -33,8 +36,8 @@ final class EntityIndexer implements EntityIndexerInterface
     /**
      * EntityIndexer constructor.
      *
-     * @param Mapper $mapper The entity mapper. Used for extract attribute value
-     * @param string[] $indexes List of initial indexes keys to use. Entities will be indexed with theses keys when pushed
+     * @param Mapper<E> $mapper The entity mapper. Used for extract attribute value
+     * @param list<string> $indexes List of initial indexes keys to use. Entities will be indexed with theses keys when pushed
      */
     public function __construct(Mapper $mapper, $indexes = [])
     {
@@ -46,7 +49,7 @@ final class EntityIndexer implements EntityIndexerInterface
      * Push the entity to the indexer
      * Active indexes will be updated
      *
-     * @param object $entity Entity to add
+     * @param E $entity Entity to add
      *
      * @return void
      */
@@ -110,10 +113,12 @@ final class EntityIndexer implements EntityIndexerInterface
     /**
      * Create an indexer with list of entities
      *
-     * @param Mapper $mapper
-     * @param object[] $entities
+     * @param Mapper<T> $mapper
+     * @param T[] $entities
      *
-     * @return EntityIndexer
+     * @return EntityIndexer<T>
+     *
+     * @template T as object
      */
     public static function fromArray(Mapper $mapper, array $entities): self
     {

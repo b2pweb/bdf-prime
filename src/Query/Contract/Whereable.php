@@ -9,7 +9,6 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
  */
 interface Whereable
 {
-
     /**
      * Specifies one or more restrictions to the query result.
      * Replaces any previously specified restrictions, if any.
@@ -30,9 +29,9 @@ interface Whereable
      *         })
      * </code>
      *
-     * @param  string|array $column The restriction predicates.
-     * @param  string $operator
-     * @param  mixed $value
+     * @param string|array<string,mixed>|callable(static):void $column The restriction predicates.
+     * @param string|mixed|null $operator The comparison operator, or the value is you want to use "=" operator
+     * @param mixed $value
      *
      * @return $this This Query instance.
      */
@@ -50,9 +49,9 @@ interface Whereable
      *         ->orWhere('u.id = 2');
      * </code>
      *
-     * @param  string|array $column The restriction predicates.
-     * @param  string $operator
-     * @param  mixed $value
+     * @param string|array<string,mixed>|callable(static):void $column The restriction predicates.
+     * @param string|mixed|null $operator The comparison operator, or the value is you want to use "=" operator
+     * @param mixed $value
      *
      * @return $this This Query instance.
      *
@@ -68,7 +67,7 @@ interface Whereable
      *
      * @return $this This Query instance.
      */
-    public function whereNull($column, $type = CompositeExpression::TYPE_AND);
+    public function whereNull(string $column, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add where IS NOT NULL expression
@@ -78,7 +77,7 @@ interface Whereable
      *
      * @return $this This Query instance.
      */
-    public function whereNotNull($column, $type = CompositeExpression::TYPE_AND);
+    public function whereNotNull(string $column, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add OR where IS NULL expression
@@ -87,7 +86,7 @@ interface Whereable
      *
      * @return $this This Query instance.
      */
-    public function orWhereNull($column);
+    public function orWhereNull(string $column);
 
     /**
      * Add OR where IS NOT NULL expression
@@ -96,22 +95,22 @@ interface Whereable
      *
      * @return $this This Query instance.
      */
-    public function orWhereNotNull($column);
+    public function orWhereNotNull(string $column);
 
     /**
      * Add where SQL expression
      *
-     * @param string $raw
+     * @param string|\Bdf\Prime\Query\QueryInterface|\Bdf\Prime\Query\Expression\ExpressionInterface $raw
      * @param string $type
      *
      * @return $this This Query instance.
      */
-    public function whereRaw($raw, $type = CompositeExpression::TYPE_AND);
+    public function whereRaw($raw, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add OR where SQL expression
      *
-     * @param string $raw
+     * @param string|\Bdf\Prime\Query\QueryInterface|\Bdf\Prime\Query\Expression\ExpressionInterface $raw
      *
      * @return $this This Query instance.
      */
@@ -127,11 +126,10 @@ interface Whereable
      *         })
      * </code>
      *
-     * @param \Closure $callback
+     * @param callable(static):void $callback
      * @param string $type
      *
      * @return $this This Query instance.
      */
-    public function nested(\Closure $callback, $type = CompositeExpression::TYPE_AND);
-
+    public function nested(callable $callback, string $type = CompositeExpression::TYPE_AND);
 }

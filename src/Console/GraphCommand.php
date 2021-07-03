@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Console;
 
 use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Schema\Resolver;
 use Bdf\Prime\Schema\Transformer\Doctrine\TableTransformer;
 use Bdf\Prime\Schema\Visitor\Graphviz;
 use Bdf\Prime\ServiceLocator;
@@ -100,6 +101,7 @@ class GraphCommand extends Command
             }
 
             $mapper = $this->locator->mappers()->createMapper($this->locator, $className);
+            /** @var Resolver $schemaManager */
             $schemaManager = $mapper->repository()->schema(true);
             $platform = $mapper->repository()->connection()->platform();
 

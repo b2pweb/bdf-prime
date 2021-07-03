@@ -12,7 +12,7 @@ class CollectionFactory
     /**
      * Alias of known collection class
      *
-     * @var array
+     * @var array<string, class-string<CollectionInterface>|callable(array):CollectionInterface>
      */
     private $aliases = [
         'array' => ArrayCollection::class,
@@ -21,7 +21,7 @@ class CollectionFactory
     /**
      * List of collection factories, indexed by the class name
      *
-     * @var callable[]
+     * @var array<class-string<CollectionInterface>, callable(array):CollectionInterface>
      */
     private $factories = [];
 
@@ -51,16 +51,17 @@ class CollectionFactory
      * </code></pre>
      *
      * @param string $wrapperAlias The wrapper alias name
-     * @param string|callable $wrapperClass The wrapper class, or callable for instantiate the wrapper
-     * @param callable $factory The wrapper factory. If null use the constructor
+     * @param class-string<CollectionInterface>|callable(array):CollectionInterface $wrapperClass The wrapper class, or callable for instantiate the wrapper
+     * @param callable(array):CollectionInterface|null $factory The wrapper factory. If null use the constructor
      *
      * @return void
      */
-    public function registerWrapperAlias($wrapperAlias, $wrapperClass, callable $factory = null)
+    public function registerWrapperAlias(string $wrapperAlias, $wrapperClass, ?callable $factory = null)
     {
         $this->aliases[$wrapperAlias] = $wrapperClass;
 
         if ($factory) {
+            /** @var class-string<CollectionInterface> $wrapperClass */
             $this->factories[$wrapperClass] = $factory;
         }
     }
@@ -68,10 +69,12 @@ class CollectionFactory
     /**
      * Wrap data with a wrapper class
      *
-     * @param array $data
-     * @param string $wrapper
+     * @param T[] $data
+     * @param string|callable $wrapper
      *
-     * @return CollectionInterface
+     * @return CollectionInterface<T>
+     *
+     * @template T
      */
     public function wrap(array $data, $wrapper = 'array')
     {
@@ -95,9 +98,9 @@ class CollectionFactory
      *
      * @param string $wrapper
      *
-     * @return string
+     * @return class-string
      */
-    public function wrapperClass($wrapper)
+    public function wrapperClass(string $wrapper): string
     {
         if (isset($this->aliases[$wrapper])) {
             $wrapper = $this->aliases[$wrapper];
@@ -117,7 +120,7 @@ class CollectionFactory
      *
      * @return static
      */
-    public static function forRepository(RepositoryInterface $repository)
+    public static function forRepository(RepositoryInterface $repository): self
     {
         $factory = new static();
         $factory->registerWrapperAlias('collection', EntityCollection::class, [$repository, 'collection']);
@@ -132,7 +135,7 @@ class CollectionFactory
      *
      * @return static
      */
-    public static function forDbal()
+    public static function forDbal(): self
     {
         static $instance;
 
@@ -148,7 +151,7 @@ class CollectionFactory
      *
      * @return string[]
      */
-    public static function collections()
+    public static function collections(): array
     {
         return [ArrayCollection::class, EntityCollection::class];
     }

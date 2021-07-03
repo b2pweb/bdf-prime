@@ -69,7 +69,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     private $scale;
 
     /**
-     * @var string[]
+     * @var IndexInterface::TYPE_*[]
      */
     private $indexes = [];
 

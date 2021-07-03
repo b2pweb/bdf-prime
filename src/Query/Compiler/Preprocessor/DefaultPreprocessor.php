@@ -45,7 +45,7 @@ class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function field($attribute, &$type = null)
+    public function field(string $attribute, &$type = null): string
     {
         if ($type === true) {
             $type = null;
@@ -73,7 +73,7 @@ class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function root()
+    public function root(): ?string
     {
         return null;
     }

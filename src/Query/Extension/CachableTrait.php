@@ -12,7 +12,7 @@ use Bdf\Prime\Query\Contract\Cachable;
  *
  * @see Cachable
  *
- * @property ConnectionInterface $connection
+ * @psalm-require-implements Cachable
  *
  * @todo Cache statement instead of assoc array result ?
  */
@@ -30,14 +30,18 @@ trait CachableTrait
 
 
     /**
+     * {@inheritdoc}
+     *
      * @see Cachable::cache()
      */
-    public function cache()
+    public function cache(): ?CacheInterface
     {
         return $this->cache;
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Cachable::useCache()
      */
     public function useCache(int $lifetime = 0, ?string $key = null)
@@ -62,6 +66,8 @@ trait CachableTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Cachable::setCache()
      */
     public function setCache(CacheInterface $cache = null)
@@ -72,6 +78,8 @@ trait CachableTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Cachable::setCacheLifetime()
      */
     public function setCacheLifetime(int $lifetime)
@@ -86,6 +94,8 @@ trait CachableTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Cachable::setCacheKey()
      */
     public function setCacheKey(?string $cacheKey)
@@ -100,6 +110,8 @@ trait CachableTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Cachable::setCacheNamespace()
      */
     public function setCacheNamespace(string $namespace)
@@ -114,6 +126,8 @@ trait CachableTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Cachable::getCacheKey()
      */
     public function getCacheKey(): ?CacheKey
@@ -132,6 +146,7 @@ trait CachableTrait
         $key = $this->cacheKey;
 
         if (!$this->cache || !$key || !$key->valid()) {
+            /** @psalm-suppress InvalidArgument */
             return $this->connection->execute($this)->all();
         }
 
@@ -141,6 +156,7 @@ trait CachableTrait
             return $data;
         }
 
+        /** @psalm-suppress InvalidArgument */
         $data = $this->connection->execute($this)->all();
 
         $this->cache->set($key, $data);
@@ -164,7 +180,7 @@ trait CachableTrait
      *
      * @return string
      */
-    protected function cacheKey()
+    protected function cacheKey(): ?string
     {
         return null;
     }
@@ -175,7 +191,7 @@ trait CachableTrait
      *
      * @return string
      */
-    protected function cacheNamespace()
+    protected function cacheNamespace(): string
     {
         $ns = $this->connection->getName().':';
 

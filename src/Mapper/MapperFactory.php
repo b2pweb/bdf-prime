@@ -46,11 +46,12 @@ class MapperFactory
      * Get associated entity mapper
      *
      * @param ServiceLocator $serviceLocator
-     * @param string $entityClass
+     * @param class-string<E> $entityClass
      *
-     * @return Mapper
+     * @return Mapper<E>|null
+     * @template E as object
      */
-    public function build(ServiceLocator $serviceLocator, $entityClass)
+    public function build(ServiceLocator $serviceLocator, $entityClass): ?Mapper
     {
         return $this->createMapper($serviceLocator, $this->nameResolver->resolve($entityClass), $entityClass);
     }
@@ -59,17 +60,18 @@ class MapperFactory
      * Get mapper object
      *
      * @param ServiceLocator $serviceLocator
-     * @param string $mapperClass
-     * @param string $entityClass
+     * @param class-string<Mapper> $mapperClass
+     * @param class-string<E>|null $entityClass
      *
-     * @return Mapper
+     * @return Mapper<E>|null
+     * @template E as object
      */
-    public function createMapper(ServiceLocator $serviceLocator, $mapperClass, $entityClass = null)
+    public function createMapper(ServiceLocator $serviceLocator, $mapperClass, $entityClass = null): ?Mapper
     {
         if (!$this->isMapper($mapperClass)) {
             return null;
         }
-        
+
         if ($entityClass === null) {
             $entityClass = $this->nameResolver->reverse($mapperClass);
         }
@@ -106,6 +108,7 @@ class MapperFactory
      * @param string $className
      *
      * @return bool
+     * @psalm-assert-if-true class-string<Mapper> $className
      */
     public function isMapper($className)
     {

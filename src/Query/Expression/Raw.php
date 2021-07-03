@@ -2,6 +2,9 @@
 
 namespace Bdf\Prime\Query\Expression;
 
+use Bdf\Prime\Query\CompilableClause;
+use Bdf\Prime\Query\Compiler\CompilerInterface;
+
 /**
  * SQL Expression
  * 
@@ -39,7 +42,7 @@ class Raw implements ExpressionInterface
     /**
      * {@inheritdoc}
      */
-    public function build($query, $compiler)
+    public function build(CompilableClause $query, CompilerInterface $compiler)
     {
         return $this->__toString();
     }

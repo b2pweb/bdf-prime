@@ -38,11 +38,11 @@ interface QueryManagerInterface
      *
      * To perform operations, you should use @see SchemaManagerInterface::flush()
      *
-     * @param Closure|null $operations Operations to perform, or null for create a buffered SchemaManager
+     * @param callable(static):void|null $operations Operations to perform, or null for create a buffered SchemaManager
      *
      * @return static The simulated new SchemaManager
      */
-    public function simulate(Closure $operations = null);
+    public function simulate(callable $operations = null);
 
     /**
      * Do operations into a transaction.
@@ -55,14 +55,15 @@ interface QueryManagerInterface
      * });
      * </code>
      *
-     * @param Closure $operations
+     * @param callable(static):void $operations
      *
      * @return $this
      *
      * @throws PrimeException When transaction fail
      * @throws Exception Rethrow $operations exception
+     * @throws \BadMethodCallException When the connection do not supports transations
      */
-    public function transaction(Closure $operations);
+    public function transaction(callable $operations);
 
     /**
      * Check if the SchemaManager use a buffer

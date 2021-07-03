@@ -88,7 +88,7 @@ class TypesRegistry implements TypesRegistryInterface
      * @param string $class
      * @param string $name
      *
-     * @return FacadeTypeInterface
+     * @return TypeInterface
      */
     protected function instantiate($class, $name)
     {

@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Behaviors;
 
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
 
@@ -14,7 +15,8 @@ use Bdf\Prime\Types\TypeInterface;
  * It simply inserts the current user id into the fields created_by and updated_by.
  * That way every time a model gets created, updated or deleted, you can see who did it (or who blame for that).
  *
- * @package Bdf\Prime\Behaviors
+ * @template E as object
+ * @extends Behavior<E>
  */
 class Blameable extends Behavior
 {
@@ -81,11 +83,12 @@ class Blameable extends Behavior
     /**
      * Get the field infos from option
      *
-     * @param mixed $field
+     * @param bool|string|array{0:string,1:string} $field
+     * @param array $default
      *
      * @return null|array
      */
-    private function getFieldInfos($field, $default)
+    private function getFieldInfos($field, array $default): ?array
     {
         if ($field === true) {
             return $default;
@@ -108,7 +111,7 @@ class Blameable extends Behavior
     /**
      * {@inheritdoc}
      */
-    public function changeSchema(FieldBuilder $builder)
+    public function changeSchema(FieldBuilder $builder): void
     {
         if ($this->createdBy !== null && !isset($builder[$this->createdBy['name']])) {
             $builder->add($this->createdBy['name'], $this->type)->nillable();
@@ -132,13 +135,13 @@ class Blameable extends Behavior
      *
      * we set the user that created the entity
      * 
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      */
-    public function beforeInsert($entity, $repository)
+    public function beforeInsert($entity, RepositoryInterface $repository)
     {
         $resolver = $this->userResolver;
-        $repository->hydrateOne($entity, $this->createdBy['name'], $resolver());
+        $repository->mapper()->hydrateOne($entity, $this->createdBy['name'], $resolver());
     }
 
     /**
@@ -146,9 +149,9 @@ class Blameable extends Behavior
      *
      * we set the user that updated the entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
-     * @param null|\ArrayObject      $attributes
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
+     * @param null|\ArrayObject $attributes
      */
     public function beforeUpdate($entity, $repository, $attributes)
     {
@@ -157,13 +160,13 @@ class Blameable extends Behavior
         }
 
         $resolver = $this->userResolver;
-        $repository->hydrateOne($entity, $this->updatedBy['name'], $resolver());
+        $repository->mapper()->hydrateOne($entity, $this->updatedBy['name'], $resolver());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function subscribe($notifier)
+    public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
     {
         if ($this->createdBy !== null) {
             $notifier->inserting([$this, 'beforeInsert']);

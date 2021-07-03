@@ -11,6 +11,8 @@ use Bdf\Prime\Types\TypeInterface;
  * Compiler for @see BulkInsertQuery
  *
  * The query will be compiled into a prepared statement
+ *
+ * @extends AbstractCompiler<BulkInsertQuery, \Doctrine\DBAL\Connection&\Bdf\Prime\Connection\ConnectionInterface>
  */
 class BulkInsertSqlCompiler extends AbstractCompiler
 {

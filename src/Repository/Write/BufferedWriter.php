@@ -6,6 +6,8 @@ use Bdf\Event\EventNotifier;
 use Bdf\Prime\Events;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
@@ -29,11 +31,14 @@ use Bdf\Prime\Repository\RepositoryInterface;
  *
  * Note 1: If there is pending operations, there were flushed by the object destructor
  * Note 2: Because operations will be performed later, the WriterInterface methods will always returns 1
+ *
+ * @template E as object
+ * @implements WriterInterface<E>
  */
 class BufferedWriter implements WriterInterface
 {
     /**
-     * @var RepositoryInterface|EventNotifier
+     * @var RepositoryInterface&RepositoryEventsSubscriberInterface
      */
     private $repository;
 
@@ -61,7 +66,7 @@ class BufferedWriter implements WriterInterface
     /**
      * BufferedWriter constructor.
      *
-     * @param EventNotifier|RepositoryInterface $repository The owner repository where operation should be performed
+     * @param RepositoryEventsSubscriberInterface&RepositoryInterface $repository The owner repository where operation should be performed
      * @param WriterInterface|null $writer The base writer. If not provided, will use the repository writer
      */
     public function __construct(RepositoryInterface $repository, ?WriterInterface $writer = null)
@@ -73,7 +78,7 @@ class BufferedWriter implements WriterInterface
     /**
      * {@inheritdoc}
      */
-    public function insert($entity, array $options = [])
+    public function insert($entity, array $options = []): int
     {
         $this->insert[] = [$entity, $options];
 
@@ -83,7 +88,7 @@ class BufferedWriter implements WriterInterface
     /**
      * {@inheritdoc}
      */
-    public function update($entity, array $options = [])
+    public function update($entity, array $options = []): int
     {
         $this->update[] = [$entity, $options];
 
@@ -93,7 +98,7 @@ class BufferedWriter implements WriterInterface
     /**
      * {@inheritdoc}
      */
-    public function delete($entity, array $options = [])
+    public function delete($entity, array $options = []): int
     {
         $this->delete[] = [$entity, $options];
 
@@ -105,7 +110,7 @@ class BufferedWriter implements WriterInterface
      *
      * @return int
      */
-    public function pending()
+    public function pending(): int
     {
         return count($this->insert) + count($this->update) + count($this->delete);
     }
@@ -117,7 +122,7 @@ class BufferedWriter implements WriterInterface
      * @throws PrimeException When pending query fail
      */
     #[WriteOperation]
-    public function flush()
+    public function flush(): int
     {
         try {
             return $this->flushInsert() + $this->flushUpdate() + $this->flushDelete();
@@ -129,7 +134,7 @@ class BufferedWriter implements WriterInterface
     /**
      * Clear pending operations
      */
-    public function clear()
+    public function clear(): void
     {
         $this->insert = [];
         $this->update = [];
@@ -172,6 +177,7 @@ class BufferedWriter implements WriterInterface
      */
     private function flushDelete()
     {
+        /** @var EntityRepository $this->repository */
         if (empty($this->delete)) {
             return 0;
         }

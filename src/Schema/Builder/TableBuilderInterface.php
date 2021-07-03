@@ -76,7 +76,7 @@ interface TableBuilderInterface
      * ;
      * </code>
      *
-     * @param string|string[] $columns The columns composed the index. If a string is passed, it will be transformed to an array with single column
+     * @param string|array<int,string>|array<string,array> $columns The columns composed the index. If a string is passed, it will be transformed to an array with single column
      * @param int $type The index type (one of the IndexInterface::TYPE_* constant)
      * @param string $name The index name. If not specified, it will be generated
      * @param array $options Options of the index

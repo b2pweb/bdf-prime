@@ -6,6 +6,7 @@ use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Query\ReadCommandInterface;
 
 /**
  * EntityRelation
@@ -14,29 +15,34 @@ use Bdf\Prime\Query\QueryInterface;
  * 
  * @package Bdf\Prime\Relations
  *
+ * @template E as object
+ * @template R as object
+ *
  * @api
+ * @mixin ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, E>
+ * @noinspection PhpHierarchyChecksInspection
  */
 class EntityRelation
 {
     /**
      * The entity owner of the relation
      *
-     * @var object
+     * @var E
      */
     protected $owner;
 
     /**
      * The relation
      *
-     * @var RelationInterface
+     * @var RelationInterface<E, R>
      */
     protected $relation;
 
     /**
      * EntityRelation constructor.
      *
-     * @param object                 $owner     The relation owner
-     * @param RelationInterface      $relation  The relation
+     * @param E $owner     The relation owner
+     * @param RelationInterface<E, R> $relation  The relation
      */
     public function __construct($owner, RelationInterface $relation)
     {
@@ -47,19 +53,38 @@ class EntityRelation
     /**
      * Associate an entity to the owner entity
      *
-     * @param object     $entity The related entity data
+     * This method will set the foreign key value on the owner entity and attach the entity
+     * If the relation is detached, only the foreign key will be updated
      *
-     * @return object    Returns the owner entity instance
+     * Note: This method will not perform any write operation on database :
+     *       the related entity id must be generated before, and the owner must be updated manually
+     *
+     * <code>
+     * $entity->relation('foo')->associate($foo);
+     * $entity->getFoo() === $foo; // should be true
+     * </code>
+     *
+     * Only foreign key barrier can associate an entity
+     *
+     * @param R $entity The related entity data
+     *
+     * @return E Returns the owner entity instance
      */
     public function associate($entity)
     {
         return $this->relation->associate($this->owner, $entity);
     }
-    
+
     /**
      * Remove the relation from owner entity
+     * This is the reverse operation of associate : will detach the related entity and set the foreign key to null
      *
-     * @return object  Returns the owner entity instance
+     * Note: This method will not perform any write operation on database :
+     *       the related entity id must be generated before, and the owner must be updated manually
+     *
+     * Only foreign key barrier can dissociate an entity
+     *
+     * @return E Returns the owner entity instance
      */
     public function dissociate()
     {
@@ -68,10 +93,21 @@ class EntityRelation
 
     /**
      * Add a relation entity on the given entity owner
+     * This method will not attach the created entity to the owner
      *
-     * @param array $data   The related entity data
+     * Note: This method will not perform any write operation on database, it will only instantiate the entity
      *
-     * @return object       Returns the related entity instance
+     * <code>
+     * $foo = $entity->relation('foo')->create(['foo' => 'bar']);
+     * $foo->getOwnerId() === $entity->id(); // Should be true
+     * $foo->getFoo() === 'bar'; // Should be true
+     * </code>
+     *
+     * Only non foreign key barrier can create an entity
+     *
+     * @param array $data The related entity data
+     *
+     * @return R Returns the related entity instance
      */
     public function create(array $data = [])
     {
@@ -80,64 +116,83 @@ class EntityRelation
 
     /**
      * Add a relation entity on the given entity owner
+     * This method will set the foreign key value on the related entity but not attach the related entity to the owner
      *
-     * @param object $related
+     * Only non foreign key barrier can add an entity
+     *
+     * <code>
+     * $entity->relation('foo')->($entity, $foo);
+     * $foo->getOwnerId() === $entity->id(); // Should be true
+     * </code>
+     *
+     * @param R $related
      *
      * @return int
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function add($related)
+    public function add($related): int
     {
         return $this->relation->add($this->owner, $related);
     }
 
     /**
      * Check whether the owner has a distant entity relation
+     * Note: only works with BelongsToMany relation
      *
-     * @param string|object  $related
+     * @param string|R $related
      *
      * @return boolean
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function has($related)
+    public function has($related): bool
     {
+        /** @var BelongsToMany $this->relation */
         return $this->relation->has($this->owner, $related);
     }
 
     /**
      * Attach a distant entity to an entity
+     * Note: only works with BelongsToMany relation
      *
-     * @param string|array|object   $related
+     * @param string|R[]|R $related
      *
      * @return int
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function attach($related)
+    public function attach($related): int
     {
+        /** @var BelongsToMany<E, R> $this->relation */
         return $this->relation->attach($this->owner, $related);
     }
 
     /**
      * Detach a distant entity of an entity
+     * Note: only works with BelongsToMany relation
      *
-     * @param string|array|object   $related
+     * @param string|R[]|R $related
      *
      * @return int
      */
-    public function detach($related)
+    public function detach($related): int
     {
+        /** @var BelongsToMany<E, R> $this->relation */
         return $this->relation->detach($this->owner, $related);
     }
 
     /**
      * Gets the relation query builder
+     * Note: You can use magic __call method to call query methods directly
      *
-     * @return QueryInterface
+     * <code>
+     * $entity->relation('foo')->where(['foo' => 'bar'])->get();
+     * </code>
+     *
+     * @return ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>
      */
-    public function query()
+    public function query(): ReadCommandInterface
     {
         return $this->relation->link($this->owner);
     }
@@ -145,13 +200,15 @@ class EntityRelation
     /**
      * Save the relation from an entity
      *
-     * @param string|array $relations
+     * Note: This method can only works with attached entities
      *
-     * @return int
-     * @throws PrimeException
+     * @param string|array $relations sub-relation names to save
+     *
+     * @return int Number of updated / inserted entities
+     * @throws PrimeException When cannot save entity
      */
     #[WriteOperation]
-    public function saveAll($relations = [])
+    public function saveAll($relations = []): int
     {
         return $this->relation->saveAll($this->owner, (array)$relations);
     }
@@ -159,13 +216,15 @@ class EntityRelation
     /**
      * Remove the relation from an entity
      *
-     * @param string|array $relations
+     * Note: This method can only works
      *
-     * @return int
-     * @throws PrimeException
+     * @param array $relations sub-relation names to delete
+     *
+     * @return int Number of deleted entities
+     * @throws PrimeException When cannot delete entity
      */
     #[WriteOperation]
-    public function deleteAll($relations = [])
+    public function deleteAll($relations = []): int
     {
         return $this->relation->deleteAll($this->owner, (array)$relations);
     }
@@ -175,7 +234,7 @@ class EntityRelation
      *
      * @return bool
      */
-    public function isLoaded()
+    public function isLoaded(): bool
     {
         return $this->relation->isLoaded($this->owner);
     }
@@ -184,11 +243,11 @@ class EntityRelation
      * Redirect every call to the relation query Builder
      *
      * @param string $name
-     * @param array  $arguments
+     * @param array $arguments
      *
-     * @return QueryInterface
+     * @return mixed
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, array $arguments)
     {
         return $this->query()->$name(...$arguments);
     }

@@ -6,6 +6,7 @@ use Bdf\Event\EventNotifier;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Prime;
+use Bdf\Prime\Repository\EntityRepository;
 
 /**
  * TestPack
@@ -21,14 +22,14 @@ class TestPack
     /**
      * Singleton
      *
-     * @var static
+     * @var static|null
      */
     protected static $pack;
 
     /**
      * Test data by group
      *
-     * @var array
+     * @var array{persistent:object[], non-persistent: object[]}
      */
     protected $testPacks = [
         'persistent'        => [],  // Entités créées non modifiables
@@ -41,12 +42,12 @@ class TestPack
     private $initialized = false;
 
     /**
-     * @var array
+     * @var class-string[]
      */
     private $entityClasses = [];
 
     /**
-     * @var object[]
+     * @var array<string, object>
      */
     private $entities = [];
 
@@ -69,8 +70,6 @@ class TestPack
      * Check whether the pack is initialized
      *
      * @return bool Return true if testPack is initialized
-     *
-     * @return bool
      */
     public function isInitialized()
     {
@@ -104,6 +103,7 @@ class TestPack
      * @param object|array $entities
      *
      * @return $this
+     * @psalm-assert true $this->initialized
      */
     public function nonPersist($entities)
     {
@@ -117,7 +117,7 @@ class TestPack
     /**
      * Store entities
      *
-     * @param object|array $entities
+     * @param object|object[] $entities
      *
      * @return $this
      */
@@ -148,7 +148,7 @@ class TestPack
     /**
      * Declare a entity class for schema managing
      *
-     * @param string|array $entityClasses
+     * @param class-string|list<class-string> $entityClasses
      *
      * @return self
      */
@@ -176,6 +176,7 @@ class TestPack
      * Initialize schema and data
      *
      * @return self
+     * @psalm-assert true $this->initialized
      */
     public function initialize()
     {
@@ -199,7 +200,7 @@ class TestPack
     /**
      * Create schema
      *
-     * @param array $entityClasses
+     * @param list<class-string> $entityClasses
      *
      * @return $this
      */
@@ -287,7 +288,7 @@ class TestPack
      *
      * @param string $name        The entity alias name
      *
-     * @return object
+     * @return object|null
      */
     public function get($name)
     {
@@ -305,6 +306,7 @@ class TestPack
      */
     public function pushEntity($entity)
     {
+        /** @var EntityRepository $repository */
         $repository = Prime::repository($entity);
         $mapper = $repository->mapper();
 
@@ -325,6 +327,7 @@ class TestPack
      */
     public function deleteEntity($entity)
     {
+        /** @var EntityRepository $repository */
         $repository = Prime::repository($entity);
         $mapper = $repository->mapper();
 
@@ -372,10 +375,11 @@ class TestPack
     /**
      * Get Prime connections
      *
-     * @return ConnectionInterface[]
+     * @return SimpleConnection[]
      */
     private function getActiveConnections()
     {
+        /** @var SimpleConnection[] */
         return Prime::service()->connections()->connections();
     }
 }

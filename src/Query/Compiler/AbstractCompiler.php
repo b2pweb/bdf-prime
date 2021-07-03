@@ -16,13 +16,18 @@ use Bdf\Prime\Query\CompilableClause;
  * - For compile projection (SELECT columns), use preprocessor->root() for select all columns
  * - preprocessor->table() for register new tables / relations (FROM & JOIN)
  * - Use preprocessor->expression() for compile filter (WHERE, ON, HAVING) expression
+ *
+ * @template Q as CompilableClause&\Bdf\Prime\Query\Contract\Compilable
+ * @template C as ConnectionInterface
+ *
+ * @implements CompilerInterface<Q>
  */
 abstract class AbstractCompiler implements CompilerInterface
 {
     /**
      * The connection platform
      *
-     * @var ConnectionInterface
+     * @var C
      */
     protected $connection;
 
@@ -30,7 +35,7 @@ abstract class AbstractCompiler implements CompilerInterface
     /**
      * AbstractCompiler constructor.
      *
-     * @param ConnectionInterface $connection
+     * @param C $connection
      */
     public function __construct(ConnectionInterface $connection)
     {
@@ -152,7 +157,7 @@ abstract class AbstractCompiler implements CompilerInterface
     /**
      * Compile an insert query
      *
-     * @param CompilableClause $query
+     * @param Q $query
      *
      * @return mixed
      * @throws PrimeException
@@ -162,7 +167,7 @@ abstract class AbstractCompiler implements CompilerInterface
     /**
      * Compile an update query
      *
-     * @param CompilableClause $query
+     * @param Q $query
      *
      * @return mixed
      * @throws PrimeException
@@ -172,7 +177,7 @@ abstract class AbstractCompiler implements CompilerInterface
     /**
      * Compile a delete query
      *
-     * @param CompilableClause $query
+     * @param Q $query
      *
      * @return mixed
      * @throws PrimeException
@@ -182,7 +187,7 @@ abstract class AbstractCompiler implements CompilerInterface
     /**
      * Compile a select query
      *
-     * @param CompilableClause $query
+     * @param Q $query
      *
      * @return mixed
      * @throws PrimeException

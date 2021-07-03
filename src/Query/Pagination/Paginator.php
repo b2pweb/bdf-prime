@@ -4,16 +4,29 @@ namespace Bdf\Prime\Query\Pagination;
 
 use Bdf\Prime\Collection\ArrayCollection;
 use Bdf\Prime\Collection\CollectionInterface;
+use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Query\Contract\Limitable;
+use Bdf\Prime\Query\Contract\Orderable;
+use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
+use IteratorAggregate;
 
 /**
  * Query Paginator
  * 
  * @author  Seb
  * @package Bdf\Prime\Query\Pagination
+ *
+ * @template R as array|object
+ *
+ * @implements PaginatorInterface<R>
+ * @implements IteratorAggregate<array-key, R>
+ * @extends AbstractPaginator<R>
+ *
+ * @property CollectionInterface<R> $collection protected
  */
-class Paginator extends AbstractPaginator implements \IteratorAggregate, PaginatorInterface
+class Paginator extends AbstractPaginator implements IteratorAggregate, PaginatorInterface
 {
     const DEFAULT_PAGE  = 1;
     const DEFAULT_LIMIT = 20;
@@ -21,7 +34,7 @@ class Paginator extends AbstractPaginator implements \IteratorAggregate, Paginat
     /**
      * Create a query paginator
      *
-     * @param ReadCommandInterface $query
+     * @param ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable $query
      * @param int $maxRows
      * @param int $page
      *
@@ -53,7 +66,7 @@ class Paginator extends AbstractPaginator implements \IteratorAggregate, Paginat
      *
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): CollectionInterface
     {
         return $this->collection;
     }

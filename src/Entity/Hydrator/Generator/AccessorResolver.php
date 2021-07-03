@@ -49,7 +49,7 @@ class AccessorResolver
      *
      * @return ClassAccessor
      */
-    public function get($className)
+    public function get(string $className): ClassAccessor
     {
         if ($className === $this->baseAccessor->className()) {
             return $this->baseAccessor;

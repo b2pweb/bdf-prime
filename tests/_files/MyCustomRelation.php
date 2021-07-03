@@ -6,6 +6,7 @@ use Bdf\Prime\Collection\Indexer\EntityIndexerInterface;
 use Bdf\Prime\Query\Expression\Attribute;
 use Bdf\Prime\Query\JoinClause;
 use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Relations\Util\EntityKeys;
 use Bdf\Prime\Relations\Util\SimpleTableJoinRelation;
 use Bdf\Prime\Repository\RepositoryInterface;
@@ -55,7 +56,7 @@ class MyCustomRelation extends AbstractRelation implements CustomRelationInterfa
     /**
      * {@inheritdoc}
      */
-    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = [])
+    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
     {
         if (empty($collection)) {
             return;
@@ -167,7 +168,7 @@ class MyCustomRelation extends AbstractRelation implements CustomRelationInterfa
     /**
      * {@inheritdoc}
      */
-    protected function applyWhereKeys(QueryInterface $query, $value)
+    protected function applyWhereKeys(ReadCommandInterface $query, $value): ReadCommandInterface
     {
         if (!is_array($value)) {
             $query->where(array_combine($this->distantKeys, $value->toArray()));
@@ -183,7 +184,7 @@ class MyCustomRelation extends AbstractRelation implements CustomRelationInterfa
     /**
      * {@inheritdoc}
      */
-    public static function make(RepositoryInterface $repository, $relationName, array $relationMeta)
+    public static function make(RepositoryInterface $repository, string $relationName, array $relationMeta): RelationInterface
     {
         return new MyCustomRelation(
             $relationName,

@@ -228,19 +228,22 @@ class Migration implements MigrationInterface
      *
      * @param string|null $connectionName
      *
-     * @return ConnectionInterface
+     * @return ConnectionInterface&\Doctrine\DBAL\Connection
      */
     public function connection($connectionName = null)
     {
+        /** @var ConnectionInterface&\Doctrine\DBAL\Connection */
         return $this->prime()->connection($connectionName);
     }
 
     /**
      * Get entity repository
      *
-     * @param string|object $entity
+     * @param class-string<E>|E $entity
      *
-     * @return RepositoryInterface
+     * @return RepositoryInterface<E>
+     *
+     * @template E as object
      */
     public function repository($entity)
     {

@@ -23,7 +23,7 @@ abstract class VersionableMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function getEntityClass()
+    public function getEntityClass(): string
     {
         return $this->getVersionedClass();
     }

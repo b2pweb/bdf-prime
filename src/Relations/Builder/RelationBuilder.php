@@ -2,22 +2,44 @@
 
 namespace Bdf\Prime\Relations\Builder;
 
+use ArrayAccess;
 use Bdf\Prime\Relations\Relation;
 use Bdf\Prime\Relations\RelationInterface;
+use IteratorAggregate;
 
 /**
  * RelationBuilder
  *
- * @package Bdf\Prime\Relations\Builder
+ * @psalm-type RelationDefinition = array{
+ *     type: string,
+ *     localKey: string,
+ *     entity?: class-string,
+ *     distantKey?: string,
+ *     through?: class-string,
+ *     throughLocal?: string,
+ *     throughDistant?: string,
+ *     relationClass?: class-string<RelationInterface>,
+ *     discriminator?: string,
+ *     discriminatorValue?: string,
+ *     map?: string[],
+ *     mode?: string,
+ *     constraints?: array|callable,
+ *     detached?: bool,
+ *     saveStrategy?: int,
+ *     wrapper?: string|callable
+ * }
+ *
+ * @implements ArrayAccess<string, RelationDefinition>
+ * @implements IteratorAggregate<string, RelationDefinition>
  */
-class RelationBuilder implements \ArrayAccess, \IteratorAggregate
+class RelationBuilder implements ArrayAccess, IteratorAggregate
 {
     const MODE_EAGER = "EAGER";
 
     /**
      * Array of relations definition
      *
-     * @var array
+     * @var array<string, RelationDefinition>
      */
     protected $relations = [];
 
@@ -32,7 +54,7 @@ class RelationBuilder implements \ArrayAccess, \IteratorAggregate
     /**
      * Get all defined relations
      *
-     * @return array
+     * @return array<string, RelationDefinition>
      */
     public function relations()
     {
@@ -62,8 +84,8 @@ class RelationBuilder implements \ArrayAccess, \IteratorAggregate
      * $builder->on('customer')->belongsTo('Customer::id', 'customer.id');
      * </code>
      * 
-     * @param string $entity        Class of the foreign entity
-     * @param string $key           Owner's property name for the foreign key
+     * @param string $entity Class of the foreign entity
+     * @param string $key Owner's property name for the foreign key
      *
      * @return $this
      */
@@ -87,7 +109,6 @@ class RelationBuilder implements \ArrayAccess, \IteratorAggregate
      * </code>
      * 
      * @param string $entity        Class of the foreign entity
-     * @param string $foreignKey    Foreign entity's property name
      * @param string $key           Owner's property name for the foreign key
      *
      * @return $this
@@ -111,9 +132,8 @@ class RelationBuilder implements \ArrayAccess, \IteratorAggregate
      * $builder->on('documents')->hasMany('Document::distantId', 'localId');
      * </code>
      * 
-     * @param string $entity        Class of the foreign entity
-     * @param string $foreignKey    Foreign entity's property name
-     * @param string $key           Owner's property name for the foreign key
+     * @param string $entity Class of the foreign entity
+     * @param string $key Owner's property name for the foreign key
      *
      * @return $this
      */
@@ -138,9 +158,8 @@ class RelationBuilder implements \ArrayAccess, \IteratorAggregate
      * $builder->on('packs')->belongsToMany('Pack::id', 'localId');
      * </code>
      * 
-     * @param string $entity                Class of the foreign entity
-     * @param string $foreignKey            Foreign entity's property name
-     * @param string $key                   Owner's property name for the foreign key
+     * @param string $entity Class of the foreign entity
+     * @param string $key Owner's property name for the foreign key
      *
      * @return $this
      */
@@ -186,9 +205,9 @@ class RelationBuilder implements \ArrayAccess, \IteratorAggregate
      * ]);
      * </code>
      *
-     * @param string $key               Owner's property name for the foreign key
-     * @param string $discriminator     Polymorphism discriminator
-     * @param array  $map               The polymorphism map. Contains entity and foreignKey
+     * @param string $key Owner's property name for the foreign key
+     * @param string $discriminator Polymorphism discriminator
+     * @param string[] $map The polymorphism map. Contains entity and foreignKey
      *
      * @return $this
      */
@@ -354,7 +373,7 @@ class RelationBuilder implements \ArrayAccess, \IteratorAggregate
      * Only for belongs to relation
      *
      * @param string $discriminator     Polymorphism discriminator
-     * @param array  $map               The polymorphism map. COntains entity and foreignKey
+     * @param array  $map               The polymorphism map. Contains entity and foreignKey
      *
      * @return $this
      */

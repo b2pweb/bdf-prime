@@ -35,7 +35,7 @@ interface TypesHelperInterface
     public function text($name, $default = null);
 
     /**
-     * Add an integer field
+     * Add an integer (4 bytes) field
      *
      * @param string $name The property name
      * @param int $default The default value for repository
@@ -45,7 +45,7 @@ interface TypesHelperInterface
     public function integer($name, $default = null);
 
     /**
-     * Add an bigint field
+     * Add an bigint (8 bytes) field
      *
      * @param string $name The property name
      * @param string $default The default value for repository
@@ -55,7 +55,7 @@ interface TypesHelperInterface
     public function bigint($name, $default = null);
 
     /**
-     * Add a smallint field
+     * Add a smallint (2 bytes) field
      *
      * @param string $name The property name
      * @param int $default The default value for repository
@@ -65,7 +65,7 @@ interface TypesHelperInterface
     public function smallint($name, $default = null);
 
     /**
-     * Add a tinyint field
+     * Add a tinyint (1 byte) field
      *
      * @param string $name The property name
      * @param int $default The default value for repository

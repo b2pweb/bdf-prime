@@ -16,7 +16,7 @@ class DbVersionRepository implements VersionRepositoryInterface
     /**
      * The db connection
      *
-     * @var ConnectionInterface
+     * @var ConnectionInterface&\Doctrine\DBAL\Connection
      */
     private $connection;
 
@@ -48,8 +48,8 @@ class DbVersionRepository implements VersionRepositoryInterface
     /**
      * Constructor
      *
-     * @param ConnectionInterface $connection
-     * @param string              $tableName
+     * @param ConnectionInterface&\Doctrine\DBAL\Connection $connection
+     * @param string $tableName
      */
     public function __construct(ConnectionInterface $connection, string $tableName)
     {
@@ -60,7 +60,7 @@ class DbVersionRepository implements VersionRepositoryInterface
     /**
      * Get the connection
      * 
-     * @return ConnectionInterface
+     * @return ConnectionInterface&\Doctrine\DBAL\Connection
      */
     public function getConnection(): ConnectionInterface
     {
@@ -114,6 +114,7 @@ class DbVersionRepository implements VersionRepositoryInterface
 
         $this->prepare();
 
+        /** @psalm-suppress UndefinedInterfaceMethod */
         return $this->cached = $this->connection->from($this->tableName)->order('version')->inRows('version');
     }
 

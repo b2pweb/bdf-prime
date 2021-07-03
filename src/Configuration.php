@@ -8,6 +8,8 @@ use Doctrine\DBAL\Configuration as BaseConfiguration;
 
 /**
  * Configuration
+ *
+ * @psalm-suppress InternalClass
  */
 class Configuration extends BaseConfiguration
 {
@@ -18,11 +20,13 @@ class Configuration extends BaseConfiguration
      */
     public function __construct(array $options = [])
     {
+        /** @psalm-suppress InternalProperty */
         $this->_attributes = $options;
 
         if (isset($options['logger'])) {
             $this->_attributes['sqlLogger'] = $options['logger'];
 
+            /** @psalm-suppress InternalProperty */
             unset($this->_attributes['logger']);
         }
     }
@@ -31,9 +35,11 @@ class Configuration extends BaseConfiguration
      * Set common type registry
      *
      * @param TypesRegistryInterface $types
+     * @psalm-assert TypesRegistryInterface $this->_attributes['types']
      */
     public function setTypes(TypesRegistryInterface $types)
     {
+        /** @psalm-suppress InternalProperty */
         $this->_attributes['types'] = $types;
     }
 

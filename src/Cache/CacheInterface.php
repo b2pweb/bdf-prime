@@ -12,7 +12,7 @@ interface CacheInterface
      * 
      * @param CacheKey $key
      * 
-     * @return array
+     * @return array|null
      */
     public function get(CacheKey $key);
 

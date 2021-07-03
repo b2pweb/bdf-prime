@@ -8,7 +8,7 @@ namespace Bdf\Prime\Relations\Util;
 class EntityKeys
 {
     /**
-     * @var string[]
+     * @var list<string>
      */
     private $keys = [];
 
@@ -26,7 +26,7 @@ class EntityKeys
     /**
      * EntityKeys constructor.
      *
-     * @param string[] $keys The entity keys values. Must be an integer index array, not an associative one
+     * @param list<string> $keys The entity keys values. Must be an integer index array, not an associative one
      * @param mixed $entity The attached entity
      */
     public function __construct(array $keys, $entity = null)
@@ -40,7 +40,7 @@ class EntityKeys
      *
      * @param mixed $entity
      */
-    public function attach($entity)
+    public function attach($entity): void
     {
         $this->entity = $entity;
     }
@@ -60,19 +60,19 @@ class EntityKeys
      *
      * @return integer
      */
-    public function hash()
+    public function hash(): int
     {
         if ($this->hash !== null) {
             return $this->hash;
         }
 
-        $this->hash = 0;
+        $hash = 0;
 
         foreach ($this->keys as $pos => $key) {
-            $this->hash ^= ($pos + 1) * crc32($key);
+            $hash ^= ($pos + 1) * crc32($key);
         }
 
-        return $this->hash;
+        return $this->hash = (int) $hash;
     }
 
     /**
@@ -82,7 +82,7 @@ class EntityKeys
      *
      * @return bool
      */
-    public function equals(EntityKeys $other)
+    public function equals(EntityKeys $other): bool
     {
         return $this->keys == $other->keys;
     }
@@ -92,7 +92,7 @@ class EntityKeys
      *
      * @return string[]
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->keys;
     }

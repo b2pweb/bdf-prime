@@ -3,11 +3,15 @@
 namespace Bdf\Prime\Relations;
 
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
+use Bdf\Prime\Query\ReadCommandInterface;
 
 /**
  * HasOne
- * 
- * @package Bdf\Prime\Relations
+ *
+ * @template L as object
+ * @template R as object
+ *
+ * @extends OneOrMany<L, R>
  */
 class HasOne extends OneOrMany
 {
@@ -19,7 +23,7 @@ class HasOne extends OneOrMany
     /**
      * Store the relation query for optimisation purpose
      *
-     * @var KeyValueQuery
+     * @var KeyValueQuery<\Bdf\Prime\Connection\ConnectionInterface, R>|null
      */
     private $relationQuery;
 
@@ -27,7 +31,7 @@ class HasOne extends OneOrMany
     /**
      * {@inheritdoc}
      */
-    protected function getForeignInfos()
+    protected function getForeignInfos(): array
     {
         return [$this->distant, $this->distantKey];
     }
@@ -35,7 +39,7 @@ class HasOne extends OneOrMany
     /**
      * {@inheritdoc}
      */
-    protected function relationQuery($keys, $constraints)
+    protected function relationQuery($keys, $constraints): ReadCommandInterface
     {
         // Constraints can be on relation attributes : builder must be used
         // @todo Handle "bulk select"

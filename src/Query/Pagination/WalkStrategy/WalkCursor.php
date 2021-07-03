@@ -2,15 +2,17 @@
 
 namespace Bdf\Prime\Query\Pagination\WalkStrategy;
 
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
 
 /**
  * @internal
+ * @template R as array|object
  */
 final class WalkCursor
 {
     /**
-     * @var ReadCommandInterface
+     * @var ReadCommandInterface<ConnectionInterface, R>
      */
     public $query;
 
@@ -20,14 +22,14 @@ final class WalkCursor
     public $cursor = null;
 
     /**
-     * @var array|null
+     * @var R[]|null
      */
     public $entities;
 
     /**
      * WalkCursor constructor.
      *
-     * @param ReadCommandInterface $query
+     * @param ReadCommandInterface<ConnectionInterface, R> $query
      */
     public function __construct(ReadCommandInterface $query)
     {

@@ -7,6 +7,7 @@ use Bdf\Prime\Query\Contract\EntityJoinable;
 use Bdf\Prime\Query\Expression\Attribute;
 use Bdf\Prime\Query\JoinClause;
 use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Relations\Util\SimpleTableJoinRelation;
 use Bdf\Prime\Repository\RepositoryInterface;
 
@@ -58,7 +59,7 @@ class ForeignInRelation extends AbstractRelation implements CustomRelationInterf
     /**
      * {@inheritdoc}
      */
-    public function joinRepositories(EntityJoinable $query, $alias = null, $discriminator = null)
+    public function joinRepositories(EntityJoinable $query, string $alias, $discriminator = null): array
     {
         return [
             $alias => $this->relationRepository()
@@ -68,7 +69,7 @@ class ForeignInRelation extends AbstractRelation implements CustomRelationInterf
     /**
      * {@inheritdoc}
      */
-    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = [])
+    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
     {
         $entities = $this
             ->query($this->getLocalKeyValue($collection->all()), $constraints)
@@ -114,7 +115,7 @@ class ForeignInRelation extends AbstractRelation implements CustomRelationInterf
     /**
      * {@inheritdoc}
      */
-    protected function applyWhereKeys(QueryInterface $query, $value)
+    protected function applyWhereKeys(ReadCommandInterface $query, $value): ReadCommandInterface
     {
         if (is_array($value[0])) {
             $value = array_merge(...$value);
@@ -126,7 +127,7 @@ class ForeignInRelation extends AbstractRelation implements CustomRelationInterf
     /**
      * {@inheritdoc}
      */
-    public static function make(RepositoryInterface $repository, $relationName, array $relationMeta)
+    public static function make(RepositoryInterface $repository, string $relationName, array $relationMeta): RelationInterface
     {
         return new ForeignInRelation(
             $relationName,

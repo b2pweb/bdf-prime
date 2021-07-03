@@ -6,25 +6,28 @@ use Bdf\Prime\Mapper\Mapper;
 
 /**
  * Indexer for entities, but ensure that there is no duplicates
+ *
+ * @template E as object
+ * @implements EntityIndexerInterface<E>
  */
 final class EntitySetIndexer implements EntityIndexerInterface
 {
     /**
-     * @var Mapper
+     * @var Mapper<E>
      */
     private $mapper;
 
     /**
      * All entities, indexing by there object hash
      *
-     * @var object[]
+     * @var E[]
      */
     private $entities = [];
 
     /**
      * The inner indexer
      *
-     * @var EntityIndexer
+     * @var EntityIndexer<E>|null
      */
     private $indexer;
 
@@ -32,7 +35,7 @@ final class EntitySetIndexer implements EntityIndexerInterface
     /**
      * EntityIndexer constructor.
      *
-     * @param Mapper $mapper The entity mapper. Used for extract attribute value
+     * @param Mapper<E> $mapper The entity mapper. Used for extract attribute value
      */
     public function __construct(Mapper $mapper)
     {
@@ -43,7 +46,7 @@ final class EntitySetIndexer implements EntityIndexerInterface
      * Push the entity to the indexer
      * Active indexes will be updated
      *
-     * @param object $entity Entity to add
+     * @param E $entity Entity to add
      *
      * @return void
      */
@@ -97,7 +100,8 @@ final class EntitySetIndexer implements EntityIndexerInterface
     /**
      * Get or create the inner indexer
      *
-     * @return EntityIndexer
+     * @return EntityIndexer<E>
+     * @psalm-assert EntityIndexer<E> $this->indexer
      */
     private function indexer()
     {

@@ -19,7 +19,7 @@ class CompilerState
     /**
      * The current part in processing for bindings
      *
-     * @var string
+     * @var string|int
      */
     public $currentPart;
 

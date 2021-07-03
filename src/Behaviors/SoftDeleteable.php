@@ -4,6 +4,8 @@ namespace Bdf\Prime\Behaviors;
 
 use Bdf\Prime\Events;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
 
@@ -14,7 +16,8 @@ use Bdf\Prime\Types\TypeInterface;
  * filtering them at SELECT time by marking them as with a timestamp,
  * but not explicitly removing them from the database.
  *
- * @package Bdf\Prime\Behaviors
+ * @template E as object
+ * @implements BehaviorInterface<E>
  */
 class SoftDeleteable implements BehaviorInterface
 {
@@ -52,11 +55,11 @@ class SoftDeleteable implements BehaviorInterface
     /**
      * Get the field infos from option
      *
-     * @param mixed $field
+     * @param bool|string|array{0:string,1:string} $field
      *
-     * @return null|array
+     * @return array
      */
-    private function getFieldInfos($field)
+    private function getFieldInfos($field): array
     {
         if ($field === true) {
             return ['name' => 'deletedAt', 'alias' => 'deleted_at'];
@@ -75,7 +78,7 @@ class SoftDeleteable implements BehaviorInterface
     /**
      * {@inheritdoc}
      */
-    public function changeSchema(FieldBuilder $builder)
+    public function changeSchema(FieldBuilder $builder): void
     {
         if (!isset($builder[$this->deleted['name']])) {
             $builder->add($this->deleted['name'], $this->type)->nillable();
@@ -91,8 +94,8 @@ class SoftDeleteable implements BehaviorInterface
      *
      * We stop the before delete event and update the deleted at date.
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
+     * @param E $entity
+     * @param EntityRepository<E> $repository
      */
     public function beforeDelete($entity, $repository)
     {
@@ -103,7 +106,7 @@ class SoftDeleteable implements BehaviorInterface
 
         $now = $this->createDate($this->deleted['name'], $repository);
 
-        $repository->hydrateOne($entity, $this->deleted['name'], $now);
+        $repository->mapper()->hydrateOne($entity, $this->deleted['name'], $now);
         $count = $repository->update($entity, [$this->deleted['name']]);
 
         $repository->notify(Events::POST_DELETE, [$entity, $repository, $count]);
@@ -115,8 +118,10 @@ class SoftDeleteable implements BehaviorInterface
     /**
      * Get the field infos from option
      *
-     * @return string $name
-     * @return RepositoryInterface $repository
+     * @param string $name
+     * @param RepositoryInterface<E> $repository
+     *
+     * @return \DateTimeInterface|int
      */
     private function createDate($name, $repository)
     {
@@ -124,6 +129,7 @@ class SoftDeleteable implements BehaviorInterface
             return time();
         }
 
+        /** @psalm-suppress UndefinedInterfaceMethod */
         $className = $repository->mapper()->info()->property($name)->phpType();
         return new $className;
     }
@@ -131,15 +137,15 @@ class SoftDeleteable implements BehaviorInterface
     /**
      * {@inheritdoc}
      */
-    public function subscribe($notifier)
+    public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
     {
         $notifier->deleting([$this, 'beforeDelete']);
     }
-    
+
     /**
      * {@inheritdoc}
      */
-    public function constraints()
+    public function constraints(): array
     {
         return [$this->deleted['name'] => null];
     }

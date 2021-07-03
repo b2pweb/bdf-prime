@@ -154,4 +154,11 @@ interface ConnectionInterface
      *       C'est actuellement le plus simple et léger, mais ajoute une dépendence forte à Doctrine
      */
     public function getEventManager();
+
+    /**
+     * Closes the connection and trigger "onConnectionClosed" event
+     *
+     * @return void
+     */
+    public function close();
 }

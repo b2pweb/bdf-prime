@@ -6,9 +6,9 @@ use Bdf\Prime\Collection\ArrayCollection;
 
 /**
  * A empty paginator
- * 
- * @author  Seb
- * @package Bdf\Prime\Query\Pagination
+ *
+ * @template R as array|object
+ * @extends Paginator<R>
  */
 class EmptyPaginator extends Paginator
 {
@@ -33,23 +33,23 @@ class EmptyPaginator extends Paginator
      */
     public function order($attribute = null)
     {
-        return '';
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function limit()
+    public function limit(): ?int
     {
-        return 0;
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offset()
+    public function offset(): ?int
     {
-        return 0;
+        return null;
     }
 
     /**

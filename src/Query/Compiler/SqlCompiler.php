@@ -6,19 +6,22 @@ use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Exception\QueryException;
 use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\CompilableClause;
+use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Bdf\Prime\Query\Expression\ExpressionTransformerInterface;
+use Bdf\Prime\Query\Query;
 use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Query\SqlQueryInterface;
 use Bdf\Prime\Types\TypeInterface;
 use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use UnexpectedValueException;
 
 /**
- * SqlCompiler
+ * Base compiler for SQL queries
  *
- * @author seb
- * @package Bdf\Prime\Query\Compiler
+ * @template C as \Doctrine\DBAL\Connection
+ * @extends AbstractCompiler<\Bdf\Prime\Query\SqlQueryInterface&CompilableClause, \Doctrine\DBAL\Connection&\Bdf\Prime\Connection\ConnectionInterface>
  */
 class SqlCompiler extends AbstractCompiler
 {
@@ -34,7 +37,7 @@ class SqlCompiler extends AbstractCompiler
     {
         return $this->connection->quote($this->autoConvertValue($value));
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -46,11 +49,11 @@ class SqlCompiler extends AbstractCompiler
 
         return $this->platform()->grammar()->quoteIdentifier($column);
     }
-    
+
     /**
      * Quote a identifier on multiple columns
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * @param array $columns
      *
      * @return array
@@ -94,7 +97,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Compile the data part of the insert query
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      *
      * @return string
      * @throws PrimeException
@@ -114,13 +117,14 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Compile an INSERT INTO ... SELECT ... query
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      *
      * @return string
      * @throws PrimeException
      */
     protected function compileInsertSelect(CompilableClause $query)
     {
+        /** @var Query $select */
         $select = clone $query->statements['values']['data']; // Clone the query for ensure that it'll not be modified
         $columns = [];
 
@@ -146,7 +150,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Compile columns and values to insert
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      *
      * @return array
      * @throws PrimeException
@@ -197,7 +201,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Compile columns and values to update
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      *
      * @return array
      * @throws PrimeException
@@ -303,7 +307,7 @@ class SqlCompiler extends AbstractCompiler
      * Check if the the query is an aggregate which requires to execute the query as temporary table
      * A temporary table is required for DISTINT aggregate with wildcard "*" column
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      *
      * @return bool
      */
@@ -316,7 +320,7 @@ class SqlCompiler extends AbstractCompiler
      * Compile the complexe aggregate query
      * Will generate a query in form : "SELECT [aggregate](*) FROM ([query])"
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      *
      * @return string
      * @throws PrimeException
@@ -332,7 +336,7 @@ class SqlCompiler extends AbstractCompiler
     }
 
     /**
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      *
      * @return string
      * @throws PrimeException
@@ -371,7 +375,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Compile a SQL function
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * @param string $function  The sql function
      * @param string $column    The column to aggregate
      * @param bool   $distinct  The distinct status
@@ -414,7 +418,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Compile expression column
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * @param mixed $column
      * @param string $alias
      * 
@@ -447,7 +451,7 @@ class SqlCompiler extends AbstractCompiler
     }
     
     /**
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      *
      * @return string
      * @throws PrimeException
@@ -472,7 +476,7 @@ class SqlCompiler extends AbstractCompiler
     }
 
     /**
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      *
      * @return string
      * @throws PrimeException
@@ -501,7 +505,7 @@ class SqlCompiler extends AbstractCompiler
      * The compiled table expression will be returned into the 'sql' key
      * All input parameter will be kept on the return value
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * @param array $clauses
      *
      * @return array
@@ -536,7 +540,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Adding database prefix for sub query x-db
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      *
      * @return string
      */
@@ -552,7 +556,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Compile Where sql
      * 
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * 
      * @return string
      * @throws PrimeException
@@ -569,7 +573,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Compile having sql
      * 
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * 
      * @return string
      * @throws PrimeException
@@ -584,7 +588,7 @@ class SqlCompiler extends AbstractCompiler
     }
 
     /**
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * @param array $clauses
      *
      * @return string
@@ -639,7 +643,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Determine which operator to use based on custom and standard syntax
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * @param string $column
      * @param string $operator
      * @param mixed  $value
@@ -650,9 +654,10 @@ class SqlCompiler extends AbstractCompiler
      * @throws UnexpectedValueException
      * @throws PrimeException
      */
-    protected function compileExpression(CompilableClause $query, $column, $operator, $value, $converted)
+    protected function compileExpression(CompilableClause $query, string $column, string $operator, $value, bool $converted): string
     {
         if ($value instanceof ExpressionTransformerInterface) {
+            /** @psalm-suppress InvalidArgument */
             $value->setContext($this, $column, $operator);
 
             $column    = $value->getColumn();
@@ -737,7 +742,7 @@ class SqlCompiler extends AbstractCompiler
                 if (is_array($value)) {
                     return $this->platform()->grammar()->getBetweenExpression($this->quoteIdentifier($query, $column), $this->compileExpressionValue($query, $value[0], $converted), $this->compileExpressionValue($query, $value[1], $converted));
                 }
-                return $this->platform()->grammar()->getBetweenExpression($this->quoteIdentifier($query, $column), 0, $this->compileExpressionValue($query, $value, $converted));
+                return $this->platform()->grammar()->getBetweenExpression($this->quoteIdentifier($query, $column), '0', $this->compileExpressionValue($query, $value, $converted));
 
             // Not between
             case '!between':
@@ -777,7 +782,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Compile expression value
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * @param mixed $value
      * @param bool $converted Does the value is already converted to database ?
      * 
@@ -800,7 +805,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Compile expression value with type
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * @param mixed $value
      * @param TypeInterface|null $type The type. If null it will be resolved from value
      *
@@ -823,7 +828,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Compile raw expression value
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * @param mixed $value
      * 
      * @return string
@@ -845,7 +850,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Add sub query bindings.
      *
-     * @param CompilableClause $clause
+     * @param SqlQueryInterface&CompilableClause $clause
      * @param QueryInterface $query The sub query.
      * @param string $alias
      *
@@ -869,7 +874,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Compile IN or NOT IN expression
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * @param array|QueryInterface|ExpressionInterface  $values
      * @param string $column
      * @param string $operator
@@ -923,7 +928,7 @@ class SqlCompiler extends AbstractCompiler
      * Compile into expression
      * Multiple OR expression
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * @param array $values
      * @param string $column
      * @param string $operator
@@ -949,7 +954,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Compile group by expression
      * 
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * 
      * @return string
      * @throws PrimeException
@@ -972,7 +977,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Compile order by expression
      * 
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * 
      * @return string
      * @throws PrimeException
@@ -1003,7 +1008,7 @@ class SqlCompiler extends AbstractCompiler
      *
      * Does not support system that use hint like SqlServer
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      *
      * @return string
      * @throws PrimeException
@@ -1031,13 +1036,13 @@ class SqlCompiler extends AbstractCompiler
     /**
      * Add sub query bindings.
      *
-     * @param CompilableClause $clause The main query
-     * @param QueryInterface $subQuery The sub query.
+     * @param SqlQueryInterface&CompilableClause $clause The main query
+     * @param Compilable $subQuery The sub query.
      *
      * @return $this This compiler instance.
      * @throws PrimeException
      */
-    protected function addQueryBindings(CompilableClause $clause, $subQuery)
+    protected function addQueryBindings(CompilableClause $clause, Compilable $subQuery)
     {
         foreach ($subQuery->getBindings() as $binding) {
             $this->bindRaw($clause, $binding); // Types are already converted on compilation
@@ -1055,7 +1060,7 @@ class SqlCompiler extends AbstractCompiler
      * statement , otherwise they get bound in the wrong order which can lead to serious
      * bugs in your code.
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * @param mixed $value
      * @param TypeInterface|null $type The type to bind, or null to resolve
      *
@@ -1076,7 +1081,7 @@ class SqlCompiler extends AbstractCompiler
      * statement , otherwise they get bound in the wrong order which can lead to serious
      * bugs in your code.
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * @param mixed $value Raw database value : must be converted before
      *
      * @return string
@@ -1089,7 +1094,7 @@ class SqlCompiler extends AbstractCompiler
     }
 
     /**
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      *
      * @return array
      */

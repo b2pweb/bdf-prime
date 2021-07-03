@@ -122,8 +122,11 @@ final class TableBuilder implements TableBuilderInterface
 
             foreach ($columns as $columnName => $columnOption) {
                 if (is_int($columnName)) {
+                    /** @var string $columnOption */
                     $normalizedColumns[$columnOption] = [];
                 } else {
+                    /** @var string $columnName */
+                    /** @var array $columnOption */
                     $normalizedColumns[$columnName] = $columnOption;
                 }
             }

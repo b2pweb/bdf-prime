@@ -24,5 +24,5 @@ interface Deletable
      * @throws PrimeException When execute fail
      */
     #[WriteOperation]
-    public function delete();
+    public function delete(): int;
 }

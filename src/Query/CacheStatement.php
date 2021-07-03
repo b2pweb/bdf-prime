@@ -52,6 +52,8 @@ class CacheStatement implements \IteratorAggregate, ResultStatement
     {
         unset($this->data);
         $this->columnCount = 0;
+
+        return true;
     }
 
     /**

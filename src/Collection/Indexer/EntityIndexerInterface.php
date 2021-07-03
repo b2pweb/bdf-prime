@@ -5,6 +5,8 @@ namespace Bdf\Prime\Collection\Indexer;
 /**
  * Indexing entities by given attribute
  * Generate indexes should be kept in memory for not regenerate the same index
+ *
+ * @template E as object
  */
 interface EntityIndexerInterface
 {
@@ -34,7 +36,7 @@ interface EntityIndexerInterface
      *
      * @param string $key The indexing key
      *
-     * @return object[][]
+     * @return E[][]
      *
      * @throws \InvalidArgumentException When given key is not valid
      */
@@ -66,7 +68,7 @@ interface EntityIndexerInterface
      *
      * @param string $key The indexing key
      *
-     * @return object[]
+     * @return E[]
      *
      * @throws \InvalidArgumentException When given key is not valid
      */
@@ -75,7 +77,7 @@ interface EntityIndexerInterface
     /**
      * Get all entities present in the indexer without any indexation
      *
-     * @return object[]
+     * @return E[]
      */
     public function all(): array;
 

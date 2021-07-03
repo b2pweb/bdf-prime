@@ -33,14 +33,14 @@ interface Joinable
      * </code>
      *
      * @param string|\Bdf\Prime\Query\QueryInterface|array $table The joined table. Can also be a sub query. To defined an alias, use syntax [$table, $alias]
-     * @param string|callable(JoinClause):void $key The local key (fk), or the join clause configurator
+     * @param string|callable(\Bdf\Prime\Query\JoinClause):void $key The local key (fk), or the join clause configurator
      * @param string|null $operator If $key is a string, the matching operator
      * @param mixed|\Bdf\Prime\Query\Expression\ExpressionInterface|null $foreign If $key is a string, the foreign key value. Use new Attribute() to match with an attribute
-     * @param string $type Type of join.
+     * @param Joinable::* $type Type of join.
      *
      * @return $this This Query instance.
      */
-    public function join($table, $key, $operator = null, $foreign = null, $type = self::INNER_JOIN);
+    public function join($table, $key, ?string $operator = null, $foreign = null, string $type = self::INNER_JOIN);
 
     /**
      * Creates and adds a left join to the query.
@@ -64,13 +64,13 @@ interface Joinable
      * </code>
      *
      * @param string|\Bdf\Prime\Query\QueryInterface|array $table The joined table. Can also be a sub query. To defined an alias, use syntax [$table, $alias]
-     * @param string|callable(JoinClause):void $key The local key (fk), or the join clause configurator
+     * @param string|callable(\Bdf\Prime\Query\JoinClause):void $key The local key (fk), or the join clause configurator
      * @param string|null $operator If $key is a string, the matching operator
      * @param mixed|\Bdf\Prime\Query\Expression\ExpressionInterface|null $foreign If $key is a string, the foreign key value. Use new Attribute() to match with an attribute
      *
      * @return $this This Query instance.
      */
-    public function leftJoin($table, $key, $operator = null, $foreign = null);
+    public function leftJoin($table, $key, ?string $operator = null, $foreign = null);
 
     /**
      * Creates and adds a right join to the query.
@@ -94,11 +94,11 @@ interface Joinable
      * </code>
      *
      * @param string|\Bdf\Prime\Query\QueryInterface|array $table The joined table. Can also be a sub query. To defined an alias, use syntax [$table, $alias]
-     * @param string|callable(JoinClause):void $key The local key (fk), or the join clause configurator
+     * @param string|callable(\Bdf\Prime\Query\JoinClause):void $key The local key (fk), or the join clause configurator
      * @param string|null $operator If $key is a string, the matching operator
      * @param mixed|\Bdf\Prime\Query\Expression\ExpressionInterface|null $foreign If $key is a string, the foreign key value. Use new Attribute() to match with an attribute
      *
      * @return $this This Query instance.
      */
-    public function rightJoin($table, $key, $operator = null, $foreign = null);
+    public function rightJoin($table, $key, ?string $operator = null, $foreign = null);
 }

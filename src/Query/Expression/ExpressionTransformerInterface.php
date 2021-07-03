@@ -38,7 +38,7 @@ interface ExpressionTransformerInterface
      *
      * @return void
      */
-    public function setContext(CompilerInterface $compiler, $column, $operator);
+    public function setContext(CompilerInterface $compiler, string $column, string $operator): void;
 
     /**
      * Transform and get the value, according to the compiler
@@ -52,12 +52,12 @@ interface ExpressionTransformerInterface
      *
      * @return string The new operator
      */
-    public function getOperator();
+    public function getOperator(): string;
 
     /**
      * Get the expression column
      *
      * @return string The new column
      */
-    public function getColumn();
+    public function getColumn(): string;
 }

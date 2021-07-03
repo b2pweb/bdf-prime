@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Query\Pagination;
 
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
 
 /**
@@ -57,12 +58,14 @@ class PaginatorFactory
     /**
      * Create the paginator instance
      *
-     * @param ReadCommandInterface $query The query to paginate
+     * @param ReadCommandInterface<ConnectionInterface, R> $query The query to paginate
      * @param string $class The paginator class name
      * @param int|null $maxRows Number of entries by page
      * @param int|null $page The current page
      *
-     * @return PaginatorInterface
+     * @return PaginatorInterface<R>
+     *
+     * @template R as array|object
      */
     public function create(ReadCommandInterface $query, string $class = 'paginator', ?int $maxRows = null, ?int $page = null): PaginatorInterface
     {
@@ -80,7 +83,7 @@ class PaginatorFactory
     /**
      * Get the paginator instance
      *
-     * @return $this
+     * @return self
      */
     public static function instance(): self
     {

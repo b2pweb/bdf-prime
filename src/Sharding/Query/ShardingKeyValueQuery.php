@@ -21,6 +21,11 @@ use Bdf\Prime\Sharding\ShardingConnection;
  * In other case, all shards will be queried on
  *
  * @property ShardingConnection $connection
+ *
+ * @template R as object|array
+ *
+ * @implements KeyValueQueryInterface<ShardingConnection, R>
+ * @extends AbstractReadCommand<ShardingConnection, R>
  */
 class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterface
 {
@@ -138,7 +143,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      *
      * @internal Use internally for optimise "first" query. The offset parameter is not used
      */
-    public function limit($limit, $offset = null)
+    public function limit(?int $limit, ?int $offset = null)
     {
         $this->statements['limit'] = $limit;
 
@@ -149,7 +154,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function count($column = null)
+    public function count(?string $column = null): int
     {
         return (int) array_sum($this->aggregate(__FUNCTION__, $column));
     }
@@ -158,7 +163,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function avg($column = null)
+    public function avg(?string $column = null): float
     {
         $results = $this->aggregate(__FUNCTION__, $column);
 
@@ -169,25 +174,25 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function min($column = null)
+    public function min(?string $column = null)
     {
-        return (float) min($this->aggregate(__FUNCTION__, $column));
+        return min($this->aggregate(__FUNCTION__, $column));
     }
 
     /**
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function max($column = null)
+    public function max(?string $column = null)
     {
-        return (float) max($this->aggregate(__FUNCTION__, $column));
+        return max($this->aggregate(__FUNCTION__, $column));
     }
 
     /**
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function sum($column = null)
+    public function sum(?string $column = null): float
     {
         return (float) array_sum($this->aggregate(__FUNCTION__, $column));
     }
@@ -198,7 +203,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      * @return array
      */
     #[ReadOperation]
-    public function aggregate($function, $column = null)
+    public function aggregate(string $function, ?string $column = null): array
     {
         $results = [];
 
@@ -243,7 +248,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function update($values = null)
+    public function update($values = null): int
     {
         $count = 0;
 
@@ -262,7 +267,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function delete()
+    public function delete(): int
     {
         $count = 0;
 
@@ -280,7 +285,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     /**
      * Select the queries to use
      *
-     * @return KeyValueQueryInterface[]
+     * @return iterable<KeyValueQueryInterface>
      *
      * @throws ShardingException
      */
@@ -322,17 +327,19 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      */
     private function getQueryByShard($shardId)
     {
-        /** @var KeyValueQueryInterface $query */
         if (isset($this->queries[$shardId])) {
             $query = $this->queries[$shardId];
+            /** @var KeyValueQueryInterface $query */
         } else {
             $this->queries[$shardId] = $query = $this->connection->getShardConnection($shardId)->make(KeyValueQueryInterface::class, $this->preprocessor());
+            /** @var KeyValueQueryInterface $query */
             $query->setExtension($this->extension);
         }
 
         $query->from($this->statements['table']);
 
         if (!empty($this->statements['limit'])) {
+            /** @var KeyValueQueryInterface&\Bdf\Prime\Query\Contract\Limitable $query */
             $query->limit($this->statements['limit']);
         }
 
@@ -354,7 +361,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     /**
      * {@inheritdoc}
      */
-    protected function cacheNamespace()
+    protected function cacheNamespace(): string
     {
         return $this->connection->getName().':'.$this->statements['table'];
     }

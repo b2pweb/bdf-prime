@@ -164,8 +164,10 @@ class PropertyInfo implements InfoInterface
             return $this->metadata['phpOptions']['timezone'];
         }
 
+        /** @var \Bdf\Prime\Types\AbstractDateTimeType $type */
+        $type = $this->getType();
         /** @var \DateTimeZone $timezone */
-        $timezone = $this->getType()->getTimezone();
+        $timezone = $type->getTimezone();
 
         return $timezone ? $timezone->getName() : null;
     }

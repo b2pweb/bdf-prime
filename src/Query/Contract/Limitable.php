@@ -11,12 +11,12 @@ interface Limitable
      * Limit executed query to specified amount of records
      * Implemented at adapter-level for databases that support it
      *
-     * @param int $limit Number of records to return
-     * @param int $offset Record to start at for limited result set
+     * @param int|null $limit Number of records to return
+     * @param int|null $offset Record to start at for limited result set
      *
      * @return $this This Query instance.
      */
-    public function limit($limit, $offset = null);
+    public function limit(?int $limit, ?int $offset = null);
 
     /**
      * Sets the limit and count by page number.
@@ -28,45 +28,45 @@ interface Limitable
      *
      * @return $this This Query instance.
      */
-    public function limitPage($page, $rowCount = 1);
+    public function limitPage(int $page, int $rowCount = 1);
 
     /**
      * Get the page of pagination
      *
      * @return int
      */
-    public function getPage();
+    public function getPage(): int;
 
     /**
      * Get limit value
      *
-     * @return int
+     * @return int|null The limit, or null if not defined
      */
-    public function getLimit();
+    public function getLimit(): ?int;
 
     /**
      * Offset executed query to skip specified amount of records
      * Implemented at adapter-level for databases that support it
      *
-     * @param int $offset Record to start at for limited result set
+     * @param int|null $offset Record to start at for limited result set
      *
      * @return $this This Query instance.
      */
-    public function offset($offset);
+    public function offset(?int $offset);
 
     /**
      * Get offset value
      *
-     * @return int
+     * @return int|null The offset, or null is not defined
      */
-    public function getOffset();
+    public function getOffset(): ?int;
 
     /**
      * Check if query has limit attribute
      *
      * @return bool
      */
-    public function isLimitQuery();
+    public function isLimitQuery(): bool;
 
     /**
      * Check if query has pagination
@@ -74,5 +74,5 @@ interface Limitable
      *
      * @return bool
      */
-    public function hasPagination();
+    public function hasPagination(): bool;
 }

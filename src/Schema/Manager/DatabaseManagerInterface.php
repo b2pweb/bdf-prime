@@ -11,20 +11,22 @@ use Bdf\Prime\Schema\TableInterface;
  * manage database...
  *
  * The operations will be done one the remote connection (or simulate), so it will result to database queries
+ *
+ * @template C as ConnectionInterface
  */
 interface DatabaseManagerInterface
 {
     /**
      * Get the database connection instance.
      *
-     * @return ConnectionInterface
+     * @return C
      */
     public function getConnection();
 
     /**
      * Set the database connection instance.
      *
-     * @param  ConnectionInterface $connection
+     * @param  C $connection
      *
      * @return $this
      *

@@ -6,16 +6,19 @@ use Bdf\Prime\Mapper\Mapper;
 
 /**
  * Entity indexer for singleton entity
+ *
+ * @template E as object
+ * @implements EntityIndexerInterface<E>
  */
 final class SingleEntityIndexer implements EntityIndexerInterface
 {
     /**
-     * @var Mapper
+     * @var Mapper<E>
      */
     private $mapper;
 
     /**
-     * @var object
+     * @var E
      */
     private $entity;
 
@@ -23,8 +26,8 @@ final class SingleEntityIndexer implements EntityIndexerInterface
     /**
      * SingleEntityIndexer constructor.
      *
-     * @param Mapper $mapper
-     * @param object $entity
+     * @param Mapper<E> $mapper
+     * @param E $entity
      */
     public function __construct(Mapper $mapper, $entity)
     {

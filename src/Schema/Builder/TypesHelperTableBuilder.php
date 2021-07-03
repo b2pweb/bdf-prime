@@ -163,9 +163,9 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function string($column, $length = 255, $default = null)
+    public function string($name, $length = 255, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::STRING)
+        $this->addTypeAsString($name, TypeInterface::STRING)
             ->length($length)
             ->setDefault($default)
         ;
@@ -176,87 +176,39 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function text($column, $default = null)
+    public function text($name, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::TEXT)->setDefault($default);
+        $this->addTypeAsString($name, TypeInterface::TEXT)->setDefault($default);
 
         return $this;
     }
 
     /**
-     * Create a new integer (4-byte) column on the table.
-     *
-     * @param  string $column
-     * @param  bool|int $autoIncrement
-     * @param  bool $unsigned
-     * @param  mixed   $default
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function integer($column, $autoIncrement = false, $unsigned = false, $default = null)
+    public function integer($name, $default = null)
     {
-        if ($unsigned === false && $default === null && is_int($autoIncrement)) {
-            $default = $autoIncrement;
-            $autoIncrement = false;
-        }
-
-        $this->addTypeAsString($column, TypeInterface::INTEGER)
-            ->autoincrement($autoIncrement)
-            ->unsigned($unsigned)
-            ->setDefault($default)
-        ;
+        $this->addTypeAsString($name, TypeInterface::INTEGER)->setDefault($default);
 
         return $this;
     }
 
     /**
-     * Create a new tiny integer (1-byte) column on the table.
-     *
-     * @param  string  $column
-     * @param  bool|int  $autoIncrement
-     * @param  bool  $unsigned
-     * @param  mixed   $default
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function tinyint($column, $autoIncrement = false, $unsigned = false, $default = null)
+    public function tinyint($name, $default = null)
     {
-        if ($unsigned === false && $default === null && is_int($autoIncrement)) {
-            $default = $autoIncrement;
-            $autoIncrement = false;
-        }
-
-        $this->addTypeAsString($column, TypeInterface::TINYINT)
-            ->autoincrement($autoIncrement)
-            ->unsigned($unsigned)
-            ->setDefault($default)
-        ;
+        $this->addTypeAsString($name, TypeInterface::TINYINT)->setDefault($default);
 
         return $this;
     }
 
     /**
-     * Create a new small integer (2-byte) column on the table.
-     *
-     * @param  string  $column
-     * @param  bool|int  $autoIncrement
-     * @param  bool  $unsigned
-     * @param  mixed   $default
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function smallint($column, $autoIncrement = false, $unsigned = false, $default = null)
+    public function smallint($name, $default = null)
     {
-        if ($unsigned === false && $default === null && is_int($autoIncrement)) {
-            $default = $autoIncrement;
-            $autoIncrement = false;
-        }
-
-        $this->addTypeAsString($column, TypeInterface::SMALLINT)
-            ->autoincrement($autoIncrement)
-            ->unsigned($unsigned)
-            ->setDefault($default)
-        ;
+        $this->addTypeAsString($name, TypeInterface::SMALLINT)->setDefault($default);
 
         return $this;
     }
@@ -264,51 +216,24 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * Create a new medium integer (3-byte) column on the table.
      *
-     * @param  string  $column
-     * @param  bool|int  $autoIncrement
-     * @param  bool  $unsigned
+     * @param  string  $name
      * @param  mixed   $default
      *
      * @return $this
      */
-    public function mediumint($column, $autoIncrement = false, $unsigned = false, $default = null)
+    public function mediumint($name, $default = null)
     {
-        if ($unsigned === false && $default === null && is_int($autoIncrement)) {
-            $default = $autoIncrement;
-            $autoIncrement = false;
-        }
-
-        $this->addTypeAsString($column, 'mediumint')
-            ->autoincrement($autoIncrement)
-            ->unsigned($unsigned)
-            ->setDefault($default)
-        ;
+        $this->addTypeAsString($name, 'mediumint')->setDefault($default);
 
         return $this;
     }
 
     /**
-     * Create a new big integer (8-byte) column on the table.
-     *
-     * @param  string  $column
-     * @param  bool|int  $autoIncrement
-     * @param  bool  $unsigned
-     * @param  mixed   $default
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function bigint($column, $autoIncrement = false, $unsigned = false, $default = null)
+    public function bigint($name, $default = null)
     {
-        if ($unsigned === false && $default === null && is_int($autoIncrement)) {
-            $default = $autoIncrement;
-            $autoIncrement = false;
-        }
-
-        $this->addTypeAsString($column, TypeInterface::BIGINT)
-            ->autoincrement($autoIncrement)
-            ->unsigned($unsigned)
-            ->setDefault($default)
-        ;
+        $this->addTypeAsString($name, TypeInterface::BIGINT)->setDefault($default);
 
         return $this;
     }
@@ -316,139 +241,74 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * Create a new unsigned tiny integer (1-byte) column on the table.
      *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
+     * @param string $name
+     * @param mixed $default
      *
      * @return $this
      */
-    public function unsignedTinyint($column, $autoIncrement = false)
+    public function unsignedTinyint($name, $default = null)
     {
-        return $this->tinyint($column, $autoIncrement, true);
+        return $this->tinyint($name, $default)->unsigned();
     }
 
     /**
      * Create a new unsigned small integer (2-byte) column on the table.
      *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
+     * @param string $name
+     * @param mixed $default
      *
      * @return $this
      */
-    public function unsignedSmallint($column, $autoIncrement = false)
+    public function unsignedSmallint($name, $default = null)
     {
-        return $this->smallint($column, $autoIncrement, true);
+        return $this->smallint($name, $default)->unsigned();
     }
 
     /**
      * Create a new unsigned medium integer (3-byte) column on the table.
      *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
+     * @param string $name
+     * @param mixed $default
      *
      * @return $this
      */
-    public function unsignedMediumint($column, $autoIncrement = false)
+    public function unsignedMediumint($name, $default = null)
     {
-        return $this->mediumint($column, $autoIncrement, true);
+        return $this->mediumint($name, $default)->unsigned();
     }
 
     /**
      * Create a new unsigned integer (4-byte) column on the table.
      *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
+     * @param string $name
+     * @param mixed $default
      *
      * @return $this
      */
-    public function unsignedInteger($column, $autoIncrement = false)
+    public function unsignedInteger($name, $default = null)
     {
-        return $this->integer($column, $autoIncrement, true);
+        return $this->integer($name, $default)->unsigned();
     }
 
     /**
      * Create a new unsigned big integer (8-byte) column on the table.
      *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
+     * @param string $name
+     * @param mixed $default
      *
      * @return $this
      */
-    public function unsignedBigint($column, $autoIncrement = false)
+    public function unsignedBigint($name, $default = null)
     {
-        return $this->bigint($column, $autoIncrement, true);
+        return $this->bigint($name, $default)->unsigned();
     }
 
     /**
-     * Create a new float column on the table.
-     *
-     * @param  string  $column
-     * @param  int     $precision
-     * @param  int     $scale
-     * @param  mixed   $default
-     *
-     * @return $this
+     * {@inheritdoc}
      */
-    public function float($column, $precision = null, $scale = null, $default = null)
+    public function float($name, $default = null)
     {
-        if ($scale === null && $default === null && is_float($precision)) {
-            $default = $precision;
-            $precision = null;
-        }
-
-        $this->addTypeAsString($column, TypeInterface::FLOAT)
-            ->precision($precision, $scale)
-            ->setDefault($default)
-        ;
-
-        return $this;
-    }
-
-    /**
-     * Create a new double column on the table.
-     *
-     * @param  string  $column
-     * @param  int     $precision
-     * @param  int     $scale
-     * @param  mixed   $default
-     *
-     * @return $this
-     */
-    public function double($column, $precision = null, $scale = null, $default = null)
-    {
-        if ($scale === null && $default === null && is_float($precision)) {
-            $default = $precision;
-            $precision = null;
-        }
-
-        $this->addTypeAsString($column, TypeInterface::DOUBLE)
-            ->precision($precision, $scale)
-            ->setDefault($default)
-        ;
-
-        return $this;
-    }
-
-    /**
-     * Create a new decimal column on the table.
-     *
-     * @param  string  $column
-     * @param  int     $precision
-     * @param  int     $scale
-     * @param  mixed   $default
-     *
-     * @return $this
-     */
-    public function decimal($column, $precision = null, $scale = null, $default = null)
-    {
-        if ($scale === null && $default === null && is_float($precision)) {
-            $default = $precision;
-            $precision = null;
-        }
-
-        $this->addTypeAsString($column, TypeInterface::DECIMAL)
-            ->precision($precision, $scale)
-            ->setDefault($default)
-        ;
+        $this->addTypeAsString($name, TypeInterface::FLOAT)->setDefault($default);
 
         return $this;
     }
@@ -456,9 +316,29 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function boolean($column, $default = null)
+    public function double($name, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::BOOLEAN)->setDefault($default);
+        $this->addTypeAsString($name, TypeInterface::DOUBLE)->setDefault($default);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function decimal($name, $default = null)
+    {
+        $this->addTypeAsString($name, TypeInterface::DECIMAL)->setDefault($default);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function boolean($name, $default = null)
+    {
+        $this->addTypeAsString($name, TypeInterface::BOOLEAN)->setDefault($default);
 
         return $this;
     }
@@ -466,14 +346,14 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * Create a new enum column on the table.
      *
-     * @param  string  $column
+     * @param  string  $name
      * @param  array   $allowed
      *
      * @return $this
      */
-//    public function enum($column, array $allowed)
+//    public function enum($name, array $allowed)
 //    {
-//        $this->addTypeAsString($column, 'enum', ['allowed' => $allowed]);
+//        $this->addTypeAsString($name, 'enum', ['allowed' => $allowed]);
 //
 //        return $this;
 //    }
@@ -481,9 +361,9 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function date($column, $default = null)
+    public function date($name, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::DATE)->setDefault($default);
+        $this->addTypeAsString($name, TypeInterface::DATE)->setDefault($default);
 
         return $this;
     }
@@ -491,9 +371,9 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function dateTime($column, $default = null)
+    public function dateTime($name, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::DATETIME)->setDefault($default);
+        $this->addTypeAsString($name, TypeInterface::DATETIME)->setDefault($default);
 
         return $this;
     }
@@ -501,9 +381,9 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function dateTimeTz($column, $default = null)
+    public function dateTimeTz($name, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::DATETIMETZ)->setDefault($default);
+        $this->addTypeAsString($name, TypeInterface::DATETIMETZ)->setDefault($default);
 
         return $this;
     }
@@ -511,9 +391,9 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function time($column, $default = null)
+    public function time($name, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::TIME)->setDefault($default);
+        $this->addTypeAsString($name, TypeInterface::TIME)->setDefault($default);
 
         return $this;
     }
@@ -521,9 +401,9 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function timestamp($column, $default = null)
+    public function timestamp($name, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::TIMESTAMP)->setDefault($default);
+        $this->addTypeAsString($name, TypeInterface::TIMESTAMP)->setDefault($default);
 
         return $this;
     }
@@ -531,9 +411,9 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function binary($column, $default = null)
+    public function binary($name, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::BINARY)->setDefault($default);
+        $this->addTypeAsString($name, TypeInterface::BINARY)->setDefault($default);
 
         return $this;
     }
@@ -541,9 +421,9 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function blob($column, $default = null)
+    public function blob($name, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::BLOB)->setDefault($default);
+        $this->addTypeAsString($name, TypeInterface::BLOB)->setDefault($default);
 
         return $this;
     }
@@ -551,9 +431,9 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function guid($column, $default = null)
+    public function guid($name, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::GUID)->setDefault($default);
+        $this->addTypeAsString($name, TypeInterface::GUID)->setDefault($default);
 
         return $this;
     }
@@ -561,14 +441,14 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * Create a new json column on the table.
      *
-     * @param  string  $column
+     * @param  string  $name
      * @param  mixed   $default
      *
      * @return $this
      */
-    public function json($column, $default = null)
+    public function json($name, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::JSON)->setDefault($default);
+        $this->addTypeAsString($name, TypeInterface::JSON)->setDefault($default);
 
         return $this;
     }
@@ -576,9 +456,9 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function simpleArray($column, $default = null)
+    public function simpleArray($name, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::TARRAY)->setDefault($default);
+        $this->addTypeAsString($name, TypeInterface::TARRAY)->setDefault($default);
 
         return $this;
     }
@@ -586,9 +466,9 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function object($column, $default = null)
+    public function object($name, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::OBJECT)->setDefault($default);
+        $this->addTypeAsString($name, TypeInterface::OBJECT)->setDefault($default);
 
         return $this;
     }
@@ -596,9 +476,9 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function arrayObject($column, $default = null)
+    public function arrayObject($name, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::ARRAY_OBJECT)->setDefault($default);
+        $this->addTypeAsString($name, TypeInterface::ARRAY_OBJECT)->setDefault($default);
 
         return $this;
     }
@@ -606,9 +486,9 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function searchableArray($column, $default = null)
+    public function searchableArray($name, $default = null)
     {
-        $this->addTypeAsString($column, TypeInterface::TARRAY)->setDefault($default);
+        $this->addTypeAsString($name, TypeInterface::TARRAY)->setDefault($default);
 
         return $this;
     }
@@ -616,9 +496,9 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function arrayOf($column, $type, $default = null)
+    public function arrayOf($name, $type, $default = null)
     {
-        $this->addTypeAsString($column, $type.'[]')->setDefault($default);
+        $this->addTypeAsString($name, $type.'[]')->setDefault($default);
 
         return $this;
     }
@@ -674,6 +554,35 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     public function nillable($flag = true)
     {
         $this->column()->nillable($flag);
+
+        return $this;
+    }
+
+    /**
+     * Set unsigned flag on the current field
+     *
+     * @param bool $flag Activate/Deactivate unsigned
+     *
+     * @return $this This builder instance
+     */
+    public function unsigned($flag = true)
+    {
+        $this->column()->unsigned($flag);
+
+        return $this;
+    }
+
+    /**
+     * Define the decimal field precision
+     *
+     * @param int $precision The number of significant digits that are stored for values
+     * @param int $scale The number of digits that can be stored following the decimal point
+     *
+     * @return $this This builder instance
+     */
+    public function precision(int $precision, int $scale)
+    {
+        $this->column()->precision($precision, $scale);
 
         return $this;
     }

@@ -552,8 +552,8 @@ class EntityCollectionTest extends TestCase
             ['toArray',      [],                                     'rtrn'],
             ['offsetExists', ['a'],                                  'rtrn'],
             ['offsetGet',    ['a'],                                  'rtrn'],
-            ['offsetSet',    ['a', new stdClass()],                  'this'],
-            ['offsetUnset',  ['a'],                                  'this'],
+            ['offsetSet',    ['a', new stdClass()],                  'null'],
+            ['offsetUnset',  ['a'],                                  'null'],
             ['count',        [],                                     'rtrn'],
         ];
     }

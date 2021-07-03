@@ -4,21 +4,26 @@ namespace Bdf\Prime\Query;
 
 use BadMethodCallException;
 use Bdf\Prime\Collection\Indexer\EntityIndexer;
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Events;
 use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
+use Bdf\Prime\Query\Contract\Whereable;
 use Bdf\Prime\Relations\Relation;
+use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
  * QueryRepositoryExtension
+ *
+ * @template E as object
  */
 class QueryRepositoryExtension extends QueryCompatExtension
 {
     /**
-     * @var RepositoryInterface
+     * @var RepositoryInterface<E>
      */
     protected $repository;
 
@@ -28,7 +33,7 @@ class QueryRepositoryExtension extends QueryCompatExtension
     protected $metadata;
 
     /**
-     * @var Mapper
+     * @var Mapper<E>
      */
     protected $mapper;
 
@@ -59,7 +64,7 @@ class QueryRepositoryExtension extends QueryCompatExtension
     /**
      * QueryRepositoryExtension constructor.
      *
-     * @param RepositoryInterface $repository
+     * @param RepositoryInterface<E> $repository
      */
     public function __construct(RepositoryInterface $repository)
     {
@@ -71,10 +76,10 @@ class QueryRepositoryExtension extends QueryCompatExtension
     /**
      * Gets associated repository
      *
-     * @param ReadCommandInterface $query
+     * @param ReadCommandInterface<ConnectionInterface, E> $query
      * @param null|string $name
      *
-     * @return RepositoryInterface
+     * @return RepositoryInterface|null
      */
     public function repository(ReadCommandInterface $query, $name = null)
     {
@@ -88,11 +93,11 @@ class QueryRepositoryExtension extends QueryCompatExtension
     /**
      * Get one entity by identifier
      *
-     * @param ReadCommandInterface $query
+     * @param ReadCommandInterface<ConnectionInterface, E>&Whereable $query
      * @param mixed         $id
      * @param null|string|array  $attributes
      *
-     * @return object|null
+     * @return E|null
      */
     public function get(ReadCommandInterface $query, $id, $attributes = null)
     {
@@ -111,11 +116,11 @@ class QueryRepositoryExtension extends QueryCompatExtension
     /**
      * Get one entity or throws entity not found
      *
-     * @param ReadCommandInterface $query
-     * @param mixed         $id
-     * @param null|string|array  $attributes
+     * @param ReadCommandInterface<ConnectionInterface, E>&Whereable $query
+     * @param mixed $id
+     * @param null|string|array $attributes
      *
-     * @return object
+     * @return E
      *
      * @throws EntityNotFoundException  If entity is not found
      */
@@ -133,11 +138,11 @@ class QueryRepositoryExtension extends QueryCompatExtension
     /**
      * Get one entity or return a new one if not found in repository
      *
-     * @param ReadCommandInterface $query
-     * @param mixed         $id
-     * @param null|string|array  $attributes
+     * @param ReadCommandInterface<ConnectionInterface, E>&Whereable $query
+     * @param mixed $id
+     * @param null|string|array $attributes
      *
-     * @return object
+     * @return E
      */
     public function getOrNew(ReadCommandInterface $query, $id, $attributes = null)
     {
@@ -166,10 +171,10 @@ class QueryRepositoryExtension extends QueryCompatExtension
      * $query->with('target#customer.packs');
      * </code>
      *
-     * @param ReadCommandInterface $query
+     * @param ReadCommandInterface<ConnectionInterface, E> $query
      * @param string|array $relations
      *
-     * @return ReadCommandInterface
+     * @return ReadCommandInterface<ConnectionInterface, E>
      */
     public function with(ReadCommandInterface $query, $relations)
     {
@@ -181,10 +186,10 @@ class QueryRepositoryExtension extends QueryCompatExtension
     /**
      * Relations to discard
      *
-     * @param ReadCommandInterface $query
+     * @param ReadCommandInterface<ConnectionInterface, E> $query
      * @param string|array $relations
      *
-     * @return ReadCommandInterface
+     * @return ReadCommandInterface<ConnectionInterface, E>
      */
     public function without(ReadCommandInterface $query, $relations)
     {
@@ -194,13 +199,14 @@ class QueryRepositoryExtension extends QueryCompatExtension
     }
 
     /**
-     * Collect entities by attribute
+     * Indexing entities by an attribute value
+     * Use combine for multiple entities with same attribute value
      *
-     * @param ReadCommandInterface $query
+     * @param ReadCommandInterface<ConnectionInterface, E> $query
      * @param string  $attribute
      * @param boolean $combine
      *
-     * @return ReadCommandInterface
+     * @return ReadCommandInterface<ConnectionInterface, E>
      */
     public function by(ReadCommandInterface $query, $attribute, $combine = false)
     {
@@ -222,7 +228,9 @@ class QueryRepositoryExtension extends QueryCompatExtension
      */
     public function processEntities(array $data)
     {
-        $hasLoadEvent  = $this->repository->hasListeners(Events::POST_LOAD);
+        /** @var EntityRepository $repository */
+        $repository = $this->repository;
+        $hasLoadEvent = $repository->hasListeners(Events::POST_LOAD);
 
         // Save into local vars to ensure that value will not be changed during execution
         $withRelations = $this->withRelations;
@@ -245,15 +253,15 @@ class QueryRepositoryExtension extends QueryCompatExtension
         }
 
         foreach ($data as $result) {
-            $entities->push($entity = $this->mapper->prepareFromRepository($result, $this->repository->connection()->platform()));
+            $entities->push($entity = $this->mapper->prepareFromRepository($result, $repository->connection()->platform()));
 
-            if ($hasLoadEvent === true) {
-                $this->repository->notify(Events::POST_LOAD, [$entity, $this->repository]);
+            if ($hasLoadEvent) {
+                $repository->notify(Events::POST_LOAD, [$entity, $repository]);
             }
         }
 
         foreach ($withRelations as $relationName => $relationInfos) {
-            $this->repository->relation($relationName)->load(
+            $repository->relation($relationName)->load(
                 $entities,
                 $relationInfos['relations'],
                 $relationInfos['constraints'],
@@ -284,10 +292,11 @@ class QueryRepositoryExtension extends QueryCompatExtension
      */
     public function __call($name, $arguments)
     {
+        /** @var EntityRepository $this->repository */
         $scopes = $this->repository->scopes();
 
         if (!isset($scopes[$name])) {
-            throw new BadMethodCallException('Method "' . get_class($this->repository) . '::' . $name . '" not found');
+            throw new BadMethodCallException('Scope "' . get_class($this->mapper) . '::' . $name . '" not found');
         }
 
         return $scopes[$name](...$arguments);
