@@ -26,6 +26,8 @@ use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Info\MapperInfo;
 use Bdf\Prime\ServiceLocator;
 use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector as InflectorObject;
+use Doctrine\Inflector\InflectorFactory;
 
 /**
  * Generic class used to generate PHP5 entity classes from Mapper.
@@ -65,6 +67,13 @@ class EntityGenerator
      * @var ServiceLocator
      */
     private $prime;
+
+    /**
+     * The inflector instance
+     *
+     * @var InflectorObject
+     */
+    private $inflector;
 
     /**
      * The mapper info
@@ -270,9 +279,10 @@ public function __construct(array $data = [])
     /**
      * Set prime service locator
      */
-    public function __construct(ServiceLocator $prime)
+    public function __construct(ServiceLocator $prime, ?InflectorObject $inflector = null)
     {
         $this->prime = $prime;
+        $this->inflector = $inflector ?? InflectorFactory::create()->build();
     }
 
     /**
@@ -681,16 +691,16 @@ public function __construct(array $data = [])
         $hintOne = false;
 
         if ($type === 'get' && $this->useGetShortcutMethod === true) {
-            $variableName = Inflector::camelize($fieldName);
+            $variableName = $this->inflector->camelize($fieldName);
             $methodName = $variableName;
         } else {
-            $methodName = $type . Inflector::classify($fieldName);
-            $variableName = Inflector::camelize($fieldName);
+            $methodName = $type . $this->inflector->classify($fieldName);
+            $variableName = $this->inflector->camelize($fieldName);
         }
         
         if ($type === 'add') {
-            $methodName = Inflector::singularize($methodName);
-            $variableName = Inflector::singularize($variableName);
+            $methodName = $this->inflector->singularize($methodName);
+            $variableName = $this->inflector->singularize($variableName);
             $hintOne = true;
         }
 

@@ -2,7 +2,8 @@
 
 namespace Bdf\Prime\Schema\Inflector;
 
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector as InflectorObject;
+use Doctrine\Inflector\InflectorFactory;
 
 /**
  * SimpleInfector
@@ -10,11 +11,23 @@ use Doctrine\Common\Inflector\Inflector;
 class SimpleInfector implements InflectorInterface
 {
     /**
+     * The inflector instance
+     *
+     * @var InflectorObject
+     */
+    private $inflector;
+
+    public function __construct(?InflectorObject $inflector = null)
+    {
+        $this->inflector = $inflector ?? InflectorFactory::create()->build();
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getClassName($table)
     {
-        return Inflector::classify(Inflector::singularize(strtolower($table)));
+        return $this->inflector->classify($this->inflector->singularize(strtolower($table)));
     }
 
     /**
@@ -22,7 +35,7 @@ class SimpleInfector implements InflectorInterface
      */
     public function getPropertyName($table, $field)
     {
-        return Inflector::camelize(strtolower($field));
+        return $this->inflector->camelize(strtolower($field));
     }
 
     /**

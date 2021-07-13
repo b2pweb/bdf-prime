@@ -44,9 +44,9 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
     protected $offset;
 
     /**
-     * @var array|null
+     * @var array
      */
-    private $collection;
+    private $collection = [];
 
     /**
      * @var WalkStrategyInterface
