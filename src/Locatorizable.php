@@ -5,7 +5,9 @@ namespace Bdf\Prime;
 use Closure;
 
 /**
- * Class Locatorizable
+ * Locatorizable
+ *
+ * @IgnoreAnnotation("SerializeIgnore")
  */
 abstract class Locatorizable
 {
