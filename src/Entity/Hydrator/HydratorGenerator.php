@@ -377,7 +377,7 @@ PHP;
         }
 
         return '$values = [' . implode(', ', $lines) . '];' . PHP_EOL . PHP_EOL .
-            implode($possiblyNotInitialized, PHP_EOL) . PHP_EOL . PHP_EOL .
+            implode(PHP_EOL, $possiblyNotInitialized) . PHP_EOL . PHP_EOL .
             'return $values;'
         ;
     }

@@ -94,12 +94,13 @@ class AttributeInfo
 
     /**
      * Get the declared field type
+     * If there is no declared type (like with root attributes), this method will return null
      *
-     * @return string
+     * @return string|null
      */
     public function type()
     {
-        return $this->metadata['type'];
+        return $this->metadata['type'] ?? null;
     }
 
     /**
