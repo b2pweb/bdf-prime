@@ -12,8 +12,9 @@ use Bdf\Prime\Customer;
 use Bdf\Prime\Document;
 use Bdf\Prime\DocumentControlTask;
 use Bdf\Prime\EmbeddedEntity2;
+use Bdf\Prime\Entity\Hydrator\Exception\FieldNotDeclaredException;
+use Bdf\Prime\Entity\Hydrator\Exception\HydratorGenerationException;
 use Bdf\Prime\Entity\Model;
-use Bdf\Prime\Exception\HydratorException;
 use Bdf\Prime\Folder;
 use Bdf\Prime\Location;
 use Bdf\Prime\Mapper\Mapper;
@@ -62,7 +63,7 @@ class HydratorGeneratorTest extends TestCase
      */
     public function test_error_on_inaccessible_property()
     {
-        $this->expectException(HydratorException::class);
+        $this->expectException(HydratorGenerationException::class);
 
         $hydrator = new HydratorGenerator(
             Prime::service(),
@@ -78,7 +79,7 @@ class HydratorGeneratorTest extends TestCase
      */
     public function test_error_on_not_found_property()
     {
-        $this->expectException(HydratorException::class);
+        $this->expectException(HydratorGenerationException::class);
 
         $hydrator = new HydratorGenerator(
             Prime::service(),
@@ -155,11 +156,11 @@ class HydratorGeneratorTest extends TestCase
         $code = $generator->generate();
 
         $expected = <<<EOL
-                if (\$__rel_target instanceof \Bdf\Prime\Document) {
-                    \$__rel_target->import(\$data['target']);
-                } elseif (\$__rel_target instanceof \Bdf\Prime\Customer) {
-                    \$__rel_target->import(\$data['target']);
-                }
+                    if (\$__rel_target instanceof \Bdf\Prime\Document) {
+                        \$__rel_target->import(\$data['target']);
+                    } elseif (\$__rel_target instanceof \Bdf\Prime\Customer) {
+                        \$__rel_target->import(\$data['target']);
+                    }
 EOL;
 
         $this->assertStringContainsString($expected, $code);
@@ -628,8 +629,8 @@ EOL;
      */
     public function test_extractOne_functional_on_not_declared_embedded_should_raise_exception()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot read from attribute "foreign.name" : it\'s not declared');
+        $this->expectException(FieldNotDeclaredException::class);
+        $this->expectExceptionMessage('The field "foreign.name" is not declared for the entity ' . TestEntity::class);
 
         $entity = new TestEntity([
             "id" => 147,
@@ -652,8 +653,8 @@ EOL;
      */
     public function test_extractOne_on_not_declared_attribute_should_raise_exception()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot read from attribute "not_declared" : it\'s not declared');
+        $this->expectException(FieldNotDeclaredException::class);
+        $this->expectExceptionMessage('The field "not_declared" is not declared for the entity ' . TestEntity::class);
 
         $entity = new TestEntity([
             "id" => 147,
@@ -719,8 +720,8 @@ EOL;
      */
     public function test_hydrateOne_on_not_declared_embedded_attribute_should_raise_exception()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot write to attribute "foreign.name" : it\'s not declared');
+        $this->expectException(FieldNotDeclaredException::class);
+        $this->expectExceptionMessage('The field "foreign.name" is not declared for the entity ' . TestEntity::class);
 
         $entity = new TestEntity();
 
@@ -733,8 +734,8 @@ EOL;
      */
     public function test_hydrateOne_on_not_declared_attribute_should_raise_exception()
     {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('Cannot write to attribute "not_declared" : it\'s not declared');
+        $this->expectException(FieldNotDeclaredException::class);
+        $this->expectExceptionMessage('The field "not_declared" is not declared for the entity ' . TestEntity::class);
 
         $entity = new TestEntity();
 

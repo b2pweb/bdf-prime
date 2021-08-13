@@ -55,13 +55,23 @@ class EmbeddedAccessorTest extends TestCase
 
         $this->assertEquals(<<<'PHP'
 { //START accessor for contact.location
-    $__tmp_0 = $object->contact;
+    try {
+        $__tmp_0 = $object->contact;
+    } catch (\Error $e) {
+        // Ignore not initialized property if embedded is instantiated
+        $__tmp_0 = null;
+    }
     if ($__tmp_0 === null) {
         $__tmp_0 = $this->__instantiator->instantiate('Bdf\Prime\Contact', 1);
         $object->contact = $__tmp_0;
     }
     
-    $target = $__tmp_0->location;
+    try {
+        $target = $__tmp_0->location;
+    } catch (\Error $e) {
+        // Ignore not initialized property if embedded is instantiated
+        $target = null;
+    }
     if ($target === null) {
         $target = $this->__instantiator->instantiate('Bdf\Prime\Location', 1);
         $__tmp_0->location = $target;
@@ -82,7 +92,12 @@ PHP
 
         $this->assertEquals(<<<'PHP'
 { //START accessor for contact.location
-    $__tmp_0 = $object->contact;
+    try {
+        $__tmp_0 = $object->contact;
+    } catch (\Error $e) {
+        // Ignore not initialized property if embedded is instantiated
+        $__tmp_0 = null;
+    }
     if ($__tmp_0 === null) {
         $__tmp_0 = $this->__instantiator->instantiate('Bdf\Prime\Contact', 1);
         $object->contact = $__tmp_0;
@@ -115,7 +130,12 @@ PHP
 
         $this->assertEquals(<<<'PHP'
 { //START accessor for contact
-    $target = $object->contact;
+    try {
+        $target = $object->contact;
+    } catch (\Error $e) {
+        // Ignore not initialized property if embedded is instantiated
+        $target = null;
+    }
     if ($target === null) {
         $target = $this->__instantiator->instantiate('Bdf\Prime\Contact', 1);
         $object->contact = $target;
@@ -142,7 +162,12 @@ PHP
 
         $this->assertEquals(<<<'PHP'
 { //START accessor for embedded
-    $target = $object->embedded();
+    try {
+        $target = $object->embedded();
+    } catch (\Error $e) {
+        // Ignore not initialized property if embedded is instantiated
+        $target = null;
+    }
 } //END accessor for embedded
 
 PHP
@@ -151,7 +176,12 @@ PHP
 
         $this->assertEquals(<<<'PHP'
 { //START accessor for embedded
-    $target = $object->embedded();
+    try {
+        $target = $object->embedded();
+    } catch (\Error $e) {
+        // Ignore not initialized property if embedded is instantiated
+        $target = null;
+    }
     switch ($dbData['sub_type']) {
         case 'A':
             if (!$target instanceof \Bdf\Prime\PolymorphSubA) {
@@ -188,7 +218,12 @@ PHP
 
         $this->assertEquals(<<<'PHP'
 { //START accessor for embedded.location
-    $__tmp_0 = $object->embedded();
+    try {
+        $__tmp_0 = $object->embedded();
+    } catch (\Error $e) {
+        // Ignore not initialized property if embedded is instantiated
+        $__tmp_0 = null;
+    }
     switch ($dbData['sub_type']) {
         case 'A':
             if (!$__tmp_0 instanceof \Bdf\Prime\PolymorphSubA) {
@@ -206,13 +241,23 @@ PHP
     
     if ($__tmp_0 !== null) {
         if ($__tmp_0 instanceof \Bdf\Prime\PolymorphSubA) {
-            $target = $__tmp_0->location();
+            try {
+                $target = $__tmp_0->location();
+            } catch (\Error $e) {
+                // Ignore not initialized property if embedded is instantiated
+                $target = null;
+            }
             if ($target === null) {
                 $target = $this->__instantiator->instantiate('Bdf\Prime\Location', 1);
                 $__tmp_0->setLocation($target);
             }
         } elseif ($__tmp_0 instanceof \Bdf\Prime\PolymorphSubB) {
-            $target = $__tmp_0->location();
+            try {
+                $target = $__tmp_0->location();
+            } catch (\Error $e) {
+                // Ignore not initialized property if embedded is instantiated
+                $target = null;
+            }
             if ($target === null) {
                 $target = $this->__instantiator->instantiate('Bdf\Prime\Location', 1);
                 $__tmp_0->setLocation($target);

@@ -2,6 +2,8 @@
 
 namespace Bdf\Prime\Entity\Hydrator\Generator;
 
+use ReflectionProperty;
+
 /**
  * Store info about attribute
  */
@@ -22,6 +24,11 @@ class AttributeInfo
      */
     private $resolver;
 
+    /**
+     * @var ReflectionProperty|null
+     */
+    private $reflection;
+
 
     /**
      * AttributeInfo constructor.
@@ -30,7 +37,7 @@ class AttributeInfo
      * @param array $metadata
      * @param AttributesResolver $resolver
      */
-    public function __construct($name, array $metadata, AttributesResolver $resolver)
+    public function __construct(string $name, array $metadata, AttributesResolver $resolver)
     {
         $this->name = $name;
         $this->metadata = $metadata;
@@ -106,10 +113,78 @@ class AttributeInfo
     }
 
     /**
+     * Get the class name of the entity which contains the given attribute
+     *
+     * @return class-string
+     */
+    public function containerClassName(): string
+    {
+        if (!empty($this->metadata['root']) || !$this->isEmbedded()) {
+            return $this->resolver->className();
+        }
+
+        return $this->embedded()->class(); // @todo polymorph ?
+    }
+
+    /**
      * Get the php options of the field
      */
     public function phpOptions(): array
     {
         return $this->metadata['phpOptions'];
+    }
+
+    /**
+     * Get the ReflectionProperty instance for the current attribute
+     *
+     * @return ReflectionProperty
+     * @throws \ReflectionException
+     */
+    public function reflection(): ReflectionProperty
+    {
+        if (!$this->reflection) {
+            $this->reflection = new ReflectionProperty($this->containerClassName(), $this->property());
+        }
+
+        return $this->reflection;
+    }
+
+    /**
+     * Check if the property on the entity is typed (PHP >= 7.4)
+     *
+     * @return bool true if a type is defined
+     *
+     * @throws \ReflectionException
+     */
+    public function isTyped(): bool
+    {
+        if (PHP_VERSION_ID < 70400) {
+            return false;
+        }
+
+        return $this->reflection()->hasType();
+    }
+
+    /**
+     * Check if the property on the entity allows null
+     * To allow null it must be not typed or with nullable type
+     *
+     * @return bool
+     * @throws \ReflectionException
+     */
+    public function isNullable(): bool
+    {
+        return !$this->isTyped() || $this->reflection()->getType()->allowsNull();
+    }
+
+    /**
+     * Check if the property on the entity has a default value, or is initilized with null
+     *
+     * @return bool
+     * @throws \ReflectionException
+     */
+    public function isInitializedByDefault(): bool
+    {
+        return !$this->isTyped() || array_key_exists($this->property(), (new \ReflectionClass($this->containerClassName()))->getDefaultProperties());
     }
 }

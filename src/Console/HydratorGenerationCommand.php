@@ -2,9 +2,9 @@
 
 namespace Bdf\Prime\Console;
 
+use Bdf\Prime\Entity\Hydrator\Exception\HydratorGenerationException;
 use Bdf\Prime\Entity\Hydrator\HydratorGeneratedInterface;
 use Bdf\Prime\Entity\Hydrator\HydratorGenerator;
-use Bdf\Prime\Exception\HydratorException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\ServiceLocator;
 use Bdf\Util\Console\BdfStyle;
@@ -142,7 +142,7 @@ class HydratorGenerationCommand extends Command
             );
 
             $io->info('[OK]');
-        } catch (HydratorException $exception) {
+        } catch (HydratorGenerationException $exception) {
             $io->error($exception->getMessage());
         }
     }

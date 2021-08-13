@@ -1,24 +1,24 @@
 <?php
 
-namespace Bdf\Prime\Exception;
+namespace Bdf\Prime\Entity\Hydrator\Exception;
 
-use RuntimeException;
+use LogicException;
 use Throwable;
 
 /**
- * Exception for hydrators
+ * Exception raised when the entity hydrator cannot be generated
  */
-class HydratorException extends RuntimeException implements PrimeException
+class HydratorGenerationException extends LogicException implements HydratorException
 {
     /**
-     * @var string
+     * @var class-string
      */
     private $entityClass;
 
     /**
      * HydratorException constructor.
      *
-     * @param string $entityClass
+     * @param class-string $entityClass
      * @param string $message
      * @param Throwable|null $previous
      */
@@ -32,7 +32,7 @@ class HydratorException extends RuntimeException implements PrimeException
     /**
      * Get the entity class name
      *
-     * @return string
+     * @return class-string
      */
     public function entityClass(): string
     {

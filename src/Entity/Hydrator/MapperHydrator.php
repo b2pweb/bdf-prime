@@ -2,10 +2,17 @@
 
 namespace Bdf\Prime\Entity\Hydrator;
 
+use Bdf\Prime\Entity\Hydrator\Exception\FieldNotDeclaredException;
+use Bdf\Prime\Entity\Hydrator\Exception\InvalidTypeException;
+use Bdf\Prime\Entity\Hydrator\Exception\UninitializedPropertyException;
 use Bdf\Prime\Entity\Instantiator\InstantiatorInterface;
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Platform\PlatformTypesInterface;
+use Error;
+use ReflectionException;
+use ReflectionProperty;
 use stdClass;
+use TypeError;
 
 /**
  * Base implementation for @see MapperHydratorInterface
@@ -27,7 +34,7 @@ class MapperHydrator implements MapperHydratorInterface
     /**
      * Property accessors, indexed by attribute name
      *
-     * @var \ReflectionProperty[][]
+     * @var ReflectionProperty[][]
      */
     private $reflectionProperties = [];
 
@@ -124,15 +131,16 @@ class MapperHydrator implements MapperHydratorInterface
                             $this->writeToEmbedded(
                                 $cacheEmbedded[$parentMeta['parentPath']],
                                 $parentMeta,
-                                $cacheEmbedded[$parentMeta['path']]
+                                $cacheEmbedded[$parentMeta['path']],
+                                true
                             );
                         }
                     }
                 }
 
-                $this->writeToAttribute($cacheEmbedded[$path], $metadata[$field], $value);
+                $this->writeToAttribute($cacheEmbedded[$path], $metadata[$field], $value, true);
             } else {
-                $this->writeToAttribute($object, $metadata[$field], $value);
+                $this->writeToAttribute($object, $metadata[$field], $value, true);
             }
         }
     }
@@ -144,7 +152,7 @@ class MapperHydrator implements MapperHydratorInterface
     {
         if (!isset($this->metadata->attributes[$attribute])) {
             if (!isset($this->metadata->embeddeds[$attribute])) {
-                throw new \InvalidArgumentException('Cannot read from attribute "'.$attribute.'" : it\'s not declared');
+                throw new FieldNotDeclaredException($this->metadata->entityClass, $attribute);
             }
 
             return $this->readFromEmbedded($object, $this->metadata->embeddeds[$attribute]);
@@ -167,10 +175,10 @@ class MapperHydrator implements MapperHydratorInterface
     {
         if (!isset($this->metadata->attributes[$attribute])) {
             if (!isset($this->metadata->embeddeds[$attribute])) {
-                throw new \InvalidArgumentException('Cannot write to attribute "'.$attribute.'" : it\'s not declared');
+                throw new FieldNotDeclaredException($this->metadata->entityClass, $attribute);
             }
 
-            $this->writeToEmbedded($object, $this->metadata->embeddeds[$attribute], $value);
+            $this->writeToEmbedded($object, $this->metadata->embeddeds[$attribute], $value, false);
         } else {
             $ownerObject = $this->getOwnerObject($object, $this->metadata->attributes[$attribute]);
 
@@ -179,15 +187,15 @@ class MapperHydrator implements MapperHydratorInterface
                 throw new \InvalidArgumentException('Cannot write to attribute '.$attribute.' : the embedded entity cannot be resolved');
             }
 
-            $this->writeToAttribute($ownerObject, $this->metadata->attributes[$attribute], $value);
+            $this->writeToAttribute($ownerObject, $this->metadata->attributes[$attribute], $value, false);
         }
     }
 
     /**
      * Get owner object attribute
      *
-     * @param object  $entity
-     * @param array   $metadata  Metadata d'un attribut a retrouver
+     * @param object $entity
+     * @param array $metadata Metadata d'un attribut a retrouver
      *
      * @return object|null The object, or null if cannot be instantiated (polymorph)
      */
@@ -207,7 +215,11 @@ class MapperHydrator implements MapperHydratorInterface
         for ($i = 0, $l = count($embeddedMeta['paths']); $i < $l; $i++) {
             $parentMeta = $embeddeds[$embeddedMeta['paths'][$i]];
 
-            $embedded = $this->readFromEmbedded($current, $parentMeta);
+            try {
+                $embedded = $this->readFromEmbedded($current, $parentMeta);
+            } catch (UninitializedPropertyException $e) { // The property is not initialized
+                $embedded = null;
+            }
 
             if ($embedded === null) {
                 if (!isset($parentMeta['class'])) {
@@ -216,7 +228,8 @@ class MapperHydrator implements MapperHydratorInterface
 
                 $embedded = $this->instantiator->instantiate($parentMeta['class'], $parentMeta['hint']);
 
-                $this->writeToEmbedded($current, $parentMeta, $embedded);
+                // This writes should never fail : $embedded is not null
+                $this->writeToEmbedded($current, $parentMeta, $embedded, false);
             }
 
             $current = $embedded;
@@ -232,6 +245,9 @@ class MapperHydrator implements MapperHydratorInterface
      * @param array $metadata
      *
      * @return mixed
+     *
+     * @throws ReflectionException When property do not exist on the object
+     * @throws UninitializedPropertyException When the property is not initialized
      */
     protected function readFromAttribute($entity, array $metadata)
     {
@@ -239,7 +255,11 @@ class MapperHydrator implements MapperHydratorInterface
         $class = get_class($entity);
 
         if (isset($this->reflectionProperties[$class][$attribute])) {
-            return $this->reflectionProperties[$class][$attribute]->getValue($entity);
+            try {
+                return $this->reflectionProperties[$class][$attribute]->getValue($entity);
+            } catch (Error $e) {
+                throw new UninitializedPropertyException($class, $this->reflectionProperties[$class][$attribute]->name, $e);
+            }
         }
 
         if (!isset($metadata['embedded'])) {
@@ -248,13 +268,7 @@ class MapperHydrator implements MapperHydratorInterface
             $property = substr($attribute, strlen($metadata['embedded']) + 1);
         }
 
-        if ($class === stdClass::class) {
-            return isset($entity->{$property}) ? $entity->{$property} : null;
-        }
-
-        $this->reflectionProperties[$class][$attribute] = new \ReflectionProperty($class, $property);
-        $this->reflectionProperties[$class][$attribute]->setAccessible(true);
-        return $this->reflectionProperties[$class][$attribute]->getValue($entity);
+        return $this->readFromProperty($class, $property, $attribute, $entity);
     }
 
     /**
@@ -264,6 +278,9 @@ class MapperHydrator implements MapperHydratorInterface
      * @param array $metadata
      *
      * @return mixed
+     *
+     * @throws ReflectionException When property do not exist on the object
+     * @throws UninitializedPropertyException When the property is not initialized
      */
     protected function readFromEmbedded($entity, array $metadata)
     {
@@ -271,7 +288,11 @@ class MapperHydrator implements MapperHydratorInterface
         $class = get_class($entity);
 
         if (isset($this->reflectionProperties[$class][$attribute])) {
-            return $this->reflectionProperties[$class][$attribute]->getValue($entity);
+            try {
+                return $this->reflectionProperties[$class][$attribute]->getValue($entity);
+            } catch (Error $e) {
+                throw new UninitializedPropertyException($class, $this->reflectionProperties[$class][$attribute]->name, $e);
+            }
         }
 
         if ($metadata['parentPath'] === 'root') {
@@ -280,13 +301,7 @@ class MapperHydrator implements MapperHydratorInterface
             $property = substr($attribute, strlen($metadata['parentPath']) + 1);
         }
 
-        if ($class === stdClass::class) {
-            return isset($entity->{$property}) ? $entity->{$property} : null;
-        }
-
-        $this->reflectionProperties[$class][$attribute] = new \ReflectionProperty($class, $property);
-        $this->reflectionProperties[$class][$attribute]->setAccessible(true);
-        return $this->reflectionProperties[$class][$attribute]->getValue($entity);
+        return $this->readFromProperty($class, $property, $attribute, $entity);
     }
 
     /**
@@ -294,13 +309,13 @@ class MapperHydrator implements MapperHydratorInterface
      * @param array $metadata
      * @param mixed $value
      */
-    protected function writeToAttribute($entity, array $metadata, $value)
+    protected function writeToAttribute($entity, array $metadata, $value, bool $skipInvalid)
     {
         $attribute = $metadata['attribute'];
         $class = get_class($entity);
 
         if (isset($this->reflectionProperties[$class][$attribute])) {
-            $this->reflectionProperties[$class][$attribute]->setValue($entity, $value);
+            $this->writeToReflection($this->reflectionProperties[$class][$attribute], $entity, $value, $skipInvalid, $metadata);
             return;
         }
 
@@ -315,9 +330,10 @@ class MapperHydrator implements MapperHydratorInterface
             return;
         }
 
-        $this->reflectionProperties[$class][$attribute] = new \ReflectionProperty($class, $property);
-        $this->reflectionProperties[$class][$attribute]->setAccessible(true);
-        $this->reflectionProperties[$class][$attribute]->setValue($entity, $value);
+        $this->reflectionProperties[$class][$attribute] = $reflectionProperty = new ReflectionProperty($class, $property);
+        $reflectionProperty->setAccessible(true);
+
+        $this->writeToReflection($reflectionProperty, $entity, $value, $skipInvalid, $metadata);
     }
 
     /**
@@ -325,13 +341,13 @@ class MapperHydrator implements MapperHydratorInterface
      * @param array $metadata
      * @param mixed $value
      */
-    protected function writeToEmbedded($entity, array $metadata, $value)
+    protected function writeToEmbedded($entity, array $metadata, $value, bool $skipInvalid)
     {
         $attribute = $metadata['path'];
         $class = get_class($entity);
 
         if (isset($this->reflectionProperties[$class][$attribute])) {
-            $this->reflectionProperties[$class][$attribute]->setValue($entity, $value);
+            $this->writeToReflection($this->reflectionProperties[$class][$attribute], $entity, $value, $skipInvalid, $metadata);
             return;
         }
 
@@ -346,8 +362,74 @@ class MapperHydrator implements MapperHydratorInterface
             return;
         }
 
-        $this->reflectionProperties[$class][$attribute] = new \ReflectionProperty($class, $property);
-        $this->reflectionProperties[$class][$attribute]->setAccessible(true);
-        $this->reflectionProperties[$class][$attribute]->setValue($entity, $value);
+        $this->reflectionProperties[$class][$attribute] = $reflectionProperty = new ReflectionProperty($class, $property);
+        $reflectionProperty->setAccessible(true);
+
+        $this->writeToReflection($reflectionProperty, $entity, $value, $skipInvalid, $metadata);
+    }
+
+    /**
+     * Simple property read
+     *
+     * @param class-string $class
+     * @param string $property
+     * @param string $attribute
+     * @param object $entity
+     * @return mixed|null
+     *
+     * @throws ReflectionException
+     * @throws UninitializedPropertyException
+     */
+    private function readFromProperty(string $class, string $property, string $attribute, $entity)
+    {
+        if ($class === stdClass::class) {
+            return $entity->$property ?? null;
+        }
+
+        $this->reflectionProperties[$class][$attribute] = $propertyReflection = new ReflectionProperty($class, $property);
+        $propertyReflection->setAccessible(true);
+
+        try {
+            return $propertyReflection->getValue($entity);
+        } catch (Error $e) {
+            throw new UninitializedPropertyException($class, $property, $e);
+        }
+    }
+
+    /**
+     * Check if the value should not be hydrated, in case of null value on not nullable property
+     *
+     * @param ReflectionProperty $property
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    private function shouldSkipValue(ReflectionProperty $property, $value): bool
+    {
+        if (PHP_VERSION_ID < 70400 || $value !== null) {
+            return false;
+        }
+
+        return $property->hasType() && !$property->getType()->allowsNull();
+    }
+
+    /**
+     * @param ReflectionProperty $reflectionProperty
+     * @param object $entity
+     * @param mixed $value
+     * @param bool $skipInvalid
+     * @param array $metadata
+     *
+     * @throws InvalidTypeException
+     */
+    private function writeToReflection(ReflectionProperty $reflectionProperty, $entity, $value, bool $skipInvalid, array $metadata)
+    {
+        if (!$skipInvalid || !$this->shouldSkipValue($reflectionProperty, $value)) {
+            try {
+                $reflectionProperty->setValue($entity, $value);
+            } catch (TypeError $e) {
+                throw new InvalidTypeException($e, $metadata['type'] ?? null);
+            }
+        }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Entity\Hydrator;
 
+use Bdf\Prime\Entity\Hydrator\Exception\HydratorGenerationException;
 use Bdf\Prime\Entity\Hydrator\Generator\AccessorResolver;
 use Bdf\Prime\Entity\Hydrator\Generator\AttributeInfo;
 use Bdf\Prime\Entity\Hydrator\Generator\AttributesResolver;
@@ -9,7 +10,6 @@ use Bdf\Prime\Entity\Hydrator\Generator\ClassAccessor;
 use Bdf\Prime\Entity\Hydrator\Generator\CodeGenerator;
 use Bdf\Prime\Entity\Hydrator\Generator\EmbeddedInfo;
 use Bdf\Prime\Entity\Hydrator\Generator\TypeAccessor;
-use Bdf\Prime\Exception\HydratorException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\SingleTableInheritanceMapper;
 use Bdf\Prime\ServiceLocator;
@@ -79,7 +79,7 @@ class HydratorGenerator
      * @param Mapper $mapper
      * @param string $className
      *
-     * @throws HydratorException
+     * @throws HydratorGenerationException
      */
     public function __construct(ServiceLocator $prime, Mapper $mapper, $className)
     {
@@ -178,6 +178,8 @@ class HydratorGenerator
      * Get the hydrator class template
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function hydratorTemplate()
     {
@@ -203,6 +205,8 @@ class HydratorGenerator
      * Generate the hydrate() method body
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateHydrateBody()
     {
@@ -210,7 +214,7 @@ class HydratorGenerator
 
         foreach ($this->resolver->rootAttributes() as $attribute) {
             $out .= <<<PHP
-if (isset(\$data['{$attribute->name()}'])) {
+if (array_key_exists('{$attribute->name()}', \$data)) {
 {$this->code->indent($this->generateAttributeHydrate($attribute), 1)}
 }
 
@@ -227,6 +231,8 @@ PHP;
      * @param AttributeInfo $attribute
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateAttributeHydrate(AttributeInfo $attribute)
     {
@@ -246,7 +252,13 @@ PHP;
             $out .= $this->accessor->setter('$object', $attribute->property(), $value).';';
         }
 
-        return $out;
+        return <<<PHP
+try {
+{$this->code->indent($out, 1)}
+} catch (\TypeError \$e) {
+    throw new \Bdf\Prime\Entity\Hydrator\Exception\InvalidTypeException(\$e, '{$attribute->type()}');
+}
+PHP;
     }
 
     /**
@@ -255,6 +267,8 @@ PHP;
      * @param AttributeInfo $attribute
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateEmbeddedHydrate(AttributeInfo $attribute)
     {
@@ -271,7 +285,7 @@ PHP;
                 // For Entities, use hydrators
                 $hydrators[$this->normalizeClassName($class)] = "{$this->generateEmbeddedHydrator($class)}->hydrate({$varName}, \$data['{$attribute->name()}']);";
             } else {
-                throw new HydratorException($class, 'Cannot generate embedded hydration for the property "'.$attribute->name().'"');
+                throw new HydratorGenerationException($class, 'Cannot generate embedded hydration for the property "'.$attribute->name().'"');
             }
         }
 
@@ -323,6 +337,8 @@ PHP;
      * Generate the {@link HydratorInterface::extract()} method's body
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateExtractBody()
     {
@@ -340,31 +356,60 @@ PHP;
      * Generate extract method's code for extract all attributes
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateExtractAll()
     {
         $lines = [];
+        $possiblyNotInitialized = [];
 
         foreach ($this->resolver->rootAttributes() as $attribute) {
-            $lines[] = "'{$attribute->name()}' => ({$this->generateExtractValue($attribute)})";
+            if ($attribute->isInitializedByDefault()) {
+                $lines[] = "'{$attribute->name()}' => ({$this->generateExtractValue($attribute)})";
+            } else {
+                $possiblyNotInitialized[] = "try { \$values['{$attribute->name()}'] = {$this->generateExtractValue($attribute)}; } catch (\Error \$e) { /** Ignore not initialized properties */ }";
+            }
         }
 
-        return 'return [' . implode(', ', $lines) . '];';
+        if (empty($possiblyNotInitialized)) {
+            return 'return [' . implode(', ', $lines) . '];';
+        }
+
+        return '$values = [' . implode(', ', $lines) . '];' . PHP_EOL . PHP_EOL .
+            implode($possiblyNotInitialized, PHP_EOL) . PHP_EOL . PHP_EOL .
+            'return $values;'
+        ;
     }
 
     /**
      * Generate extract method's code for extract select attributes
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateExtractSelected()
     {
         $extracts = '';
 
         foreach ($this->resolver->rootAttributes() as $attribute) {
+            $extractor = "\$values['{$attribute->name()}'] = {$this->generateExtractValue($attribute)};";
+
+            if (!$attribute->isInitializedByDefault()) {
+                $extractor = <<<PHP
+try {
+    {$extractor}
+} catch (\Error \$e) {
+    // Ignore not initialized properties
+}
+PHP;
+
+            }
+
             $extracts .= <<<PHP
 if (isset(\$attributes['{$attribute->name()}'])) {
-    \$values['{$attribute->name()}'] = {$this->generateExtractValue($attribute)};
+{$this->code->indent($extractor, 1)}
 }
 
 PHP;
@@ -386,6 +431,8 @@ PHP;
      * @param AttributeInfo $attribute
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateExtractValue(AttributeInfo $attribute)
     {
@@ -401,7 +448,7 @@ PHP;
                 } elseif ($this->resolver->isEntity($class)) {
                     $line .= "({$varName} instanceof {$this->normalizeClassName($class)} ? {$this->generateEmbeddedHydrator($class)}->extract({$varName}) : ";
                 } else {
-                    throw new HydratorException($class, 'Cannot generate embedded hydration for the property "'.$attribute->name().'"');
+                    throw new HydratorGenerationException($class, 'Cannot generate embedded hydration for the property "'.$attribute->name().'"');
                 }
             }
 
@@ -419,6 +466,8 @@ PHP;
      * Generate the flatExtract (i.e. Mapper::prepareToRepository) method body
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateFlatExtract()
     {
@@ -435,31 +484,52 @@ PHP;
      * Generate extract method's code for extract all attributes
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateFlatExtractAll()
     {
-        $lines = [];
-        $embeddeds = [];
+        $simpleArray = [];
+        $extractors = [];
 
         foreach ($this->resolver->attributes() as $attribute) {
             if ($attribute->isEmbedded()) {
                 $accessor = $this->accessors->embedded($attribute->embedded());
-
-                $embeddeds[] = <<<PHP
+                $extractor = <<<PHP
 {$accessor->getEmbedded('$__embedded')}
 \$data['{$attribute->name()}'] = {$accessor->getter('$__embedded', $attribute->property())};
 PHP;
+
+                if (!$attribute->isInitializedByDefault()) {
+                    $extractor = <<<PHP
+try {
+{$this->code->indent($extractor, 1)}
+} catch (\Error \$e) {
+    throw new \Bdf\Prime\Entity\Hydrator\Exception\UninitializedPropertyException('{$this->className}', '{$attribute->property()}');
+}
+PHP;
+                }
+
+                $extractors[] = $extractor;
+            } elseif ($attribute->isInitializedByDefault()) {
+                $simpleArray[] = "'{$attribute->name()}' => ({$this->accessor->getter('$object', $attribute->property())})";
             } else {
-                $lines[] = "'{$attribute->name()}' => ({$this->accessor->getter('$object', $attribute->property())})";
+                $extractors[] = <<<PHP
+try {
+    \$data['{$attribute->name()}'] = {$this->accessor->getter('$object', $attribute->property())};
+} catch (\Error \$e) {
+    throw new \Bdf\Prime\Entity\Hydrator\Exception\UninitializedPropertyException('{$attribute->containerClassName()}', '{$attribute->property()}');
+}
+PHP;
             }
         }
 
-        $lines = implode(', ', $lines);
-        $embeddeds = implode(PHP_EOL, $embeddeds);
+        $simpleArray = implode(', ', $simpleArray);
+        $extractors = implode(PHP_EOL, $extractors);
 
         return <<<PHP
-\$data = [{$lines}];
-{$embeddeds}
+\$data = [{$simpleArray}];
+{$extractors}
 
 return \$data;
 PHP;
@@ -469,6 +539,8 @@ PHP;
      * Generate the extract method's code for extract selected attributes
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateFlatExtractSelected()
     {
@@ -507,6 +579,8 @@ PHP;
      * Generate the flatHydrate method's body
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateFlatHydrate()
     {
@@ -523,7 +597,6 @@ PHP;
         foreach ($this->resolver->attributes() as $attribute) {
             $set[$attribute->field()] = $this->generateAttributeFlatHydrate($attribute, $relationKeys, $types);
         }
-
 
         foreach ($set as $field => $declaration) {
             $out .= <<<PHP
@@ -546,6 +619,8 @@ PHP;
      * @param TypeAccessor $types
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateAttributeFlatHydrate(AttributeInfo $attribute, array $relationKeys, TypeAccessor $types)
     {
@@ -558,21 +633,41 @@ PHP;
         $out = $target.' = '.$types->generateFromDatabase($attribute->type(), '$data[\''.$attribute->field().'\']', $options);
 
         if (!$attribute->isEmbedded()) {
-            return $out."\n".$this->accessor->setter('$object', $attribute->name(), $target, false).';';
+            if ($attribute->isNullable()) {
+                return $out."\n".$this->accessor->setter('$object', $attribute->name(), $target, false).';';
+            }
+
+            return <<<PHP
+{$out}
+
+if ({$target} !== null) {
+    {$this->accessor->setter('$object', $attribute->name(), $target, false)};
+}
+PHP;
         }
 
-        return $this->code->lines([
-            $out,
-            $this->accessors
-                ->embedded($attribute->embedded())
-                ->fullSetter($attribute->property(), $target, '$__embedded', '$data').';'
-        ]);
+        $accessor = $this->accessors
+            ->embedded($attribute->embedded())
+            ->fullSetter($attribute->property(), $target, '$__embedded', '$data').';'
+        ;
+
+        if (!$attribute->isNullable()) {
+            $accessor = <<<PHP
+if ({$target} !== null) {
+    {$accessor}
+}
+PHP;
+        }
+
+        return $this->code->lines([$out, $accessor]);
     }
 
     /**
      * Generate the extractOne() method's body
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateExtractOneBody()
     {
@@ -589,8 +684,8 @@ PHP;
         return $this->code->switch(
             '$attribute',
             $cases,
-            <<<'PHP'
-throw new \InvalidArgumentException('Cannot read from attribute "'.$attribute.'" : it\'s not declared');
+            <<<PHP
+throw new \Bdf\Prime\Entity\Hydrator\Exception\FieldNotDeclaredException('{$this->className}', \$attribute);
 PHP
         );
     }
@@ -601,16 +696,30 @@ PHP
      * @param AttributeInfo $attribute
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateExtractOneCaseAttribute(AttributeInfo $attribute)
     {
-        if (!$attribute->isEmbedded()) {
-            return "return {$this->accessor->getter('$object', $attribute->property())};";
+        if ($attribute->isEmbedded()) {
+            $accessor = $this->accessors->embedded($attribute->embedded());
+
+            $body = $accessor->getEmbedded('$__embedded').$this->code->eol().'return '.$accessor->getter('$__embedded', $attribute->property()).';';
+        } else {
+            $body = "return {$this->accessor->getter('$object', $attribute->property())};";
         }
 
-        $accessor = $this->accessors->embedded($attribute->embedded());
+        if ($attribute->isInitializedByDefault()) {
+            return $body;
+        }
 
-        return $accessor->getEmbedded('$__embedded').$this->code->eol().'return '.$accessor->getter('$__embedded', $attribute->property()).';';
+        return <<<PHP
+try {
+{$this->code->indent($body, 1)}
+} catch (\Error \$e) {
+    throw new \Bdf\Prime\Entity\Hydrator\Exception\UninitializedPropertyException('{$attribute->containerClassName()}', '{$attribute->property()}');
+}
+PHP;
     }
 
     /**
@@ -619,19 +728,30 @@ PHP
      * @param EmbeddedInfo $embedded
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateExtractOneCaseEmbedded(EmbeddedInfo $embedded)
     {
         $varName = '$__' . str_replace('.', '_', $embedded->path());
         $code = $this->accessors->embedded($embedded)->getEmbedded($varName, false);
+        $className = $embedded->isRoot() ? $this->mapper->getEntityClass() : $embedded->parent()->class();
 
-        return $this->code->lines([$code, 'return '.$varName.';']);
+        return <<<PHP
+try {
+{$this->code->indent($this->code->lines([$code, 'return ' . $varName . ';']), 1)}
+} catch (\Error \$e) {
+    throw new \Bdf\Prime\Entity\Hydrator\Exception\UninitializedPropertyException('{$className}', '{$embedded->property()}');
+}
+PHP;
     }
 
     /**
      * Generate hydrateOne() method's body
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateHydrateOneBody()
     {
@@ -648,8 +768,8 @@ PHP
         return $this->code->switch(
             '$attribute',
             $cases,
-            <<<'PHP'
-throw new \InvalidArgumentException('Cannot write to attribute "'.$attribute.'" : it\'s not declared');
+            <<<PHP
+throw new \Bdf\Prime\Entity\Hydrator\Exception\FieldNotDeclaredException('{$this->className}', \$attribute);
 PHP
 
         );
@@ -663,17 +783,29 @@ PHP
      * @param AttributeInfo $attribute
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateHydrateOneCaseAttribute($attribute)
     {
-        if (!$attribute->isEmbedded()) {
-            return $this->accessor->setter('$object', $attribute->property(), '$value', false).';';
-        }
-
-        return $this->accessors
+        if ($attribute->isEmbedded()) {
+            $code = $this->accessors
                 ->embedded($attribute->embedded())
                 ->fullSetter($attribute->property(), '$value', '$__embedded').';'
             ;
+        } else {
+            $code = $this->accessor->setter('$object', $attribute->property(), '$value', false) . ';';
+        }
+
+        // Always surround with try catch because setter can also be typed
+        return <<<PHP
+try {
+{$this->code->indent($code, 1)}
+} catch (\TypeError \$e) {
+    throw new \Bdf\Prime\Entity\Hydrator\Exception\InvalidTypeException(\$e, '{$attribute->type()}');
+}
+PHP;
+
     }
 
     /**
@@ -682,6 +814,8 @@ PHP
      * @param EmbeddedInfo $embedded
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     protected function generateHydrateOneCaseEmbedded(EmbeddedInfo $embedded)
     {
@@ -690,8 +824,8 @@ PHP
         }
 
         return $this->accessors
-                ->embedded($embedded->parent())
-                ->fullSetter($embedded->property(), '$value').';'
-            ;
+            ->embedded($embedded->parent())
+            ->fullSetter($embedded->property(), '$value').';'
+        ;
     }
 }
