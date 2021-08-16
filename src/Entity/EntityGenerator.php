@@ -25,6 +25,8 @@ use Bdf\Prime\Mapper\Info\PropertyInfo;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Info\MapperInfo;
 use Bdf\Prime\ServiceLocator;
+use Bdf\Prime\Types\PhpTypeInterface;
+use Bdf\Prime\Types\TypeInterface;
 use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Inflector\Inflector as InflectorObject;
 use Doctrine\Inflector\InflectorFactory;
@@ -51,6 +53,16 @@ use Doctrine\Inflector\InflectorFactory;
  */
 class EntityGenerator
 {
+    // @todo should not be there : should be on PhpTypeInterface
+    /**
+     * Map prime types to php 7.4 property type
+     */
+    const PROPERTY_TYPE_MAP = [
+        PhpTypeInterface::BOOLEAN => 'bool',
+        PhpTypeInterface::DOUBLE => 'float',
+        PhpTypeInterface::INTEGER => 'int',
+    ];
+
     /**
      * Specifies class fields should be protected.
      */
@@ -168,6 +180,14 @@ class EntityGenerator
      * @var string
      */
     private $fieldVisibility = self::FIELD_VISIBLE_PROTECTED;
+
+    /**
+     * Use type on generated properties
+     * Note: only compatible with PHP >= 7.4
+     *
+     * @var bool
+     */
+    private $useTypedProperties = false;
 
     /**
      * @var string
@@ -619,7 +639,7 @@ public function __construct(array $data = [])
      */
     protected function generateEntityFieldMappingProperties()
     {
-        $lines = array();
+        $lines = [];
 
         foreach ($this->mapperInfo->properties() as  $property) {
             if ($this->hasProperty($property->name())) {
@@ -627,6 +647,7 @@ public function __construct(array $data = [])
             }
             
             $default = '';
+
             if ($property->hasDefault() && !$property->isDateTime()) {
                 $default = ' = '.$this->stringfyValue(
                     $property->convert($property->getDefault())
@@ -635,8 +656,14 @@ public function __construct(array $data = [])
                 $default = ' = []';
             }
 
+            // A nullable property should be defined as null by default
+            // A property is considered as nullable if it's explicitly defined on mapper or if the field is auto-generated
+            if ($this->useTypedProperties && !$default && $property->isNullable()) {
+                $default = ' = null';
+            }
+
             $lines[] = $this->generateFieldMappingPropertyDocBlock($property);
-            $lines[] = $this->spaces.$this->fieldVisibility.' $'.$property->name().$default.";\n";
+            $lines[] = $this->spaces.$this->fieldVisibility.$this->getPropertyTypeHintForSimpleProperty($property).' $'.$property->name().$default.";\n";
         }
 
         return implode("\n", $lines);
@@ -656,17 +683,23 @@ public function __construct(array $data = [])
             
             if (!$property->isRelation()) {
                 $lines[] = $this->generateEmbeddedPropertyDocBlock($property);
-                $lines[] = $this->spaces.$this->fieldVisibility.' $'.$property->name().";\n";
+                $lines[] = $this->spaces . $this->fieldVisibility . $this->getPropertyTypeHintForObject($property) . ' $'.$property->name().";\n";
             } else {
                 $name = $property->name();
+                $default = '';
 
                 // Do not initialize the property if it's a wrapper
                 if ($property->isArray() && $property->wrapper() === null) {
-                    $name .= ' = []';
+                    $default = ' = []';
+                }
+
+                // If property is typed, always define a default value
+                if ($this->useTypedProperties && !$default) {
+                    $default = ' = null';
                 }
 
                 $lines[] = $this->generateEmbeddedPropertyDocBlock($property);
-                $lines[] = $this->spaces.$this->fieldVisibility.' $'.$name.";\n";
+                $lines[] = $this->spaces . $this->fieldVisibility . $this->getPropertyTypeHintForObject($property) . ' $' . $name . $default .";\n";
             }
         }
 
@@ -1122,6 +1155,85 @@ public function __construct(array $data = [])
         return $value;
     }
 
+    /**
+     * Get the php 7.4 property type hint
+     *
+     * This method will map invalid type hint to value one (ex: double -> float)
+     * It will also resolve the relative class name if the type is a class
+     *
+     * @param string $type The property type declared by field phpType()
+     * @param bool $nullable Does the property should be nullable
+     *
+     * @return string
+     *
+     * @see TypeInterface::phpType()
+     *
+     * @todo use directly the property info object ?
+     */
+    protected function getPropertyTypeHint(string $type, bool $nullable): string
+    {
+        if (class_exists($type)) {
+            $type = $this->getRelativeClassName($type);
+        } else {
+            $type = self::PROPERTY_TYPE_MAP[$type] ?? $type;
+        }
+
+        return ($nullable ? '?' : '') . $type;
+    }
+
+    /**
+     * Get the php 7.4 property type hint for a simple property
+     *
+     * If typed properties are disabled, this method will return an empty string
+     * The returned type hint will be prefixed by a single space
+     *
+     * @param PropertyInfo $property
+     *
+     * @return string
+     */
+    protected function getPropertyTypeHintForSimpleProperty(PropertyInfo $property): string
+    {
+        if (!$this->useTypedProperties) {
+            return '';
+        }
+
+        return ' ' . $this->getPropertyTypeHint($property->phpType(), $property->isNullable());
+    }
+
+    /**
+     * Get the php 7.4 property type hint for a object property (i.e. relation or embedded)
+     *
+     * If typed properties are disabled, this method will return an empty string
+     * The returned type hint will be prefixed by a single space
+     *
+     * - Embedded properties will not be marked as nullable
+     * - Relations will always be nullable
+     * - This method will also resolve collection relations and the wrapper class if provided
+     *
+     * @param ObjectPropertyInfo $property
+     *
+     * @return string
+     */
+    protected function getPropertyTypeHintForObject(ObjectPropertyInfo $property): string
+    {
+        if (!$this->useTypedProperties) {
+            return '';
+        }
+
+        $type = $property->className();
+
+        if ($property->isArray()) {
+            if ($property->wrapper() === null) {
+                $type = 'array';
+            } else {
+                $repository = $this->prime->repository($type);
+                $type = $repository->collectionFactory()->wrapperClass($property->wrapper());
+            }
+        }
+
+        return ' ' . $this->getPropertyTypeHint($type, $property->isRelation());
+    }
+
     //---------------------- mutators
 
     /**
@@ -1337,5 +1449,23 @@ public function __construct(array $data = [])
     public function getUseGetShortcutMethod(): bool
     {
         return $this->useGetShortcutMethod;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getUseTypedProperties(): bool
+    {
+        return $this->useTypedProperties;
+    }
+
+    /**
+     * Enable usage of php 7.4 type properties
+     *
+     * @param bool $useTypedProperties
+     */
+    public function useTypedProperties(bool $useTypedProperties = true): void
+    {
+        $this->useTypedProperties = $useTypedProperties;
     }
 }

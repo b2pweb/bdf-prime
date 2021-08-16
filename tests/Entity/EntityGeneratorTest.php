@@ -2,12 +2,15 @@
 
 namespace Bdf\Prime\Entity;
 
+use Bdf\Prime\Admin;
 use Bdf\Prime\Collection\EntityCollection;
 use Bdf\Prime\Customer;
 use Bdf\Prime\Document;
+use Bdf\Prime\Faction;
 use Bdf\Prime\Folder;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Project;
 use Bdf\Prime\Task;
 use Bdf\Prime\User;
 use PHPUnit\Framework\TestCase;
@@ -38,6 +41,45 @@ class EntityGeneratorTest extends TestCase
         $this->assertStringContainsString('protected $id;', $classContent);
         $this->assertStringContainsString('protected $name;', $classContent);
         $this->assertStringContainsString('protected $roles = [];', $classContent);
+    }
+
+    /**
+     *
+     */
+    public function test_properties_with_type()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->useTypedProperties();
+        $classContent = $generator->generate(User::repository()->mapper());
+
+        $this->assertStringContainsString('protected string $id;', $classContent);
+        $this->assertStringContainsString('protected string $name;', $classContent);
+        $this->assertStringContainsString('protected array $roles = [];', $classContent);
+
+        // Should use bool instead of boolean
+        $classContent = $generator->generate(Faction::repository()->mapper());
+        $this->assertStringContainsString('protected bool $enabled = true;', $classContent);
+        $this->assertStringContainsString('protected ?string $domain = null;', $classContent);
+
+        // Should use int instead of integer
+        $classContent = $generator->generate(Project::repository()->mapper());
+        $this->assertStringContainsString('protected int $id;', $classContent);
+
+        // Autoincrement should be null by default
+        $classContent = $generator->generate(Task::repository()->mapper());
+        $this->assertStringContainsString('protected ?int $id = null;', $classContent);
+    }
+
+    /**
+     *
+     */
+    public function test_properties_with_type_on_embedded()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->useTypedProperties();
+        $classContent = $generator->generate(Document::repository()->mapper());
+
+        $this->assertStringContainsString('protected Contact $contact;', $classContent);
     }
 
     /**
@@ -247,6 +289,10 @@ EOF;
         $this->assertStringContainsString('$this->customer = new Customer();', $classContent);
         $this->assertStringContainsString('function setCustomer(Customer $customer)', $classContent);
         $this->assertStringContainsString('function customer()', $classContent);
+
+        $generator->useTypedProperties();
+        $classContent = $generator->generate(User::repository()->mapper());
+        $this->assertStringContainsString('protected ?Customer $customer = null;', $classContent);
     }
 
     /**
@@ -262,6 +308,10 @@ EOF;
         $this->assertStringContainsString('function addDocument(Document $document)', $classContent);
         $this->assertStringContainsString('function setDocuments(array $documents)', $classContent);
         $this->assertStringContainsString('function documents()', $classContent);
+
+        $generator->useTypedProperties();
+        $classContent = $generator->generate(Customer::repository()->mapper());
+        $this->assertStringContainsString('protected ?array $documents = [];', $classContent);
     }
 
     /**
@@ -277,6 +327,10 @@ EOF;
         $this->assertStringContainsString('function addPack(Pack $pack)', $classContent);
         $this->assertStringContainsString('function setPacks(array $packs)', $classContent);
         $this->assertStringContainsString('function packs()', $classContent);
+
+        $generator->useTypedProperties();
+        $classContent = $generator->generate(Customer::repository()->mapper());
+        $this->assertStringContainsString('protected ?array $packs = [];', $classContent);
     }
 
     /**
@@ -290,6 +344,11 @@ EOF;
         $this->assertStringContainsString('protected $uploader;', $classContent);
         $this->assertStringContainsString('function setUploader(Admin $uploader)', $classContent);
         $this->assertStringContainsString('function uploader()', $classContent);
+
+        // Normal ?
+        $generator->useTypedProperties();
+        $classContent = $generator->generate(Document::repository()->mapper());
+        $this->assertStringContainsString('protected ?Admin $uploader = null;', $classContent);
     }
 
     /**
@@ -339,6 +398,10 @@ PHP
 PHP
     , $classContent
 );
+
+        $generator->useTypedProperties();
+        $classContent = $generator->generate(Folder::repository()->mapper());
+        $this->assertStringContainsString('protected ?EntityCollection $files = null;', $classContent);
     }
 
     /**
@@ -420,5 +483,35 @@ PHP
         $this->assertTrue($generator->getUseGetShortcutMethod());
         $generator->useGetShortcutMethod(false);
         $this->assertFalse($generator->getUseGetShortcutMethod());
+    }
+
+    /**
+     * @param class-string<Model>
+     * @dataProvider provideEntities
+     */
+    public function test_generated_code_compile(string $entity)
+    {
+        $generator = new EntityGenerator(Prime::service());
+
+        $this->assertValidPHP($generator->generate($entity::repository()->mapper()));
+
+        if (PHP_VERSION_ID >= 70400) {
+            $generator->useTypedProperties();
+            $this->assertValidPHP($generator->generate($entity::repository()->mapper()));
+        }
+    }
+
+    public function provideEntities(): array
+    {
+        return [
+            [User::class], [Customer::class], [Document::class],  [Task::class], [Admin::class], [Faction::class],
+        ];
+    }
+
+    public function assertValidPHP($str): void
+    {
+        $result = trim(shell_exec('echo ' . escapeshellarg($str) . ' | ' . PHP_BINARY . ' -l'));
+
+        $this->assertStringStartsWith('No syntax errors detected', $result, 'On generated file ' . $str);
     }
 }

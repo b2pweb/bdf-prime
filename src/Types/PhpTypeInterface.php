@@ -4,6 +4,8 @@ namespace Bdf\Prime\Types;
 
 /**
  * PHP type representation
+ *
+ * @todo rename to PhpType and make it as class or enum
  */
 interface PhpTypeInterface
 {

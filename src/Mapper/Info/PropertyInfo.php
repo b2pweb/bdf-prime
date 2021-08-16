@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Mapper\Info;
 
+use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Types\PhpTypeInterface;
 use Bdf\Prime\Types\TypeInterface;
 use Bdf\Prime\Types\TypesRegistryInterface;
@@ -113,6 +114,29 @@ class PropertyInfo implements InfoInterface
     public function isPrimary()
     {
         return $this->metadata['primary'] !== null;
+    }
+
+    /**
+     * Check if the property value is auto-generated (auto increment or sequence)
+     *
+     * @return bool
+     */
+    public function isGenerated(): bool
+    {
+        return in_array($this->metadata['primary'], [Metadata::PK_AUTOINCREMENT, Metadata::PK_SEQUENCE], true);
+    }
+
+    /**
+     * Check if the property can be null
+     *
+     * - Marked as nullable on mapper
+     * - It's value is auto-generated
+     *
+     * @return bool
+     */
+    public function isNullable(): bool
+    {
+        return !empty($this->metadata['nillable']) || $this->isGenerated();
     }
 
     /**
