@@ -155,7 +155,7 @@ class MapperHydratorWithTypedPropertiesTest extends TestCase
     public function test_hydrateOne_invalid_type()
     {
         $this->expectException(InvalidTypeException::class);
-        $this->expectExceptionMessageMatches('/Try to hydrate with an invalid type :.*Php74\\\\SimpleEntity.*id.*must be (of the type )?int or null, string.*\(declared type on mapper : integer\)/i');
+        $this->expectExceptionMessageMatches('/Try to hydrate with an invalid type :.*Php74\\\\SimpleEntity.*id.*\(declared type on mapper : integer\)/i');
 
         $entity = new SimpleEntity();
         SimpleEntity::repository()->hydrateOne($entity, 'id', 'foo');
@@ -198,7 +198,7 @@ class MapperHydratorWithTypedPropertiesTest extends TestCase
     public function test_hydrateOne_on_embedded_invalid_type()
     {
         $this->expectException(InvalidTypeException::class);
-        $this->expectExceptionMessageMatches('/Try to hydrate with an invalid type :.*Php74\\\\SimpleEntity.*firstName.*must be (of the type )?string, (stdClass|object).*\(declared type on mapper : string\)/i');
+        $this->expectExceptionMessageMatches('/Try to hydrate with an invalid type :.*Php74\\\\SimpleEntity.*firstName.*\(declared type on mapper : string\)/i');
 
         $entity = new EntityWithEmbedded();
         EntityWithEmbedded::repository()->hydrateOne($entity, 'embedded.firstName', new \stdClass());

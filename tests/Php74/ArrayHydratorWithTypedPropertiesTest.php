@@ -82,7 +82,7 @@ class ArrayHydratorWithTypedPropertiesTest extends TestCase
     public function test_hydrate_invalid_type_should_raise_InvalidTypeException()
     {
         $this->expectException(InvalidTypeException::class);
-        $this->expectErrorMessage('Try to hydrate with an invalid type : Argument 1 passed to Php74\SimpleEntity::setId() must be of the type int or null, string given');
+        $this->expectExceptionMessageMatches('/Try to hydrate with an invalid type :.*Php74\\\\SimpleEntity.*id.*/i');
         $entity = new SimpleEntity();
 
         $this->hydrator->hydrate($entity, ['id' => 'invalid']);
@@ -94,7 +94,7 @@ class ArrayHydratorWithTypedPropertiesTest extends TestCase
     public function test_hydrate_without_setter_invalid_type_should_raise_InvalidTypeException()
     {
         $this->expectException(InvalidTypeException::class);
-        $this->expectErrorMessage('Try to hydrate with an invalid type : Typed property Php74\WithoutSetter::$id must be int, string used');
+        $this->expectExceptionMessageMatches('/Try to hydrate with an invalid type :.*Php74\\\\WithoutSetter.*id.*/i');
         $entity = new WithoutSetter();
 
         $this->hydrator->hydrate($entity, ['id' => 'invalid']);
@@ -106,7 +106,7 @@ class ArrayHydratorWithTypedPropertiesTest extends TestCase
     public function test_hydrate_null_on_not_null_property_should_raise_InvalidTypeException()
     {
         $this->expectException(InvalidTypeException::class);
-        $this->expectErrorMessage('Try to hydrate with an invalid type : Argument 1 passed to Php74\SimpleEntity::setFirstName() must be of the type string, null given');
+        $this->expectExceptionMessageMatches('/Try to hydrate with an invalid type :.*Php74\\\\SimpleEntity.*firstName.*/i');
         $entity = new SimpleEntity();
 
         $this->hydrator->hydrate($entity, ['firstName' => null]);
