@@ -303,6 +303,38 @@ class MorphToTest extends TestCase
     /**
      *
      */
+    public function test_relation_method_should_define_distant_repository()
+    {
+        /** @var Document $document */
+        $document = TestPack::pack()->get('document-user');
+
+        $user = new Admin([
+            'id'   => 100,
+            'name' => 'User associated'
+        ]);
+        /** @var MorphTo $relation */
+        $relation = Document::repository()->relation('uploader');
+        $resetRelation = \Closure::bind(function () use($relation) {
+            $relation->discriminatorValue = null;
+            $relation->distant = null;
+            $relation->distantKey = null;
+        }, null, MorphTo::class);
+
+        $resetRelation();
+        $document->relation('uploader')->associate($user);
+        $this->assertEquals(Admin::repository(), $relation->relationRepository());
+
+        $document->uploader = $user;
+        $document->uploaderType = 'admin';
+
+        $resetRelation();
+        $document->relation('uploader')->query();
+        $this->assertEquals(Admin::repository(), $relation->relationRepository());
+    }
+
+    /**
+     *
+     */
     public function test_create()
     {
         $this->expectException('InvalidArgumentException');
