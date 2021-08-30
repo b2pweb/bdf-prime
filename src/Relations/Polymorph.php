@@ -204,7 +204,7 @@ trait Polymorph
      *
      * @param object $entity
      *
-     * @return mixed
+     * @return void
      */
     protected function updateDiscriminatorValue($entity)
     {
