@@ -2,7 +2,17 @@
 
 namespace Bdf\Prime\Entity\Hydrator;
 
+use Bdf\Prime\Entity\Hydrator\Exception\InvalidTypeException;
 use Bdf\Prime\Entity\ImportableInterface;
+use Closure;
+use stdClass;
+
+use TypeError;
+use function get_class;
+use function is_array;
+use function method_exists;
+use function property_exists;
+use function ucfirst;
 
 /**
  * Base hydrator implementation.
@@ -16,34 +26,16 @@ class ArrayHydrator implements HydratorInterface
     const PROTECTED_PREFIX = "\0*\0";
 
     /**
+     * @var array<class-string, callable(object, array)>
+     */
+    private $hydratorsCache = [];
+
+    /**
      * {@inheritdoc}
      */
     public function hydrate($object, array $data)
     {
-        $privatePrefix = "\0" . get_class($object) . "\0";
-        $privatePrefixLen = strlen($privatePrefix);
-
-        foreach ((array) $object as $name => $property) {
-            if (strpos($name, self::PROTECTED_PREFIX) === 0) {
-                $name = substr($name, 3);
-            } elseif (strpos($name, $privatePrefix) === 0) {
-                $name = substr($name, $privatePrefixLen);
-            }
-
-            if (!array_key_exists($name, $data)) {
-                continue;
-            }
-
-            $value = $data[$name];
-
-            if ($property instanceof ImportableInterface && is_array($value)) {
-                $property->import($value);
-            } elseif (method_exists($object, 'set' . ucfirst($name))) {
-                $object->{'set' . ucfirst($name)}($value);
-            } else {
-                $object->$name = $value;
-            }
-        }
+        return $this->getHydratorForClass(get_class($object))($object, $data);
     }
 
     /**
@@ -76,5 +68,43 @@ class ArrayHydrator implements HydratorInterface
         }
 
         return $values;
+    }
+
+    /**
+     * Create or retrieve the hydrator callback for the given entity class
+     *
+     * @param class-string $entityClass The entity class name
+     *
+     * @return callable(object, array)
+     */
+    private function getHydratorForClass(string $entityClass): callable
+    {
+        if (isset($this->hydratorsCache[$entityClass])) {
+            return $this->hydratorsCache[$entityClass];
+        }
+
+        $hydrator = static function ($object, array $data) {
+            foreach ($data as $property => $value) {
+                try {
+                    if (isset($object->$property) && $object->$property instanceof ImportableInterface && is_array($value)) {
+                        $object->$property->import($value);
+                    } elseif (method_exists($object, 'set' . ucfirst($property))) {
+                        $object->{'set' . ucfirst($property)}($value);
+                    } elseif (property_exists($object, $property)) {
+                        $object->$property = $value;
+                    }
+                } catch (TypeError $e) {
+                    throw new InvalidTypeException($e);
+                }
+            }
+        };
+
+        if ($entityClass !== stdClass::class) {
+            // Bind to access private properties
+            // Note: ignore stdClass because all its fields are public
+            $hydrator = Closure::bind($hydrator, null, $entityClass);
+        }
+
+        return $this->hydratorsCache[$entityClass] = $hydrator;
     }
 }

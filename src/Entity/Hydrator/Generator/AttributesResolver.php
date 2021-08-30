@@ -2,8 +2,8 @@
 
 namespace Bdf\Prime\Entity\Hydrator\Generator;
 
+use Bdf\Prime\Entity\Hydrator\Exception\HydratorGenerationException;
 use Bdf\Prime\Entity\ImportableInterface;
-use Bdf\Prime\Exception\HydratorException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\SingleTableInheritanceMapper;
 use Bdf\Prime\Relations\RelationInterface;
@@ -63,6 +63,16 @@ class AttributesResolver
         $this->prime = $prime;
 
         $this->build();
+    }
+
+    /**
+     * Get the root entity class name
+     *
+     * @return class-string
+     */
+    public function className(): string
+    {
+        return $this->mapper->getEntityClass();
     }
 
     /**
@@ -228,7 +238,7 @@ class AttributesResolver
     }
 
     /**
-     * @throws HydratorException
+     * @throws HydratorGenerationException
      */
     private function buildRelationEmbeddeds()
     {
@@ -280,7 +290,7 @@ class AttributesResolver
      *
      * @return string[] List of entities classes
      *
-     * @throws HydratorException
+     * @throws HydratorGenerationException
      */
     private function resolveClassesFromRelation(array $relation, $relationName)
     {
@@ -304,7 +314,7 @@ class AttributesResolver
 
             case RelationInterface::BY_INHERITANCE:
                 if (!$this->mapper instanceof SingleTableInheritanceMapper) {
-                    throw new HydratorException($this->mapper->getEntityClass(), "The mapper should be a subclass of SingleTableInheritanceMapper for use 'by inheritance' relation");
+                    throw new HydratorGenerationException($this->mapper->getEntityClass(), "The mapper should be a subclass of SingleTableInheritanceMapper for use 'by inheritance' relation");
                 }
 
                 $classes = [];
@@ -317,7 +327,7 @@ class AttributesResolver
                 return array_unique($classes);
 
             default:
-                throw new HydratorException($this->mapper->getEntityClass(), 'Cannot handle relation type ' . $relation['type']);
+                throw new HydratorGenerationException($this->mapper->getEntityClass(), 'Cannot handle relation type ' . $relation['type']);
         }
     }
 }

@@ -13,6 +13,11 @@
       "Bdf\\Prime\\": "src"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Php74\\": "tests/Php74"
+    }
+  },
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {

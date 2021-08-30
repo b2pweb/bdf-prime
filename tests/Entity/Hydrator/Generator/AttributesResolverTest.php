@@ -64,6 +64,12 @@ class AttributesResolverTest extends TestCase
         $this->assertEquals('id_', $attribute->field());
         $this->assertEquals('bigint', $attribute->type());
         $this->assertFalse($attribute->isEmbedded());
+        $this->assertEquals(Document::class, $attribute->containerClassName());
+        $this->assertFalse($attribute->isTyped());
+        $this->assertTrue($attribute->isNullable());
+        $this->assertTrue($attribute->isInitializedByDefault());
+        $this->assertEquals('id', $attribute->reflection()->getName());
+        $this->assertEquals(Document::class, $attribute->reflection()->class);
     }
 
     /**
@@ -78,6 +84,12 @@ class AttributesResolverTest extends TestCase
         $this->assertEquals('contact_address', $attribute->field());
         $this->assertEquals('string', $attribute->type());
         $this->assertTrue($attribute->isEmbedded());
+        $this->assertEquals(Location::class, $attribute->containerClassName());
+        $this->assertFalse($attribute->isTyped());
+        $this->assertTrue($attribute->isNullable());
+        $this->assertTrue($attribute->isInitializedByDefault());
+        $this->assertEquals('address', $attribute->reflection()->getName());
+        $this->assertEquals(Location::class, $attribute->reflection()->class);
 
         $this->assertInstanceOf(EmbeddedInfo::class, $attribute->embedded());
         $this->assertEquals('contact.location', $attribute->embedded()->path());

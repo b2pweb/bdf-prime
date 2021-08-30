@@ -5,6 +5,7 @@ namespace Bdf\Prime\Bench;
 use Bdf\Prime\Entity\Hydrator\HydratorGeneratedInterface;
 use Bdf\Prime\Entity\Hydrator\HydratorGenerator;
 use Bdf\Prime\Entity\Hydrator\HydratorRegistry;
+use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Prime;
 use LogicException;
 
@@ -65,5 +66,21 @@ trait HydratorGeneration
         $this->__registry->add($entityClass, $hydrator);
 
         return $hydrator;
+    }
+
+    /**
+     * Generate and register to prime hydrators
+     *
+     * @param string ...$entityClasses
+     */
+    private function setUpGeneratedHydrators(string... $entityClasses): void
+    {
+        $r = new \ReflectionProperty(Mapper::class, 'hydrator');
+        $r->setAccessible(true);
+
+        foreach ($entityClasses as $entityClass) {
+            $hydrator = $this->createGeneratedHydrator($entityClass);
+            $r->setValue(Prime::service()->repository($entityClass)->mapper(), $hydrator);
+        }
     }
 }

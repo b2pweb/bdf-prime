@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Mapper\Info;
 
+use Bdf\Prime\Faction;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Task;
 use Bdf\Prime\TestEntity;
@@ -113,7 +114,27 @@ class PropertyInfoTest extends TestCase
         $this->assertTrue($this->info->property('roles')->isArray());
         $this->assertFalse($this->info->property('id')->isArray());
     }
-    
+
+    /**
+     *
+     */
+    public function test_isGenerated()
+    {
+        $this->assertFalse($this->info->property('roles')->isGenerated());
+        $this->assertFalse($this->info->property('name')->isGenerated());
+        $this->assertTrue(Faction::repository()->mapper()->info()->property('id')->isGenerated());
+    }
+
+    /**
+     *
+     */
+    public function test_isNullable()
+    {
+        $this->assertFalse($this->info->property('name')->isNullable());
+        $this->assertTrue(Faction::repository()->mapper()->info()->property('id')->isNullable());
+        $this->assertTrue(Faction::repository()->mapper()->info()->property('domain')->isNullable());
+    }
+
     /**
      * 
      */

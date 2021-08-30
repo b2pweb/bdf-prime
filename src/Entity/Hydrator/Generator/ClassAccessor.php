@@ -2,7 +2,9 @@
 
 namespace Bdf\Prime\Entity\Hydrator\Generator;
 
-use Bdf\Prime\Exception\HydratorException;
+use Bdf\Prime\Entity\Hydrator\Exception\HydratorGenerationException;
+use ReflectionException;
+use ReflectionProperty;
 
 /**
  * Handle accessor from class
@@ -44,7 +46,7 @@ class ClassAccessor
      * @param string $scope
      * @param array $subClasses List of potential sub-classes which the property can be redefined
      *
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function __construct($className, $scope, array $subClasses = [])
     {
@@ -73,7 +75,7 @@ class ClassAccessor
      *
      * @return string
      *
-     * @throws HydratorException When the attribute is not readable
+     * @throws HydratorGenerationException When the attribute is not readable
      */
     public function getter($varName, $attribute)
     {
@@ -87,7 +89,7 @@ class ClassAccessor
             }
         }
 
-        throw new HydratorException($this->className, 'Cannot get the value of property "' . $attribute . '"');
+        throw new HydratorGenerationException($this->className, 'Cannot get the value of property "' . $attribute . '"');
     }
 
     /**
@@ -99,6 +101,8 @@ class ClassAccessor
      * @param bool $useSetterInPriority For use setter if exists (instead of direct property set)
      *
      * @return string
+     *
+     * @throws HydratorGenerationException When the attribute is not accessible
      */
     public function setter($varName, $attribute, $value, $useSetterInPriority = true)
     {
@@ -114,7 +118,7 @@ class ClassAccessor
             return $varName.'->set'.ucfirst($attribute).'('.$value.')';
         }
 
-        throw new HydratorException($this->className, 'Cannot access to attribute "' . $attribute . '" on write');
+        throw new HydratorGenerationException($this->className, 'Cannot access to attribute "' . $attribute . '" on write');
     }
 
     /**
@@ -123,6 +127,8 @@ class ClassAccessor
      * @param string $prop The property name
      *
      * @return bool
+     *
+     * @throws HydratorGenerationException When the property is not accessible
      */
     public function isPropertyAccessible($prop)
     {
@@ -150,15 +156,15 @@ class ClassAccessor
             // If a protected property is redefined in a sub-class, it will not be accessible anymore in the hydrator
             // So we need to check if the property is redefined in sub-entities
             foreach ($this->subClasses as $subEntity) {
-                $subEntityProperty = new \ReflectionProperty($subEntity, $prop);
+                $subEntityProperty = new ReflectionProperty($subEntity, $prop);
 
                 // Not same class => property redefined
                 if ($subEntityProperty->class !== $this->reflection->name) {
                     return false;
                 }
             }
-        } catch (\ReflectionException $e) {
-            throw new HydratorException($this->className, 'Cannot access to the property ' . $prop, $e);
+        } catch (ReflectionException $e) {
+            throw new HydratorGenerationException($this->className, 'Cannot access to the property ' . $prop, $e);
         }
 
         return true;
