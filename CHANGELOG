@@ -1,5 +1,6 @@
 v1.2.0
 
+* Support of typed properties from php 7.4
 * Remove all deprecated classes and methods.
 * You should now use the connection configuration instance to register your custom types.
 
