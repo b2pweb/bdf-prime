@@ -1,12 +1,18 @@
 v1.2.0
+------
 
-* Support of typed properties from php 7.4
+* Feat: Adding support of typed properties from php 7.4.
+* Feat: Adding support of configuration by connection.
+* Fix: fixing usage of non php 7.1 function.
+* Fix: Ignore the SearializeIgnore annotation on the doctrine annotations reader.
+* Fix: MorphTo  do not resolve repository on associate.
 * Remove all deprecated classes and methods.
 * You should now use the connection configuration instance to register your custom types.
 
 BC Breaks
 * ConnectionRegistry::__construct signature changed. The third parameter is now an instance of ConfigurationResolver
 * ConnectionInterface::create() signature changed. The third parameter is now nillable.
+
 
 v1.1.0
 ------
