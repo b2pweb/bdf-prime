@@ -6,6 +6,7 @@ use Bdf\Prime\Connection\ConnectionRegistry;
 use Bdf\Prime\Customer;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\User;
+use Doctrine\DBAL\Tools\Dumper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -60,7 +61,7 @@ class RunSqlCommandTest extends TestCase
      */
     public function test_sql()
     {
-        $this->pack()->nonPersist($user = new User([
+        $this->pack()->nonPersist(new User([
             'id'            => 1,
             'name'          => 'TEST1',
             'customer'      => new Customer(['id' => '1']),
@@ -71,24 +72,15 @@ class RunSqlCommandTest extends TestCase
         $tester = new CommandTester($this->command);
         $tester->execute(['sql' => 'SELECT * from user_']);
 
-        $display = <<<EOF
-array(1) {
-  [0]=>
-  array(5) {
-    ["id_"]=>
-    string(1) "1"
-    ["name_"]=>
-    string(5) "TEST1"
-    ["roles_"]=>
-    string(3) ",2,"
-    ["customer_id"]=>
-    string(1) "1"
-    ["faction_id"]=>
-    NULL
-  }
-}
+        $dbalValues = [
+            'id_' => '1',
+            'name_' => 'TEST1',
+            'roles_' => ',2,',
+            'customer_id' => '1',
+            'faction_id' => null,
+        ];
 
-EOF;
+        $display = Dumper::dump([$dbalValues], 7);
 
         $this->assertSame($display, $tester->getDisplay());
     }
