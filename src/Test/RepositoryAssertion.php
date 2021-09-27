@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Test;
 
+use Bdf\Prime\Entity\Hydrator\Exception\UninitializedPropertyException;
 use Bdf\Prime\Prime;
 use PHPUnit\Framework\Constraint\Constraint;
 
@@ -179,14 +180,27 @@ trait RepositoryAssertion
 
         $repository = Prime::repository($entity);
 
-        if (is_object($expected)) {
-            $expected = $repository->mapper()->prepareToRepository($expected);
-        }
-
         foreach ($repository->metadata()->attributes as $attribute => $metadata) {
             $path = $repository->metadata()->entityClass.'::'.$attribute;
-            $value = $repository->extractOne($entity, $attribute);
-            $expectedValue = $expected[$attribute] ?? null;
+            $isUninitialized = false;
+
+            try {
+                $expectedValue = is_object($expected) ? $repository->extractOne($expected, $attribute) : ($expected[$attribute] ?? null);
+            } catch (UninitializedPropertyException $e) {
+                $isUninitialized = true;
+            }
+
+            try {
+                $value = $repository->extractOne($entity, $attribute);
+
+                if ($isUninitialized) {
+                    $this->fail($message . ': Expected attribute "'.$path.'" to be not initialised');
+                }
+            } catch (UninitializedPropertyException $e) {
+                if (!$isUninitialized) {
+                    $this->fail($message . ': The attribute "'.$path.'" is not initialised');
+                }
+            }
 
             if (!is_object($expectedValue)) {
                 $this->assertSame($expectedValue, $value, $message . ': Expected attribute "'.$path.'" is not the same');

@@ -144,6 +144,12 @@ EOF
                 $generator->setUpdateEntityIfExists(true);
             }
         }
+
+        $typedPropertiesAvailable = PHP_VERSION_ID >= 70400;
+
+        if ($typedPropertiesAvailable) {
+            $generator->useTypedProperties();
+        }
         
         $choices = [
             '0'     => 'Skip',
@@ -157,7 +163,11 @@ EOF
             '8'     => 'Enable/disable get method shortcut',
             '9'     => 'Change field visibility',
         ];
-        
+
+        if ($typedPropertiesAvailable) {
+            $choices[10] = 'Enable/disable typed properties (PHP >= 7.4 only)';
+        }
+
         while (true) {
             switch ($io->choice("'$className' found", $choices, 'auto')) {
                 case 'Auto+create':
@@ -234,6 +244,10 @@ EOF
                         ? EntityGenerator::FIELD_VISIBLE_PRIVATE
                         : EntityGenerator::FIELD_VISIBLE_PROTECTED
                     );
+                    break;
+
+                case 'Enable/disable typed properties (PHP >= 7.4 only)':
+                    $generator->useTypedProperties($generator->getUseTypedProperties() === false);
                     break;
 
                 default:

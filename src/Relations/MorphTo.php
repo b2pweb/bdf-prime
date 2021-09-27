@@ -94,6 +94,16 @@ class MorphTo extends BelongsTo
     /**
      * {@inheritdoc}
      */
+    public function associate($owner, $entity)
+    {
+        $this->loadDistantFromType($this->discriminator(get_class($entity)));
+
+        return parent::associate($owner, $entity);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     #[WriteOperation]
     public function saveAll($owner, array $relations = []): int
     {

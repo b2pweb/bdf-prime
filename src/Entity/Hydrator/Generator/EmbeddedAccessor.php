@@ -2,7 +2,7 @@
 
 namespace Bdf\Prime\Entity\Hydrator\Generator;
 
-use Bdf\Prime\Exception\HydratorException;
+use Bdf\Prime\Entity\Hydrator\Exception\HydratorGenerationException;
 
 /**
  * Accessor for embedded entity
@@ -56,6 +56,8 @@ class EmbeddedAccessor
      * @param string $rawDataVarName The variable name which store raw database data
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     public function getEmbedded($target, $instantiate = true, $rawDataVarName = null)
     {
@@ -77,7 +79,7 @@ PHP;
      *
      * @return string
      *
-     * @throws HydratorException When the attribute is not readable
+     * @throws HydratorGenerationException When the attribute is not readable
      */
     public function getter($varName, $attribute)
     {
@@ -112,6 +114,8 @@ PHP;
      * @param bool $useSetterInPriority For use setter if exists (instead of direct property set)
      *
      * @return string
+     *
+     * @throws HydratorGenerationException When the property is not accessible
      */
     public function setter($varName, $attribute, $value, $useSetterInPriority = true)
     {
@@ -145,6 +149,8 @@ PHP;
      * @param string $rawDataVarName The variable name which store raw database data
      *
      * @return string
+     *
+     * @throws HydratorGenerationException When the property is not accessible
      */
     public function fullSetter($attribute, $value, $tmpVarName = '$__owner', $rawDataVarName = null)
     {
@@ -162,6 +168,8 @@ PHP;
      * @param bool $nillable
      *
      * @return string
+     *
+     * @throws HydratorGenerationException
      */
     private function recursiveGetEmbedded($parent, $target, $instantiate = true, $rawDataVarName = null, &$nillable = false)
     {
@@ -201,6 +209,8 @@ PHP;
      * @param string $rawDataVarName The database raw data var name
      *
      * @return string
+     *
+     * @throws HydratorGenerationException When the property is not accessible
      */
     private function getOrInstantiate($parent, $target, $instantiate, $rawDataVarName)
     {
@@ -211,6 +221,16 @@ PHP;
             $className = '\\'.ltrim($classAccessor->className(), '\\');
 
             if ($instantiate) {
+                $accessorCode = <<<PHP
+try {
+    {$accessorCode}
+} catch (\Error \$e) {
+    // Ignore not initialized property if embedded is instantiated
+    {$target} = null;
+}
+PHP;
+
+
                 $classes = $this->embedded->classes();
 
                 // Indexed array : no discriminator value

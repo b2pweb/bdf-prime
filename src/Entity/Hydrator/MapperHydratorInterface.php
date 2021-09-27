@@ -2,6 +2,9 @@
 
 namespace Bdf\Prime\Entity\Hydrator;
 
+use Bdf\Prime\Entity\Hydrator\Exception\FieldNotDeclaredException;
+use Bdf\Prime\Entity\Hydrator\Exception\InvalidTypeException;
+use Bdf\Prime\Entity\Hydrator\Exception\UninitializedPropertyException;
 use Bdf\Prime\Entity\Instantiator\InstantiatorInterface;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
@@ -35,10 +38,14 @@ interface MapperHydratorInterface
      * Extract attributes from the entity. The result array if a single dimensional array.
      * To extract with multi-dimensional array, use @see HydratorInterface::extract()
      *
+     * Note: If the entity has typed properties, this method will raised an UninitializedPropertyException if some properties are not initialized
+     *
      * @param E $object The entity to extract
      * @param array<string, mixed> $attributes Attributes to extract. The attribute name is the array key, the value is the metadata
      *
      * @return array
+     *
+     * @throws UninitializedPropertyException When unititialized properties are tried to be extracted
      */
     public function flatExtract($object, array $attributes = null);
 
@@ -48,9 +55,16 @@ interface MapperHydratorInterface
      * /!\ This method IS NOT the inverted operation of flatExtract().
      *     This method fill from DATABASE FIELDS, whereas flatExtract() extract using ATTRIBUTES
      *
+     * Note: This method will ignore null values if properties are not nullable.
+     *       So those properties will keep their default value or uninitialized state
+     *
      * @param E $object
      * @param array $data
      * @param PlatformTypesInterface $types
+     *
+     * @return void
+     *
+     * @throws InvalidTypeException When database type do not correspond with property type (expect null)
      */
     public function flatHydrate($object, array $data, PlatformTypesInterface $types);
 
@@ -67,7 +81,8 @@ interface MapperHydratorInterface
      *
      * @return mixed
      *
-     * @throws \InvalidArgumentException When given attribute is not declared
+     * @throws FieldNotDeclaredException When given attribute is not declared
+     * @throws UninitializedPropertyException When unititialized properties are tried to be extracted
      *
      * @see MapperHydratorInterface::hydrateOne() For perform the reverse operation
      */
@@ -85,7 +100,8 @@ interface MapperHydratorInterface
      * @param string $attribute
      * @param mixed $value
      *
-     * @throws \InvalidArgumentException When given attribute is not declared or the owner object cannot be instantiated
+     * @throws FieldNotDeclaredException When given attribute is not declared or the owner object cannot be instantiated
+     * @throws InvalidTypeException When trying to hydrate null on nonnull property
      *
      * @see MapperHydratorInterface::extractOne() For perform the reverse operation
      */
