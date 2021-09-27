@@ -93,13 +93,13 @@ class ObjectPropertyInfo implements InfoInterface
      *
      * @see EntityCollection
      *
-     * @return string|callable The wrapper, or null if not set
+     * @return string|callable|null The wrapper, or null if not set
      */
     public function wrapper()
     {
         return empty($this->relation['wrapper']) ? null : $this->relation['wrapper'];
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -123,9 +123,9 @@ class ObjectPropertyInfo implements InfoInterface
     /**
      * Get the class name of the property if it is a class
      * 
-     * @return null|string
+     * @return null|class-string
      */
-    public function className()
+    public function className(): ?string
     {
         if (isset($this->relation['entity'])) {
             return $this->relation['entity'];

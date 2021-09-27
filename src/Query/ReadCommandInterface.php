@@ -3,12 +3,25 @@
 namespace Bdf\Prime\Query;
 
 use Bdf\Prime\Collection\CollectionFactory;
+use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\Cachable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 
 /**
  * Base type for "read" operation commands
+ *
+ * @method $this by(string $attribute, bool $combine = false) Indexing entities by an attribute value. Use combine for multiple entities with same attribute value
+ * @method $this with(string|string[] $relations) Relations to load
+ * @method $this without(string|string[] $relations) Relations to discard
+ * @method R|null get($pk) Get one entity by its identifier
+ * @method R getOrFail($pk) Get one entity or throws when entity is not found
+ * @method R getOrNew($pk) Get one entity or return a new one if not found in repository
+ *
+ * @template C as \Bdf\Prime\Connection\ConnectionInterface
+ * @template R as object|array
+ *
+ * @extends CommandInterface<C>
  */
 interface ReadCommandInterface extends CommandInterface, Cachable
 {
@@ -81,7 +94,8 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      *
      * @param string|array $columns
      *
-     * @return array
+     * @return R[]|CollectionInterface<R>
+     *
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]
@@ -98,7 +112,7 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      *
      * @param string|array $columns
      *
-     * @return array|object|null
+     * @return R|null
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]

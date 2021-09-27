@@ -10,6 +10,8 @@ use Bdf\Prime\Query\Contract\Projectionable;
  *
  * @property CompilerState $compilerState
  * @property array $statements
+ *
+ * @psalm-require-implements Projectionable
  */
 trait ProjectionableTrait
 {

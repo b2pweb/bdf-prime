@@ -7,6 +7,8 @@ use Bdf\Prime\Query\Contract\WriteOperation;
 
 /**
  * Handle write operations on repository
+ *
+ * @template E as object
  */
 interface WriterInterface
 {
@@ -24,14 +26,14 @@ interface WriterInterface
      * $inserted = $writer->insert($otherEntity, ['ignore' => true]) === 1;
      * </code>
      *
-     * @param object $entity The entity
+     * @param E $entity The entity
      * @param array $options Insert options
      *
      * @return int The number of affected rows
      * @throws PrimeException When insert fail
      */
     #[WriteOperation]
-    public function insert($entity, array $options = []);
+    public function insert($entity, array $options = []): int;
 
     /**
      * Update an entity to the repository
@@ -47,14 +49,14 @@ interface WriterInterface
      * $writer->update($entity, ['attributes' => ['name']]);
      * </code>
      *
-     * @param object $entity The entity
+     * @param E $entity The entity
      * @param array $options Update options
      *
      * @return int The number of affected rows
      * @throws PrimeException When update fail
      */
     #[WriteOperation]
-    public function update($entity, array $options = []);
+    public function update($entity, array $options = []): int;
 
     /**
      * Delete an entity from the repository
@@ -63,12 +65,12 @@ interface WriterInterface
      * $writer->delete($entity);
      * </code>
      *
-     * @param object $entity The entity
+     * @param E $entity The entity
      * @param array $options Delete options
      *
      * @return int The number of affected rows
      * @throws PrimeException When delete fail
      */
     #[WriteOperation]
-    public function delete($entity, array $options = []);
+    public function delete($entity, array $options = []): int;
 }

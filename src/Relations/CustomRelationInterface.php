@@ -18,5 +18,5 @@ interface CustomRelationInterface extends RelationInterface
      *
      * @return static
      */
-    public static function make(RepositoryInterface $repository, $relationName, array $relationMeta);
+    public static function make(RepositoryInterface $repository, string $relationName, array $relationMeta): RelationInterface;
 }

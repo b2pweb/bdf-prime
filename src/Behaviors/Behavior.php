@@ -3,18 +3,20 @@
 namespace Bdf\Prime\Behaviors;
 
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 
 /**
- * Behavior
+ * Default implementation for Behavior classes
  *
- * @package Bdf\Prime\Behaviors
+ * @template E as object
+ * @implements BehaviorInterface<E>
  */
 class Behavior implements BehaviorInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function changeSchema(FieldBuilder $builder)
+    public function changeSchema(FieldBuilder $builder): void
     {
         
     }
@@ -22,7 +24,7 @@ class Behavior implements BehaviorInterface
     /**
      * {@inheritdoc}
      */
-    public function subscribe($notifier)
+    public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
     {
         
     }
@@ -30,7 +32,7 @@ class Behavior implements BehaviorInterface
     /**
      * {@inheritdoc}
      */
-    public function constraints()
+    public function constraints(): array
     {
         return [];
     }

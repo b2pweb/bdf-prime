@@ -9,27 +9,35 @@ use Bdf\Prime\Query\Contract\EntityJoinable;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Relations\Util\ForeignKeyRelation;
 use Bdf\Prime\Repository\RepositoryInterface;
+use LogicException;
 
 /**
  * ByInheritance
  *
  * @todo options ?
+ *
+ * @template L as object
+ *
+ * @extends AbstractRelation<L, object>
  */
 class ByInheritance extends AbstractRelation
 {
+    /** @use Polymorph<L> */
     use Polymorph;
+    /** @use ForeignKeyRelation<L, object> */
     use ForeignKeyRelation;
 
     /**
      * Set inheritance relation
      * 
-     * @param string              $attributeAim
-     * @param RepositoryInterface $local
-     * @param string              $localKey
+     * @param string $attributeAim
+     * @param RepositoryInterface<L> $local
+     * @param string $localKey
      */
-    public function __construct($attributeAim, RepositoryInterface $local, $localKey)
+    public function __construct(string $attributeAim, RepositoryInterface $local, string $localKey)
     {
         parent::__construct($attributeAim, $local);
 
@@ -38,7 +46,7 @@ class ByInheritance extends AbstractRelation
         $mapper = $local->mapper();
         
         if (!$mapper instanceof SingleTableInheritanceMapper) {
-            throw new \LogicException('The mapper could not manage single table inheritance relation');
+            throw new LogicException('The mapper could not manage single table inheritance relation');
         }
 
         $this->setDiscriminator($mapper->getDiscriminatorColumn());
@@ -48,7 +56,7 @@ class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
-    public function relationRepository()
+    public function relationRepository(): RepositoryInterface
     {
         return $this->subRelation()->relationRepository();
     }
@@ -57,7 +65,7 @@ class ByInheritance extends AbstractRelation
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = [])
+    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
     {
         if ($collection->empty()) {
             return;
@@ -82,22 +90,22 @@ class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
-    public function link($owner)
+    public function link($owner): ReadCommandInterface
     {
         $this->updateDiscriminatorValue($owner);
 
-        return $this->subRelation()->associate($owner);
+        return $this->subRelation()->link($owner);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function join($query, $alias = null)
+    public function join(EntityJoinable $query, string $alias): void
     {
-        $parts = explode('#', (string)$alias);
+        $parts = explode('#', $alias);
 
         if (!isset($parts[1])) {
-            throw new \LogicException('Joins are not supported on polymorph without discriminator');
+            throw new LogicException('Joins are not supported on polymorph without discriminator');
         }
 
         $this->discriminatorValue = end($parts);
@@ -112,9 +120,9 @@ class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
-    public function joinRepositories(EntityJoinable $query, $alias = null, $discriminatorValue = null)
+    public function joinRepositories(EntityJoinable $query, string $alias, $discriminator = null): array
     {
-        $this->discriminatorValue = $discriminatorValue;
+        $this->discriminatorValue = $discriminator;
 
         return [
             $alias => $this->relationRepository()
@@ -159,14 +167,14 @@ class ByInheritance extends AbstractRelation
     {
         $this->updateDiscriminatorValue($owner);
 
-        return $this->subRelation()->saveAll($owner, $related);
+        return $this->subRelation()->add($owner, $related);
     }
 
     /**
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function saveAll($owner, array $relations = [])
+    public function saveAll($owner, array $relations = []): int
     {
         $relations = $this->rearrangeWith($relations);
         $this->updateDiscriminatorValue($owner);
@@ -178,7 +186,7 @@ class ByInheritance extends AbstractRelation
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function deleteAll($owner, array $relations = [])
+    public function deleteAll($owner, array $relations = []): int
     {
         $relations = $this->rearrangeWith($relations);
         $this->updateDiscriminatorValue($owner);
@@ -189,10 +197,11 @@ class ByInheritance extends AbstractRelation
     /**
      * Get the delagated sub relation
      *
-     * @return RelationInterface
+     * @return RelationInterface<L, object>
      */
-    protected function subRelation()
+    protected function subRelation(): RelationInterface
     {
+        /** @var array{entity:class-string<L>} $infos */
         $infos = $this->map($this->discriminatorValue);
 
         $relation = $this->local->repository($infos['entity'])
@@ -226,8 +235,8 @@ class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
-    protected function applyWhereKeys(QueryInterface $query, $value)
+    protected function applyWhereKeys(ReadCommandInterface $query, $value): ReadCommandInterface
     {
-
+        return $query;
     }
 }

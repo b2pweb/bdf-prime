@@ -47,7 +47,7 @@ interface InsertQueryInterface
      *
      * @return $this
      */
-    public function into($table);
+    public function into(string $table);
 
     /**
      * Set the insert columns and types
@@ -70,7 +70,7 @@ interface InsertQueryInterface
      * ]);
      * </code>
      *
-     * @param array $columns The columns. For typed columns, set the column name as key and type as value
+     * @param string[] $columns The columns. For typed columns, set the column name as key and type as value
      *
      * @return $this
      */
@@ -102,34 +102,34 @@ interface InsertQueryInterface
      * ], true);
      * </code>
      *
-     * @param array $data Data to insert, with key as column and value as insert value
+     * @param array<string,mixed> $data Data to insert, with key as column and value as insert value
      * @param bool $replace Overrides old values, or append value on the bulk insert. This parameter has effect only on bulk insert
      *
      * @return $this
      */
-    public function values(array $data, $replace = false);
+    public function values(array $data, bool $replace = false);
 
     /**
      * Change the insert mode
      * Prefer use ignore() or replace() methods
      *
-     * @param string $mode One of the BulkInsertQuery::MODE_* constants
+     * @param BulkInsertQuery::MODE_* $mode One of the BulkInsertQuery::MODE_* constants
      *
      * @return $this
      *
      * @see BulkInsertQuery::ignore()
      * @see BulkInsertQuery::replace()
      */
-    public function mode($mode);
+    public function mode(string $mode);
 
     /**
-     * Ignore the insert if the primary constrait failed
+     * Ignore the insert if the primary constraint failed
      *
      * @param bool $flag true to enable, or false to use normal insert
      *
      * @return $this
      */
-    public function ignore($flag = true);
+    public function ignore(bool $flag = true);
 
     /**
      * Force replace data :
@@ -140,7 +140,7 @@ interface InsertQueryInterface
      *
      * @return $this
      */
-    public function replace($flag = true);
+    public function replace(bool $flag = true);
 
     /**
      * Enable bulk insert query
@@ -152,7 +152,7 @@ interface InsertQueryInterface
      *
      * @return $this
      */
-    public function bulk($flag = true);
+    public function bulk(bool $flag = true);
 
     /**
      * Execute the insert operation

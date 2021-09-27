@@ -21,7 +21,7 @@ interface Aggregatable
      * @see Aggregate::count() For generate a count query
      */
     #[ReadOperation]
-    public function count($column = null);
+    public function count(?string $column = null): int;
 
     /**
      * Execute a AVG function
@@ -34,33 +34,33 @@ interface Aggregatable
      * @see Aggregate::avg() For generate a avg query
      */
     #[ReadOperation]
-    public function avg($column = null);
+    public function avg(?string $column = null): float;
 
     /**
      * Execute a MIN function
      *
      * @param null|string $column
      *
-     * @return float
+     * @return float|int|string
      * @throws PrimeException When execute fail
      *
      * @see Aggregate::min() For generate a min query
      */
     #[ReadOperation]
-    public function min($column = null);
+    public function min(?string $column = null);
 
     /**
      * Execute a MAX function
      *
      * @param null|string $column
      *
-     * @return float
+     * @return float|int|string
      * @throws PrimeException When execute fail
      *
      * @see Aggregate::max() For generate a max query
      */
     #[ReadOperation]
-    public function max($column = null);
+    public function max(?string $column = null);
 
     /**
      * Execute a SUM function
@@ -73,7 +73,7 @@ interface Aggregatable
      * @see Aggregate::sum() For generate a sum query
      */
     #[ReadOperation]
-    public function sum($column = null);
+    public function sum(?string $column = null): float;
 
     /**
      * Execute a aggregate function
@@ -81,9 +81,9 @@ interface Aggregatable
      * @param string $function
      * @param null|string $column
      *
-     * @return string
+     * @return mixed
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]
-    public function aggregate($function, $column = null);
+    public function aggregate(string $function, ?string $column = null);
 }

@@ -2,21 +2,50 @@
 
 namespace Bdf\Prime\Mapper\Builder;
 
+use ArrayAccess;
+use ArrayIterator;
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Types\TypeInterface;
 use Bdf\Prime\Types\TypesHelperInterface;
+use IteratorAggregate;
 
 /**
  * FieldBuilder
  *
- * @package Bdf\Prime\Mapper\Builder
+ * @psalm-type FieldDefinition = array{
+ *     type: string,
+ *     default: mixed,
+ *     primary?: "autoincrement"|"sequence"|true,
+ *     class?: class-string,
+ *     embedded?: array<string, array>,
+ *     class_map?: class-string[],
+ *     polymorph?: bool,
+ *     discriminator_field?: string,
+ *     discriminator_attribute?: string,
+ *     length?: int,
+ *     comment?: string,
+ *     alias?: string,
+ *     precision?: int,
+ *     scale?: int,
+ *     nillable?: bool,
+ *     unsigned?: bool,
+ *     unique?: bool|string,
+ *     fixed?: bool,
+ *     phpOptions?: array,
+ *     customSchemaOptions?: array,
+ *     platformOptions?: array,
+ *     columnDefinition?: string
+ * }
+ *
+ * @implements IteratorAggregate<string, FieldDefinition>
+ * @implements ArrayAccess<string, FieldDefinition>
  */
-class FieldBuilder implements \ArrayAccess, \IteratorAggregate, TypesHelperInterface
+class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterface
 {
     /**
      * Array of fields definition
      *
-     * @var array
+     * @var array<string, FieldDefinition>
      */
     protected $fields = [];
 
@@ -31,7 +60,7 @@ class FieldBuilder implements \ArrayAccess, \IteratorAggregate, TypesHelperInter
     /**
      * Get all defined fields
      *
-     * @return array
+     * @return array<string, FieldDefinition>
      */
     public function fields()
     {
@@ -61,7 +90,7 @@ class FieldBuilder implements \ArrayAccess, \IteratorAggregate, TypesHelperInter
     /**
      * Specify the primary key(s) for the table.
      * 
-     * @param  string $type     Type of sequence
+     * @param Metadata::PK_* $type Type of sequence
      * 
      * @return $this
      */
@@ -634,9 +663,9 @@ class FieldBuilder implements \ArrayAccess, \IteratorAggregate, TypesHelperInter
      */
     public function getIterator()
     {
-        return new \ArrayIterator($this->fields);
+        return new ArrayIterator($this->fields);
     }
-    
+
     //---- array access interface
     
     /**
@@ -649,6 +678,8 @@ class FieldBuilder implements \ArrayAccess, \IteratorAggregate, TypesHelperInter
 
     /**
      * {@inheritdoc}
+     *
+     * @return FieldDefinition
      */
     public function offsetGet($key)
     {

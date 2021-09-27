@@ -14,20 +14,19 @@ use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Pagination\PaginatorFactory;
-use Bdf\Prime\Query\Pagination\Walker;
-use Bdf\Prime\Query\Pagination\WalkStrategy\KeyWalkStrategy;
-use Bdf\Prime\Query\Pagination\WalkStrategy\MapperPrimaryKey;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\QueryRepositoryExtension;
 use Bdf\Prime\Query\ReadCommandInterface;
 
 /**
  * Factory for repository queries
+ *
+ * @template E as object
  */
 class RepositoryQueryFactory
 {
     /**
-     * @var RepositoryInterface
+     * @var RepositoryInterface<E>
      */
     private $repository;
 
@@ -66,19 +65,19 @@ class RepositoryQueryFactory
     //===============//
 
     /**
-     * @var KeyValueQueryInterface
+     * @var KeyValueQueryInterface<ConnectionInterface, E>
      */
     private $findByIdQuery;
 
     /**
-     * @var KeyValueQueryInterface
+     * @var KeyValueQueryInterface<ConnectionInterface, E>
      */
     private $countKeyValueQuery;
 
     /**
      * Save extension instance for optimisation
      *
-     * @var QueryRepositoryExtension
+     * @var QueryRepositoryExtension<E>
      */
     private $extension;
 
@@ -93,7 +92,7 @@ class RepositoryQueryFactory
     /**
      * RepositoryQueryFactory constructor.
      *
-     * @param RepositoryInterface $repository
+     * @param RepositoryInterface<E> $repository
      * @param CacheInterface|null $resultCache
      */
     public function __construct(RepositoryInterface $repository, ?CacheInterface $resultCache = null)
@@ -111,7 +110,7 @@ class RepositoryQueryFactory
     /**
      * Get query builder
      *
-     * @return QueryInterface
+     * @return QueryInterface<ConnectionInterface, E>
      */
     public function builder()
     {
@@ -123,7 +122,7 @@ class RepositoryQueryFactory
      *
      * @param string|null $alias The FROM table alias
      *
-     * @return QueryInterface
+     * @return QueryInterface<ConnectionInterface, E>
      *
      * @throws PrimeException
      */
@@ -135,12 +134,19 @@ class RepositoryQueryFactory
     /**
      * Make a query
      *
-     * @param string $query The query name or class name to make
+     * @param class-string<Q> $query The query name or class name to make
      *
-     * @return CommandInterface
+     * @return Q
+     * @throws PrimeException When cannot create the query
+     *
+     * @template Q as object
+     *
+     * @todo typehint with CommandInterface
+     * @psalm-suppress InvalidReturnType
      */
-    public function make($query)
+    public function make(string $query)
     {
+        /** @psalm-suppress InvalidReturnStatement */
         return $this->configure($this->connection->make($query, new OrmPreprocessor($this->repository)));
     }
 
@@ -154,7 +160,7 @@ class RepositoryQueryFactory
      *
      * @param array|string $id The entity PK. Use an array for composite PK
      *
-     * @return mixed The entity or null if not found
+     * @return E|null The entity or null if not found
      * @throws PrimeException When query fail
      */
     #[ReadOperation]
@@ -205,7 +211,7 @@ class RepositoryQueryFactory
      * @param string|array|null $attribute The search attribute, or criteria
      * @param mixed $value The search value
      *
-     * @return KeyValueQueryInterface|null The query, or null if not supported
+     * @return KeyValueQueryInterface<ConnectionInterface, E>|null The query, or null if not supported
      */
     public function keyValue($attribute = null, $value = null)
     {
@@ -213,6 +219,7 @@ class RepositoryQueryFactory
             return null;
         }
 
+        /** @var KeyValueQueryInterface<ConnectionInterface, E> $query */
         $query = $this->make(KeyValueQueryInterface::class);
 
         if ($attribute) {
@@ -278,24 +285,25 @@ class RepositoryQueryFactory
      * $queries->entities($entities)->delete();
      * </code>
      *
-     * @param object[] $entities Array of entities to select
+     * @param E[] $entities Array of entities to select
      *
-     * @return QueryInterface
+     * @return QueryInterface<ConnectionInterface, E>
      */
     public function entities(array $entities)
     {
-        $query = $this->repository->queries()->builder();
+        $query = $this->builder();
+        $mapper = $this->repository->mapper();
 
-        if ($this->repository->mapper()->metadata()->isCompositePrimaryKey()) {
+        if ($this->metadata->isCompositePrimaryKey()) {
             foreach ($entities as $entity) {
-                $query->orWhere($this->repository->mapper()->primaryCriteria($entity));
+                $query->orWhere($mapper->primaryCriteria($entity));
             }
         } else {
-            $attribute = $this->repository->mapper()->metadata()->primary['attributes'][0];
+            $attribute = $this->metadata->primary['attributes'][0];
             $keys = [];
 
             foreach ($entities as $entity) {
-                $keys[] = $this->repository->extractOne($entity, $attribute);
+                $keys[] = $mapper->extractOne($entity, $attribute);
             }
 
             $query->where($attribute, 'in', $keys);
@@ -357,7 +365,7 @@ class RepositoryQueryFactory
     /**
      * Optimise query extension creation
      *
-     * @return QueryRepositoryExtension
+     * @return QueryRepositoryExtension<E>
      */
     private function extension()
     {

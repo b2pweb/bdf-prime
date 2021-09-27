@@ -20,12 +20,11 @@ use Bdf\Serializer\Type\Type;
 class PaginatorNormalizer implements NormalizerInterface, AutoRegisterInterface
 {
     /**
-     * @param PaginatorInterface $data
-     *
      * {@inheritdoc}
      */
     public function normalize($data, NormalizationContext $context)
     {
+        /** @var PaginatorInterface $data */
         $class = get_class($data);
         $values = [];
 

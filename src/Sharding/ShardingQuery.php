@@ -10,7 +10,12 @@ use Bdf\Prime\Sharding\Extension\ShardPicker;
 /**
  * ShardingQuery
  *
+ * @template R as object|array
+ *
  * @property ShardingConnection $connection protected
+ * @template R as object|array
+ *
+ * @extends Query<ShardingConnection, R>
  */
 class ShardingQuery extends Query
 {
@@ -94,7 +99,7 @@ class ShardingQuery extends Query
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function paginationCount($column = null)
+    public function paginationCount(?string $column = null): int
     {
         $statements = $this->statements;
 
@@ -121,7 +126,7 @@ class ShardingQuery extends Query
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function count($column = null)
+    public function count(?string $column = null): int
     {
         return (int)array_sum($this->aggregate(__FUNCTION__, $column));
     }
@@ -130,7 +135,7 @@ class ShardingQuery extends Query
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function avg($column = null)
+    public function avg(?string $column = null): float
     {
         $numbers = $this->aggregate(__FUNCTION__, $column);
 
@@ -141,25 +146,25 @@ class ShardingQuery extends Query
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function min($column = null)
+    public function min(?string $column = null)
     {
-        return (float)min($this->aggregate(__FUNCTION__, $column));
+        return min($this->aggregate(__FUNCTION__, $column));
     }
 
     /**
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function max($column = null)
+    public function max(?string $column = null)
     {
-        return (float)max($this->aggregate(__FUNCTION__, $column));
+        return max($this->aggregate(__FUNCTION__, $column));
     }
 
     /**
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function sum($column = null)
+    public function sum(?string $column = null): float
     {
         return (float)array_sum($this->aggregate(__FUNCTION__, $column));
     }
@@ -168,7 +173,7 @@ class ShardingQuery extends Query
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function aggregate($function, $column = null)
+    public function aggregate(string $function, ?string $column = null)
     {
         $statements = $this->statements;
 

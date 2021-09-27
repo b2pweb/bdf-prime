@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Behaviors;
 
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
 
@@ -10,6 +11,9 @@ use Bdf\Prime\Types\TypeInterface;
  * Timestampable
  *
  * The timestampable behavior allows you to keep track of the date of creation and last update of your model objects.
+ *
+ * @template E as object
+ * @extends Behavior<E>
  */
 final class Timestampable extends Behavior
 {
@@ -67,11 +71,12 @@ final class Timestampable extends Behavior
     /**
      * Get the field infos from option
      *
-     * @param mixed $field
+     * @param bool|string|array{0:string,1:string} $field
+     * @param array $default
      *
      * @return null|array
      */
-    private function getFieldInfos($field, $default)
+    private function getFieldInfos($field, array $default): ?array
     {
         if ($field === true) {
             return $default;
@@ -94,7 +99,7 @@ final class Timestampable extends Behavior
     /**
      * {@inheritdoc}
      */
-    public function changeSchema(FieldBuilder $builder)
+    public function changeSchema(FieldBuilder $builder): void
     {
         if ($this->createdAt !== null && !isset($builder[$this->createdAt['name']])) {
             $builder->add($this->createdAt['name'], $this->type)->nillable();
@@ -118,13 +123,13 @@ final class Timestampable extends Behavior
      *
      * we set the new date created on the entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
      */
     public function beforeInsert($entity, $repository)
     {
         $now = $this->createDate($this->createdAt['name'], $repository);
-        $repository->hydrateOne($entity, $this->createdAt['name'], $now);
+        $repository->mapper()->hydrateOne($entity, $this->createdAt['name'], $now);
     }
 
     /**
@@ -132,9 +137,9 @@ final class Timestampable extends Behavior
      *
      * we set the new date updated on entity
      *
-     * @param object                 $entity
-     * @param RepositoryInterface    $repository
-     * @param null|\ArrayObject      $attributes
+     * @param E $entity
+     * @param RepositoryInterface<E> $repository
+     * @param null|\ArrayObject $attributes
      */
     public function beforeUpdate($entity, $repository, $attributes)
     {
@@ -143,14 +148,16 @@ final class Timestampable extends Behavior
         }
 
         $now = $this->createDate($this->updatedAt['name'], $repository);
-        $repository->hydrateOne($entity, $this->updatedAt['name'], $now);
+        $repository->mapper()->hydrateOne($entity, $this->updatedAt['name'], $now);
     }
 
     /**
      * Get the field infos from option
      *
-     * @return string $name
-     * @return RepositoryInterface $repository
+     * @param string $name
+     * @param RepositoryInterface $repository
+     *
+     * @return int|\DateTimeInterface
      */
     private function createDate($name, $repository)
     {
@@ -158,6 +165,7 @@ final class Timestampable extends Behavior
             return time();
         }
 
+        /** @psalm-suppress UndefinedInterfaceMethod */
         $className = $repository->mapper()->info()->property($name)->phpType();
         return new $className;
     }
@@ -165,7 +173,7 @@ final class Timestampable extends Behavior
     /**
      * {@inheritdoc}
      */
-    public function subscribe($notifier)
+    public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
     {
         if ($this->createdAt !== null) {
             $notifier->inserting([$this, 'beforeInsert']);

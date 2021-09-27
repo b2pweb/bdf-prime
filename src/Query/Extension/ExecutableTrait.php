@@ -2,12 +2,15 @@
 
 namespace Bdf\Prime\Query\Extension;
 
+use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\Contract\ReadOperation;
 
 /**
  * Trait for provide execute() wrapper methods
+ *
+ * @psalm-require-implements \Bdf\Prime\Query\ReadCommandInterface
  */
 trait ExecutableTrait
 {
@@ -69,7 +72,7 @@ trait ExecutableTrait
      *
      * @param array  $data
      *
-     * @return array
+     * @return array|CollectionInterface
      */
     abstract public function postProcessResult($data);
 
@@ -83,8 +86,8 @@ trait ExecutableTrait
 
     /**
      * {@inheritdoc}
+     *
      * @see QueryInterface::limit()
-     * @return $this
      */
-    abstract public function limit($limit, $offset = null);
+    abstract public function limit(?int $limit, ?int $offset = null);
 }

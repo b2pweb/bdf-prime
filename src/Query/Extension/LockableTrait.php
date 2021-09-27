@@ -1,6 +1,7 @@
 <?php
 
 namespace Bdf\Prime\Query\Extension;
+
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Doctrine\DBAL\LockMode;
 
@@ -9,13 +10,17 @@ use Doctrine\DBAL\LockMode;
  *
  * @property CompilerInterface $compiler
  * @property array $statements
+ *
+ * @psalm-require-implements \Bdf\Prime\Query\Contract\Lockable
  */
 trait LockableTrait
 {
     /**
+     * {@inheritdoc}
+     *
      * @see Lockable::lock()
      */
-    public function lock($lock = LockMode::PESSIMISTIC_WRITE)
+    public function lock(int $lock = LockMode::PESSIMISTIC_WRITE)
     {
         $this->compilerState->invalidate('lock');
 
@@ -25,9 +30,11 @@ trait LockableTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Lockable::isLocked()
      */
-    public function isLocked($lock = LockMode::PESSIMISTIC_WRITE)
+    public function isLocked(int $lock = LockMode::PESSIMISTIC_WRITE): bool
     {
         return $this->statements['lock'] === $lock;
     }

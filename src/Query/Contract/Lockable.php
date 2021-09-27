@@ -12,18 +12,18 @@ interface Lockable
     /**
      * Lock the row for select
      *
-     * @param int $lock  {@see LockMode} constants
+     * @param LockMode::* $lock  {@see LockMode} constants
      *
      * @return $this This Query instance.
      */
-    public function lock($lock = LockMode::PESSIMISTIC_WRITE);
+    public function lock(int $lock = LockMode::PESSIMISTIC_WRITE);
 
     /**
      * Checks whether the query is locked for select
      *
-     * @param int $lock
+     * @param LockMode::* $lock
      *
      * @return boolean
      */
-    public function isLocked($lock = LockMode::PESSIMISTIC_WRITE);
+    public function isLocked(int $lock = LockMode::PESSIMISTIC_WRITE): bool;
 }

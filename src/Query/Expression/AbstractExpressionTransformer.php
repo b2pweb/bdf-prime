@@ -43,7 +43,7 @@ abstract class AbstractExpressionTransformer implements ExpressionTransformerInt
     /**
      * {@inheritdoc}
      */
-    public function setContext(CompilerInterface $compiler, $column, $operator)
+    public function setContext(CompilerInterface $compiler, string $column, string $operator): void
     {
         $this->compiler = $compiler;
         $this->column   = $column;
@@ -53,7 +53,7 @@ abstract class AbstractExpressionTransformer implements ExpressionTransformerInt
     /**
      * {@inheritdoc}
      */
-    public function getOperator()
+    public function getOperator(): string
     {
         return $this->operator;
     }
@@ -61,7 +61,7 @@ abstract class AbstractExpressionTransformer implements ExpressionTransformerInt
     /**
      * {@inheritdoc}
      */
-    public function getColumn()
+    public function getColumn(): string
     {
         return $this->column;
     }

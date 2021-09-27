@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Entity;
 
 use ArrayAccess;
+use Bdf\Prime\Query\Contract\Orderable;
 
 /**
  * EntityFilter gère les critères de recherche d'entités
@@ -201,9 +202,9 @@ class Criteria implements ArrayAccess
      * Set attribute order
      * 
      * @param string $attribute
-     * @param string $type
+     * @param Orderable::ORDER_* $type
      */
-    public function order($attribute, $type = 'ASC')
+    public function order(string $attribute, string $type = Orderable::ORDER_ASC)
     {
         $this->specials[':order'][$attribute] = $type;
     }
@@ -294,7 +295,7 @@ class Criteria implements ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        return $this->add($offset, $value);
+        $this->add($offset, $value);
     }
     
     /**
@@ -318,6 +319,6 @@ class Criteria implements ArrayAccess
      */
     public function offsetUnset($offset)
     {
-        return $this->remove($offset);
+        $this->remove($offset);
     }
 }

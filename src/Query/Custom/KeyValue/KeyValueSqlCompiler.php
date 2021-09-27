@@ -11,6 +11,8 @@ use Doctrine\DBAL\Statement;
 
 /**
  * SQL compiler for KeyValueQuery
+ *
+ * @extends AbstractCompiler<KeyValueQuery, \Doctrine\DBAL\Connection&\Bdf\Prime\Connection\ConnectionInterface>
  */
 class KeyValueSqlCompiler extends AbstractCompiler
 {
@@ -258,7 +260,7 @@ class KeyValueSqlCompiler extends AbstractCompiler
      * @return string
      * @throws PrimeException
      */
-    private function compileValues(CompilableClause $query)
+    private function compileValues(CompilableClause $query): string
     {
         if (isset($query->state()->compiledParts['values'])) {
             return $query->state()->compiledParts['values']['sql'];
@@ -288,7 +290,7 @@ class KeyValueSqlCompiler extends AbstractCompiler
             'types' => $types
         ];
 
-        return $sql;
+        return (string) $sql;
     }
 
     /**

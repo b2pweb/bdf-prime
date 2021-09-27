@@ -97,7 +97,7 @@ final class PdoResultSet implements ResultSetInterface
                 break;
 
             case self::FETCH_CLASS:
-                $this->statement->setFetchMode(\PDO::FETCH_CLASS, $options);
+                $this->statement->setFetchMode(\PDO::FETCH_CLASS, (string) $options);
                 break;
 
             default:

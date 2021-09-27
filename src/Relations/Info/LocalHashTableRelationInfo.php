@@ -11,7 +11,7 @@ final class LocalHashTableRelationInfo implements RelationInfoInterface
      * Store loaded state of entities relations
      * Use the entity object id as key, and boolean as value
      *
-     * @var boolean[]
+     * @var array<string, boolean>
      */
     private $loaded = [];
 

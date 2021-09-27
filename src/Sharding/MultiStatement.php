@@ -47,6 +47,8 @@ class MultiStatement implements \IteratorAggregate, ResultStatement
         }
 
         unset($this->statements);
+
+        return true;
     }
 
     /**

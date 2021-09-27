@@ -35,7 +35,7 @@ class EmbeddedAccessor
      *
      * @param CodeGenerator $code
      * @param EmbeddedInfo $embedded
-     * @param EmbeddedAccessor[] $accessors
+     * @param ClassAccessor[] $accessors
      * @param EmbeddedAccessor|ClassAccessor $parentAccessor
      */
     public function __construct(CodeGenerator $code, EmbeddedInfo $embedded, array $accessors, $parentAccessor)

@@ -41,7 +41,7 @@ class ShardingConnectionTest extends TestCase
         $this->connections = new ConnectionManager($this->registry);
         $this->connections->getConnection('sharding')->schema()
             ->table('test', function(TypesHelperTableBuilder $table) {
-                $table->bigint('id', true);
+                $table->bigint('id')->autoincrement(true);
                 $table->string('name');
                 $table->primary('id');
             });

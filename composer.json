@@ -44,11 +44,13 @@
     "symfony/console": "~4.3|~5.0",
     "symfony/http-foundation": "~4.3|~5.0",
     "symfony/http-kernel": "~4.3|~5.0",
-    "symfony/validator": "~4.3|~5.0"
+    "symfony/validator": "~4.3|~5.0",
+    "vimeo/psalm": "~4.6.0"
   },
   "scripts": {
     "tests": "phpunit",
-    "tests-with-coverage": "phpunit --coverage-clover coverage.xml"
+    "tests-with-coverage": "phpunit --coverage-clover coverage.xml",
+    "psalm": "psalm --shepherd"
   },
   "extra": {
     "branch-alias": {

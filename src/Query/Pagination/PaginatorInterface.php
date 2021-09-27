@@ -3,19 +3,20 @@
 namespace Bdf\Prime\Query\Pagination;
 
 use Bdf\Prime\Collection\CollectionInterface;
+use Bdf\Prime\Query\Contract\Orderable;
 
 /**
  * PaginatorInterface
  * 
- * @author  Seb
- * @package Bdf\Prime\Query\Pagination
+ * @template R as array|object
+ * @implements CollectionInterface<R>
  */
 interface PaginatorInterface extends CollectionInterface
 {
     /**
      * Get the current collection
      * 
-     * @return array|CollectionInterface
+     * @return R[]|CollectionInterface<R>
      */
     public function collection();
 
@@ -38,23 +39,23 @@ interface PaginatorInterface extends CollectionInterface
      * 
      * @param string $attribute
      * 
-     * @return string|array
+     * @return Orderable::ORDER_*|array<string,Orderable::ORDER_*>|null
      */
     public function order($attribute = null);
 
     /**
      * Get query limit
      * 
-     * @return int
+     * @return int|null
      */
-    public function limit();
+    public function limit(): ?int;
 
     /**
      * Get query offset
      * 
-     * @return int
+     * @return int|null
      */
-    public function offset();
+    public function offset(): ?int;
 
     /**
      * Get page from pagination

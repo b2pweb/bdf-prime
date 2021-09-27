@@ -2,11 +2,15 @@
 
 namespace Bdf\Prime\Relations;
 
+use BadMethodCallException;
 use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Collection\Indexer\EntityIndexerInterface;
 use Bdf\Prime\Collection\Indexer\EntitySetIndexer;
 use Bdf\Prime\Locatorizable;
+use Bdf\Prime\Query\Contract\Deletable;
+use Bdf\Prime\Query\Contract\Whereable;
 use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Relations\Info\LocalHashTableRelationInfo;
 use Bdf\Prime\Relations\Info\NullRelationInfo;
 use Bdf\Prime\Relations\Info\RelationInfoInterface;
@@ -14,6 +18,11 @@ use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
  * Base class for define common methods for relations
+ *
+ * @template L as object
+ * @template R as object
+ *
+ * @implements RelationInterface<L, R>
  */
 abstract class AbstractRelation implements RelationInterface
 {
@@ -27,21 +36,21 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * The local repository of this relation
      *
-     * @var RepositoryInterface
+     * @var RepositoryInterface<L>
      */
     protected $local;
 
     /**
      * The local alias
      *
-     * @var string
+     * @var string|null
      */
     protected $localAlias;
 
     /**
      * The distant repository
      *
-     * @var RepositoryInterface
+     * @var RepositoryInterface<R>
      */
     protected $distant;
 
@@ -78,11 +87,11 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * Set the relation info
      *
-     * @param string              $attributeAim  The property name that hold the relation
-     * @param RepositoryInterface $local
-     * @param RepositoryInterface $distant
+     * @param string $attributeAim  The property name that hold the relation
+     * @param RepositoryInterface<L> $local
+     * @param RepositoryInterface<R>|null $distant
      */
-    public function __construct($attributeAim, RepositoryInterface $local, RepositoryInterface $distant = null)
+    public function __construct($attributeAim, RepositoryInterface $local, ?RepositoryInterface $distant = null)
     {
         $this->attributeAim = $attributeAim;
         $this->local = $local;
@@ -97,7 +106,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function setLocalAlias($localAlias)
+    public function setLocalAlias(?string $localAlias)
     {
         $this->localAlias = $localAlias;
 
@@ -107,7 +116,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function localRepository()
+    public function localRepository(): RepositoryInterface
     {
         return $this->local;
     }
@@ -141,7 +150,7 @@ abstract class AbstractRelation implements RelationInterface
      *
      * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return [
             'constraints' => $this->constraints,
@@ -157,9 +166,9 @@ abstract class AbstractRelation implements RelationInterface
      *
      * @return $this
      */
-    public function setDetached($flag)
+    public function setDetached(bool $flag)
     {
-        $this->isDetached = (bool)$flag;
+        $this->isDetached = $flag;
 
         return $this;
     }
@@ -169,7 +178,7 @@ abstract class AbstractRelation implements RelationInterface
      *
      * @return bool
      */
-    public function isDetached()
+    public function isDetached(): bool
     {
         return $this->isDetached;
     }
@@ -177,7 +186,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * Get the query's result wrapper
      *
-     * @return string|callable
+     * @return string|callable|null
      */
     public function getWrapper()
     {
@@ -227,7 +236,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function isLoaded($entity)
+    public function isLoaded($entity): bool
     {
         return $this->relationInfo->isLoaded($entity);
     }
@@ -235,7 +244,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function clearInfo($entity)
+    public function clearInfo($entity): void
     {
         $this->relationInfo->clear($entity);
     }
@@ -246,13 +255,15 @@ abstract class AbstractRelation implements RelationInterface
      *
      * Use prefix on keys if set
      *
-     * @param QueryInterface $query
-     * @param mixed        $constraints
-     * @param string       $context         The context is the prefix used by the query to refer to the related repository
+     * @param Q $query
+     * @param mixed $constraints
+     * @param string $context         The context is the prefix used by the query to refer to the related repository
      *
-     * @return QueryInterface
+     * @return Q
+     *
+     * @template Q as \Bdf\Prime\Query\Contract\Whereable&ReadCommandInterface
      */
-    protected function applyConstraints($query, $constraints = [], $context = null)
+    protected function applyConstraints(ReadCommandInterface $query, $constraints = [], $context = null): ReadCommandInterface
     {
         if (is_array($constraints) && is_array($this->constraints)) {
             $query->where($this->applyContext($context, $constraints + $this->constraints));
@@ -270,14 +281,16 @@ abstract class AbstractRelation implements RelationInterface
      * @todo algo également présent dans EntityRepository::constraints()
      *
      * @param string|null $context
-     * @param mixed       $constraints
+     * @param mixed|array<string,mixed> $constraints
      *
      * @return mixed
      */
-    protected function applyContext($context, $constraints)
+    protected function applyContext(?string $context, $constraints)
     {
         if ($context && is_array($constraints)) {
             $context .= '.';
+
+            /** @var string $key */
             foreach ($constraints as $key => $value) {
                 // Skip commands
                 if ($key[0] !== ':') {
@@ -297,12 +310,12 @@ abstract class AbstractRelation implements RelationInterface
      * @param string|array $value
      * @param mixed        $constraints
      *
-     * @return QueryInterface
+     * @return ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>&Deletable
      */
-    protected function query($value, $constraints = [])
+    protected function query($value, $constraints = []): ReadCommandInterface
     {
         return $this->applyConstraints(
-            $this->applyWhereKeys($this->distant->builder(), $value),
+            $this->applyWhereKeys($this->distant->queries()->builder(), $value),
             $constraints
         );
     }
@@ -310,12 +323,14 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * Apply the where constraint on the query
      *
-     * @param QueryInterface $query
+     * @param Q $query
      * @param mixed $value The keys. Can be an array of keys for perform a "IN" query
      *
-     * @return QueryInterface
+     * @return Q
+     *
+     * @template Q as \Bdf\Prime\Query\Contract\Whereable&ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>
      */
-    abstract protected function applyWhereKeys(QueryInterface $query, $value);
+    abstract protected function applyWhereKeys(ReadCommandInterface $query, $value): ReadCommandInterface;
 
     //
     //---------- util methods to set and get/set relation, foreign and primary key
@@ -324,10 +339,10 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * Set the relation value of an entity
      *
-     * @param object $entity The relation owner
-     * @param object|object[] $relation The entity to set to the owner. Can be an array of entities
+     * @param L $entity The relation owner
+     * @param R|R[]|null $relation The entity to set to the owner. Can be an array of entities
      */
-    protected function setRelation($entity, $relation)
+    protected function setRelation($entity, $relation): void
     {
         if ($this->isDetached) {
             return;
@@ -337,7 +352,7 @@ abstract class AbstractRelation implements RelationInterface
             $relation = $this->distant->collectionFactory()->wrap((array) $relation, $this->wrapper);
         }
 
-        $this->local->hydrateOne($entity, $this->attributeAim, $relation);
+        $this->local->mapper()->hydrateOne($entity, $this->attributeAim, $relation);
 
         if ($relation !== null) {
             $this->relationInfo->markAsLoaded($entity);
@@ -349,9 +364,9 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * Get the relation value of an entity
      *
-     * @param object $entity
+     * @param L $entity
      *
-     * @return object|object[] The relation object. Can be an array on many relation
+     * @return R|R[]|null The relation object. Can be an array on many relation
      */
     protected function getRelation($entity)
     {
@@ -359,7 +374,7 @@ abstract class AbstractRelation implements RelationInterface
             return null;
         }
 
-        $relation = $this->local->extractOne($entity, $this->attributeAim);
+        $relation = $this->local->mapper()->extractOne($entity, $this->attributeAim);
 
         if ($relation === null) {
             return null;
@@ -377,12 +392,14 @@ abstract class AbstractRelation implements RelationInterface
      *
      * This method returns the local alias in the context of the query
      *
-     * @param QueryInterface $query
+     * @param ReadCommandInterface $query
      *
      * @return string  The alias of the local table
      */
-    protected function getLocalAlias($query)
+    protected function getLocalAlias(ReadCommandInterface $query)
     {
+        // @todo works ?
+        /** @psalm-suppress UndefinedInterfaceMethod */
         if ($this->local === $query->repository()) {
             return '';
         }
@@ -397,9 +414,9 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = [])
+    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
     {
-        throw new \BadMethodCallException('Unsupported operation '.__METHOD__);
+        throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }
 
     /**
@@ -407,7 +424,7 @@ abstract class AbstractRelation implements RelationInterface
      */
     public function associate($owner, $entity)
     {
-        throw new \BadMethodCallException('Unsupported operation '.__METHOD__);
+        throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }
 
     /**
@@ -415,7 +432,7 @@ abstract class AbstractRelation implements RelationInterface
      */
     public function dissociate($owner)
     {
-        throw new \BadMethodCallException('Unsupported operation '.__METHOD__);
+        throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }
 
     /**
@@ -423,7 +440,7 @@ abstract class AbstractRelation implements RelationInterface
      */
     public function create($owner, array $data = [])
     {
-        throw new \BadMethodCallException('Unsupported operation '.__METHOD__);
+        throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }
 
     /**
@@ -431,31 +448,31 @@ abstract class AbstractRelation implements RelationInterface
      */
     public function add($owner, $related)
     {
-        throw new \BadMethodCallException('Unsupported operation '.__METHOD__);
+        throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function saveAll($owner, array $relations = [])
+    public function saveAll($owner, array $relations = []): int
     {
-        throw new \BadMethodCallException('Unsupported operation '.__METHOD__);
+        throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteAll($owner, array $relations = [])
+    public function deleteAll($owner, array $relations = []): int
     {
-        throw new \BadMethodCallException('Unsupported operation '.__METHOD__);
+        throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function loadIfNotLoaded(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = [])
+    public function loadIfNotLoaded(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
     {
-        if (empty($collection)) {
+        if ($collection->empty()) {
             return;
         }
 
@@ -476,7 +493,9 @@ abstract class AbstractRelation implements RelationInterface
         $indexer = new EntitySetIndexer($this->distant->mapper());
 
         foreach ($collection->all() as $owner) {
-            $relationValue = $this->getRelation($owner);
+            if (!$relationValue = $this->getRelation($owner)) {
+                continue; // The owner has no relation : skip
+            }
 
             if (is_array($relationValue)) {
                 foreach ($relationValue as $entity) {
@@ -495,11 +514,11 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * Check if all entities has loaded the relation
      *
-     * @param array $collection
+     * @param L[] $collection
      *
      * @return bool
      */
-    private function isAllLoaded(array $collection)
+    private function isAllLoaded(array $collection): bool
     {
         foreach ($collection as $entity) {
             if (!$this->isLoaded($entity)) {

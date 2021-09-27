@@ -36,7 +36,7 @@ interface ColumnInterface
     /**
      * Get the column max length
      *
-     * @return int
+     * @return int|null
      */
     public function length();
 
@@ -71,21 +71,21 @@ interface ColumnInterface
     /**
      * Get the column comment
      *
-     * @return string
+     * @return string|null
      */
     public function comment();
 
     /**
      * Get the decimal precision
      *
-     * @return int
+     * @return int|null
      */
     public function precision();
 
     /**
      * The number of digit after the decimal mark
      *
-     * @return int
+     * @return int|null
      */
     public function scale();
 

@@ -24,6 +24,13 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
  * @package Bdf\Prime\Query
  * 
  * @todo comment reset un statement (ex ecraser les orders). Prendre en compte le reset du compiler
+ *
+ * @template C as \Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection
+ * @template R as object|array
+ *
+ * @extends AbstractQuery<C, R>
+ * @implements SqlQueryInterface<C, R>
+ * @implements Paginable<R>
  */
 class Query extends AbstractQuery implements SqlQueryInterface, Paginable
 {
@@ -37,7 +44,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * Initializes a new <tt>Query</tt>.
      *
-     * @param ConnectionInterface $connection The DBAL Connection.
+     * @param C $connection The DBAL Connection.
      * @param PreprocessorInterface|null $preprocessor
      */
     public function __construct(ConnectionInterface $connection, PreprocessorInterface $preprocessor = null)
@@ -84,7 +91,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
      */
     public function quote($value, $type = null)
     {
-        return $this->compiler->quote($value, $type);
+        return $this->connection->quote($value, $type);
     }
 
     /**
@@ -101,9 +108,9 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function delete()
+    public function delete(): int
     {
-        return $this->executeUpdate(self::TYPE_DELETE);
+        return (int) $this->executeUpdate(self::TYPE_DELETE);
     }
 
     /**
@@ -246,7 +253,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
-    protected function cacheKey()
+    protected function cacheKey(): ?string
     {
         return sha1($this->toSql().'-'.serialize($this->getBindings()));
     }
@@ -255,7 +262,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function paginationCount($columns = null)
+    public function paginationCount(?string $column = null): int
     {
         $statements = $this->statements;
 
@@ -264,7 +271,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
         $this->statements['orders'] = [];
         $this->statements['limit'] = null;
         $this->statements['offset'] = null;
-        $this->statements['aggregate'] = ['pagination', $this->getPaginationColumns($columns)];
+        $this->statements['aggregate'] = ['pagination', $this->getPaginationColumns($column)];
 
         $count = (int)$this->execute()[0]['aggregate'];
 
@@ -277,12 +284,13 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * Get the column to count for pagination
      * @todo Voir pour count sur PK quand une entité est liée ?
+     * @todo array ?
      *
-     * @param array|string|null $column
+     * @param string|null $column
      *
      * @return string
      */
-    protected function getPaginationColumns($column)
+    protected function getPaginationColumns(?string $column): string
     {
         if (!empty($column)) {
             return $column;
@@ -309,7 +317,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function count($column = null)
+    public function count(?string $column = null): int
     {
         return (int)$this->aggregate(__FUNCTION__, $column);
     }
@@ -318,7 +326,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function avg($column = null)
+    public function avg(?string $column = null): float
     {
         return (float)$this->aggregate(__FUNCTION__, $column);
     }
@@ -327,7 +335,25 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function min($column = null)
+    public function min(?string $column = null)
+    {
+        return $this->aggregate(__FUNCTION__, $column);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    #[ReadOperation]
+    public function max(?string $column = null)
+    {
+        return $this->aggregate(__FUNCTION__, $column);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    #[ReadOperation]
+    public function sum(?string $column = null): float
     {
         return (float)$this->aggregate(__FUNCTION__, $column);
     }
@@ -336,25 +362,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function max($column = null)
-    {
-        return (float)$this->aggregate(__FUNCTION__, $column);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    #[ReadOperation]
-    public function sum($column = null)
-    {
-        return (float)$this->aggregate(__FUNCTION__, $column);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    #[ReadOperation]
-    public function aggregate($function, $column = null)
+    public function aggregate(string $function, ?string $column = null)
     {
         $statements = $this->statements;
 
@@ -539,7 +547,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
-    public function addCommand($command, $value)
+    public function addCommand(string $command, $value)
     {
         switch ($command) {
             case ':limit':

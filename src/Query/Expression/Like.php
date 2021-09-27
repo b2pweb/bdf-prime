@@ -146,7 +146,7 @@ class Like extends AbstractExpressionTransformer
     /**
      * {@inheritdoc}
      */
-    public function getOperator()
+    public function getOperator(): string
     {
         return ':like';
     }

@@ -43,6 +43,9 @@ use Bdf\Prime\Query\Extension\CachableTrait;
  *     ->execute()
  * ;
  * </code>
+ *
+ * @template C as \Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection
+ * @implements CommandInterface<C>
  */
 class BulkInsertQuery extends CompilableClause implements CommandInterface, Compilable, Cachable, InsertQueryInterface
 {
@@ -51,7 +54,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * The DBAL Connection.
      *
-     * @var ConnectionInterface
+     * @var C
      */
     protected $connection;
 
@@ -66,7 +69,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * BulkInsertQuery constructor.
      *
-     * @param ConnectionInterface $connection
+     * @param C $connection
      * @param PreprocessorInterface|null $preprocessor
      */
     public function __construct(ConnectionInterface $connection, PreprocessorInterface $preprocessor = null)
@@ -87,7 +90,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * {@inheritdoc}
      */
-    public function compiler()
+    public function compiler(): CompilerInterface
     {
         return $this->compiler;
     }
@@ -116,7 +119,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * {@inheritdoc}
      */
-    public function connection()
+    public function connection(): ConnectionInterface
     {
         return $this->connection;
     }
@@ -139,7 +142,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * {@inheritdoc}
      */
-    public function into($table)
+    public function into(string $table)
     {
         $this->compilerState->invalidate('table');
         $this->compilerState->invalidate('columns');
@@ -192,7 +195,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * {@inheritdoc}
      */
-    public function values(array $data, $replace = false)
+    public function values(array $data, bool $replace = false)
     {
         if (empty($this->statements['columns'])) {
             $this->columns(array_keys($data));
@@ -214,7 +217,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * {@inheritdoc}
      */
-    public function mode($mode)
+    public function mode(string $mode)
     {
         if ($mode !== $this->statements['mode']) {
             $this->compilerState->invalidate('mode');
@@ -227,7 +230,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * {@inheritdoc}
      */
-    public function ignore($flag = true)
+    public function ignore(bool $flag = true)
     {
         return $this->mode($flag ? self::MODE_IGNORE : self::MODE_INSERT);
     }
@@ -235,7 +238,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * {@inheritdoc}
      */
-    public function replace($flag = true)
+    public function replace(bool $flag = true)
     {
         return $this->mode($flag ? self::MODE_REPLACE : self::MODE_INSERT);
     }
@@ -243,7 +246,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * {@inheritdoc}
      */
-    public function bulk($flag = true)
+    public function bulk(bool $flag = true)
     {
         $this->compilerState->invalidate();
         $this->statements['bulk'] = $flag;
@@ -254,7 +257,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * {@inheritdoc}
      */
-    public function compile($forceRecompile = false)
+    public function compile(bool $forceRecompile = false)
     {
         if (!$forceRecompile && $this->state()->compiled) {
             return $this->state()->compiled;
@@ -274,7 +277,7 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
     /**
      * {@inheritdoc}
      */
-    public function type()
+    public function type(): string
     {
         return self::TYPE_INSERT;
     }

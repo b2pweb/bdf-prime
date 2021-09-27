@@ -5,8 +5,10 @@ namespace Bdf\Prime\Relations\Util;
 use Bdf\Prime\Query\Contract\EntityJoinable;
 use Bdf\Prime\Query\JoinClause;
 use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Relations\AbstractRelation;
 use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
  * Configure relation with simple join (one level) relation
@@ -19,7 +21,7 @@ trait SimpleTableJoinRelation
     /**
      * {@inheritdoc}
      */
-    public function relationRepository()
+    public function relationRepository(): RepositoryInterface
     {
         return $this->distant;
     }
@@ -27,7 +29,7 @@ trait SimpleTableJoinRelation
     /**
      * {@inheritdoc}
      */
-    public function link($owner)
+    public function link($owner): ReadCommandInterface
     {
         return $this->query($this->getLocalKeyValue($owner));
     }
@@ -35,11 +37,12 @@ trait SimpleTableJoinRelation
     /**
      * {@inheritdoc}
      */
-    public function join($query, $alias = null)
+    public function join(EntityJoinable $query, string $alias): void
     {
-        if ($alias === null) {
-            $alias = $this->attributeAim;
-        }
+        // @fixme ?
+//        if ($alias === null) {
+//            $alias = $this->attributeAim;
+//        }
 
         $query->joinEntity(
             $this->distant->entityName(),
@@ -55,7 +58,7 @@ trait SimpleTableJoinRelation
     /**
      * {@inheritdoc}
      */
-    public function joinRepositories(EntityJoinable $query, $alias = null, $discriminator = null)
+    public function joinRepositories(EntityJoinable $query, string $alias, $discriminator = null): array
     {
         return [
             $alias => $this->relationRepository()
@@ -65,17 +68,17 @@ trait SimpleTableJoinRelation
     /**
      * @see AbstractRelation::query()
      */
-    abstract protected function query($value, $constraints = []);
+    abstract protected function query($value, $constraints = []): ReadCommandInterface;
 
     /**
      * @see AbstractRelation::applyConstraints()
      */
-    abstract protected function applyConstraints($query, $constraints = [], $context = null);
+    abstract protected function applyConstraints(ReadCommandInterface $query, $constraints = [], $context = null): ReadCommandInterface;
 
     /**
      * @see AbstractRelation::applyContext()
      */
-    abstract protected function applyContext($context, $constraints);
+    abstract protected function applyContext(?string $context, $constraints);
 
     /**
      * Extract local (owner) entity key(s)

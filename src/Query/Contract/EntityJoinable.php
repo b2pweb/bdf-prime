@@ -19,40 +19,39 @@ interface EntityJoinable extends Joinable, Whereable
      *         ->where('entity.name', ':like', 'seb%');
      * </code>
      *
-     * @param string          $entity
-     * @param string|\Closure  $key
-     * @param string          $foreign
-     * @param string          $alias    Alias is mandatory
-     * @param string          $type     Type of join.
+     * @param class-string $entity
+     * @param string|callable(\Bdf\Prime\Query\JoinClause):void $key
+     * @param string|null $foreign
+     * @param string $alias Alias is mandatory
+     * @param Joinable::* $type Type of join.
      *
      * @return $this This Query instance.
      *
      * @throws LogicException  If alias is not set and $key is not a closure
      */
-    public function joinEntity($entity, $key, $foreign = null, $alias = null, $type = 'inner');
-
-
-    /**
-     * Creates and adds a join to the query.
-     *
-     * @param string|array $entity
-     * @param string|Closure $key
-     * @param string $foreign
-     * @param string|null $alias
-     *
-     * @return $this This Query instance.
-     */
-    public function leftJoinEntity($entity, $key, $foreign = null, $alias = null);
+    public function joinEntity(string $entity, $key, ?string $foreign = null, string $alias = null, string $type = self::INNER_JOIN);
 
     /**
      * Creates and adds a join to the query.
      *
-     * @param string|array $entity
-     * @param string|Closure $key
-     * @param string $foreign
-     * @param string|null $alias
+     * @param class-string $entity
+     * @param string|callable(\Bdf\Prime\Query\JoinClause):void $key
+     * @param string|null $foreign
+     * @param string $alias
      *
      * @return $this This Query instance.
      */
-    public function rightJoinEntity($entity, $key, $foreign = null, $alias = null);
+    public function leftJoinEntity(string $entity, $key, ?string $foreign = null, string $alias = null);
+
+    /**
+     * Creates and adds a join to the query.
+     *
+     * @param class-string $entity
+     * @param string|callable(\Bdf\Prime\Query\JoinClause):void $key
+     * @param string|null $foreign
+     * @param string $alias
+     *
+     * @return $this This Query instance.
+     */
+    public function rightJoinEntity(string $entity, $key, ?string $foreign = null, string $alias = null);
 }

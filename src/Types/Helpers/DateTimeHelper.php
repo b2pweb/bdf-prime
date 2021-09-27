@@ -71,8 +71,6 @@ trait DateTimeHelper
 
     /**
      * {@inheritdoc}
-     *
-     * @param string|DateTimeInterface $value
      */
     public function toDatabase($value)
     {

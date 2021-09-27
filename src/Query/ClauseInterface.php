@@ -1,6 +1,7 @@
 <?php
 namespace Bdf\Prime\Query;
 
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 /**
@@ -11,7 +12,7 @@ interface ClauseInterface
     /**
      * Set custom filters
      *
-     * @param array $filters
+     * @param array<string,callable(static,mixed):void> $filters
      *
      * @return $this
      */
@@ -21,18 +22,18 @@ interface ClauseInterface
      * Add a custom filter
      *
      * @param string $name
-     * @param \Closure $callback
+     * @param callable(static,mixed):void $callback
      *
      * @return $this
      */
-    public function addCustomFilter($name, \Closure $callback);
+    public function addCustomFilter(string $name, callable $callback);
 
     /**
      * Get custom filters
      *
-     * @return array
+     * @return array<string,callable(static,mixed):void>
      */
-    public function getCustomFilters();
+    public function getCustomFilters(): array;
 
     /**
      * Get clause statement
@@ -41,7 +42,7 @@ interface ClauseInterface
      *
      * @return array
      */
-    public function statement($statement);
+    public function statement(string $statement): array;
 
     /**
      * Add clause statement
@@ -49,9 +50,9 @@ interface ClauseInterface
      * @param string $name
      * @param mixed $values
      *
-     * @return array
+     * @return void
      */
-    public function addStatement($name, $values);
+    public function addStatement(string $name, $values): void;
 
     /**
      * Add a criteria part: WHERE HAVING ON
@@ -79,15 +80,15 @@ interface ClauseInterface
      *     $query->buildRaw('where', 'raw expression');
      * </code>
      *
-     * @param  string $statement
-     * @param  string|array $expression The restriction predicates.
-     * @param  string $operator
-     * @param  mixed $value
-     * @param  string $type
+     * @param string $statement
+     * @param string|array<string,mixed> $expression The restriction predicates.
+     * @param string|null $operator
+     * @param mixed $value
+     * @param string $type
      *
      * @return $this
      */
-    public function buildClause($statement, $expression, $operator = null, $value = null, $type = CompositeExpression::TYPE_AND);
+    public function buildClause(string $statement, $expression, $operator = null, $value = null, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add a raw expression in statement
@@ -97,12 +98,12 @@ interface ClauseInterface
      * </code>
      *
      * @param string $statement
-     * @param string $expression
+     * @param string|QueryInterface|ExpressionInterface $expression
      * @param string $type
      *
      * @return $this
      */
-    public function buildRaw($statement, $expression, $type = CompositeExpression::TYPE_AND);
+    public function buildRaw(string $statement, $expression, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add nested statement
@@ -114,13 +115,13 @@ interface ClauseInterface
      *         })
      * </code>
      *
-     * @param  string $statement
-     * @param \Closure $callback
+     * @param string $statement
+     * @param callable(static):void $callback
      * @param string $type
      *
      * @return $this
      */
-    public function buildNested($statement, \Closure $callback, $type = CompositeExpression::TYPE_AND);
+    public function buildNested(string $statement, callable $callback, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * @todo Revoir cette gestion des commandes
@@ -132,5 +133,5 @@ interface ClauseInterface
      *
      * @return $this This Query instance.
      */
-    public function addCommand($command, $value);
+    public function addCommand(string $command, $value);
 }

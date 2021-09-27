@@ -374,6 +374,10 @@ class MigrationManager
      */
     private function applyConsoleContext(MigrationInterface $migration)
     {
+        if (!$migration instanceof Migration) {
+            return;
+        }
+
         $migration->setOutput($this->output);
 
         if (null !== $this->input) {

@@ -11,18 +11,20 @@ use Bdf\Prime\Query\Contract\Compilable;
  *
  * @property CompilerState $compilerState
  * @property CompilerInterface $compiler
+ *
+ * @psalm-require-implements Compilable
  */
 trait CompilableTrait
 {
     /**
-     * @var string
+     * @var Compilable::TYPE_*
      */
     protected $type = Compilable::TYPE_SELECT;
 
     /**
      * {@inheritdoc}
      */
-    public function compile($forceRecompile = false)
+    public function compile(bool $forceRecompile = false)
     {
         if ($forceRecompile) {
             $this->compilerState->invalidate('prepared');
@@ -43,8 +45,10 @@ trait CompilableTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @return Compilable::TYPE_*
      */
-    public function type()
+    public function type(): string
     {
         return $this->type;
     }
@@ -53,11 +57,11 @@ trait CompilableTrait
      * Change the query type
      * This action will invalidate the current query
      *
-     * @param string $type One of the Compilable::TYPE_* constant
+     * @param Compilable::TYPE_* $type One of the Compilable::TYPE_* constant
      *
      * @return void
      */
-    protected function setType($type)
+    protected function setType(string $type): void
     {
         if ($this->type !== $type) {
             $this->compilerState->invalidate();

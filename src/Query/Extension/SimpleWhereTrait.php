@@ -12,15 +12,19 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
  *
  * @see Whereable
  * @property CompilerInterface $compiler
+ *
+ * @psalm-require-implements Whereable
  */
 trait SimpleWhereTrait
 {
     /**
+     * {@inheritdoc}
+     *
      * @see Whereable::where()
      */
     public function where($column, $operator = null, $value = null)
     {
-        if ($column instanceof \Closure) {
+        if (is_callable($column)) {
             $this->nested($column, $operator ?: CompositeExpression::TYPE_AND);
         } else {
             $this->compilerState->invalidate('where');
@@ -32,11 +36,13 @@ trait SimpleWhereTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Whereable::orWhere()
      */
     public function orWhere($column, $operator = null, $value = null)
     {
-        if ($column instanceof \Closure) {
+        if (is_callable($column)) {
             $this->nested($column, $operator ?: CompositeExpression::TYPE_OR);
         } else {
             $this->compilerState->invalidate('where');
@@ -48,9 +54,11 @@ trait SimpleWhereTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Whereable::whereNull()
      */
-    public function whereNull($column, $type = CompositeExpression::TYPE_AND)
+    public function whereNull(string $column, string $type = CompositeExpression::TYPE_AND)
     {
         $this->compilerState->invalidate('where');
 
@@ -58,9 +66,11 @@ trait SimpleWhereTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Whereable::whereNotNull()
      */
-    public function whereNotNull($column, $type = CompositeExpression::TYPE_AND)
+    public function whereNotNull(string $column, string $type = CompositeExpression::TYPE_AND)
     {
         $this->compilerState->invalidate('where');
 
@@ -68,25 +78,31 @@ trait SimpleWhereTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Whereable::orWhereNull()
      */
-    public function orWhereNull($column)
+    public function orWhereNull(string $column)
     {
         return $this->whereNull($column, CompositeExpression::TYPE_OR);
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Whereable::orWhereNotNull()
      */
-    public function orWhereNotNull($column)
+    public function orWhereNotNull(string $column)
     {
         return $this->whereNotNull($column, CompositeExpression::TYPE_OR);
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Whereable::whereRaw()
      */
-    public function whereRaw($raw, $type = CompositeExpression::TYPE_AND)
+    public function whereRaw($raw, string $type = CompositeExpression::TYPE_AND)
     {
         $this->compilerState->invalidate('where');
 
@@ -94,6 +110,8 @@ trait SimpleWhereTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Whereable::orWhereRaw()
      */
     public function orWhereRaw($raw)
@@ -102,9 +120,11 @@ trait SimpleWhereTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Whereable::nested()
      */
-    public function nested(\Closure $callback, $type = CompositeExpression::TYPE_AND)
+    public function nested(callable $callback, string $type = CompositeExpression::TYPE_AND)
     {
         $this->compilerState->invalidate('where');
 
@@ -112,17 +132,23 @@ trait SimpleWhereTrait
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @see Clause::buildClause()
      */
-    abstract public function buildClause($statement, $expression, $operator = null, $value = null, $type = CompositeExpression::TYPE_AND);
+    abstract public function buildClause(string $statement, $expression, $operator = null, $value = null, string $type = CompositeExpression::TYPE_AND);
 
     /**
+     * {@inheritdoc}
+     *
      * @see Clause::buildNested()
      */
-    abstract public function buildNested($statement, \Closure $callback, $type = CompositeExpression::TYPE_AND);
+    abstract public function buildNested(string $statement, callable $callback, string $type = CompositeExpression::TYPE_AND);
 
     /**
-     * @see Clause::buildNested()
+     * {@inheritdoc}
+     *
+     * @see Clause::buildRaw()
      */
-    abstract public function buildRaw($statement, $expression, $type = CompositeExpression::TYPE_AND);
+    abstract public function buildRaw(string $statement, $expression, string $type = CompositeExpression::TYPE_AND);
 }

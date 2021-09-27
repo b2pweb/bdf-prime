@@ -14,6 +14,11 @@ use Bdf\Prime\Query\Pagination\PaginatorInterface;
 
 /**
  * QueryInterface
+ *
+ * @template C as \Bdf\Prime\Connection\ConnectionInterface
+ * @template R as object|array
+ *
+ * @extends ReadCommandInterface<C, R>
  */
 interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable, Compilable, Deletable
 {
@@ -114,7 +119,7 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * @param array $criteria
      * @param string|array $attributes
      *
-     * @return object[]|CollectionInterface|PaginatorInterface
+     * @return R[]|CollectionInterface<R>|PaginatorInterface
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]
@@ -126,7 +131,7 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * @param array $criteria
      * @param string|array $attributes
      *
-     * @return object|null
+     * @return R|null
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]

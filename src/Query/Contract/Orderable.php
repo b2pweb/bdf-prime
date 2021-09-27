@@ -22,12 +22,12 @@ interface Orderable
      *     $query->order(['u.id' => 'asc', 'name' => 'desc']); // ORDER BY u.id asc, name desc
      * </code>
      *
-     * @param string|array|ExpressionInterface $sort The ordering expression.
-     * @param string|null $order The ordering direction.
+     * @param string|array<string,Orderable::ORDER_*>|ExpressionInterface $sort The ordering expression.
+     * @param Orderable::ORDER_*|null $order The ordering direction.
      *
      * @return $this This Query instance.
      */
-    public function order($sort, $order = null);
+    public function order($sort, ?string $order = null);
 
     /**
      * Adds an ordering for the query results.
@@ -39,16 +39,16 @@ interface Orderable
      * </code>
      *
      * @param string|array|ExpressionInterface $sort The ordering expression.
-     * @param string|null $order The ordering direction.
+     * @param Orderable::ORDER_*|null $order The ordering direction.
      *
      * @return $this This Query instance.
      */
-    public function addOrder($sort, $order = null);
+    public function addOrder($sort, ?string $order = null);
 
     /**
      * Get orders
      *
-     * @return array
+     * @return array<string, Orderable::ORDER_*>
      */
-    public function getOrders();
+    public function getOrders(): array;
 }

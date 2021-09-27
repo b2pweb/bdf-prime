@@ -15,14 +15,14 @@ interface IndexSetInterface
     /**
      * Get the primary index
      *
-     * @return IndexInterface
+     * @return IndexInterface|null
      */
     public function primary();
 
     /**
      * Get list of all indexes
      *
-     * @return IndexInterface[]
+     * @return array<string, IndexInterface>
      */
     public function all();
 

@@ -25,7 +25,7 @@ interface Compilable
      * @return mixed
      * @throws PrimeException When compile fail
      */
-    public function compile($forceRecompile = false);
+    public function compile(bool $forceRecompile = false);
 
     /**
      * Get the query bindings
@@ -39,7 +39,7 @@ interface Compilable
      * Get the query type
      * Must return one of the constants Compilable::TYPE_*
      *
-     * @return string
+     * @return Compilable::TYPE_*
      */
-    public function type();
+    public function type(): string;
 }

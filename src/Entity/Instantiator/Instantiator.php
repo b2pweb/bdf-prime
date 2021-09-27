@@ -38,6 +38,12 @@ class Instantiator implements InstantiatorInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param class-string<T> $className  The class name to instantiate
+     * @param null|int $hint     The instantiation hint flag
+     *
+     * @return T
+     * @template T as object
      */
     public function instantiate($className, $hint = null)
     {
@@ -45,6 +51,7 @@ class Instantiator implements InstantiatorInterface
             return new $className;
         }
 
+        /** @var T $object */
         $object = $this->instantiator->instantiate($className);
 
         if ($object instanceof InitializableInterface) {

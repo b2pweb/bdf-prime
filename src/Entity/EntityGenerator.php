@@ -392,11 +392,13 @@ public function __construct(array $data = [])
     /**
      * @return string
      */
-    protected function generateEntityNamespace()
+    protected function generateEntityNamespace(): string
     {
         if ($this->hasNamespace($this->mapperInfo->className())) {
             return 'namespace ' . $this->getNamespace($this->mapperInfo->className()) .';' . "\n\n";
         }
+
+        return '';
     }
 
     /**
@@ -743,15 +745,18 @@ public function __construct(array $data = [])
         $this->staticReflection[$this->mapperInfo->className()]['methods'][] = strtolower($methodName);
 
         if ($propertyInfo->isObject()) {
+            /** @var ObjectPropertyInfo $propertyInfo */
             $variableType = $this->getRelativeClassName($propertyInfo->className());
             $methodTypeHint =  $variableType.' ';
         } else {
+            /** @var PropertyInfo $propertyInfo */
             $variableType = $propertyInfo->phpType();
-            $methodTypeHint = null;
+            $methodTypeHint = '';
         }
 
         if ($propertyInfo->isArray() && $hintOne === false) {
             if ($propertyInfo->isObject() && $propertyInfo->wrapper() !== null) {
+                /** @var ObjectPropertyInfo $propertyInfo */
                 $repository = $this->prime->repository($propertyInfo->className());
                 $wrapperClass = $this->getRelativeClassName($repository->collectionFactory()->wrapperClass($propertyInfo->wrapper()));
 
@@ -817,7 +822,7 @@ public function __construct(array $data = [])
      *
      * @return string
      */
-    protected function generateMethod($description, $methodName, $content = null)
+    protected function generateMethod(string $description, string $methodName, string $content)
     {
         if ($this->hasMethod($methodName)) {
             return '';

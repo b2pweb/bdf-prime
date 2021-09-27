@@ -11,6 +11,9 @@ use Bdf\Prime\ServiceLocator;
  * AbstractGenerator
  *
  * A basic property generator. Let inheritance set its generation algorithm.
+ *
+ * @template C as ConnectionInterface
+ * @implements GeneratorInterface<C>
  */
 abstract class AbstractGenerator implements GeneratorInterface
 {
@@ -24,7 +27,7 @@ abstract class AbstractGenerator implements GeneratorInterface
     /**
      * The active connection
      *
-     * @var ConnectionInterface
+     * @var C
      */
     private $connection;
 
@@ -66,7 +69,7 @@ abstract class AbstractGenerator implements GeneratorInterface
     /**
      * Get connection
      * 
-     * @return ConnectionInterface
+     * @return C
      */
     public function connection()
     {
@@ -103,7 +106,7 @@ abstract class AbstractGenerator implements GeneratorInterface
      * @param array            $data            By reference
      * @param ServiceLocator   $serviceLocator
      *
-     * @return string   Returns the generated id
+     * @return string|null   Returns the generated id
      * @throws PrimeException
      */
     protected function doGenerate($property, array &$data, ServiceLocator $serviceLocator)

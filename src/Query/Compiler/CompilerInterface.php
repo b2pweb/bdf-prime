@@ -7,14 +7,16 @@ use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Query\CompilableClause;
 
 /**
- * CompilerInterface
+ * Compile a query object to usable connection query
+ *
+ * @template Q as CompilableClause&\Bdf\Prime\Query\Contract\Compilable
  */
 interface CompilerInterface
 {
     /**
      * Converts query into a INSERT/REPLACE string in SQL.
      *
-     * @param CompilableClause $query
+     * @param Q $query
      *
      * @return string
      * @throws PrimeException
@@ -24,7 +26,7 @@ interface CompilerInterface
     /**
      * Converts query into a UPDATE string in SQL.
      *
-     * @param CompilableClause $query
+     * @param Q $query
      *
      * @return string
      * @throws PrimeException
@@ -34,7 +36,7 @@ interface CompilerInterface
     /**
      * Converts query into a DELETE string in SQL.
      *
-     * @param CompilableClause $query
+     * @param Q $query
      *
      * @return string
      * @throws PrimeException
@@ -44,7 +46,7 @@ interface CompilerInterface
     /**
      * Converts query into a SELECT string in SQL.
      *
-     * @param CompilableClause $query
+     * @param Q $query
      *
      * @return string
      * @throws PrimeException
@@ -62,7 +64,7 @@ interface CompilerInterface
     /**
      * Quote a identifier
      *
-     * @param CompilableClause $query
+     * @param Q $query
      * @param string $column
      *
      * @return string
@@ -73,7 +75,7 @@ interface CompilerInterface
     /**
      * @todo Supprimer ? Il est plus logique que ce soit la query elle même qui gère ses bindings. En l'état impossible, mais à voir pour gérer une autre stratégie de gestion des bindings
      *
-     * @param CompilableClause $query
+     * @param Q $query
      * @throws PrimeException
      */
     public function getBindings(CompilableClause $query);

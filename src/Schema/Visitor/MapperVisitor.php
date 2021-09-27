@@ -29,7 +29,14 @@ class MapperVisitor extends AbstractVisitor
     /**
      * The mappers string representation
      *
-     * @var string[]
+     * @var array<string, array{
+     *    class:class-string,
+     *    table:string,
+     *    primaries:array<string,'autoincrement'|'sequence'|'primary'>,
+     *    sequence:string|null,
+     *    properties:array,
+     *    indexes:array
+     * }>
      */
     private $mappers = [];
 

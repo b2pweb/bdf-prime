@@ -7,15 +7,23 @@ use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Relations\Util\ForeignKeyRelation;
 use Bdf\Prime\Repository\RepositoryInterface;
+use RuntimeException;
 
 /**
  * Relation
  *
  * @todo Mettre le saveStrategy en trait + supprimer ou deprécier cette classe
+ *
+ * @template L as object
+ * @template R as object
+ *
+ * @extends AbstractRelation<L, R>
  */
 abstract class Relation extends AbstractRelation
 {
+    /** @use Polymorph<L> */
     use Polymorph;
+    /** @use ForeignKeyRelation<L, R> */
     use ForeignKeyRelation;
 
     // save strategies
@@ -33,13 +41,13 @@ abstract class Relation extends AbstractRelation
     /**
      * Set the relation info
      *
-     * @param string              $attributeAim  The property name that hold the relation
-     * @param RepositoryInterface $local
-     * @param string              $localKey
-     * @param RepositoryInterface $distant
-     * @param string              $distantKey
+     * @param string $attributeAim  The property name that hold the relation
+     * @param RepositoryInterface<L> $local
+     * @param string $localKey
+     * @param RepositoryInterface<R>|null $distant
+     * @param string|null $distantKey
      */
-    public function __construct($attributeAim, RepositoryInterface $local, $localKey, RepositoryInterface $distant = null, $distantKey = null)
+    public function __construct(string $attributeAim, RepositoryInterface $local, string $localKey, ?RepositoryInterface $distant = null, ?string $distantKey = null)
     {
         parent::__construct($attributeAim, $local, $distant);
 
@@ -76,7 +84,7 @@ abstract class Relation extends AbstractRelation
     /**
      * {@inheritdoc}
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return parent::getOptions() + [
             'saveStrategy'          => $this->saveStrategy,
@@ -92,9 +100,9 @@ abstract class Relation extends AbstractRelation
      *
      * @return $this
      */
-    public function setSaveStrategy($strategy)
+    public function setSaveStrategy(int $strategy)
     {
-        $this->saveStrategy = (int) $strategy;
+        $this->saveStrategy = $strategy;
 
         return $this;
     }
@@ -104,7 +112,7 @@ abstract class Relation extends AbstractRelation
      *
      * @return int
      */
-    public function getSaveStrategy()
+    public function getSaveStrategy(): int
     {
         return $this->saveStrategy;
     }
@@ -117,7 +125,7 @@ abstract class Relation extends AbstractRelation
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = [])
+    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
     {
         if ($collection->empty()) {
             return;
@@ -140,30 +148,32 @@ abstract class Relation extends AbstractRelation
      * @throws PrimeException
      */
     #[ReadOperation]
-    abstract protected function relations($keys, $with, $constraints, $without);
+    abstract protected function relations($keys, $with, $constraints, $without): array;
 
     /**
      * Set the relation in a collection of entities
      *
-     * @param array $collection
+     * @param L[][] $collection
      * @param array $relations
      */
-    abstract protected function match($collection, $relations);
+    abstract protected function match($collection, $relations): void;
 
     /**
      * Get defined relation
      *
      * Build object relation defined by user
      *
-     * @param RepositoryInterface $repository
+     * @param RepositoryInterface<T> $repository
      * @param string              $relationName
      * @param array               $relationMeta
      *
-     * @return RelationInterface
+     * @return RelationInterface<T, object>
      *
-     * @throws \RuntimeException If relation type does not exist
+     * @throws RuntimeException If relation type does not exist
+     *
+     * @template T as object
      */
-    public static function make(RepositoryInterface $repository, $relationName, array $relationMeta)
+    public static function make(RepositoryInterface $repository, string $relationName, array $relationMeta): RelationInterface
     {
         switch ($relationMeta['type']) {
             case RelationInterface::BELONGS_TO:
@@ -235,7 +245,7 @@ abstract class Relation extends AbstractRelation
                 break;
 
             default:
-                throw new \RuntimeException('Unknown type from relation "' . $relationName . '" in ' . $repository->entityName());
+                throw new RuntimeException('Unknown type from relation "' . $relationName . '" in ' . $repository->entityName());
         }
 
         return $relation->setOptions($relationMeta);
@@ -266,7 +276,7 @@ abstract class Relation extends AbstractRelation
      *
      * @todo voir pour intégrer en meta le polymorphism
      */
-    public static function sanitizeRelations(array $relations)
+    public static function sanitizeRelations(array $relations): array
     {
         $sanitized = [];
 
@@ -317,7 +327,7 @@ abstract class Relation extends AbstractRelation
      *
      * @return array
      */
-    public static function sanitizeWithoutRelations(array $relations)
+    public static function sanitizeWithoutRelations(array $relations): array
     {
         $sanitized = [];
 
@@ -341,9 +351,9 @@ abstract class Relation extends AbstractRelation
      *
      * @param string $name
      *
-     * @return array
+     * @return array{0:string,1:string|null}
      */
-    public static function parseRelationName($name)
+    public static function parseRelationName(string $name): array
     {
         if (strpos($name, '.') === false) {
             return [$name, null];
@@ -366,9 +376,9 @@ abstract class Relation extends AbstractRelation
      *
      * @param string $pattern
      *
-     * @return array
+     * @return array{0:class-string,1:string}
      */
-    public static function parseEntity($pattern)
+    public static function parseEntity(string $pattern): array
     {
         $parts = explode('::', $pattern, 2);
 

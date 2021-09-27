@@ -16,10 +16,11 @@ interface InstantiatorInterface extends BaseInstantiatorInterface
      *
      * Instantiate an object from its class name
      *
-     * @param string $className  The class name to instantiate
+     * @param class-string<T> $className  The class name to instantiate
      * @param null|int $hint     The instantiation hint flag
      *
-     * @return object
+     * @return T
+     * @template T as object
      */
     public function instantiate($className, $hint = null);
 }

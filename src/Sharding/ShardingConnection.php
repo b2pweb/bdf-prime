@@ -8,6 +8,7 @@ use Bdf\Prime\Exception\ShardingException;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
+use Bdf\Prime\Query\Factory\DefaultQueryFactory;
 use Bdf\Prime\Sharding\Query\ShardingInsertQuery;
 use Bdf\Prime\Sharding\Query\ShardingKeyValueQuery;
 use Doctrine\Common\EventManager;
@@ -123,8 +124,11 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
 
         parent::__construct($params, $driver, $config, $eventManager);
 
-        $this->factory()->alias(InsertQueryInterface::class, ShardingInsertQuery::class);
-        $this->factory()->alias(KeyValueQueryInterface::class, ShardingKeyValueQuery::class);
+        /** @var DefaultQueryFactory $queryFactory */
+        $queryFactory = $this->factory();
+
+        $queryFactory->alias(InsertQueryInterface::class, ShardingInsertQuery::class);
+        $queryFactory->alias(KeyValueQueryInterface::class, ShardingKeyValueQuery::class);
     }
 
     /**
@@ -219,9 +223,13 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      * Get a shard connection by its id
      * Returns all connection if id is null
      *
-     * @param mixed $shardId
+     * @param null|string|int $shardId
      *
-     * @return SimpleConnection|SimpleConnection[]
+     * @return SimpleConnection[]|SimpleConnection
+     *
+     * @psalm-param S $shardId
+     * @psalm-return (S is null ? SimpleConnection[] : SimpleConnection)
+     * @template S as null|array-key
      *
      * @throws ShardingException   If the shard id is not known
      */
@@ -326,6 +334,8 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
 
     /**
      * {@inheritdoc}
+     *
+     * @psalm-suppress InvalidReturnType
      */
     public function query()
     {
@@ -341,6 +351,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
             $stmt->add($shard->query(...$args));
         }
 
+        /** @psalm-suppress InvalidReturnStatement */
         return $stmt;
     }
 
@@ -361,31 +372,49 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function beginTransaction()
+    public function beginTransaction(): bool
     {
+        $success = true;
+
         foreach ($this->getSelectedShards() as $shard) {
-            $shard->beginTransaction();
+            if (!$shard->beginTransaction()) {
+                $success = false;
+            }
         }
+
+        return $success;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function commit()
+    public function commit(): bool
     {
+        $success = true;
+
         foreach ($this->getSelectedShards() as $shard) {
-            $shard->commit();
+            if (!$shard->commit()) {
+                $success = false;
+            }
         }
+
+        return $success;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rollBack()
+    public function rollBack(): bool
     {
+        $success = true;
+
         foreach ($this->getSelectedShards() as $shard) {
-            $shard->rollBack();
+            if (!$shard->rollBack()) {
+                $success = false;
+            }
         }
+
+        return $success;
     }
 
     /**

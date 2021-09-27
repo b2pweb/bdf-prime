@@ -14,21 +14,21 @@ class Clause implements ClauseInterface
     /**
      * The collection of custom filter.
      *
-     * @var callable[]
+     * @var array<string,callable(static,mixed):void>
      */
     protected $customFilters = [];
     
     /**
      * The clause statements
      *
-     * @var array
+     * @var array<string,mixed>
      */
     public $statements = [];
-    
+
     /**
      * Available operators
      * 
-     * @var array 
+     * @var array<string, true>
      */
     protected $operators = [
         '<'             => true,
@@ -73,7 +73,7 @@ class Clause implements ClauseInterface
     /**
      * {@inheritdoc}
      */
-    public function addCustomFilter($name, \Closure $callback)
+    public function addCustomFilter(string $name, callable $callback)
     {
         $this->customFilters[$name] = $callback;
         
@@ -83,7 +83,7 @@ class Clause implements ClauseInterface
     /**
      * {@inheritdoc}
      */
-    public function getCustomFilters()
+    public function getCustomFilters(): array
     {
         return $this->customFilters;
     }
@@ -91,23 +91,23 @@ class Clause implements ClauseInterface
     /**
      * {@inheritdoc}
      */
-    public function statement($statement)
+    public function statement(string $statement): array
     {
-        return isset($this->statements[$statement]) ? $this->statements[$statement] : [];
+        return $this->statements[$statement] ?? [];
     }
     
     /**
      * {@inheritdoc}
      */
-    public function addStatement($name, $values)
+    public function addStatement(string $name, $values): void
     {
         $this->statements[$name][] = $values;
     }
-    
+
     /**
      * {@inheritdoc}
      */
-    public function buildClause($statement, $expression, $operator = null, $value = null, $type = CompositeExpression::TYPE_AND)
+    public function buildClause(string $statement, $expression, $operator = null, $value = null, string $type = CompositeExpression::TYPE_AND)
     {
         if (is_array($expression)) {
             //nested expression
@@ -169,7 +169,7 @@ class Clause implements ClauseInterface
     /**
      * {@inheritdoc}
      */
-    public function buildRaw($statement, $expression, $type = CompositeExpression::TYPE_AND)
+    public function buildRaw(string $statement, $expression, string $type = CompositeExpression::TYPE_AND)
     {
         $this->statements[$statement][] = [
             'raw'  => $expression,
@@ -182,7 +182,7 @@ class Clause implements ClauseInterface
     /**
      * {@inheritdoc}
      */
-    public function buildNested($statement, \Closure $callback, $type = CompositeExpression::TYPE_AND)
+    public function buildNested(string $statement, callable $callback, string $type = CompositeExpression::TYPE_AND)
     {
         $statements = $this->statements;
         $this->statements = [];
@@ -205,7 +205,7 @@ class Clause implements ClauseInterface
      * @todo Revoir cette gestion des commandes
      * {@inheritdoc}
      */
-    public function addCommand($command, $value)
+    public function addCommand(string $command, $value)
     {
         // TO overload
         

@@ -94,6 +94,7 @@ abstract class DatabaseCommand extends Command
             }
 
             $dbName = $this->prepareConnectionConfig($parameters);
+            /** @var ConnectionInterface&DoctrineConnection $connectionTmp */
             $connectionTmp = $this->connectionFactory->create($connectionName, $parameters, $connection->getConfiguration());
             $schema = $connectionTmp->schema();
 

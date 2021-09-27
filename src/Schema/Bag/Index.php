@@ -33,7 +33,7 @@ final class Index extends AbstractIndex
     /**
      * ArrayIndex constructor.
      *
-     * @param array $fields The fields as key, and option as value
+     * @param array<string,array> $fields The fields as key, and option as value
      * @param int $type
      * @param string $name
      * @param array $options

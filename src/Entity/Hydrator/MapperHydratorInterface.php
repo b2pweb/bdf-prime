@@ -15,6 +15,8 @@ use Bdf\Prime\Platform\PlatformTypesInterface;
  *
  * Do not forget to call @see MapperHydratorInterface::setMetadata()
  * Do not forget to call @see MapperHydratorInterface::setInstantiator()
+ *
+ * @template E as object
  */
 interface MapperHydratorInterface
 {
@@ -38,8 +40,8 @@ interface MapperHydratorInterface
      *
      * Note: If the entity has typed properties, this method will raised an UninitializedPropertyException if some properties are not initialized
      *
-     * @param object $object
-     * @param string[] $attributes
+     * @param E $object The entity to extract
+     * @param array<string, mixed> $attributes Attributes to extract. The attribute name is the array key, the value is the metadata
      *
      * @return array
      *
@@ -56,7 +58,7 @@ interface MapperHydratorInterface
      * Note: This method will ignore null values if properties are not nullable.
      *       So those properties will keep their default value or uninitialized state
      *
-     * @param object $object
+     * @param E $object
      * @param array $data
      * @param PlatformTypesInterface $types
      *
@@ -74,7 +76,7 @@ interface MapperHydratorInterface
      *
      * If the attribute is an embedded attribute, and one of its ascendant is null, this method will return null
      *
-     * @param object $object
+     * @param E $object
      * @param string $attribute
      *
      * @return mixed
@@ -94,7 +96,7 @@ interface MapperHydratorInterface
      *
      * If the attribute is an embedded attribute, all null ascendant will be instantiated
      *
-     * @param object $object
+     * @param E $object
      * @param string $attribute
      * @param mixed $value
      *

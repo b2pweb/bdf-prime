@@ -6,6 +6,8 @@ use Bdf\Prime\Query\Contract\EntityJoinable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\ReadCommandInterface;
+use Bdf\Prime\Repository\RepositoryInterface;
+use InvalidArgumentException;
 
 /**
  * OneOrMany
@@ -13,13 +15,18 @@ use Bdf\Prime\Query\ReadCommandInterface;
  * @package Bdf\Prime\Relations
  * 
  * @todo possibilité de désactiver les constraints globales
+ *
+ * @template L as object
+ * @template R as object
+ *
+ * @extends Relation<L, R>
  */
 abstract class OneOrMany extends Relation
 {
     /**
      * {@inheritdoc}
      */
-    public function relationRepository()
+    public function relationRepository(): RepositoryInterface
     {
         return $this->distant;
     }
@@ -27,7 +34,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
-    protected function applyConstraints($query, $constraints = [], $context = null)
+    protected function applyConstraints(ReadCommandInterface $query, $constraints = [], $context = null): ReadCommandInterface
     {
         parent::applyConstraints($query, $constraints, $context);
 
@@ -41,15 +48,16 @@ abstract class OneOrMany extends Relation
 
         return $query;
     }
-    
+
     /**
      * {@inheritdoc}
      */
-    public function join($query, $alias = null)
+    public function join(EntityJoinable $query, string $alias): void
     {
-        if ($alias === null) {
-            $alias = $this->attributeAim;
-        }
+        // @fixme ?
+//        if ($alias === null) {
+//            $alias = $this->attributeAim;
+//        }
 
         $query->joinEntity($this->distant->entityName(), $this->distantKey, $this->getLocalAlias($query).$this->localKey, $alias);
 
@@ -60,7 +68,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function joinRepositories(EntityJoinable $query, $alias = null, $discriminatorValue = null)
+    public function joinRepositories(EntityJoinable $query, string $alias, $discriminator = null): array
     {
         return [
             $alias => $this->relationRepository()
@@ -71,21 +79,19 @@ abstract class OneOrMany extends Relation
      * {@inheritdoc}
      */
     #[ReadOperation]
-    protected function relations($keys, $with, $constraints, $without)
+    protected function relations($keys, $with, $constraints, $without): array
     {
+        /** @var R[] */
         return $this->relationQuery($keys, $constraints)
             ->with($with)
             ->without($without)
             ->all();
     }
-    
+
     /**
-     * Set the relation in a collection of entities
-     * 
-     * @param array $collection
-     * @param array $relations
+     * {@inheritdoc}
      */
-    protected function match($collection, $relations)
+    protected function match($collection, $relations): void
     {
         foreach ($relations as $key => $distant) {
             foreach ($collection[$key] as $local) {
@@ -97,7 +103,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function link($owner)
+    public function link($owner): ReadCommandInterface
     {
         return $this->query($this->getLocalKeyValue($owner));
     }
@@ -108,7 +114,7 @@ abstract class OneOrMany extends Relation
     public function associate($owner, $entity)
     {
         if (!$this->isForeignKeyBarrier($owner)) {
-            throw new \InvalidArgumentException('The local entity is not the foreign key barrier.');
+            throw new InvalidArgumentException('The local entity is not the foreign key barrier.');
         }
 
         if ($this->isPolymorphic()) {
@@ -127,7 +133,7 @@ abstract class OneOrMany extends Relation
     public function dissociate($owner)
     {
         if (!$this->isForeignKeyBarrier($owner)) {
-            throw new \InvalidArgumentException('The local entity is not the foreign key barrier.');
+            throw new InvalidArgumentException('The local entity is not the foreign key barrier.');
         }
 
         if ($this->isPolymorphic()) {
@@ -147,7 +153,7 @@ abstract class OneOrMany extends Relation
     public function create($owner, array $data = [])
     {
         if ($this->isForeignKeyBarrier($owner)) {
-            throw new \InvalidArgumentException('The local entity is not the primary key barrier.');
+            throw new InvalidArgumentException('The local entity is not the primary key barrier.');
         }
 
         $entity = $this->distant->entity($data);
@@ -161,22 +167,22 @@ abstract class OneOrMany extends Relation
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function add($owner, $entity)
+    public function add($owner, $related)
     {
         if ($this->isForeignKeyBarrier($owner)) {
-            throw new \InvalidArgumentException('The local entity is not the primary key barrier.');
+            throw new InvalidArgumentException('The local entity is not the primary key barrier.');
         }
 
-        $this->setForeignKeyValue($entity, $this->getLocalKeyValue($owner));
+        $this->setForeignKeyValue($related, $this->getLocalKeyValue($owner));
 
-        return $this->distant->save($entity);
+        return $this->distant->save($related);
     }
 
     /**
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function saveAll($owner, array $relations = [])
+    public function saveAll($owner, array $relations = []): int
     {
         $entities = $this->getRelation($owner);
 
@@ -197,19 +203,20 @@ abstract class OneOrMany extends Relation
         
         // Save new relations
         $nb = 0;
+
         foreach ($entities as $entity) {
             $this->setForeignKeyValue($entity, $id);
             $nb += $this->distant->saveAll($entity, $relations);
         }
 
-        return $nb;
+        return (int) $nb;
     }
 
     /**
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function deleteAll($owner, array $relations = [])
+    public function deleteAll($owner, array $relations = []): int
     {
         $entities = $this->getRelation($owner);
 
@@ -222,19 +229,20 @@ abstract class OneOrMany extends Relation
         }
         
         $nb = 0;
+
         foreach ($entities as $entity) {
             $nb += $this->distant->deleteAll($entity, $relations);
         }
 
-        return $nb;
+        return (int) $nb;
     }
 
     /**
      * Get the repository that owns the foreign key and the key name
      *
-     * @return array
+     * @return array{0:RepositoryInterface,1:string}
      */
-    abstract protected function getForeignInfos();
+    abstract protected function getForeignInfos(): array;
 
     /**
      * Get the query used to load relations
@@ -244,7 +252,7 @@ abstract class OneOrMany extends Relation
      *
      * @return ReadCommandInterface
      */
-    abstract protected function relationQuery($keys, $constraints);
+    abstract protected function relationQuery($keys, $constraints): ReadCommandInterface;
 
     /**
      * Check if the entity is the foreign key barrier
@@ -253,7 +261,7 @@ abstract class OneOrMany extends Relation
      *
      * @return bool
      */
-    private function isForeignKeyBarrier($entity)
+    private function isForeignKeyBarrier($entity): bool
     {
         list($repository) = $this->getForeignInfos();
 
@@ -270,15 +278,19 @@ abstract class OneOrMany extends Relation
      * @param object $entity
      * @param mixed  $id
      */
-    private function setForeignKeyValue($entity, $id)
+    private function setForeignKeyValue($entity, $id): void
     {
+        /**
+         * @var RepositoryInterface $repository
+         * @var string $key
+         */
         list($repository, $key) = $this->getForeignInfos();
 
         if ($repository->entityClass() === get_class($entity)) {
-            $repository->hydrateOne($entity, $key, $id);
+            $repository->mapper()->hydrateOne($entity, $key, $id);
 
             if ($this->isPolymorphic()) {
-                $repository->hydrateOne($entity, $this->discriminator, $this->discriminatorValue);
+                $repository->mapper()->hydrateOne($entity, $this->discriminator, $this->discriminatorValue);
             }
         }
     }

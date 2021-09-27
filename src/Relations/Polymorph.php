@@ -6,6 +6,8 @@ use InvalidArgumentException;
 
 /**
  * Polymorph
+ *
+ * @template E as object
  */
 trait Polymorph
 {
@@ -125,11 +127,11 @@ trait Polymorph
     /**
      * Resolve the entity name for meta relation
      *
-     * @param string|array $value
+     * @param string|array{entity:class-string,distantKey:string,constraints?:mixed} $value
      *
-     * @return array
+     * @return array{entity:class-string,distantKey:string,constraints?:mixed}
      */
-    protected function resolveEntity(&$value)
+    protected function resolveEntity(&$value): array
     {
         if (is_string($value)) {
             list($entity, $distantKey) = Relation::parseEntity($value);
@@ -148,7 +150,7 @@ trait Polymorph
      *
      * @return array
      */
-    protected function rearrangeWith(array $with)
+    protected function rearrangeWith(array $with): array
     {
         $rearrangedWith = [];
 
@@ -176,7 +178,7 @@ trait Polymorph
      *
      * @return array
      */
-    protected function rearrangeWithout(array $without)
+    protected function rearrangeWithout(array $without): array
     {
         $rearranged = [];
 
@@ -202,12 +204,13 @@ trait Polymorph
     /**
      * Get the discriminator value from an entity
      *
-     * @param object $entity
+     * @param E $entity
      *
      * @return void
      */
-    protected function updateDiscriminatorValue($entity)
+    protected function updateDiscriminatorValue($entity): void
     {
-        $this->discriminatorValue = $this->local->extractOne($entity, $this->discriminator);
+        /** @psalm-suppress InvalidArgument */
+        $this->discriminatorValue = $this->local->mapper()->extractOne($entity, $this->discriminator);
     }
 }

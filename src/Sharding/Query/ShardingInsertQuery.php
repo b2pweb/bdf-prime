@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Sharding\Query;
 
+use BadMethodCallException;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\CompilableClause;
@@ -18,6 +19,8 @@ use Bdf\Prime\Sharding\ShardingConnection;
 /**
  * Handle INSERT operations on Sharding connection set
  * The shard will be choosed using inserted data value, and the operation will be delegated to the shard connection
+ *
+ * @implements CommandInterface<ShardingConnection>
  */
 class ShardingInsertQuery extends CompilableClause implements InsertQueryInterface, CommandInterface, Cachable
 {
@@ -80,17 +83,23 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function compiler() { }
+    public function compiler(): CompilerInterface
+    {
+        throw new BadMethodCallException('Cannot directly compile a sharding query');
+    }
 
     /**
      * {@inheritdoc}
      */
-    public function setCompiler(CompilerInterface $compiler) { }
+    public function setCompiler(CompilerInterface $compiler)
+    {
+        throw new BadMethodCallException('Cannot directly compile a sharding query');
+    }
 
     /**
      * {@inheritdoc}
      */
-    public function connection()
+    public function connection(): ConnectionInterface
     {
         return $this->connection;
     }
@@ -103,6 +112,8 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
         $this->connection = $connection;
         $this->queries = [];
         $this->currentQuery = null;
+
+        return $this;
     }
 
     /**
@@ -116,15 +127,15 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function bulk($flag = true)
+    public function bulk(bool $flag = true)
     {
-        throw new \BadMethodCallException('Bulk insert is not (yet ?) supported by sharding connection');
+        throw new BadMethodCallException('Bulk insert is not (yet ?) supported by sharding connection');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function into($table)
+    public function into(string $table)
     {
         $this->table = $table;
 
@@ -152,7 +163,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function values(array $data, $replace = false)
+    public function values(array $data, bool $replace = false)
     {
         $this->values = $data;
         $this->currentQuery = null;
@@ -165,7 +176,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function mode($mode)
+    public function mode(string $mode)
     {
         $this->mode = $mode;
 
@@ -179,7 +190,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function ignore($flag = true)
+    public function ignore(bool $flag = true)
     {
         return $this->mode($flag ? self::MODE_IGNORE : self::MODE_INSERT);
     }
@@ -187,7 +198,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function replace($flag = true)
+    public function replace(bool $flag = true)
     {
         return $this->mode($flag ? self::MODE_REPLACE : self::MODE_INSERT);
     }

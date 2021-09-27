@@ -2,6 +2,9 @@
 
 namespace Bdf\Prime\Query\Expression;
 
+use Bdf\Prime\Query\CompilableClause;
+use Bdf\Prime\Query\Compiler\CompilerInterface;
+
 /**
  * Now
  * 
@@ -14,7 +17,7 @@ class Now implements ExpressionInterface
     /**
      * {@inheritdoc}
      */
-    public function build($query, $compiler)
+    public function build(CompilableClause $query, CompilerInterface $compiler)
     {
         return $compiler->platform()->grammar()->getCurrentDateSQL();
     }

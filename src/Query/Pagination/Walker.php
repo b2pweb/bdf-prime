@@ -3,13 +3,18 @@
 namespace Bdf\Prime\Query\Pagination;
 
 use BadMethodCallException;
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\PrimeSerializable;
+use Bdf\Prime\Query\Contract\Limitable;
+use Bdf\Prime\Query\Contract\Orderable;
+use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Pagination\WalkStrategy\PaginationWalkStrategy;
 use Bdf\Prime\Query\Pagination\WalkStrategy\WalkCursor;
 use Bdf\Prime\Query\Pagination\WalkStrategy\WalkStrategyInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
+use Iterator;
 use LogicException;
 
 /**
@@ -21,10 +26,12 @@ use LogicException;
  * 
  * Attention, le walker ne gère pas les objects collection
  *
- * @author  Seb
- * @package Bdf\Prime\Query\Pagination
+ * @template R as array|object
+ *
+ * @implements PaginatorInterface<R>
+ * @implements Iterator<array-key, R>
  */
-class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
+class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
 {
     const DEFAULT_PAGE  = 1;
     const DEFAULT_LIMIT = 150;
@@ -39,27 +46,27 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
     /**
      * The current offset
      *
-     * @var int
+     * @var int|null
      */
     protected $offset;
 
     /**
-     * @var array
+     * @var R[]
      */
     private $collection = [];
 
     /**
-     * @var WalkStrategyInterface
+     * @var WalkStrategyInterface<R>
      */
     private $strategy;
 
     /**
-     * @var WalkCursor
+     * @var WalkCursor<R>
      */
     private $cursor;
 
     /**
-     * @var ReadCommandInterface
+     * @var ReadCommandInterface<ConnectionInterface, R>
      */
     private $query;
 
@@ -76,7 +83,7 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
     /**
      * Create a query walker
      * 
-     * @param ReadCommandInterface $query
+     * @param ReadCommandInterface<ConnectionInterface, R> $query
      * @param int            $maxRows
      * @param int            $page
      */
@@ -91,9 +98,9 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
     /**
      * Change the walk strategy
      *
-     * @param WalkStrategyInterface $strategy
+     * @param WalkStrategyInterface<R> $strategy
      *
-     * @return Walker
+     * @return $this
      */
     public function setStrategy(WalkStrategyInterface $strategy): self
     {
@@ -109,7 +116,7 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
     /**
      * Get the current active walk strategy
      *
-     * @return WalkStrategyInterface
+     * @return WalkStrategyInterface<R>
      */
     public function getStrategy(): WalkStrategyInterface
     {
@@ -117,6 +124,10 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
             return $this->strategy;
         }
 
+        /**
+         * @var WalkStrategyInterface<R>
+         * @psalm-suppress InvalidPropertyAssignmentValue
+         */
         return $this->strategy = new PaginationWalkStrategy();
     }
 
@@ -134,7 +145,7 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
     }
 
     /**
-     * @return ReadCommandInterface
+     * @return ReadCommandInterface<ConnectionInterface, R>
      */
     public function query(): ReadCommandInterface
     {
@@ -158,6 +169,10 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
      */
     public function size()
     {
+        if (!$this->query instanceof Paginable) {
+            throw new BadMethodCallException(__METHOD__.' should be called with a Paginable query');
+        }
+
         return $this->query->paginationCount();
     }
 
@@ -166,29 +181,43 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
      */
     public function order($attribute = null)
     {
-        $orders = $this->query()->getOrders();
+        $query = $this->query();
+
+        if (!$query instanceof Orderable) {
+            return $attribute ? null : [];
+        }
+
+        $orders = $query->getOrders();
 
         if ($attribute === null) {
             return $orders;
         }
 
-        return isset($orders[$attribute]) ? $orders[$attribute] : null;
+        return $orders[$attribute] ?? null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function limit()
+    public function limit(): ?int
     {
-        return $this->cursor->query->getLimit();
+        if ($this->cursor->query instanceof Limitable) {
+            return $this->cursor->query->getLimit();
+        }
+
+        return 0;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offset()
+    public function offset(): ?int
     {
-        return $this->cursor->query->getOffset();
+        if ($this->cursor->query instanceof Limitable) {
+            return $this->cursor->query->getOffset();
+        }
+
+        return 0;
     }
 
     /**
@@ -242,6 +271,7 @@ class Walker extends PrimeSerializable implements \Iterator, PaginatorInterface
     public function key()
     {
         if ($this->offset !== null) {
+            /** @var array<int, mixed> $this->collection */
             return $this->offset + key($this->collection);
         }
 
