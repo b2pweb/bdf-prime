@@ -187,7 +187,7 @@ class Migration implements MigrationInterface
      * @param array  $params
      * @param string $connectionName
      *
-     * @return \Doctrine\DBAL\Statement
+     * @return \Doctrine\DBAL\ForwardCompatibility\DriverResultStatement|\Doctrine\DBAL\ForwardCompatibility\DriverStatement
      * @throws PrimeException
      */
     public function query($sql, array $params = [], $connectionName = null)

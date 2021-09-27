@@ -163,6 +163,7 @@ class AttributeInfo
             return false;
         }
 
+        /** @psalm-suppress UndefinedMethod */
         return $this->reflection()->hasType();
     }
 
@@ -175,6 +176,7 @@ class AttributeInfo
      */
     public function isNullable(): bool
     {
+        /** @psalm-suppress UndefinedMethod */
         return !$this->isTyped() || $this->reflection()->getType()->allowsNull();
     }
 

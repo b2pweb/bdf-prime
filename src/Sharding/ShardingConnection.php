@@ -15,6 +15,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Driver;
+use Doctrine\DBAL\ForwardCompatibility\Result;
 use LogicException;
 
 /**
@@ -315,7 +316,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
             $stmt->add($shard->executeQuery($sql, $params, $types, $qcp));
         }
 
-        return $stmt;
+        return new Result($stmt);
     }
 
     /**

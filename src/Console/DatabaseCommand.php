@@ -84,6 +84,7 @@ abstract class DatabaseCommand extends Command
                 continue;
             }
 
+            /** @psalm-suppress InternalMethod */
             $parameters = $connection->getParams();
 
             // Skip connections marked as "ignore" on configuration

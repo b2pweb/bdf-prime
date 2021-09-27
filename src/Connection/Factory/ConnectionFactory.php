@@ -9,7 +9,7 @@ use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\MongoDB\Driver\MongoConnection;
 use Bdf\Prime\MongoDB\Driver\MongoDriver;
 use Doctrine\Common\EventManager;
-use Doctrine\DBAL\DBALException as DoctrineDBALException;
+use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Doctrine\DBAL\DriverManager;
 
 /**
@@ -23,6 +23,9 @@ class ConnectionFactory implements ConnectionFactoryInterface
      * The drivers map
      *
      * @var array<string, array{0: class-string<\Doctrine\DBAL\Driver>, 1: class-string<\Doctrine\DBAL\Driver\Connection>}>
+     *
+     * @psalm-suppress UndefinedClass
+     * @psalm-suppress InvalidPropertyAssignmentValue
      */
     static private $driversMap = [
         'mongodb' => [MongoDriver::class, MongoConnection::class],
@@ -52,12 +55,14 @@ class ConnectionFactory implements ConnectionFactoryInterface
     /**
      * Create the instance of the connection
      *
-     * @param array $parameters
+     * @param array{wrapperClass?: class-string<T>} $parameters
      * @param Configuration|null $config
      * @param EventManager|null $eventManager The event manager, optional.
      *
      * @return ConnectionInterface
      * @throws DBALException
+     *
+     * @template T as ConnectionInterface
      */
     private function createConnection(array $parameters, Configuration $config = null, EventManager $eventManager = null): ConnectionInterface
     {
@@ -88,6 +93,10 @@ class ConnectionFactory implements ConnectionFactoryInterface
         }
 
         try {
+            /**
+             * @var T
+             * @psalm-suppress InvalidArgument
+             */
             return DriverManager::getConnection($parameters, $config, $eventManager);
         } catch (DoctrineDBALException $e) {
             /** @psalm-suppress InvalidScalarArgument */
@@ -99,10 +108,10 @@ class ConnectionFactory implements ConnectionFactoryInterface
      * Register a global driver map
      *
      * @param string $name
-     * @param string $driver
-     * @param string|null $wrapper
+     * @param class-string<\Doctrine\DBAL\Driver> $driver
+     * @param class-string<\Doctrine\DBAL\Driver\Connection>|null $wrapper
      */
-    public static function registerDriverMap($name, $driver, $wrapper = null)
+    public static function registerDriverMap(string $name, string $driver, ?string $wrapper = null): void
     {
         self::$driversMap[$name] = [$driver, $wrapper];
     }
@@ -112,13 +121,11 @@ class ConnectionFactory implements ConnectionFactoryInterface
      *
      * @param string $name
      *
-     * @return string|null
+     * @return array{0: class-string<\Doctrine\DBAL\Driver>, 1: class-string<\Doctrine\DBAL\Driver\Connection>}|null
      */
-    public static function getDriverMap($name)
+    public static function getDriverMap(string $name): ?array
     {
-        return isset(self::$driversMap[$name])
-            ? self::$driversMap[$name]
-            : null;
+        return self::$driversMap[$name] ?? null;
     }
 
     /**
@@ -126,7 +133,7 @@ class ConnectionFactory implements ConnectionFactoryInterface
      *
      * @param string $name
      */
-    public static function unregisterDriverMap($name)
+    public static function unregisterDriverMap(string $name): void
     {
         unset(self::$driversMap[$name]);
     }

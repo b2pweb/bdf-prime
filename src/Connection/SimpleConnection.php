@@ -79,6 +79,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      */
     public function __construct(array $params, Driver $driver, Configuration $config = null, EventManager $eventManager = null)
     {
+        /** @psalm-suppress InternalMethod */
         parent::__construct($params, $driver, $config, $eventManager);
 
         /** @psalm-suppress InvalidArgument */
@@ -202,17 +203,17 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function delete($table, array $identifier, array $types = array())
+    public function delete($table, array $criteria, array $types = array())
     {
-        return $this->from($table)->where($identifier)->delete();
+        return $this->from($table)->where($criteria)->delete();
     }
     
     /**
      * {@inheritdoc}
      */
-    public function update($table, array $data, array $identifier, array $types = array())
+    public function update($table, array $data, array $criteria, array $types = array())
     {
-        return $this->from($table)->where($identifier)->update($data, $types);
+        return $this->from($table)->where($criteria)->update($data, $types);
     }
 
     /**

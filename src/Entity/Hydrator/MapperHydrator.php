@@ -410,6 +410,7 @@ class MapperHydrator implements MapperHydratorInterface
             return false;
         }
 
+        /** @psalm-suppress UndefinedMethod */
         return $property->hasType() && !$property->getType()->allowsNull();
     }
 

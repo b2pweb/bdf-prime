@@ -34,9 +34,9 @@ class Comparator extends BaseComparator
     /**
      * {@inheritdoc}
      */
-    public function diffTable(BaseTable $table1, BaseTable $table2)
+    public function diffTable(BaseTable $fromTable, BaseTable $toTable)
     {
-        $diff = parent::diffTable($table1, $table2);
+        $diff = parent::diffTable($fromTable, $toTable);
         
         if ($diff && !$this->listDropColumn) {
             $diff->removedColumns = [];
