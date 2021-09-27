@@ -1,6 +1,29 @@
 v1.3.0
 ------
 
+* Feat: Adding psaml comments.
+* Feat: Adding `Bdf\Prime\Connection\TransactionManagerInterface` to manage transactional connection.
+* Feat: Adding `Bdf\Prime\Repository\RepositoryEventsSubscriberInterface` to manage event subscription.
+
+BC Breaks
+* Change signature of `Bdf\Prime\Behaviors\BehaviorInterface`.
+* Change signature of `Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface`.
+* Change signature of `Bdf\Prime\Query\Expression\ExpressionInterface`.
+* Change signature of `Bdf\Prime\Query\Expression\ExpressionTransformerInterface`.
+* Change signature of `Bdf\Prime\Query\Pagination\PaginatorInterface`.
+* Change signature of `Bdf\Prime\Query\SqlQueryInterface`.
+* Change signature of `Bdf\Prime\Relations\CustomRelationInterface`.
+* Change signature of `Bdf\Prime\Relations\RelationInterface`.
+* Change signature of `Bdf\Prime\Repository\RepositoryInterface`.
+* Change signature of `Bdf\Prime\Repository\Write\WriterInterface`.
+* Change signature of `Bdf\Prime\Schema\Manager\QueryManagerInterface`.
+* Change signature of many interfaces from package `Bdf\Prime\Query\Contract` and `Bdf\Prime\Query\Contract\Query`.
+* Add close method in `Bdf\Prime\Connection\ConnectionInterface` interface.
+
+
+v1.2.1
+------
+
 * Feat: Adding console command to run sql.
 
 
