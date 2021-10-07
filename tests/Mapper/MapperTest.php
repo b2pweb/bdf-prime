@@ -204,7 +204,7 @@ class MapperTest extends TestCase
     public function test_set_generator_need_valid_generator()
     {
         $this->expectException('LogicException');
-        $this->expectExceptionMessageRegExp('/Trying to set an invalid generator/');
+        $this->expectExceptionMessageMatches('/Trying to set an invalid generator/');
 
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
         $mapper->setGenerator(new TestEntity());

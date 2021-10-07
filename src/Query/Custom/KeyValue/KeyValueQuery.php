@@ -3,7 +3,7 @@
 namespace Bdf\Prime\Query\Custom\KeyValue;
 
 use Bdf\Prime\Connection\ConnectionInterface;
-use Bdf\Prime\Exception\DBALException;
+use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\AbstractReadCommand;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
@@ -18,7 +18,6 @@ use Bdf\Prime\Query\Extension\CompilableTrait;
 use Bdf\Prime\Query\Extension\LimitableTrait;
 use Bdf\Prime\Query\Extension\PaginableTrait;
 use Bdf\Prime\Query\Extension\ProjectionableTrait;
-use Doctrine\DBAL\DBALException as BaseDBALException;
 
 /**
  * Query for perform simple key / value search
@@ -181,7 +180,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
 
         $this->statements['aggregate'] = [$function, $column ?: '*'];
 
-        $aggregate = $this->execute()[0]['aggregate'];
+        $aggregate = $this->execute()->current()['aggregate'];
 
         $this->compilerState->invalidate();
         $this->statements = $statements;
@@ -203,7 +202,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
         $this->statements['offset'] = null;
         $this->statements['aggregate'] = ['count', $columns ?: '*'];
 
-        $count = (int)$this->execute()[0]['aggregate'];
+        $count = (int)$this->execute()->current()['aggregate'];
 
         $this->compilerState->invalidate();
         $this->statements = $statements;
@@ -215,7 +214,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function execute($columns = null)
+    public function execute($columns = null): ResultSetInterface
     {
         $this->setType(self::TYPE_SELECT);
 
@@ -232,15 +231,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     #[WriteOperation]
     public function delete(): int
     {
-        $this->setType(self::TYPE_DELETE);
-
-        $count = $this->connection->execute($this)->count();
-
-        if ($count > 0) {
-            $this->clearCacheOnWrite();
-        }
-
-        return $count;
+        return $this->executeWrite(self::TYPE_DELETE);
     }
 
     /**
@@ -253,15 +244,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
             $this->values($values);
         }
 
-        $this->setType(self::TYPE_UPDATE);
-
-        $count = $this->connection->execute($this)->count();
-
-        if ($count > 0) {
-            $this->clearCacheOnWrite();
-        }
-
-        return $count;
+        return $this->executeWrite(self::TYPE_UPDATE);
     }
 
     /**
@@ -333,5 +316,22 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
         }
 
         return sha1($sql.'-'.serialize($this->getBindings()));
+    }
+
+    /**
+     * @param Compilable::TYPE_* $type
+     * @return int
+     */
+    private function executeWrite(string $type): int
+    {
+        $this->setType($type);
+
+        $result = $this->connection->execute($this);
+
+        if ($result->hasWrite()) {
+            $this->clearCacheOnWrite();
+        }
+
+        return $result->count();
     }
 }

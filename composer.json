@@ -21,18 +21,19 @@
   "minimum-stability": "dev",
   "prefer-stable": true,
   "require": {
-    "php": ">=7.1",
+    "php": ">=7.4",
     "ext-mbstring": "*",
     "b2pweb/bdf-dsn": "~1.0",
     "b2pweb/bdf-event-notifier": "~1.0",
     "b2pweb/bdf-serializer": "~1.0",
     "b2pweb/bdf-util": "~1.0",
-    "doctrine/dbal": "~2.5",
+    "doctrine/dbal": "~3.0",
     "doctrine/inflector": "~1.0",
     "psr/container": "~1.0",
     "psr/log": "~1.0",
     "psr/simple-cache": "^1.0",
-    "symfony/filesystem": "~4.3|~5.0"
+    "symfony/filesystem": "~4.3|~5.0",
+    "ramsey/uuid": "^4.2"
   },
   "conflict": {
     "doctrine/cache": ">=2.0"
@@ -40,7 +41,7 @@
   "require-dev": {
     "b2pweb/bdf-phpunit": "~1.0",
     "cache/array-adapter": "~1.0",
-    "phpunit/phpunit": "~7.0|~8.0",
+    "phpunit/phpunit": "~9.0",
     "symfony/console": "~4.3|~5.0",
     "symfony/http-foundation": "~4.3|~5.0",
     "symfony/http-kernel": "~4.3|~5.0",

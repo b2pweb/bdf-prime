@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Logger\PsrDecorator;
 use Bdf\Prime\Types\TypesRegistry;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -28,10 +29,12 @@ class ConfigurationTest extends TestCase
     public function test_set_parameters_from_constructor()
     {
         $configuration = new Configuration([
-            'logger' => $logger = new NullLogger()
+            'logger' => $logger = new PsrDecorator(new NullLogger()),
+            'autoCommit' => false,
         ]);
         
         $this->assertSame($logger, $configuration->getSQLLogger());
+        $this->assertFalse($configuration->getAutoCommit());
     }
 
     /**

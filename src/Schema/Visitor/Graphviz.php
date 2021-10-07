@@ -91,7 +91,7 @@ class Graphviz extends AbstractVisitor
                     . $columnName
                 . '</td>'
                 . '<td border="0" align="left">'
-                    . '<font point-size="10">'.lcfirst((string) $column->getType()).'</font>'
+                    . '<font point-size="10">'.lcfirst($column->getType()->getName()).'</font>'
                 . '</td>'
             . '</tr>';
         }

@@ -49,7 +49,7 @@ class GuidGeneratorTest extends TestCase
 
         $generator->postProcess($entity);
         
-        $this->assertRegExp('/[\w\d\-]+/', $data['id']);
+        $this->assertMatchesRegularExpression('/[\w\d\-]+/', $data['id']);
         $this->assertEquals($data['id'], $entity->id);
     }
 
@@ -73,7 +73,7 @@ class GuidGeneratorTest extends TestCase
 
         $generator->postProcess($entity);
 
-        $this->assertRegExp('/[\w\d\-]+/', $data['id']);
+        $this->assertMatchesRegularExpression('/[\w\d\-]+/', $data['id']);
         $this->assertNull($entity->id);
     }
 }

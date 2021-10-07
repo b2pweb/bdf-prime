@@ -18,7 +18,7 @@ class DownCommandTest extends CommandTestCase
 
         $output = $this->execute(new DownCommand($this->manager), ['version' => '100']);
 
-        $this->assertRegExp("/ == 100 Migration100 reverting\nInit 100\nDown 100\n == 100 Migration100 reverted [0-9\\.]+s\n/", $output);
+        $this->assertMatchesRegularExpression("/ == 100 Migration100 reverting\nInit 100\nDown 100\n == 100 Migration100 reverted [0-9\\.]+s\n/", $output);
         $this->assertEquals([], $this->repository->all());
     }
 

@@ -74,7 +74,7 @@ class MigrationTest extends TestCase
             'name' => 'test-name'
         ]);
         
-        $entity = $this->migration->query('select * from test_ where id = :id', [':id' => 1], 'test')->fetchAll()[0];
+        $entity = $this->migration->query('select * from test_ where id = :id', ['id' => 1], 'test')->fetchAll()[0];
         
         $this->assertEquals(1, $entity['id']);
         $this->assertEquals('test-name', $entity['name']);
@@ -93,8 +93,8 @@ class MigrationTest extends TestCase
             'name' => 'test-name'
         ]);
         
-        $this->migration->update('update test_ set name = :name', [':name' => 'new'], 'test');
-        $entity = $this->migration->query('select * from test_ where id = :id', [':id' => 1], 'test')->fetchAll()[0];
+        $this->migration->update('update test_ set name = :name', ['name' => 'new'], 'test');
+        $entity = $this->migration->query('select * from test_ where id = :id', ['id' => 1], 'test')->fetchAll()[0];
         
         $this->assertEquals('new', $entity['name']);
         

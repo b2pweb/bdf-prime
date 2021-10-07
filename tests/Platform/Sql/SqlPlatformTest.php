@@ -11,7 +11,7 @@ use Bdf\Prime\Platform\Sql\Types\SqlStringType;
 use Bdf\Prime\Types\TypeInterface;
 use Bdf\Prime\Types\TypesRegistry;
 use DateTime;
-use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -30,7 +30,7 @@ class SqlPlatformTest extends TestCase
      */
     public function setUp(): void
     {
-        $this->platform = new SqlPlatform(new MySqlPlatform(), new TypesRegistry());
+        $this->platform = new SqlPlatform(new MySQLPlatform(), new TypesRegistry());
     }
 
     /**
@@ -46,7 +46,7 @@ class SqlPlatformTest extends TestCase
      */
     public function test_grammar()
     {
-        $this->assertInstanceOf(MySqlPlatform::class, $this->platform->grammar());
+        $this->assertInstanceOf(MySQLPlatform::class, $this->platform->grammar());
     }
 
     /**

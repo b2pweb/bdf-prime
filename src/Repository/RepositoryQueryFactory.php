@@ -5,7 +5,7 @@ namespace Bdf\Prime\Repository;
 use Bdf\Prime\Cache\CacheInterface;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Exception\PrimeException;
-use Bdf\Prime\Exception\QueryException;
+use Bdf\Prime\Exception\QueryBuildingException;
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\OrmPreprocessor;
@@ -179,7 +179,7 @@ class RepositoryQueryFactory
 
         if (is_array($id)) {
             if (!$this->isPrimaryKeyFilter($id)) {
-                throw new QueryException('Only primary keys must be passed to findById()');
+                throw new QueryBuildingException('Only primary keys must be passed to findById()');
             }
 
             $query->where($id);

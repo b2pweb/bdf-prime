@@ -39,7 +39,7 @@ final class ColumnTransformer
      * Get the doctrine column
      *
      * @return Column
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws \Doctrine\DBAL\Exception
      */
     public function toDoctrine()
     {

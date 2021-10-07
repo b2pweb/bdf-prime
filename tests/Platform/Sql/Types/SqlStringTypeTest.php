@@ -7,6 +7,7 @@ use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Schema\ColumnInterface;
 use Bdf\Prime\Types\TypeInterface;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -40,12 +41,12 @@ class SqlStringTypeTest extends TestCase
     {
         $column = $this->createMock(ColumnInterface::class);
 
-        $this->assertEquals(Type::STRING, $this->type->declaration($column));
-        $this->assertEquals(Type::STRING, $this->platform->types()->native(TypeInterface::STRING)->declaration($column));
-        $this->assertEquals(Type::TEXT, $this->platform->types()->native(TypeInterface::TEXT)->declaration($column));
-        $this->assertEquals(Type::BIGINT, $this->platform->types()->native(TypeInterface::BIGINT)->declaration($column));
-        $this->assertEquals(Type::BINARY, $this->platform->types()->native(TypeInterface::BINARY)->declaration($column));
-        $this->assertEquals(Type::BLOB, $this->platform->types()->native(TypeInterface::BLOB)->declaration($column));
+        $this->assertEquals(Types::STRING, $this->type->declaration($column));
+        $this->assertEquals(Types::STRING, $this->platform->types()->native(TypeInterface::STRING)->declaration($column));
+        $this->assertEquals(Types::TEXT, $this->platform->types()->native(TypeInterface::TEXT)->declaration($column));
+        $this->assertEquals(Types::BIGINT, $this->platform->types()->native(TypeInterface::BIGINT)->declaration($column));
+        $this->assertEquals(Types::BINARY, $this->platform->types()->native(TypeInterface::BINARY)->declaration($column));
+        $this->assertEquals(Types::BLOB, $this->platform->types()->native(TypeInterface::BLOB)->declaration($column));
     }
 
     /**

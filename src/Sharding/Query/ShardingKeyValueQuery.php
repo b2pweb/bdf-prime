@@ -3,6 +3,8 @@
 namespace Bdf\Prime\Sharding\Query;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Connection\Result\ArrayResultSet;
+use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Exception\ShardingException;
 use Bdf\Prime\Query\AbstractReadCommand;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
@@ -220,28 +222,29 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      * @todo execute cached with closure
      */
     #[ReadOperation]
-    public function execute($columns = null)
+    public function execute($columns = null): ResultSetInterface
     {
         $results = [];
         $limit = $this->statements['limit'];
 
         foreach ($this->selectQueries() as $query) {
-            $results = array_merge($results, $query->execute($columns));
+            $results = array_merge($results, $query->execute($columns)->all());
 
             if ($limit) {
                 $count = count($results);
 
                 if ($count == $limit) {
-                    return $results;
+                    break;
                 }
 
                 if ($count > $limit) {
-                    return array_slice($results, 0, $limit);
+                    $results = array_slice($results, 0, $limit);
+                    break;
                 }
             }
         }
 
-        return $results;
+        return new ArrayResultSet($results);
     }
 
     /**

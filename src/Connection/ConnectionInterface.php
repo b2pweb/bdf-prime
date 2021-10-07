@@ -5,6 +5,8 @@ namespace Bdf\Prime\Connection;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Exception\QueryBuildingException;
+use Bdf\Prime\Exception\QueryExecutionException;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
@@ -112,10 +114,10 @@ interface ConnectionInterface
      * @param array  $bindings
      * @param array  $types
      *
-     * @return array The database result
+     * @return ResultSetInterface<\stdClass> The database result
      * @throws PrimeException When select fail
      */
-    public function select($query, array $bindings = [], array $types = []);
+    public function select($query, array $bindings = [], array $types = []): ResultSetInterface;
 
     /**
      * Execute the query and get the result
@@ -123,12 +125,15 @@ interface ConnectionInterface
      *
      * @param Compilable $query
      *
-     * @return ResultSetInterface
+     * @return ResultSetInterface<array<string, mixed>>
      *
      * @see Compilable::type() The query type
+     *
+     * @throws QueryExecutionException When query execution fail
+     * @throws QueryBuildingException When query compilation fail
      * @throws PrimeException When execution fail
      */
-    public function execute(Compilable $query);
+    public function execute(Compilable $query): ResultSetInterface;
 
     /**
      * Gets the name of the database this Connection is connected to.

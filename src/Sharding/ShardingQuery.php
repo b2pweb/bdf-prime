@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Sharding;
 
+use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Query;
@@ -25,7 +26,7 @@ class ShardingQuery extends Query
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function execute($columns = null)
+    public function execute($columns = null): ResultSetInterface
     {
         $lastShard = $this->connection->getCurrentShardId();
 

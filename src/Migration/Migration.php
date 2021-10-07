@@ -7,6 +7,7 @@ use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Schema\SchemaManager;
 use Bdf\Prime\ServiceLocator;
+use Doctrine\DBAL\Result;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -187,10 +188,10 @@ class Migration implements MigrationInterface
      * @param array  $params
      * @param string $connectionName
      *
-     * @return \Doctrine\DBAL\ForwardCompatibility\DriverResultStatement|\Doctrine\DBAL\ForwardCompatibility\DriverStatement
+     * @return Result
      * @throws PrimeException
      */
-    public function query($sql, array $params = [], $connectionName = null)
+    public function query($sql, array $params = [], $connectionName = null): Result
     {
         return $this->connection($connectionName)->executeQuery($sql, $params);
     }

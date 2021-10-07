@@ -5,6 +5,7 @@ namespace Bdf\Prime\Connection;
 use Bdf\Prime\Connection\Event\ConnectionClosedListenerInterface;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Connection\Result\UpdateResultSet;
+use Bdf\Prime\Exception\QueryExecutionException;
 use Bdf\Prime\Platform\Sql\Types\SqlBooleanType;
 use Bdf\Prime\Platform\Sql\Types\SqlIntegerType;
 use Bdf\Prime\Prime;
@@ -216,10 +217,10 @@ class SimpleConnectionTest extends TestCase
         ]);
         
         $result = $this->connection->select('select * from test_ where id = :id', ['id' => 10]);
-        $this->assertEquals('test', $result[0]->name);
+        $this->assertEquals('test', $result->current()->name);
         
         $result = $this->connection->select('select * from test_ where id = ?', [10]);
-        $this->assertEquals('test', $result[0]->name);
+        $this->assertEquals('test', $result->current()->name);
     }
 
     /**
@@ -317,6 +318,23 @@ class SimpleConnectionTest extends TestCase
     /**
      *
      */
+    public function test_execute_with_error_should_provide_query_and_parameters()
+    {
+        $query = $this->connection->builder()->from('not_found')->where('foo', 'bar');
+
+        try {
+            $this->connection->execute($query);
+            $this->fail('Expect exception');
+        } catch (QueryExecutionException $e) {
+            $this->assertEquals('Error on execute : An exception occurred while executing a query: SQLSTATE[HY000]: General error: 1 no such table: not_found', $e->getMessage());
+            $this->assertEquals('SELECT * FROM not_found WHERE foo = ?', $e->query());
+            $this->assertEquals(['bar'], $e->parameters());
+        }
+    }
+
+    /**
+     *
+     */
     public function test_execute_update_query()
     {
         $this->connection->insert('test_', [
@@ -363,7 +381,7 @@ class SimpleConnectionTest extends TestCase
 
         $query = $this->createMock(Compilable::class);
 
-        //$query->expects($this->once())->method('type')->willReturn(Compilable::TYPE_SELECT);
+        $query->expects($this->once())->method('type')->willReturn(Compilable::TYPE_SELECT);
         $query->expects($this->once())->method('compile')->willReturn($this->connection->prepare('SELECT * FROM test_ WHERE id = ?'));
         $query->expects($this->once())->method('getBindings')->willReturn([10]);
 
@@ -387,11 +405,15 @@ class SimpleConnectionTest extends TestCase
 
         $query = $this->createMock(Compilable::class);
 
-        //$query->expects($this->once())->method('type')->willReturn(Compilable::TYPE_DELETE);
+        $query->expects($this->once())->method('type')->willReturn(Compilable::TYPE_DELETE);
         $query->expects($this->once())->method('compile')->willReturn($this->connection->prepare('DELETE FROM test_ WHERE id = ?'));
         $query->expects($this->once())->method('getBindings')->willReturn([10]);
 
-        $this->assertCount(1, $this->connection->execute($query));
+        $result = $this->connection->execute($query);
+
+        $this->assertTrue($result->isWrite());
+        $this->assertTrue($result->hasWrite());
+        $this->assertCount(1, $result);
         $this->assertEmpty($this->connection->builder()->from('test_')->all());
     }
 
@@ -400,10 +422,6 @@ class SimpleConnectionTest extends TestCase
      */
     public function test_execute_select_prepared_with_schemas_changed()
     {
-        if (PHP_VERSION_ID >= 70200) {
-            return;
-        }
-
         $this->connection->insert('test_', [
             'id'   => 10,
             'name' => 'test',
@@ -489,7 +507,7 @@ class SimpleConnectionTest extends TestCase
         sleep(2);
         $result = $connection->select('select 1 as dummy');
 
-        $this->assertEquals(1, $result[0]->dummy);
+        $this->assertEquals(1, $result->current()->dummy);
     }
 
     /**

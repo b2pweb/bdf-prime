@@ -3,6 +3,7 @@
 namespace Bdf\Prime\IdGenerators;
 
 use Bdf\Prime\ServiceLocator;
+use Ramsey\Uuid\Uuid;
 
 /**
  * GUID generator
@@ -18,11 +19,6 @@ class GuidGenerator extends AbstractGenerator
      */
     protected function doGenerate($property, array &$data, ServiceLocator $serviceLocator)
     {
-        $connection = $this->connection();
-        $grammar = $connection->platform()->grammar();
-
-        $stmt = $connection->query('SELECT '.$grammar->getGuidExpression());
-
-        return $data[$property] = (string) $stmt->fetchColumn(0);
+        return $data[$property] = Uuid::uuid4()->toString();
     }
 }

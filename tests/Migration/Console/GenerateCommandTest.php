@@ -87,7 +87,7 @@ class GenerateCommandTest extends CommandTestCase
             $this->fail('Failed asserting exception');
 
         } catch (InvalidArgumentException $exception) {
-            $this->assertRegExp("/Duplicate migration version/", $exception->getMessage());
+            $this->assertMatchesRegularExpression("/Duplicate migration version/", $exception->getMessage());
         }
     }
 

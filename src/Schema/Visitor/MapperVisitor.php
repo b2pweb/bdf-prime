@@ -139,6 +139,7 @@ class MapperVisitor extends AbstractVisitor
 
             // get the type of primary
             foreach ($table->getPrimaryKeyColumns() as $primary) {
+                $primary = $primary->getName();
                 $column = $table->getColumn($primary);
 
                 if ($column->getAutoincrement()) {

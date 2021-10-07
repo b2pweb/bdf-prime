@@ -2,7 +2,9 @@
 
 namespace Bdf\Prime\Query\Contract\Query;
 
+use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\Custom\BulkInsert\BulkInsertQuery;
 
 /**
@@ -33,8 +35,11 @@ use Bdf\Prime\Query\Custom\BulkInsert\BulkInsertQuery;
  *     ->execute()
  * ;
  * </code>
+ *
+ * @template C as \Bdf\Prime\Connection\ConnectionInterface
+ * @extends CommandInterface<C>
  */
-interface InsertQueryInterface
+interface InsertQueryInterface extends CommandInterface
 {
     const MODE_INSERT = 'insert';
     const MODE_REPLACE = 'replace';
@@ -155,12 +160,14 @@ interface InsertQueryInterface
     public function bulk(bool $flag = true);
 
     /**
+     * {@inheritdoc}
+     *
      * Execute the insert operation
      *
      * @param mixed $columns Not used : only for compatibility with CommandInterface
      *
-     * @return int The number of affected rows
+     * @return ResultSetInterface<array<string, mixed>>
      * @throws PrimeException When execute fail
      */
-    public function execute($columns = null);
+    public function execute($columns = null): ResultSetInterface;
 }

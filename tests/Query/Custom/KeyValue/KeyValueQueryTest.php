@@ -8,6 +8,7 @@ use Bdf\Prime\Cache\DoctrineCacheAdapter;
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Customer;
 use Bdf\Prime\Exception\DBALException;
+use Bdf\Prime\Exception\QueryExecutionException;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Compiler\Preprocessor\OrmPreprocessor;
@@ -439,7 +440,7 @@ class KeyValueQueryTest extends TestCase
                 'id' => 2,
                 'name' => 'Mickey'
             ]
-        ], $this->query()->from('test_')->execute(['id', 'name']));
+        ], $this->query()->from('test_')->execute(['id', 'name'])->all());
     }
 
     /**
@@ -505,8 +506,8 @@ class KeyValueQueryTest extends TestCase
      */
     public function test_dbal_error()
     {
-        $this->expectException(DBALException::class);
-        $this->expectExceptionMessage("Error on execute : An exception occurred while executing 'SELECT * FROM not_found':\n\nSQLSTATE[HY000]: General error: 1 no such table: not_found");
+        $this->expectException(QueryExecutionException::class);
+        $this->expectExceptionMessage("Error on execute : An exception occurred while executing a query: SQLSTATE[HY000]: General error: 1 no such table: not_found");
 
         $this->query()->from('not_found')->execute();
     }
@@ -517,7 +518,7 @@ class KeyValueQueryTest extends TestCase
     public function test_dbal_error_delete()
     {
         $this->expectException(DBALException::class);
-        $this->expectExceptionMessage("Error on execute : An exception occurred while executing 'DELETE FROM not_found':\n\nSQLSTATE[HY000]: General error: 1 no such table: not_found");
+        $this->expectExceptionMessage("Error on execute : An exception occurred while executing a query: SQLSTATE[HY000]: General error: 1 no such table: not_found");
 
         $this->query()->from('not_found')->delete();
     }
@@ -528,7 +529,7 @@ class KeyValueQueryTest extends TestCase
     public function test_dbal_error_update()
     {
         $this->expectException(DBALException::class);
-        $this->expectExceptionMessage("Error on execute : An exception occurred while executing 'UPDATE not_found'");
+        $this->expectExceptionMessage("Error on execute : An exception occurred while executing a query: SQLSTATE[HY000]: General error: 1 incomplete input");
 
         $this->query()->from('not_found')->update();
     }
@@ -577,7 +578,7 @@ class KeyValueQueryTest extends TestCase
             ->useCache()
         ;
 
-        $this->assertEquals($expected, $query->execute(['id', 'name']));
+        $this->assertEquals($expected, $query->execute(['id', 'name'])->all());
         $this->assertEquals($expected, $cache->get(new CacheKey('test:test_', sha1('SELECT id, name FROM test_-a:0:{}'))));
     }
 
@@ -600,7 +601,7 @@ class KeyValueQueryTest extends TestCase
 
         $query = $this->query()->from('test_');
         $query->setCache($cache)->useCache();
-        $this->assertEquals($expected, $query->execute(['id', 'name']));
+        $this->assertEquals($expected, $query->execute(['id', 'name'])->all());
 
         // insert without clear cache
         $this->connection->insert('test_', [
@@ -608,7 +609,7 @@ class KeyValueQueryTest extends TestCase
             'name' => 'Mickey'
         ]);
 
-        $this->assertEquals($expected, $query->execute(['id', 'name']));
+        $this->assertEquals($expected, $query->execute(['id', 'name'])->all());
     }
 
     /**
@@ -630,13 +631,13 @@ class KeyValueQueryTest extends TestCase
 
         $query = $this->query()->from('test_')->where('id', 1);
         $query->setCache($cache);
-        $this->assertEquals($expected, $query->execute(['id', 'name']));
+        $this->assertEquals($expected, $query->execute(['id', 'name'])->all());
 
         $query->delete();
 
         $this->assertNull($cache->get(new CacheKey('test:test_', sha1('SELECT id, name FROM test_-a:0:{}'))));
 
-        $this->assertEmpty($query->execute(['id', 'name']));
+        $this->assertEmpty($query->execute(['id', 'name'])->all());
     }
 
     /**
@@ -653,7 +654,7 @@ class KeyValueQueryTest extends TestCase
         $this->assertEquals([[
             'id'          => 1,
             'name'        => 'John'
-        ]], $query->execute(['id', 'name']));
+        ]], $query->execute(['id', 'name'])->all());
 
         // Change the schema
         TestEntity::repository()->schema()->drop();
@@ -667,7 +668,7 @@ class KeyValueQueryTest extends TestCase
         $this->assertEquals([[
             'id'          => 1,
             'name'        => 'John',
-        ]], $query->execute(['id', 'name']));
+        ]], $query->execute(['id', 'name'])->all());
     }
 
     /**
@@ -752,7 +753,7 @@ class KeyValueQueryTest extends TestCase
 
         $query = $this->query()->from('test_')->where('id', 1);
         $query->setCache($cache);
-        $this->assertEquals($expected, $query->execute(['id', 'name']));
+        $this->assertEquals($expected, $query->execute(['id', 'name'])->all());
 
         $query->update(['name' => 'Bob']);
 
@@ -761,6 +762,6 @@ class KeyValueQueryTest extends TestCase
         $this->assertEquals([[
             'id' => 1,
             'name' => 'Bob'
-        ]], $query->execute(['id', 'name']));
+        ]], $query->execute(['id', 'name'])->all());
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Bdf\Prime\Connection\Extensions;
 
+use Throwable;
+
 /**
  * Trait LostConnection
  */
@@ -38,11 +40,11 @@ trait LostConnection
     /**
      * Determine if the given exception was caused by a lost connection.
      *
-     * @param \Exception $exception
+     * @param Throwable $exception
      *
      * @return bool
      */
-    protected function causedByLostConnection(\Exception $exception)
+    protected function causedByLostConnection(Throwable $exception)
     {
         $message = $exception->getMessage();
 

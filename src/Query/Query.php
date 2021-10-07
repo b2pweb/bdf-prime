@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
@@ -224,22 +225,20 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     {
         $this->setType($type);
 
-        $nb = $this->connection->execute($this)->count();
+        $result = $this->connection->execute($this);
 
-        if ($nb > 0) {
+        if ($result->hasWrite()) {
             $this->clearCacheOnWrite();
         }
 
-        return $nb;
+        return $result->count();
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @todo Return statement instead of array ?
      */
     #[ReadOperation]
-    public function execute($columns = null)
+    public function execute($columns = null): ResultSetInterface
     {
         if (!empty($columns)) {
             $this->select($columns);
@@ -273,7 +272,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
         $this->statements['offset'] = null;
         $this->statements['aggregate'] = ['pagination', $this->getPaginationColumns($column)];
 
-        $count = (int)$this->execute()[0]['aggregate'];
+        $count = (int)$this->execute()->current()['aggregate'];
 
         $this->compilerState->invalidate(['columns', 'orders']);
         $this->statements = $statements;
@@ -370,7 +369,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
 
         $this->statements['aggregate'] = [$function, $column ?: '*'];
 
-        $aggregate = $this->execute()[0]['aggregate'];
+        $aggregate = $this->execute()->current()['aggregate'];
 
         $this->compilerState->invalidate('columns');
         $this->statements = $statements;

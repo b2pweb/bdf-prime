@@ -7,7 +7,7 @@ use Bdf\Prime\CompositePkEntity;
 use Bdf\Prime\Customer;
 use Bdf\Prime\CustomerPack;
 use Bdf\Prime\Exception\EntityNotFoundException;
-use Bdf\Prime\Exception\QueryException;
+use Bdf\Prime\Exception\QueryBuildingException;
 use Bdf\Prime\Faction;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Compiler\Preprocessor\OrmPreprocessor;
@@ -162,14 +162,14 @@ class RepositoryQueryFactoryTest extends TestCase
         try {
             $factory->findById(['badKey' => '321', 'packId' => 654]);
             $this->fail('Expect QueryException');
-        } catch (QueryException $e) {
+        } catch (QueryBuildingException $e) {
             $this->assertEquals('Only primary keys must be passed to findById()', $e->getMessage());
         }
 
         try {
             $factory->findById(['customerId' => '321']);
             $this->fail('Expect QueryException');
-        } catch (QueryException $e) {
+        } catch (QueryBuildingException $e) {
             $this->assertEquals('Only primary keys must be passed to findById()', $e->getMessage());
         }
     }
@@ -179,7 +179,7 @@ class RepositoryQueryFactoryTest extends TestCase
      */
     public function test_findById_bad_keys()
     {
-        $this->expectException(QueryException::class);
+        $this->expectException(QueryBuildingException::class);
         $this->expectExceptionMessage('Only primary keys must be passed to findById()');
 
         $this->factory->findById(['foreign' => 1]);

@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 
@@ -50,10 +51,10 @@ interface CommandInterface extends CompilableClauseInterface
      *
      * @param string|array $columns
      *
-     * @return mixed
+     * @return ResultSetInterface<array<string, mixed>>
      * @throws PrimeException When execute fail
      */
-    public function execute($columns = null);
+    public function execute($columns = null): ResultSetInterface;
 
     /**
      * Creates and adds a query root corresponding to the table identified by the

@@ -57,12 +57,12 @@ class TableGenerator extends AbstractGenerator
                 $connection->executeUpdate('UPDATE '.$metadata->sequence['table']
                     .' SET '.$metadata->sequence['column'].' = '.$metadata->sequence['column'].'+1');
                 return (string) $connection->executeQuery('SELECT '.$metadata->sequence['column']
-                    .' FROM '.$metadata->sequence['table'])->fetchColumn(0);
-            
+                    .' FROM '.$metadata->sequence['table'])->fetchOne();
+
             default:
                 return (string) $connection->executeQuery(
                     $platform->grammar()->getSequenceNextValSQL($metadata->sequence['table'])
-                )->fetchColumn(0);
+                )->fetchOne();
         }
     }
 }

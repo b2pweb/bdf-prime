@@ -165,7 +165,7 @@ class ManagerTest extends TestCase
         $this->workflow->setOutput($this->output);
         $this->workflow->up('100');
 
-        $this->assertRegExp("/ == 100 Migration100 migrating\nInit 100\nUp 100\n == 100 Migration100 migrated [0-9\\.]+s\n/", $this->output->fetch());
+        $this->assertMatchesRegularExpression("/ == 100 Migration100 migrating\nInit 100\nUp 100\n == 100 Migration100 migrated [0-9\\.]+s\n/", $this->output->fetch());
         $this->assertEquals([100, 200], $this->repository->all());
     }
 
@@ -181,7 +181,7 @@ class ManagerTest extends TestCase
         $this->workflow->setOutput($this->output);
         $this->workflow->down('200');
 
-        $this->assertRegExp("/ == 200 Migration200 reverting\nInit 200\nDown 200\n == 200 Migration200 reverted [0-9\\.]+s\n/", $this->output->fetch());
+        $this->assertMatchesRegularExpression("/ == 200 Migration200 reverting\nInit 200\nDown 200\n == 200 Migration200 reverted [0-9\\.]+s\n/", $this->output->fetch());
         $this->assertEquals([100, 300], $this->repository->all());
     }
 
@@ -195,7 +195,7 @@ class ManagerTest extends TestCase
         $this->workflow->setOutput($this->output);
         $this->workflow->migrate('300');
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             "/" .
             " == 100 Migration100 migrating\nInit 100\nUp 100\n == 100 Migration100 migrated [0-9\\.]+s\n" .
             " == 300 Migration300 migrating\nInit 300\nUp 300\n == 300 Migration300 migrated [0-9\\.]+s\n" .
@@ -213,7 +213,7 @@ class ManagerTest extends TestCase
         $this->workflow->setOutput($this->output);
         $this->workflow->migrate('600', Migration::STAGE_PREPARE);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             "/" .
             " == 101 Migration101 migrating\nInit 101\nUp 101\n == 101 Migration101 migrated [0-9\\.]+s\n" .
             " == 600 Migration600 migrating\nInit 600\nUp 600\n == 600 Migration600 migrated [0-9\\.]+s\n" .
@@ -236,7 +236,7 @@ class ManagerTest extends TestCase
         $this->workflow->setOutput($this->output);
         $this->workflow->rollback('200');
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             "/" .
             " == 500 Migration500 reverting\nInit 500\nDown 500\n == 500 Migration500 reverted [0-9\\.]+s\n" .
             " == 300 Migration300 reverting\nInit 300\nDown 300\n == 300 Migration300 reverted [0-9\\.]+s\n" .
@@ -259,7 +259,7 @@ class ManagerTest extends TestCase
         $this->workflow->setOutput($this->output);
         $this->workflow->rollback('100', Migration::STAGE_PREPARE);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             "/" .
             " == 600 Migration600 reverting\nInit 600\nDown 600\n == 600 Migration600 reverted [0-9\\.]+s\n" .
             " == 101 Migration101 reverting\nInit 101\nDown 101\n == 101 Migration101 reverted [0-9\\.]+s\n" .

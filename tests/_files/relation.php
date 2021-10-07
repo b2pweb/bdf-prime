@@ -278,7 +278,7 @@ class UserMapper extends Mapper
     {
         return [
             'testScope' => function($query, $value) {
-                return $query->limit(1)->execute(['test' => $value]);
+                return $query->limit(1)->execute(['test' => $value])->all();
             }
         ];
     }

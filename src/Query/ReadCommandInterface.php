@@ -66,12 +66,14 @@ interface ReadCommandInterface extends CommandInterface, Cachable
     /**
      * Set a post processor to transform query result
      *
-     * @param callable $processor
-     * @param bool $forEach
+     * @param (EACH is true ? callable(array<string, mixed>):mixed : callable(\Bdf\Prime\Connection\Result\ResultSetInterface<array<string, mixed>>):array) $processor
+     * @param EACH $forEach
      *
      * @return $this
+     *
+     * @template EACH as bool
      */
-    public function post(callable $processor, $forEach = true);
+    public function post(callable $processor, bool $forEach = true);
 
     /**
      * Set the collection class

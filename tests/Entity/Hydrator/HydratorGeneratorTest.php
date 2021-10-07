@@ -366,7 +366,7 @@ EOL;
 
         $line = implode(PHP_EOL, $line);
 
-        $this->assertRegExp('#' . $line . '#s', $code);
+        $this->assertMatchesRegularExpression('#' . $line . '#s', $code);
     }
 
     /**
@@ -398,7 +398,7 @@ EOL;
 
         $line = implode(PHP_EOL, $line);
 
-        $this->assertRegExp('#' . $line . '#s', $code);
+        $this->assertMatchesRegularExpression('#' . $line . '#s', $code);
     }
 
     /**

@@ -16,6 +16,8 @@ use Bdf\Prime\Query\Expression\Like;
 use Bdf\Prime\Query\Expression\Now;
 use Bdf\Prime\Query\Expression\Raw;
 use Bdf\Prime\Query\Factory\QueryFactoryInterface;
+use Doctrine\DBAL\Cache\ArrayResult;
+use Doctrine\DBAL\Result;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -289,10 +291,7 @@ class QueryTest extends TestCase
         ]);
         
         $entity = $this->query()->post(function($rows) {
-            foreach ($rows as &$row) {
-                $row = (object)$row;
-            }
-            return $rows;
+            return $rows->asObject()->all();
         }, false)->first();
         
         $this->assertEquals(1, $entity->id);
@@ -1071,7 +1070,7 @@ class QueryTest extends TestCase
         $connection->expects($this->any())->method('factory')->willReturn($mysql->factory());
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(*) AS aggregate FROM test_")
-            ->will($this->returnValue(new CacheStatement([['aggregate' => 1]])));
+            ->will($this->returnValue(new Result(new ArrayResult([['aggregate' => 1]]), $connection)));
 
         $query = new Query($connection);
         $query->from('test_')->lock()->count();
@@ -1201,7 +1200,7 @@ class QueryTest extends TestCase
             'id' => '1',
             'name' => 'test-name1',
             'date_insert' => null
-        ]], $query->execute());
+        ]], $query->execute()->all());
 
         $this->assertEquals([[
             'id' => '1',
@@ -1218,7 +1217,7 @@ class QueryTest extends TestCase
             'id' => '1',
             'name' => 'test-name1',
             'date_insert' => null
-        ]], $query->execute());
+        ]], $query->execute()->all());
     }
 
     /**
@@ -1239,7 +1238,7 @@ class QueryTest extends TestCase
             'id' => '1',
             'name' => 'test-name1',
             'date_insert' => null
-        ]], $query->execute());
+        ]], $query->execute()->all());
         $this->assertNotNull($cache->get(new CacheKey('test:test_', sha1('SELECT * FROM test_-a:0:{}'))));
 
         $query->update(['name' => 'new-name']);
@@ -1412,7 +1411,7 @@ class QueryTest extends TestCase
         $query = $this->query();
         $query->setCache($cache)->useCache();
 
-        $this->assertEquals($expected, $query->execute(['id', 'name']));
+        $this->assertEquals($expected, $query->execute(['id', 'name'])->all());
         $this->assertEquals($expected, $cache->get(new CacheKey('test:test_', sha1('SELECT id, name FROM test_-a:0:{}'))));
     }
 
@@ -1435,7 +1434,7 @@ class QueryTest extends TestCase
 
         $query = $this->query();
         $query->setCache($cache)->useCache();
-        $this->assertEquals($expected, $query->execute(['id', 'name']));
+        $this->assertEquals($expected, $query->execute(['id', 'name'])->all());
 
         // insert without clear cache
         $this->push([
@@ -1443,7 +1442,7 @@ class QueryTest extends TestCase
             'name' => 'Mickey'
         ]);
 
-        $this->assertEquals($expected, $query->execute(['id', 'name']));
+        $this->assertEquals($expected, $query->execute(['id', 'name'])->all());
 
         $query->setCacheKey(null);
 
@@ -1456,7 +1455,7 @@ class QueryTest extends TestCase
                 'id' => 2,
                 'name' => 'Mickey'
             ],
-        ], $query->execute(['id', 'name']));
+        ], $query->execute(['id', 'name'])->all());
     }
 
     /**
@@ -1484,7 +1483,7 @@ class QueryTest extends TestCase
         $this->assertEquals('my-key', $query->setCacheKey('my-key')->getCacheKey()->key());
         $this->assertEquals(100, $query->setCacheLifetime(100)->getCacheKey()->lifetime());
 
-        $result = $query->execute();
+        $result = $query->execute()->all();
 
         $this->assertEquals($result, $cache->get($query->getCacheKey()));
     }

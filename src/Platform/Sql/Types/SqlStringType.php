@@ -6,7 +6,7 @@ use Bdf\Prime\Platform\AbstractPlatformType;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Schema\ColumnInterface;
 use Bdf\Prime\Types\PhpTypeInterface;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 
 /**
  * Basic string type for database
@@ -19,11 +19,11 @@ class SqlStringType extends AbstractPlatformType
      * @var string[]
      */
     private static $doctrineTypeMap = [
-        self::STRING => Type::STRING,
-        self::TEXT   => Type::TEXT,
-        self::BIGINT => Type::BIGINT,
-        self::BINARY => Type::BINARY,
-        self::BLOB   => Type::BLOB,
+        self::STRING => Types::STRING,
+        self::TEXT   => Types::TEXT,
+        self::BIGINT => Types::BIGINT,
+        self::BINARY => Types::BINARY,
+        self::BLOB   => Types::BLOB,
     ];
 
     /**
@@ -57,7 +57,7 @@ class SqlStringType extends AbstractPlatformType
      */
     public function declaration(ColumnInterface $column)
     {
-        return isset(self::$doctrineTypeMap[$this->name]) ? self::$doctrineTypeMap[$this->name] : Type::TEXT;
+        return isset(self::$doctrineTypeMap[$this->name]) ? self::$doctrineTypeMap[$this->name] : Types::TEXT;
     }
 
     /**

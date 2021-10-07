@@ -18,7 +18,7 @@ class RollbackCommandTest extends CommandTestCase
 
         $output = $this->execute(new RollbackCommand($this->manager), ['--target' => '100']);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             "/" .
                 " == 300 Migration300 reverting\nInit 300\nDown 300\n == 300 Migration300 reverted [0-9\\.]+s\n" .
                 " == 200 Migration200 reverting\nInit 200\nDown 200\n == 200 Migration200 reverted [0-9\\.]+s\n" .
@@ -37,7 +37,7 @@ class RollbackCommandTest extends CommandTestCase
 
         $output = $this->execute(new RollbackCommand($this->manager));
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             "/ == 300 Migration300 reverting\nInit 300\nDown 300\n == 300 Migration300 reverted [0-9\\.]+s\n/",
             $output
         );
@@ -66,7 +66,7 @@ class RollbackCommandTest extends CommandTestCase
 
         $output = $this->execute(new RollbackCommand($this->manager), ['--stage' => 'prepare', '--target' => '101']);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             "/ == 600 Migration600 reverting\nInit 600\nDown 600\n == 600 Migration600 reverted [0-9\\.]+s\n/",
             $output
         );
@@ -93,7 +93,7 @@ class RollbackCommandTest extends CommandTestCase
 
         $output = $this->execute(new RollbackCommand($this->manager), ['--target' => '102']);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             "/" .
                 " == 300 Migration300 reverting\nInit 300\nDown 300\n == 300 Migration300 reverted [0-9\\.]+s\n" .
                 " == 200 Migration200 reverting\nInit 200\nDown 200\n == 200 Migration200 reverted [0-9\\.]+s\n" .

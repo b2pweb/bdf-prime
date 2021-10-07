@@ -115,34 +115,6 @@ class ExpressionTest extends TestCase
                 ->toSql()
         );
     }
-    
-    /**
-     * 
-     */
-    public function test_legacy_match_expression()
-    {
-        $this->assertEquals(
-            "SELECT t0.* FROM $this->table t0 WHERE MATCH(t0.name AGAINST('test'))",
-            
-            $this->query
-            ->where([new Expression\Match('name', 'test')])
-            ->toSql()
-        );
-    }
-    
-    /**
-     * 
-     */
-    public function test_legacy_match_expression_in_boolean_mode()
-    {
-        $this->assertEquals(
-            "SELECT t0.* FROM $this->table t0 WHERE MATCH(t0.name AGAINST('test') IN BOOLEAN MODE)",
-            
-            $this->query
-            ->where([new Expression\Match('name', 'test', true)])
-            ->toSql()
-        );
-    }
 
     /**
      *
