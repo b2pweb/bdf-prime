@@ -1,3 +1,49 @@
+v2.0.0
+------
+
+* Feat: Upgrade to Doctrine 3.
+* Feat: Add helper methods `isRead`, `isWrite`, `hasWrite` on `ResultSetInterface`
+* Feat: Add "fetch mode" `asXXX` methods instead of generalist `fetchMode` method on `ResultSetInterface`
+* Feat: Add executed query on execution exception (cd: `QueryExecutionException`)
+
+BC Breaks
+* Change: PHP minimal version set to 7.4.
+* Change: `Bdf\Prime\Query\Contract\Query\InsertQueryInterface` now implements `CommandInterface`
+* Change signature of `Bdf\Prime\Query\AbstractReadCommand#postProcessResult()` : $data is now type of `Bdf\Prime\Connection\Result\ResultSetInterface`
+* The return type of `Bdf\Prime\Query\CommandInterface#execute()` changed from array to `Bdf\Prime\Connection\Result\ResultSetInterface`
+* The return type of `Bdf\Prime\Query\Contract\Query\InsertQueryInterface#execute()` changed from int to `Bdf\Prime\Connection\Result\ResultSetInterface`
+* Add typehint on signatures :
+    * The return type of Bdf\Prime\Connection\ConnectionInterface#select() changed from no type to Bdf\Prime\Connection\Result\ResultSetInterface
+    * The return type of Bdf\Prime\Connection\ConnectionInterface#execute() changed from no type to Bdf\Prime\Connection\Result\ResultSetInterface
+    * The return type of Bdf\Prime\Connection\Result\ResultSetInterface#all() changed from no type to array
+    * The return type of Bdf\Prime\Connection\Result\ResultSetInterface#count() changed from no type to int
+    * The parameter $forEach of Bdf\Prime\Query\ReadCommandInterface#post() changed from no type to bool
+    * The parameter $statement of Bdf\Prime\Connection\SimpleConnection#prepare() changed from no type to string
+    * The return type of Bdf\Prime\Connection\SimpleConnection#executeUpdate() changed from no type to int
+    * The parameter $sql of Bdf\Prime\Connection\SimpleConnection#executeUpdate() changed from no type to string
+    * The return type of Bdf\Prime\Connection\SimpleConnection#query() changed from no type to Doctrine\DBAL\Result
+    * The return type of Bdf\Prime\Connection\SimpleConnection#exec() changed from no type to int
+    * The parameter $statement of Bdf\Prime\Connection\SimpleConnection#exec() changed from no type to string
+* Remove exception `Bdf\Prime\Exception\QueryException`, and split into 2 others : `QueryBuildingException` and `QueryExecutionException`
+* Class `Bdf\Prime\Sharding\MultiStatement` has been renamed to `Bdf\Prime\Sharding\MultiResult`
+* Class `Bdf\Prime\Connection\Result\PdoResultSet` has been renamed to `Bdf\Prime\Connection\Result\DoctrineResultSet`
+* Remove methods in `Doctrine\DBAL\SimpleConnection` :
+    * getHost()
+    * getPort()
+    * getUsername()
+    * getPassword()
+    * setFetchMode()
+    * fetchAssoc()
+    * fetchArray()
+    * fetchColumn()
+    * fetchAll()
+    * project()
+    * errorCode()
+    * errorInfo()
+    * ping()
+* Class `Bdf\Prime\Query\CacheStatement` has been deleted. Use `Doctrine\DBAL\Cache\ArrayResult` instead
+* Class `Bdf\Prime\Query\Expression\Match` has been deleted. Use `Bdf\Prime\Query\Expression\FullTextMatch` instead
+
 v1.3.0
 ------
 
