@@ -3,6 +3,8 @@ build:
     tests:
       environment:
         timezone: FR
+        php:
+          version: 7.4
 
       services:
         mysql: 5.7

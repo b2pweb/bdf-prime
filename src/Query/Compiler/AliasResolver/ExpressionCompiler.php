@@ -2,7 +2,7 @@
 
 namespace Bdf\Prime\Query\Compiler\AliasResolver;
 
-use Bdf\Prime\Exception\QueryException;
+use Bdf\Prime\Exception\QueryBuildingException;
 
 /**
  * Compiler for relations and attributes expressions
@@ -180,7 +180,7 @@ class ExpressionCompiler
     protected function compileAlias($expression, &$pos, $len)
     {
         if ($pos !== 0) {
-            throw new QueryException('Alias should be the first expression token');
+            throw new QueryBuildingException('Alias should be the first expression token');
         }
 
         ++$pos;
@@ -227,7 +227,7 @@ class ExpressionCompiler
     protected function compileStatic($expression, &$pos, $len)
     {
         if ($pos !== 0) {
-            throw new QueryException('Static expression should be the first expression token');
+            throw new QueryBuildingException('Static expression should be the first expression token');
         }
 
         ++$pos;

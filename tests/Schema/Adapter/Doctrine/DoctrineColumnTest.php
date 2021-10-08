@@ -10,6 +10,7 @@ use Bdf\Prime\Platform\Sql\Types\SqlStringType;
 use Bdf\Prime\PrimeTestCase;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -46,7 +47,7 @@ class DoctrineColumnTest extends TestCase
     public function test_for_string()
     {
         $column = new DoctrineColumn(
-            new Column('col_name', Type::getType(Type::STRING), ['length' => 60, 'notnull' => false, 'comment' => 'my comment', 'default' => 'my_default']),
+            new Column('col_name', Type::getType(Types::STRING), ['length' => 60, 'notnull' => false, 'comment' => 'my comment', 'default' => 'my_default']),
             $this->types
         );
 
@@ -64,7 +65,7 @@ class DoctrineColumnTest extends TestCase
     public function test_for_int()
     {
         $column = new DoctrineColumn(
-            new Column('col_name', Type::getType(Type::INTEGER), ['unsigned' => true, 'autoincrement' => true]),
+            new Column('col_name', Type::getType(Types::INTEGER), ['unsigned' => true, 'autoincrement' => true]),
             $this->types
         );
 
@@ -80,7 +81,7 @@ class DoctrineColumnTest extends TestCase
     public function test_for_float()
     {
         $column = new DoctrineColumn(
-            new Column('col_name', Type::getType(Type::FLOAT), ['precision' => 5, 'scale' => 2]),
+            new Column('col_name', Type::getType(Types::FLOAT), ['precision' => 5, 'scale' => 2]),
             $this->types
         );
 
@@ -96,7 +97,7 @@ class DoctrineColumnTest extends TestCase
     public function test_options()
     {
         $column = new DoctrineColumn(
-            $doctrine = new Column('col_name', Type::getType(Type::FLOAT), ['precision' => 5, 'scale' => 2]),
+            $doctrine = new Column('col_name', Type::getType(Types::FLOAT), ['precision' => 5, 'scale' => 2]),
             $this->types
         );
 

@@ -66,6 +66,7 @@ class BulkInsertQueryTest extends TestCase
                 'last_name'  => 'Doe',
             ])
             ->execute()
+            ->count()
         ;
 
         $this->assertEquals(1, $count);
@@ -97,6 +98,7 @@ class BulkInsertQueryTest extends TestCase
                 'last_name'  => 'Mouse'
             ])
             ->execute()
+            ->count()
         ;
 
         $this->assertEquals(2, $count);
@@ -140,6 +142,7 @@ class BulkInsertQueryTest extends TestCase
                 'last_name'  => 'Smith',
             ])
             ->execute()
+            ->count()
         ;
 
         $this->assertEquals(1, $count);
@@ -176,6 +179,7 @@ class BulkInsertQueryTest extends TestCase
                 'last_name'  => 'Smith',
             ])
             ->execute()
+            ->count()
         ;
 
         $this->assertEquals(0, $count);
@@ -318,7 +322,7 @@ class BulkInsertQueryTest extends TestCase
             'last_name'  => 'Doe',
         ]);
 
-        $this->assertEquals(1, $query->execute());
+        $this->assertEquals(1, $query->execute()->count());
         $this->assertNull($cache->get($key));
     }
 

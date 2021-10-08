@@ -66,7 +66,7 @@ class AggregateTest extends TestCase
         $query = Faction::select(['a' => Aggregate::min('id')]);
 
         $this->assertEquals('SELECT MIN(t0.id_) as a FROM faction_ t0 WHERE t0.enabled_ = ?', $query->toSql());
-        $this->assertEquals(3, $query->execute()[0]['a']);
+        $this->assertEquals(3, $query->execute()->current()['a']);
     }
 
     /**
@@ -77,7 +77,7 @@ class AggregateTest extends TestCase
         $query = Faction::select(['a' => Aggregate::max('id')]);
 
         $this->assertEquals('SELECT MAX(t0.id_) as a FROM faction_ t0 WHERE t0.enabled_ = ?', $query->toSql());
-        $this->assertEquals(8, $query->execute()[0]['a']);
+        $this->assertEquals(8, $query->execute()->current()['a']);
     }
 
     /**
@@ -88,7 +88,7 @@ class AggregateTest extends TestCase
         $query = Faction::select(['a' => Aggregate::avg('id')]);
 
         $this->assertEquals('SELECT AVG(t0.id_) as a FROM faction_ t0 WHERE t0.enabled_ = ?', $query->toSql());
-        $this->assertEquals(6, $query->execute()[0]['a']);
+        $this->assertEquals(6, $query->execute()->current()['a']);
     }
 
     /**
@@ -99,7 +99,7 @@ class AggregateTest extends TestCase
         $query = Faction::select(['a' => Aggregate::count('id')]);
 
         $this->assertEquals('SELECT COUNT(t0.id_) as a FROM faction_ t0 WHERE t0.enabled_ = ?', $query->toSql());
-        $this->assertEquals(3, $query->execute()[0]['a']);
+        $this->assertEquals(3, $query->execute()->current()['a']);
     }
 
     /**
@@ -110,6 +110,6 @@ class AggregateTest extends TestCase
         $query = Faction::select(['a' => Aggregate::sum('id')]);
 
         $this->assertEquals('SELECT SUM(t0.id_) as a FROM faction_ t0 WHERE t0.enabled_ = ?', $query->toSql());
-        $this->assertEquals(18, $query->execute()[0]['a']);
+        $this->assertEquals(18, $query->execute()->current()['a']);
     }
 }

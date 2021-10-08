@@ -7,6 +7,7 @@ use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Schema\ColumnInterface;
 use Bdf\Prime\Types\TypeInterface;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -40,10 +41,10 @@ class SqlIntegerTypeTest extends TestCase
     {
         $column = $this->createMock(ColumnInterface::class);
 
-        $this->assertEquals(Type::INTEGER, $this->type->declaration($column));
-        $this->assertEquals(Type::INTEGER, $this->platform->types()->native(TypeInterface::INTEGER)->declaration($column));
-        $this->assertEquals(Type::SMALLINT, $this->platform->types()->native(TypeInterface::SMALLINT)->declaration($column));
-        $this->assertEquals(Type::SMALLINT, $this->platform->types()->native(TypeInterface::TINYINT)->declaration($column));
+        $this->assertEquals(Types::INTEGER, $this->type->declaration($column));
+        $this->assertEquals(Types::INTEGER, $this->platform->types()->native(TypeInterface::INTEGER)->declaration($column));
+        $this->assertEquals(Types::SMALLINT, $this->platform->types()->native(TypeInterface::SMALLINT)->declaration($column));
+        $this->assertEquals(Types::SMALLINT, $this->platform->types()->native(TypeInterface::TINYINT)->declaration($column));
     }
 
     /**

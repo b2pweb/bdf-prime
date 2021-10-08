@@ -6,6 +6,7 @@ use Bdf\Prime\Bench\DummyPlatform;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Schema\ColumnInterface;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -38,6 +39,6 @@ class SqlGuidTypeTest extends TestCase
     public function test_declaration()
     {
         $column = $this->createMock(ColumnInterface::class);
-        $this->assertEquals(Type::GUID, $this->type->declaration($column));
+        $this->assertEquals(Types::GUID, $this->type->declaration($column));
     }
 }

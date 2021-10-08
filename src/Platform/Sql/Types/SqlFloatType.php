@@ -6,7 +6,7 @@ use Bdf\Prime\Platform\AbstractPlatformType;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Schema\ColumnInterface;
 use Bdf\Prime\Types\PhpTypeInterface;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 
 /**
  * Basic float type for database
@@ -34,7 +34,7 @@ class SqlFloatType extends AbstractPlatformType
      */
     public function declaration(ColumnInterface $column)
     {
-        return Type::FLOAT;
+        return Types::FLOAT;
     }
 
     /**

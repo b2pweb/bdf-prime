@@ -71,14 +71,14 @@ class ShardingInsertQueryTest extends TestCase
      */
     public function test_simple_insert()
     {
-        $this->assertEquals(1, $this->query()->values(['id' => 1, 'name' => 'foo'])->execute());
+        $this->assertEquals(1, $this->query()->values(['id' => 1, 'name' => 'foo'])->execute()->count());
 
         $this->assertEquals([['id' => 1, 'name' => 'foo']], $this->connection->builder()->from('test')->all());
 
         $this->assertEquals([], $this->connection->getShardConnection('shard1')->builder()->from('test')->all());
         $this->assertEquals([['id' => 1, 'name' => 'foo']], $this->connection->getShardConnection('shard2')->builder()->from('test')->all());
 
-        $this->assertEquals(1, $this->query()->values(['id' => 2, 'name' => 'bar'])->execute());
+        $this->assertEquals(1, $this->query()->values(['id' => 2, 'name' => 'bar'])->execute()->count());
 
         $this->assertEquals([['id' => 2, 'name' => 'bar'], ['id' => 1, 'name' => 'foo']], $this->connection->builder()->from('test')->all());
 
@@ -93,9 +93,9 @@ class ShardingInsertQueryTest extends TestCase
     {
         $query = $this->query();
 
-        $this->assertEquals(1, $query->values(['id' => 1, 'name' => 'foo'])->execute());
-        $this->assertEquals(1, $query->values(['id' => 2, 'name' => 'bar'])->execute());
-        $this->assertEquals(1, $query->values(['id' => 3, 'name' => 'oof'])->execute());
+        $this->assertEquals(1, $query->values(['id' => 1, 'name' => 'foo'])->execute()->count());
+        $this->assertEquals(1, $query->values(['id' => 2, 'name' => 'bar'])->execute()->count());
+        $this->assertEquals(1, $query->values(['id' => 3, 'name' => 'oof'])->execute()->count());
 
         $this->assertEquals([['id' => 2, 'name' => 'bar']], $this->connection->getShardConnection('shard1')->builder()->from('test')->all());
         $this->assertEquals([['id' => 1, 'name' => 'foo'], ['id' => 3, 'name' => 'oof']], $this->connection->getShardConnection('shard2')->builder()->from('test')->all());
@@ -108,8 +108,8 @@ class ShardingInsertQueryTest extends TestCase
     {
         $query = $this->query();
 
-        $this->assertEquals(1, $query->values(['id' => 1, 'name' => 'foo'])->execute());
-        $this->assertEquals(0, $query->values(['id' => 1, 'name' => 'oof'])->ignore()->execute());
+        $this->assertEquals(1, $query->values(['id' => 1, 'name' => 'foo'])->execute()->count());
+        $this->assertEquals(0, $query->values(['id' => 1, 'name' => 'oof'])->ignore()->execute()->count());
 
         $this->assertEquals([['id' => 1, 'name' => 'foo']], $this->connection->getShardConnection('shard2')->builder()->from('test')->all());
     }
@@ -121,8 +121,8 @@ class ShardingInsertQueryTest extends TestCase
     {
         $query = $this->query();
 
-        $this->assertEquals(1, $query->values(['id' => 1, 'name' => 'foo'])->execute());
-        $this->assertEquals(1, $query->values(['id' => 1, 'name' => 'oof'])->replace()->execute());
+        $this->assertEquals(1, $query->values(['id' => 1, 'name' => 'foo'])->execute()->count());
+        $this->assertEquals(1, $query->values(['id' => 1, 'name' => 'oof'])->replace()->execute()->count());
 
         $this->assertEquals([['id' => 1, 'name' => 'oof']], $this->connection->getShardConnection('shard2')->builder()->from('test')->all());
     }
@@ -134,9 +134,9 @@ class ShardingInsertQueryTest extends TestCase
     {
         $query = $this->query();
 
-        $query->values(['id' => 1, 'name' => 'foo'])->execute();
+        $query->values(['id' => 1, 'name' => 'foo'])->execute()->count();
 
-        $this->assertEquals(1, $query->into('test2')->values(['id' => 1, 'value' => 'val', 'other' => '42'])->execute());
+        $this->assertEquals(1, $query->into('test2')->values(['id' => 1, 'value' => 'val', 'other' => '42'])->execute()->count());
 
         $this->assertEquals([['id' => 1, 'value' => 'val', 'other' => '42']], $this->connection->getShardConnection('shard2')->builder()->from('test2')->all());
     }
@@ -148,8 +148,8 @@ class ShardingInsertQueryTest extends TestCase
     {
         $query = $this->query()->into('test2');
 
-        $query->values(['id' => 1, 'value' => 'val', 'other' => '42'])->execute();
-        $query->columns(['id', 'value'])->values(['id' => 3, 'value' => 'val2', 'other' => 'az'])->execute();
+        $query->values(['id' => 1, 'value' => 'val', 'other' => '42'])->execute()->count();
+        $query->columns(['id', 'value'])->values(['id' => 3, 'value' => 'val2', 'other' => 'az'])->execute()->count();
 
         $this->assertEquals([
             ['id' => 1, 'value' => 'val', 'other' => '42'],
@@ -174,7 +174,7 @@ class ShardingInsertQueryTest extends TestCase
         $query
             ->setCache($cache)
             ->values(['id' => 3, 'name' => 'oof'])
-            ->execute()
+            ->execute()->count()
         ;
 
         $this->assertNull($cache->get(new CacheKey('sharding:test', sha1('SELECT * FROM test-a:0:{}'))));
@@ -187,7 +187,7 @@ class ShardingInsertQueryTest extends TestCase
     {
         $this->expectException(\LogicException::class);
 
-        $this->query()->execute();
+        $this->query()->execute()->count();
     }
 
     /**
@@ -197,11 +197,11 @@ class ShardingInsertQueryTest extends TestCase
     {
         $this->assertFalse($this->connection->isUsingShard());
 
-        $this->query()->values(['id' => 1, 'name' => 'John'])->execute();
+        $this->query()->values(['id' => 1, 'name' => 'John'])->execute()->count();
         $this->assertFalse($this->connection->isUsingShard());
 
         $this->connection->useShard('shard1');
-        $this->query()->values(['id' => 3, 'name' => 'Bob'])->execute();
+        $this->query()->values(['id' => 3, 'name' => 'Bob'])->execute()->count();
         $this->assertEquals('shard1', $this->connection->getCurrentShardId());
     }
 
@@ -213,7 +213,7 @@ class ShardingInsertQueryTest extends TestCase
         $query = $this->query();
         $query->pickShard(1);
         $query->values(['id' => 1, 'name' => 'John']);
-        $query->execute();
+        $query->execute()->count();
 
         $this->assertSame(0, $this->connection->getShardConnection('shard1')->from('test')->count());
         $this->assertSame(1, $this->connection->getShardConnection('shard2')->from('test')->count());
@@ -227,7 +227,7 @@ class ShardingInsertQueryTest extends TestCase
         $query = $this->query();
         $query->pickShard(2);
         $query->values(['id' => 1, 'name' => 'John']);
-        $query->execute();
+        $query->execute()->count();
 
         $this->assertSame(1, $this->connection->getShardConnection('shard1')->from('test')->count());
         $this->assertSame(0, $this->connection->getShardConnection('shard2')->from('test')->count());

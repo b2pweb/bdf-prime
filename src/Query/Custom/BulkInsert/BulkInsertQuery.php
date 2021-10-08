@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query\Custom\BulkInsert;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
@@ -45,9 +46,9 @@ use Bdf\Prime\Query\Extension\CachableTrait;
  * </code>
  *
  * @template C as \Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection
- * @implements CommandInterface<C>
+ * @implements InsertQueryInterface<C>
  */
-class BulkInsertQuery extends CompilableClause implements CommandInterface, Compilable, Cachable, InsertQueryInterface
+class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, InsertQueryInterface
 {
     use CachableTrait;
 
@@ -126,17 +127,19 @@ class BulkInsertQuery extends CompilableClause implements CommandInterface, Comp
 
     /**
      * {@inheritdoc}
+     *
+     * @return ResultSetInterface<array<string, mixed>>
      */
     #[WriteOperation]
-    public function execute($columns = null)
+    public function execute($columns = null): ResultSetInterface
     {
-        $nb = $this->connection->execute($this)->count();
+        $result = $this->connection->execute($this);
 
-        if ($nb > 0) {
+        if ($result->hasWrite()) {
             $this->clearCacheOnWrite();
         }
 
-        return $nb;
+        return $result;
     }
 
     /**

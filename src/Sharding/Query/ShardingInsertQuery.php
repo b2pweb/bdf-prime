@@ -4,6 +4,7 @@ namespace Bdf\Prime\Sharding\Query;
 
 use BadMethodCallException;
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
@@ -11,6 +12,8 @@ use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Contract\Cachable;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
+use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Custom\BulkInsert\BulkInsertQuery;
 use Bdf\Prime\Query\Extension\CachableTrait;
 use Bdf\Prime\Sharding\Extension\ShardPicker;
@@ -45,7 +48,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     private $columns = [];
 
     /**
-     * @var string
+     * @var InsertQueryInterface::MODE_*
      */
     private $mode = self::MODE_INSERT;
 
@@ -62,7 +65,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     private $queries = [];
 
     /**
-     * @var BulkInsertQuery
+     * @var BulkInsertQuery|null
      */
     private $currentQuery;
 
@@ -205,16 +208,19 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
 
     /**
      * {@inheritdoc}
+     *
+     * @return ResultSetInterface<array<string, mixed>>
      */
-    public function execute($columns = null)
+    #[WriteOperation]
+    public function execute($columns = null): ResultSetInterface
     {
-        $count = $this->currentQuery()->execute($columns);
+        $result = $this->currentQuery()->execute($columns);
 
-        if ($count > 0) {
+        if ($result->hasWrite()) {
             $this->clearCacheOnWrite();
         }
 
-        return $count;
+        return $result;
     }
 
     /**
@@ -250,7 +256,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * Get the targeted shard ID
      *
-     * @return string|null
+     * @return string
      */
     private function getShardId()
     {

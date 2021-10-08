@@ -108,9 +108,4 @@ interface KeyValueQueryInterface extends ReadCommandInterface, Projectionable, A
      * @throws PrimeException When execute fail
      */
     public function update($values = null);
-
-    /**
-     * {@inheritdoc}
-     */
-    public function execute($columns = null);
 }

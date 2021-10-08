@@ -210,7 +210,7 @@ class MorphToTest extends TestCase
     public function test_load_sub_relation_without_discriminator_non_concerned()
     {
         $this->expectException('RuntimeException');
-        $this->expectExceptionMessageRegExp('/Relation "customer" is not set/');
+        $this->expectExceptionMessageMatches('/Relation "customer" is not set/');
 
         $admin = TestPack::pack()->get('admin');
         $document = TestPack::pack()->get('document-admin');

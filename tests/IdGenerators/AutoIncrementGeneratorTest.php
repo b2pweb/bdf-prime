@@ -50,7 +50,7 @@ class AutoIncrementGeneratorTest extends TestCase
         $generator->postProcess($entity);
 
         $this->assertTrue(empty($data['id']));
-        $this->assertRegExp('/[\d]+/', $entity->id);
+        $this->assertMatchesRegularExpression('/[\d]+/', $entity->id);
     }
 
     /**

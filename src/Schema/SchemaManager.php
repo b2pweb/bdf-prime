@@ -5,7 +5,7 @@ namespace Bdf\Prime\Schema;
 use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\Schema\Adapter\Doctrine\DoctrineTable as PrimeTableAdapter;
 use Bdf\Prime\Schema\Transformer\Doctrine\TableTransformer;
-use Doctrine\DBAL\DBALException as DoctrineDBALException;
+use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Doctrine\DBAL\Schema\Schema as DoctrineSchema;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\SchemaDiff as DoctrineSchemaDiff;
@@ -204,6 +204,7 @@ class SchemaManager extends AbstractSchemaManager
                     $tableName,
                     $manager->listTableColumns($tableName),
                     $manager->listTableIndexes($tableName),
+                    [],
                     $foreignKeys
                 ),
                 $this->connection->platform()->types()

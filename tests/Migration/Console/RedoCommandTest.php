@@ -18,7 +18,7 @@ class RedoCommandTest extends CommandTestCase
 
         $output = $this->execute(new RedoCommand($this->manager), ['version' => '100']);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             "/" .
                 " == 100 Migration100 reverting\nInit 100\nDown 100\n == 100 Migration100 reverted [0-9\\.]+s\n" .
                 " == 100 Migration100 migrating\nInit 100\nUp 100\n == 100 Migration100 migrated ([0-9\\.]*)s\n" .

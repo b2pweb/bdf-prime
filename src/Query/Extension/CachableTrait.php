@@ -5,7 +5,10 @@ namespace Bdf\Prime\Query\Extension;
 use Bdf\Prime\Cache\CacheInterface;
 use Bdf\Prime\Cache\CacheKey;
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Connection\Result\ArrayResultSet;
+use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Query\Contract\Cachable;
+use Bdf\Util\Arr;
 
 /**
  * Provides result cache on queries
@@ -138,30 +141,31 @@ trait CachableTrait
     /**
      * Retrieve data from cache, or execute the query and save into cache
      *
-     * @return mixed
+     * @return ResultSetInterface<array<string, mixed>>
      * @throws \Bdf\Prime\Exception\PrimeException
      */
-    protected function executeCached()
+    protected function executeCached(): ResultSetInterface
     {
         $key = $this->cacheKey;
 
         if (!$this->cache || !$key || !$key->valid()) {
             /** @psalm-suppress InvalidArgument */
-            return $this->connection->execute($this)->all();
+            return $this->connection->execute($this);
         }
 
         $data = $this->cache->get($key);
 
         if ($data !== null) {
-            return $data;
+            return new ArrayResultSet($data);
         }
 
         /** @psalm-suppress InvalidArgument */
-        $data = $this->connection->execute($this)->all();
+        $result = $this->connection->execute($this);
 
+        $data = $result->all();
         $this->cache->set($key, $data);
 
-        return $data;
+        return new ArrayResultSet($data);
     }
 
     /**

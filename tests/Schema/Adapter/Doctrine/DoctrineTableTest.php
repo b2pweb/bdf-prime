@@ -15,6 +15,7 @@ use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -46,18 +47,18 @@ class DoctrineTableTest extends TestCase
         $this->table = new DoctrineTable(new Table(
             'table_',
             [
-                new Column('id_', Type::getType(Type::BIGINT), ['autoincrement' => true]),
-                new Column('first_name', Type::getType(Type::STRING), ['notnull' => false, 'length' => 24]),
-                new Column('last_name', Type::getType(Type::STRING), ['notnull' => false, 'length' => 32]),
+                new Column('id_', Type::getType(Types::BIGINT), ['autoincrement' => true]),
+                new Column('first_name', Type::getType(Types::STRING), ['notnull' => false, 'length' => 24]),
+                new Column('last_name', Type::getType(Types::STRING), ['notnull' => false, 'length' => 32]),
             ],
             [
                 new Index('PRIMARY', ['id_'], true, true),
                 new Index('NAME', ['first_name', 'last_name'], true)
             ],
+            [],
             [
                 new ForeignKeyConstraint(['first_name', 'last_name'], 'contact_', ['name1_', 'name2_'], 'fk_contact')
             ],
-            0,
             ['foo' => 'bar']
         ), $this->types);
     }

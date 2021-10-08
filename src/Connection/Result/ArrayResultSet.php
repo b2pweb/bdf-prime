@@ -2,47 +2,73 @@
 
 namespace Bdf\Prime\Connection\Result;
 
+use ArrayIterator;
+use Bdf\Prime\Connection\Result\FetchStrategy\ArrayFetchStrategyInterface;
+use Bdf\Prime\Connection\Result\FetchStrategy\AssociativeArrayFetch;
+use Bdf\Prime\Connection\Result\FetchStrategy\ClassArrayFetch;
+use Bdf\Prime\Connection\Result\FetchStrategy\ColumnArrayFetch;
+use Bdf\Prime\Connection\Result\FetchStrategy\ListArrayFetch;
+use Bdf\Prime\Connection\Result\FetchStrategy\ObjectArrayFetch;
 use Bdf\Prime\Exception\DBALException;
 
 /**
  * Wrap simple associative array to ResultSet
- * This result is usefull for caches
+ * This result is useful for caches
+ *
+ * @template T
+ * @implements ResultSetInterface<T>
  */
-final class ArrayResultSet extends \ArrayIterator implements ResultSetInterface
+final class ArrayResultSet extends ArrayIterator implements ResultSetInterface
 {
     /**
-     * @var string
+     * @var ArrayFetchStrategyInterface<T>
      */
-    private $fetchMode = self::FETCH_ASSOC;
+    private ArrayFetchStrategyInterface $strategy;
 
     /**
-     * @var mixed
+     * @param list<array<string, mixed>> $array
+     * @param int $flags
      */
-    private $fetchOptions;
+    public function __construct($array = [], $flags = 0)
+    {
+        parent::__construct($array, $flags);
 
-    /**
-     * @var string[]
-     */
-    private $columns;
-
-    /**
-     * @var \ReflectionClass
-     */
-    private $reflectionClass;
-
-    /**
-     * @var \ReflectionProperty[]
-     */
-    private $reflectionProperties;
-
+        $this->strategy = AssociativeArrayFetch::instance();
+    }
 
     /**
      * {@inheritdoc}
      */
     public function fetchMode($mode, $options = null)
     {
-        $this->fetchMode = $mode;
-        $this->fetchOptions = $options;
+        switch ($mode) {
+            case self::FETCH_ASSOC:
+                return $this->asAssociative();
+
+            case self::FETCH_NUM:
+                return $this->asList();
+
+            case self::FETCH_COLUMN:
+                return $this->asColumn($options ?? 0);
+
+            case self::FETCH_OBJECT:
+                return $this->asObject();
+
+            case self::FETCH_CLASS:
+                return $this->asClass($options);
+
+            default:
+                throw new DBALException('Unsupported fetch mode ' . $mode);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function asAssociative(): ResultSetInterface
+    {
+        /** @var ArrayResultSet<array<string, mixed>> $this */
+        $this->strategy = AssociativeArrayFetch::instance();
 
         return $this;
     }
@@ -50,12 +76,60 @@ final class ArrayResultSet extends \ArrayIterator implements ResultSetInterface
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function asList(): ResultSetInterface
     {
-        return $this->fetchMode === self::FETCH_ASSOC
-            ? $this->getArrayCopy()
-            : array_map([$this, 'fetchValue'], $this->getArrayCopy())
-        ;
+        /** @var ArrayResultSet<list<mixed>> $this */
+        $this->strategy = ListArrayFetch::instance();
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function asObject(): ResultSetInterface
+    {
+        /** @var ArrayResultSet<\stdClass> $this */
+        $this->strategy = ObjectArrayFetch::instance();
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param class-string<E> $className
+     * @param list<mixed> $constructorArguments
+     *
+     * @return static<E>
+     *
+     * @template E
+     */
+    public function asClass(string $className, array $constructorArguments = []): ResultSetInterface
+    {
+        /** @var ArrayResultSet<E> $this */
+        $this->strategy = new ClassArrayFetch($className, $constructorArguments);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function asColumn(int $column = 0): ResultSetInterface
+    {
+        /** @var ArrayResultSet<mixed> $this */
+        $this->strategy = new ColumnArrayFetch($column);
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function all(): array
+    {
+        return $this->strategy->all($this->getArrayCopy());
     }
 
     /**
@@ -63,69 +137,44 @@ final class ArrayResultSet extends \ArrayIterator implements ResultSetInterface
      */
     public function current()
     {
-        return $this->fetchValue(parent::current());
+        $value = parent::current();
+
+        if ($value === null) {
+            return false;
+        }
+
+        return $this->strategy->one($value);
     }
 
     /**
-     * Transform the value according to the fetch mode
-     *
-     * @param array $current
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
-    private function fetchValue($current)
+    public function count(): int
     {
-        switch ($this->fetchMode) {
-            case self::FETCH_ASSOC:
-                return $current;
-
-            case self::FETCH_NUM:
-                return array_values($current);
-
-            case self::FETCH_COLUMN:
-                return $this->fetchColum($current);
-
-            case self::FETCH_OBJECT:
-                return (object) $current;
-
-            case self::FETCH_CLASS:
-                return $this->fetchClass($current);
-
-            default:
-                throw new DBALException('Unsupported fetch mode '.$this->fetchMode);
-        }
+        return parent::count();
     }
 
-    private function fetchColum($current)
+    /**
+     * {@inheritdoc}
+     */
+    public function isRead(): bool
     {
-        if (!$this->fetchOptions) {
-            return reset($current);
-        }
-
-        if (!$this->columns) {
-            $this->columns = array_keys($current);
-        }
-
-        return $current[$this->columns[$this->fetchOptions]];
+        return true;
     }
 
-    private function fetchClass($current)
+    /**
+     * {@inheritdoc}
+     */
+    public function isWrite(): bool
     {
-        if (!$this->reflectionClass) {
-            $this->reflectionClass = new \ReflectionClass($this->fetchOptions);
-        }
+        return false;
+    }
 
-        $object = $this->reflectionClass->newInstance();
-
-        foreach ($current as $property => $value) {
-            if (!isset($this->reflectionProperties[$property])) {
-                $this->reflectionProperties[$property] = $this->reflectionClass->getProperty($property);
-                $this->reflectionProperties[$property]->setAccessible(true);
-            }
-
-            $this->reflectionProperties[$property]->setValue($object, $value);
-        }
-
-        return $object;
+    /**
+     * {@inheritdoc}
+     */
+    public function hasWrite(): bool
+    {
+        return false;
     }
 }

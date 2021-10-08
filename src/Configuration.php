@@ -14,20 +14,26 @@ use Doctrine\DBAL\Configuration as BaseConfiguration;
 class Configuration extends BaseConfiguration
 {
     /**
+     * @var TypesRegistryInterface|null
+     */
+    private ?TypesRegistryInterface $types;
+
+    /**
      * Set configuration
      * 
      * @param array $options
      */
     public function __construct(array $options = [])
     {
-        /** @psalm-suppress InternalProperty */
-        $this->_attributes = $options;
-
         if (isset($options['logger'])) {
-            $this->_attributes['sqlLogger'] = $options['logger'];
+            $this->setSQLLogger($options['logger']);
 
             /** @psalm-suppress InternalProperty */
-            unset($this->_attributes['logger']);
+            unset($options['logger']);
+        }
+
+        foreach ($options as $name => $value) {
+            $this->$name = $value;
         }
     }
 
@@ -35,12 +41,11 @@ class Configuration extends BaseConfiguration
      * Set common type registry
      *
      * @param TypesRegistryInterface $types
-     * @psalm-assert TypesRegistryInterface $this->_attributes['types']
+     * @psalm-assert TypesRegistryInterface $this->types
      */
-    public function setTypes(TypesRegistryInterface $types)
+    public function setTypes(TypesRegistryInterface $types): void
     {
-        /** @psalm-suppress InternalProperty */
-        $this->_attributes['types'] = $types;
+        $this->types = $types;
     }
 
     /**
@@ -48,12 +53,12 @@ class Configuration extends BaseConfiguration
      *
      * @return TypesRegistryInterface
      */
-    public function getTypes()
+    public function getTypes(): TypesRegistryInterface
     {
-        if (!isset($this->_attributes['types'])) {
+        if (!isset($this->types)) {
             $this->setTypes(new TypesRegistry());
         }
 
-        return $this->_attributes['types'];
+        return $this->types;
     }
 }

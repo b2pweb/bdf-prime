@@ -3,9 +3,10 @@
 namespace Bdf\Prime\Query\Extension;
 
 use Bdf\Prime\Collection\CollectionInterface;
+use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Exception\PrimeException;
-use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\QueryInterface;
 
 /**
  * Trait for provide execute() wrapper methods
@@ -31,9 +32,11 @@ trait ExecutableTrait
     #[ReadOperation]
     public function first($columns = null)
     {
-        $result = $this->limit(1)->all($columns);
+        foreach ($this->limit(1)->all($columns) as $entity) {
+            return $entity;
+        }
 
-        return isset($result[0]) ? $result[0] : null;
+        return null;
     }
 
     /**
@@ -43,13 +46,7 @@ trait ExecutableTrait
     #[ReadOperation]
     public function inRows($column)
     {
-        $result = [];
-
-        foreach ($this->execute($column) as $data) {
-            $result[] = reset($data);
-        }
-
-        return $result;
+        return $this->execute($column)->asColumn()->all();
     }
 
     /**
@@ -59,30 +56,33 @@ trait ExecutableTrait
     #[ReadOperation]
     public function inRow($column)
     {
-        $result = $this->limit(1)->execute($column);
+        foreach ($this->limit(1)->execute($column)->asColumn() as $value) {
+            return $value;
+        }
 
-        return isset($result[0]) ? reset($result[0]) : null;
+        return null;
     }
 
     /**
-     * {@inheritdoc}
-     *
      * Post processors.
      * Wrap data with defined wrapper. Run the post processors on rows
      *
-     * @param array  $data
+     * @param ResultSetInterface<array<string, mixed>> $data
      *
      * @return array|CollectionInterface
      */
-    abstract public function postProcessResult($data);
+    abstract public function postProcessResult(ResultSetInterface $data): iterable;
 
     /**
      * {@inheritdoc}
+     *
+     * @return ResultSetInterface<array<string, mixed>>
+     *
      * @see QueryInterface::execute()
      * @throws PrimeException
      */
     #[ReadOperation]
-    abstract public function execute($columns = null);
+    abstract public function execute($columns = null): ResultSetInterface;
 
     /**
      * {@inheritdoc}

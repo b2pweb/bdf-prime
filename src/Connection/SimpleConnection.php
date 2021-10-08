@@ -5,11 +5,12 @@ namespace Bdf\Prime\Connection;
 use Bdf\Prime\Connection\Event\ConnectionClosedListenerInterface;
 use Bdf\Prime\Connection\Extensions\LostConnection;
 use Bdf\Prime\Connection\Extensions\SchemaChanged;
-use Bdf\Prime\Connection\Result\PdoResultSet;
+use Bdf\Prime\Connection\Result\DoctrineResultSet;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Connection\Result\UpdateResultSet;
 use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Exception\QueryExecutionException;
 use Bdf\Prime\Platform\Sql\SqlPlatform;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Compiler\SqlCompiler;
@@ -29,10 +30,11 @@ use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection as BaseConnection;
-use Doctrine\DBAL\DBALException as DoctrineDBALException;
 use Doctrine\DBAL\Driver;
+use Doctrine\DBAL\Exception as DoctrineDBALException;
+use Doctrine\DBAL\Exception\DriverException;
+use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
-use PDO;
 
 /**
  * Connection
@@ -225,76 +227,31 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     }
 
     /**
-     * Executes select query and returns array of object
-     * 
-     * @param string $query
-     * @param array  $bindings
-     * @param array  $types
-     * 
-     * @return array
+     * {@inheritdoc}
      */
-    public function select($query, array $bindings = [], array $types = [])
+    public function select($query, array $bindings = [], array $types = []): ResultSetInterface
     {
-        $stmt = $this->executeQuery($query, $bindings, $types);
-        $stmt->setFetchMode(PDO::FETCH_OBJ);
-
-        $result = $stmt->fetchAll();
-
-        $stmt->closeCursor();
-        
-        return $result;
+        return (new DoctrineResultSet($this->executeQuery($query, $bindings, $types)))->asObject();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function executeQuery($sql, array $params = [], $types = [], QueryCacheProfile $qcp = null)
+    public function executeQuery(string $sql, array $params = [], $types = [], QueryCacheProfile $qcp = null): Result
     {
         $this->prepareLogger();
 
-        return $this->runOrReconnect(function() use ($sql, $params, $types, $qcp) {
-            return parent::executeQuery($sql, $params, $types, $qcp);
-        });
+        return $this->runOrReconnect(fn() => parent::executeQuery($sql, $params, $types, $qcp));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function executeUpdate($sql, array $params = [], array $types = [])
+    public function executeStatement($sql, array $params = [], array $types = [])
     {
         $this->prepareLogger();
 
-        return $this->runOrReconnect(function() use ($sql, $params, $types) {
-            return parent::executeUpdate($sql, $params, $types);
-        });
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function query()
-    {
-        $this->prepareLogger();
-        
-        $args = func_get_args();
-
-        return $this->runOrReconnect(function() use ($args) {
-            return parent::query(...$args);
-        });
-    }
-    
-    /**
-     * {@inheritdoc}
-     *
-     * @throws PrimeException
-     */
-    public function exec($statement)
-    {
-        $this->prepareLogger();
-        
-        return $this->runOrReconnect(function() use ($statement) {
-            return parent::exec($statement);
-        });
+        return $this->runOrReconnect(fn() => parent::executeStatement($sql, $params, $types));
     }
 
     /**
@@ -302,17 +259,15 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      *
      * @throws PrimeException
      */
-    public function prepare($statement)
+    public function prepare(string $sql): Statement
     {
-        return $this->runOrReconnect(function() use ($statement) {
-            return parent::prepare($statement);
-        });
+        return $this->runOrReconnect(fn() => parent::prepare($sql));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function execute(Compilable $query)
+    public function execute(Compilable $query): ResultSetInterface
     {
         try {
             $statement = $query->compile();
@@ -323,15 +278,21 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
 
             // $statement is a SQL query
             if ($query->type() === Compilable::TYPE_SELECT) {
-                $stmt = $this->executeQuery($statement, $query->getBindings());
-
-                return new PdoResultSet($stmt);
+                return new DoctrineResultSet($this->executeQuery($statement, $query->getBindings()));
             }
 
-            return new UpdateResultSet($this->executeUpdate($statement, $query->getBindings()));
+            return new UpdateResultSet($this->executeStatement($statement, $query->getBindings()));
+        } catch (DriverException $e) {
+            throw new QueryExecutionException(
+                'Error on execute : ' . $e->getMessage(),
+                $e->getCode(),
+                $e,
+                $e->getQuery() ? $e->getQuery()->getSQL() : null,
+                $e->getQuery() ? $e->getQuery()->getParams() : null
+            );
         } catch (DoctrineDBALException $e) {
             /** @psalm-suppress InvalidScalarArgument */
-            throw new DBALException('Error on execute : '.$e->getMessage(), $e->getCode(), $e);
+            throw new QueryExecutionException('Error on execute : '.$e->getMessage(), $e->getCode(), $e);
         }
     }
 
@@ -348,29 +309,39 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     protected function executePrepared(Statement $statement, Compilable $query)
     {
         $bindings = $query->getBindings();
+        $isRead = $query->type() === Compilable::TYPE_SELECT;
 
         $this->prepareLogger();
 
         try {
-            $statement->execute($bindings);
+            $result = $isRead
+                ? new DoctrineResultSet($statement->executeQuery($bindings))
+                : new UpdateResultSet($statement->executeStatement($bindings))
+            ;
         } catch (DoctrineDBALException $exception) {
             // Prepared query on SQLite for PHP < 7.2 invalidates the query when schema change
             // This process may be removed on PHP 7.2
             if ($this->causedBySchemaChange($exception)) {
                 $statement = $query->compile(true);
-                $statement->execute($query->getBindings());
+                $result = $isRead
+                    ? new DoctrineResultSet($statement->executeQuery($query->getBindings()))
+                    : new UpdateResultSet($statement->executeStatement($query->getBindings()))
+                ;
             } elseif ($this->causedByLostConnection($exception->getPrevious())) { // If the connection is lost, the query must be recompiled
                 $this->close();
                 $this->connect();
 
                 $statement = $query->compile(true);
-                $statement->execute($query->getBindings());
+                $result = $isRead
+                    ? new DoctrineResultSet($statement->executeQuery($query->getBindings()))
+                    : new UpdateResultSet($statement->executeStatement($query->getBindings()))
+                ;
             } else {
                 throw $exception;
             }
         }
 
-        return new PdoResultSet($statement);
+        return $result;
     }
 
     /**
@@ -429,11 +400,14 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * Execute a query. Try to reconnect if needed
      *
-     * @param Closure $callback
+     * @param Closure():T $callback
      *
-     * @return mixed  The query result
+     * @return T The query result
      *
-     * @throws DBALException
+     * @throws QueryExecutionException When an error occurs during query execution
+     * @throws DBALException When any other error occurs
+     *
+     * @template T
      */
     protected function runOrReconnect(Closure $callback)
     {
@@ -453,6 +427,14 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
 
                 throw $exception;
             }
+        } catch (DriverException $e) {
+            throw new QueryExecutionException(
+                'Error on execute : ' . $e->getMessage(),
+                $e->getCode(),
+                $e,
+                $e->getQuery() ? $e->getQuery()->getSQL() : null,
+                $e->getQuery() ? $e->getQuery()->getParams() : null
+            );
         } catch (DoctrineDBALException $e) {
             /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException('Error on execute : '.$e->getMessage(), $e->getCode(), $e);

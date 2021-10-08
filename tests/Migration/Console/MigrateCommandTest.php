@@ -18,7 +18,7 @@ class MigrateCommandTest extends CommandTestCase
 
         $output = $this->execute(new MigrateCommand($this->manager));
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             "/" .
                 " == 200 Migration200 migrating\nInit 200\nUp 200\n == 200 Migration200 migrated [0-9\\.]+s\n" .
                 " == 300 Migration300 migrating\nInit 300\nUp 300\n == 300 Migration300 migrated [0-9\\.]+s\n" .
@@ -39,7 +39,7 @@ class MigrateCommandTest extends CommandTestCase
 
         $output = $this->execute(new MigrateCommand($this->manager), ['--stage' => 'prepare']);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             "/" .
                 " == 101 Migration101 migrating\nInit 101\nUp 101\n == 101 Migration101 migrated [0-9\\.]+s\n" .
                 " == 600 Migration600 migrating\nInit 600\nUp 600\n == 600 Migration600 migrated [0-9\\.]+s\n" .
@@ -58,7 +58,7 @@ class MigrateCommandTest extends CommandTestCase
 
         $output = $this->execute(new MigrateCommand($this->manager), ['--target' => '350']);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '/Version "350" has not been found/',
             $output
         );
@@ -73,7 +73,7 @@ class MigrateCommandTest extends CommandTestCase
 
         $output = $this->execute(new MigrateCommand($this->manager), ['--target' => '300']);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             "/" .
                 " == 200 Migration200 migrating\nInit 200\nUp 200\n == 200 Migration200 migrated [0-9\\.]+s\n" .
                 " == 300 Migration300 migrating\nInit 300\nUp 300\n == 300 Migration300 migrated [0-9\\.]+s\n" .
@@ -92,7 +92,7 @@ class MigrateCommandTest extends CommandTestCase
 
         $output = $this->execute(new MigrateCommand($this->manager), ['--target' => '200']);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             "/" .
                 " == 400 Migration400 reverting\nInit 400\nDown 400\n == 400 Migration400 reverted [0-9\\.]+s\n" .
                 " == 300 Migration300 reverting\nInit 300\nDown 300\n == 300 Migration300 reverted [0-9\\.]+s\n" .
@@ -111,7 +111,7 @@ class MigrateCommandTest extends CommandTestCase
 
         $output = $this->execute(new MigrateCommand($this->manager), ['--target' => '101', '--stage' => 'prepare']);
 
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             "/" .
                 " == 600 Migration600 reverting\nInit 600\nDown 600\n == 600 Migration600 reverted [0-9\\.]+s\n" .
             "/",

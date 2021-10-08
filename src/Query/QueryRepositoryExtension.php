@@ -5,6 +5,7 @@ namespace Bdf\Prime\Query;
 use BadMethodCallException;
 use Bdf\Prime\Collection\Indexer\EntityIndexer;
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Events;
 use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\PrimeException;
@@ -221,12 +222,12 @@ class QueryRepositoryExtension extends QueryCompatExtension
     /**
      * Post processor for hydrating entities
      *
-     * @param array $data
+     * @param ResultSetInterface<array<string, mixed>> $data
      *
      * @return array
      * @throws PrimeException
      */
-    public function processEntities(array $data)
+    public function processEntities(ResultSetInterface $data)
     {
         /** @var EntityRepository $repository */
         $repository = $this->repository;

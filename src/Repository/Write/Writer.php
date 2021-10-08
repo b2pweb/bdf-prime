@@ -79,7 +79,7 @@ class Writer implements WriterInterface
         $generator->setCurrentConnection($this->repository->connection());
         $generator->generate($data, $this->serviceLocator);
 
-        $count = $this->insertQuery()->ignore(!empty($options['ignore']))->values($data)->execute();
+        $count = $this->insertQuery()->ignore(!empty($options['ignore']))->values($data)->execute()->count();
 
         $generator->postProcess($entity);
 

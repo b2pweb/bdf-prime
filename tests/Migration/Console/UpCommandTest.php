@@ -16,7 +16,7 @@ class UpCommandTest extends CommandTestCase
     {
         $output = $this->execute(new UpCommand($this->manager), ['version' => '100']);
 
-        $this->assertRegExp("/ == 100 Migration100 migrating\nInit 100\nUp 100\n == 100 Migration100 migrated [0-9\\.]+s\n/", $output);
+        $this->assertMatchesRegularExpression("/ == 100 Migration100 migrating\nInit 100\nUp 100\n == 100 Migration100 migrated [0-9\\.]+s\n/", $output);
         $this->assertEquals(['100'], $this->repository->all());
     }
 

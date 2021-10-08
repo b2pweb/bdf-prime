@@ -53,16 +53,16 @@ final class TableTransformer
 
         return new Table(
             $this->table->name(),
-            array_map(function (ColumnInterface $column) {
-                return (new ColumnTransformer($column, $this->platform))
-                    ->toDoctrine();
-            }, $this->table->columns()),
-            array_map(function (IndexInterface $index) {
-                return (new IndexTransformer($index))
-                    ->toDoctrine();
-            }, $this->table->indexes()->all()),
+            array_map(
+                fn(ColumnInterface $column) => (new ColumnTransformer($column, $this->platform))->toDoctrine(),
+                $this->table->columns()
+            ),
+            array_map(
+                fn(IndexInterface $index) => (new IndexTransformer($index))->toDoctrine(),
+                $this->table->indexes()->all()
+            ),
+            [],
             $extractor->all(),
-            0,
             $this->table->options()
         );
     }

@@ -15,7 +15,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Driver;
-use Doctrine\DBAL\ForwardCompatibility\Result;
+use Doctrine\DBAL\Result;
 use LogicException;
 
 /**
@@ -130,6 +130,14 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
 
         $queryFactory->alias(InsertQueryInterface::class, ShardingInsertQuery::class);
         $queryFactory->alias(KeyValueQueryInterface::class, ShardingKeyValueQuery::class);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDatabase()
+    {
+        return null;
     }
 
     /**
@@ -304,67 +312,30 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function executeQuery($sql, array $params = [], $types = [], QueryCacheProfile $qcp = null)
+    public function executeQuery(string $sql, array $params = [], $types = [], QueryCacheProfile $qcp = null): Result
     {
         if ($this->isUsingShard()) {
             return $this->getSelectedShard()->executeQuery($sql, $params, $types, $qcp);
         }
 
-        $stmt = new MultiStatement();
+        $result = new MultiResult();
 
         foreach ($this->getSelectedShards() as $shard) {
-            $stmt->add($shard->executeQuery($sql, $params, $types, $qcp));
+            $result->add($shard->executeQuery($sql, $params, $types, $qcp));
         }
 
-        return new Result($stmt);
+        return new Result($result, $this);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function executeUpdate($sql, array $params = [], array $types = [])
+    public function executeStatement($sql, array $params = [], array $types = []): int
     {
         $result = 0;
 
         foreach ($this->getSelectedShards() as $shard) {
-            $result += $shard->executeUpdate($sql, $params, $types);
-        }
-
-        return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @psalm-suppress InvalidReturnType
-     */
-    public function query()
-    {
-        $args = func_get_args();
-
-        if ($this->isUsingShard()) {
-            return $this->getSelectedShard()->query(...$args);
-        }
-
-        $stmt = new MultiStatement();
-
-        foreach ($this->getSelectedShards() as $shard) {
-            $stmt->add($shard->query(...$args));
-        }
-
-        /** @psalm-suppress InvalidReturnStatement */
-        return $stmt;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function exec($statement)
-    {
-        $result = 0;
-
-        foreach ($this->getSelectedShards() as $shard) {
-            $result += $shard->exec($statement);
+            $result += $shard->executeStatement($sql, $params, $types);
         }
 
         return $result;

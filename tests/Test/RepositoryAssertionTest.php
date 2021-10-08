@@ -106,7 +106,7 @@ class RepositoryAssertionTest extends TestCase
     public function test_assertion_not_same_array_of_entities()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessageRegExp('/Expected attribute "'.preg_quote(TestEntity::class).'::name" is not the same/');
+        $this->expectExceptionMessageMatches('/Expected attribute "'.preg_quote(TestEntity::class).'::name" is not the same/');
 
         $entitiesExpected = [
             new TestEntity([
@@ -132,7 +132,7 @@ class RepositoryAssertionTest extends TestCase
     public function test_assertion_not_same_class_of_entities()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessageRegExp('/Failed asserting that two entities are the same/');
+        $this->expectExceptionMessageMatches('/Failed asserting that two entities are the same/');
 
         $entitiesExpected = (object)[
             'id'      => 1,
@@ -154,7 +154,7 @@ class RepositoryAssertionTest extends TestCase
     public function test_same_entities_have_not_the_same_number()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessageRegExp('/Failed asserting that two collection entities are the same/');
+        $this->expectExceptionMessageMatches('/Failed asserting that two collection entities are the same/');
 
         $entitiesExpected = [
             new TestEntity([
@@ -185,7 +185,7 @@ class RepositoryAssertionTest extends TestCase
     public function test_entities_have_not_the_same_number()
     {
         $this->expectException(ExpectationFailedException::class);
-        $this->expectExceptionMessageRegExp('/Failed asserting that two collection entities are the same/');
+        $this->expectExceptionMessageMatches('/Failed asserting that two collection entities are the same/');
 
         $entitiesExpected = [
             new TestEntity([

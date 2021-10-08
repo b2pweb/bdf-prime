@@ -223,25 +223,25 @@ class ShardingConnectionTest extends TestCase
         ]);
 
         $connection->pickShard(10);
-        $rows = $connection->fetchAll('select * from test');
+        $rows = $connection->executeQuery('select * from test')->fetchAllAssociative();
         $this->assertEquals(1, count($rows));
         $this->assertEquals('shard1', $rows[0]['name']);
 
         $connection->pickShard(11);
-        $rows = $connection->fetchAll('select * from test');
+        $rows = $connection->executeQuery('select * from test')->fetchAllAssociative();
         $this->assertEquals(1, count($rows));
         $this->assertEquals('shard2', $rows[0]['name']);
 
         $connection->useShard();
 
-        $rows = $connection->fetchAll('select * from test');
+        $rows = $connection->executeQuery('select * from test')->fetchAllAssociative();
         $this->assertEquals(2, count($rows));
         $this->assertEquals('shard1', $rows[0]['name']);
         $this->assertEquals('shard2', $rows[1]['name']);
 
         $result = $connection->exec('delete from test');
         $this->assertEquals(2, $result);
-        $this->assertEquals(0, count($connection->fetchAll('select * from test')));
+        $this->assertEquals(0, count($connection->executeQuery('select * from test')->fetchAllAssociative()));
     }
 
     /**
@@ -264,14 +264,14 @@ class ShardingConnectionTest extends TestCase
 
         $connection->useShard();
 
-        $rows = $connection->query('select * from test')->fetchAll();
+        $rows = $connection->executeQuery('select * from test')->fetchAllAssociative();
         $this->assertEquals(2, count($rows));
         $this->assertEquals('shard1', $rows[0]['name']);
         $this->assertEquals('shard2', $rows[1]['name']);
 
         $result = $connection->executeUpdate('delete from test');
         $this->assertEquals(2, $result);
-        $this->assertEquals(0, count($connection->query('select * from test')->fetchAll()));
+        $this->assertEquals(0, count($connection->executeQuery('select * from test')->fetchAllAssociative()));
     }
 
     /**
@@ -294,7 +294,7 @@ class ShardingConnectionTest extends TestCase
 
         $connection->useShard();
 
-        $count = $connection->query('select count(*) from test')->fetchColumn();
+        $count = $connection->executeQuery('select count(*) from test')->fetchFirstColumn();
         $this->assertEquals(1, $count[0]);
         $this->assertEquals(1, $count[1]);
         $this->assertEquals(2, $connection->from('test')->count());
@@ -334,7 +334,7 @@ class ShardingConnectionTest extends TestCase
         });
 
         $this->assertEquals(1, $connection->from('test')->count());
-        $this->assertEquals(1, count($connection->query('select * from test')->fetchAll()));
+        $this->assertEquals(1, count($connection->executeQuery('select * from test')->fetchAllAssociative()));
     }
 
     /**
@@ -358,7 +358,7 @@ class ShardingConnectionTest extends TestCase
         }
 
         $this->assertEquals(0, $connection->from('test')->count());
-        $this->assertEquals(0, count($connection->query('select * from test')->fetchAll()));
+        $this->assertEquals(0, count($connection->executeQuery('select * from test')->fetchAllAssociative()));
     }
 
     /**

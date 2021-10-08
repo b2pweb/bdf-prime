@@ -6,7 +6,7 @@ use Bdf\Prime\Platform\AbstractPlatformType;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Schema\ColumnInterface;
 use Bdf\Prime\Types\PhpTypeInterface;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 
 /**
  * Type that maps an SQL DECIMAL to a PHP string.
@@ -26,7 +26,7 @@ class SqlDecimalType extends AbstractPlatformType
      */
     public function declaration(ColumnInterface $column)
     {
-        return Type::DECIMAL;
+        return Types::DECIMAL;
     }
 
     /**

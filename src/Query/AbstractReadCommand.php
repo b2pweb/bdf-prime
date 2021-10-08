@@ -5,6 +5,7 @@ namespace Bdf\Prime\Query;
 use Bdf\Prime\Collection\CollectionFactory;
 use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\CompilerState;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
@@ -41,7 +42,10 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * The listeners processor.
      *
-     * @var array
+     * @var array{
+     *    post: callable(\Bdf\Prime\Connection\Result\ResultSetInterface<array<string, mixed>>):array|null,
+     *    each: callable(array<string, mixed>):mixed|null
+     * }
      */
     protected $listeners = [
         'post' => null,
@@ -141,7 +145,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * {@inheritdoc}
      */
-    public function post(callable $processor, $forEach = true)
+    public function post(callable $processor, bool $forEach = true)
     {
         $this->listeners[$forEach ? 'each' : 'post'] = $processor;
 
@@ -159,26 +163,29 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     }
 
     /**
-     * Post processors.
-     * Wrap data with defined wrapper. Run the post processors on rows
-     *
-     * @param array  $data
+     * {@inheritdoc}
      *
      * @return array|CollectionInterface
      */
-    public function postProcessResult($data)
+    public function postProcessResult(ResultSetInterface $data): iterable
     {
         if ($this->listeners['post'] !== null) {
-            $data = $this->listeners['post']($data);
-        } elseif ($this->listeners['each'] !== null) {
-            $data = array_map($this->listeners['each'], $data);
+            $proceed = $this->listeners['post']($data);
+        } elseif (($listener = $this->listeners['each']) !== null) {
+            $proceed = [];
+
+            foreach ($data as $row) {
+                $proceed[] = $listener($row);
+            }
+        } else {
+            $proceed = $data->all();
         }
 
         if ($this->wrapper !== null) {
-            return $this->collectionFactory()->wrap($data, $this->wrapper);
+            return $this->collectionFactory()->wrap($proceed, $this->wrapper);
         }
 
-        return $data;
+        return $proceed;
     }
 
     /**

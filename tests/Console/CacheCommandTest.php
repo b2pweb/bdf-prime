@@ -35,8 +35,8 @@ class CacheCommandTest extends TestCase
         $tester->execute([]);
         $display = $tester->getDisplay();
         
-        $this->assertRegExp('/result cache is not available/', $display);
-        $this->assertRegExp('/metadata cache is not available/', $display);
+        $this->assertMatchesRegularExpression('/result cache is not available/', $display);
+        $this->assertMatchesRegularExpression('/metadata cache is not available/', $display);
     }
 
     /**
@@ -52,7 +52,7 @@ class CacheCommandTest extends TestCase
         $tester = new CommandTester($this->command);
         $tester->execute([]);
 
-        $this->assertRegExp('/nothing to do/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/nothing to do/', $tester->getDisplay());
     }
 
     /**
@@ -68,6 +68,6 @@ class CacheCommandTest extends TestCase
         $tester = new CommandTester($this->command);
         $tester->execute(['--clear' => true]);
 
-        $this->assertRegExp('/Clearing result cache/', $tester->getDisplay());
+        $this->assertMatchesRegularExpression('/Clearing result cache/', $tester->getDisplay());
     }
 }
