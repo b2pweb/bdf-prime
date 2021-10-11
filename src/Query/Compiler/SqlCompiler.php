@@ -3,7 +3,7 @@
 namespace Bdf\Prime\Query\Compiler;
 
 use Bdf\Prime\Exception\PrimeException;
-use Bdf\Prime\Exception\QueryException;
+use Bdf\Prime\Exception\QueryBuildingException;
 use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Contract\Compilable;
@@ -91,7 +91,7 @@ class SqlCompiler extends AbstractCompiler
             return $query->state()->compiled = $insert.$this->quoteIdentifier($query, $table['table']).$this->compileInsertData($query);
         }
 
-        throw new QueryException('The insert table name is missing');
+        throw new QueryBuildingException('The insert table name is missing');
     }
 
     /**
@@ -195,7 +195,7 @@ class SqlCompiler extends AbstractCompiler
             ;
         }
 
-        throw new QueryException('The update table name is missing');
+        throw new QueryBuildingException('The update table name is missing');
     }
 
     /**
@@ -237,7 +237,7 @@ class SqlCompiler extends AbstractCompiler
             ;
         }
 
-        throw new QueryException('The delete table name is missing');
+        throw new QueryBuildingException('The delete table name is missing');
     }
     
     /**

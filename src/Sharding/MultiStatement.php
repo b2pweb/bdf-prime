@@ -7,7 +7,7 @@ use Doctrine\DBAL\Driver\ResultStatement;
 /**
  * Array cache statement
  * 
- * @package Bdf\Prime\Query
+ * @deprecated Use MultiResult
  */
 class MultiStatement implements \IteratorAggregate, ResultStatement
 {

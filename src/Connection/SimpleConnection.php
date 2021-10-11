@@ -5,7 +5,7 @@ namespace Bdf\Prime\Connection;
 use Bdf\Prime\Connection\Event\ConnectionClosedListenerInterface;
 use Bdf\Prime\Connection\Extensions\LostConnection;
 use Bdf\Prime\Connection\Extensions\SchemaChanged;
-use Bdf\Prime\Connection\Result\PdoResultSet;
+use Bdf\Prime\Connection\Result\DoctrineResultSet;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Connection\Result\UpdateResultSet;
 use Bdf\Prime\Exception\DBALException;
@@ -325,7 +325,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
             if ($query->type() === Compilable::TYPE_SELECT) {
                 $stmt = $this->executeQuery($statement, $query->getBindings());
 
-                return new PdoResultSet($stmt);
+                return new DoctrineResultSet($stmt);
             }
 
             return new UpdateResultSet($this->executeUpdate($statement, $query->getBindings()));
@@ -370,7 +370,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
             }
         }
 
-        return new PdoResultSet($statement);
+        return new DoctrineResultSet($statement);
     }
 
     /**
