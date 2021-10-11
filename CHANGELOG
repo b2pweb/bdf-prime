@@ -4,6 +4,15 @@ v1.3.0
 * Feat: Adding psaml comments.
 * Feat: Adding `Bdf\Prime\Connection\TransactionManagerInterface` to manage transactional connection.
 * Feat: Adding `Bdf\Prime\Repository\RepositoryEventsSubscriberInterface` to manage event subscription.
+* Feat: Add helper methods `isRead`, `isWrite`, `hasWrite` on `ResultSetInterface`
+* Feat: Add "fetch mode" `asXXX` methods instead of generalist `fetchMode` method on `ResultSetInterface`
+
+Deprecated
+* `Bdf\Prime\Query\CacheStatement` will be deleted in 2.0. Do not use.
+* `Bdf\Prime\Sharding\MultiStatement` will be deleted in 2.0. Use MultiResult instead.
+* `Bdf\Prime\Connection\Result\PdoResultSet` will be deleted in 2.0. Use DoctrineResultSet instead.
+* `Bdf\Prime\Exception\QueryException` will be deleted in 2.0. Use QueryBuildingException instead.
+* `Bdf\Prime\Connection\Result\ResultSetInterface::fetchMode()` and associated constants. Not planned yet to deletion.
 
 BC Breaks
 * Change signature of `Bdf\Prime\Behaviors\BehaviorInterface`.
