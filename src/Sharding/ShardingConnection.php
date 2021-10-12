@@ -310,7 +310,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
             return $this->getSelectedShard()->executeQuery($sql, $params, $types, $qcp);
         }
 
-        $stmt = new MultiStatement();
+        $stmt = new MultiResult();
 
         foreach ($this->getSelectedShards() as $shard) {
             $stmt->add($shard->executeQuery($sql, $params, $types, $qcp));
@@ -346,7 +346,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
             return $this->getSelectedShard()->query(...$args);
         }
 
-        $stmt = new MultiStatement();
+        $stmt = new MultiResult();
 
         foreach ($this->getSelectedShards() as $shard) {
             $stmt->add($shard->query(...$args));

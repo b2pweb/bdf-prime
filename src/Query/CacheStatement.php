@@ -8,7 +8,7 @@ use PDO;
 /**
  * Array cache statement
  * 
- * @package Bdf\Prime\Query
+ * @deprecated Do not use
  */
 class CacheStatement implements \IteratorAggregate, ResultStatement
 {

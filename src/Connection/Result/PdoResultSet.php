@@ -7,8 +7,10 @@ use Doctrine\DBAL\Driver\Statement;
 
 /**
  * Adapt PDO statement to result set
+ *
+ * @deprecated Use DoctrineResultSet
  */
-final class PdoResultSet implements ResultSetInterface
+/*final*/ class PdoResultSet implements ResultSetInterface
 {
     /**
      * @var Statement|\PDOStatement
@@ -60,6 +62,9 @@ final class PdoResultSet implements ResultSetInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @psalm-suppress InvalidReturnType
+     * @psalm-suppress InvalidReturnStatement
      */
     public function key()
     {
@@ -110,6 +115,46 @@ final class PdoResultSet implements ResultSetInterface
     /**
      * {@inheritdoc}
      */
+    public function asAssociative(): ResultSetInterface
+    {
+        return $this->fetchMode(self::FETCH_ASSOC);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function asList(): ResultSetInterface
+    {
+        return $this->fetchMode(self::FETCH_NUM);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function asObject(): ResultSetInterface
+    {
+        return $this->fetchMode(self::FETCH_OBJECT);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function asClass(string $className): ResultSetInterface
+    {
+        return $this->fetchMode(self::FETCH_CLASS, $className);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function asColumn(int $column = 0): ResultSetInterface
+    {
+        return $this->fetchMode(self::FETCH_COLUMN, $column);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function all()
     {
         return $this->statement->fetchAll();
@@ -130,6 +175,30 @@ final class PdoResultSet implements ResultSetInterface
     public function count()
     {
         return $this->statement->rowCount();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isRead(): bool
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isWrite(): bool
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasWrite(): bool
+    {
+        return false;
     }
 
     /**

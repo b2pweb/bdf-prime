@@ -6,7 +6,7 @@ use Bdf\Prime\Platform\AbstractPlatformType;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Schema\ColumnInterface;
 use Bdf\Prime\Types\PhpTypeInterface;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 
 /**
  * Basic integer type for database
@@ -17,9 +17,9 @@ class SqlIntegerType extends AbstractPlatformType
      * @var string[]
      */
     private static $doctrineTypeMap = [
-        self::INTEGER  => Type::INTEGER,
-        self::SMALLINT => Type::SMALLINT,
-        self::TINYINT  => Type::SMALLINT,
+        self::INTEGER  => Types::INTEGER,
+        self::SMALLINT => Types::SMALLINT,
+        self::TINYINT  => Types::SMALLINT,
     ];
 
 
@@ -44,7 +44,7 @@ class SqlIntegerType extends AbstractPlatformType
      */
     public function declaration(ColumnInterface $column)
     {
-        return isset(self::$doctrineTypeMap[$this->name]) ? self::$doctrineTypeMap[$this->name] : Type::INTEGER;
+        return isset(self::$doctrineTypeMap[$this->name]) ? self::$doctrineTypeMap[$this->name] : Types::INTEGER;
     }
 
     /**
