@@ -7,7 +7,7 @@ class Migration500 extends Migration
     /**
      * Initialize the migration
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->output->writeln('Init ' . $this->version());
     }
@@ -15,7 +15,7 @@ class Migration500 extends Migration
     /**
      * Do the migration
      */
-    public function up()
+    public function up(): void
     {
         $this->output->writeln('Up ' . $this->version());
     }
@@ -23,7 +23,7 @@ class Migration500 extends Migration
     /**
      * Undo the migration
      */
-    public function down()
+    public function down(): void
     {
         $this->output->writeln('Down ' . $this->version());
     }

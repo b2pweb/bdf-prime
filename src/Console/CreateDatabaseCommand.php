@@ -2,6 +2,8 @@
 
 namespace Bdf\Prime\Console;
 
+use Bdf\Prime\Connection\ConnectionInterface;
+
 /**
  * 
  */
@@ -12,7 +14,7 @@ class CreateDatabaseCommand extends DatabaseCommand
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
@@ -24,7 +26,7 @@ class CreateDatabaseCommand extends DatabaseCommand
     /**
      * {@inheritdoc}
      */
-    protected function interactWithDatabase($connection, $dbName)
+    protected function interactWithDatabase(ConnectionInterface $connection, ?string $dbName): void
     {
         $this->io->line('Database <comment>%s</comment> for connection <comment>%s</comment> already exists.', $dbName, $connection->getName());
     }
@@ -32,7 +34,7 @@ class CreateDatabaseCommand extends DatabaseCommand
     /**
      * {@inheritdoc}
      */
-    protected function interactWithNoDatabase($connection, $dbName)
+    protected function interactWithNoDatabase(ConnectionInterface $connection, ?string $dbName): void
     {
         $connection->schema()->createDatabase($dbName);
 

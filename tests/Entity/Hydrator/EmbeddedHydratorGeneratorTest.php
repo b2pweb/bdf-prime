@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Entity\Hydrator;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Bench\HydratorGeneration;
 use Bdf\Prime\Entity\Extensions\ArrayInjector;
 use Bdf\Prime\Entity\ImportableInterface;
@@ -89,7 +90,7 @@ class HydratEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -100,7 +101,7 @@ class HydratEntityMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder->embedded('embbed', HydratEmbeddedEntity::class, function ($builder) {
             $builder->string('value');

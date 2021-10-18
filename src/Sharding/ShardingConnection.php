@@ -201,13 +201,13 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * Use a shard
      *
-     * @param string $shardId
+     * @param string|null $shardId
      *
      * @return $this
      *
      * @throws ShardingException   If the shard id is not known
      */
-    public function useShard($shardId = null)
+    public function useShard(?string $shardId = null)
     {
         if ($shardId !== null && !isset($this->connections[$shardId])) {
             throw ShardingException::unknown($shardId);
@@ -232,7 +232,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      * Get a shard connection by its id
      * Returns all connection if id is null
      *
-     * @param null|string|int $shardId
+     * @param string|null $shardId
      *
      * @return SimpleConnection[]|SimpleConnection
      *

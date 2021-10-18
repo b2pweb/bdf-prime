@@ -10,14 +10,14 @@ interface HydratorGeneratedInterface extends HydratorInterface, MapperHydratorIn
     /**
      * Get the supported entity class name
      *
-     * @return string
+     * @return class-string
      */
-    public static function supportedPrimeClassName();
+    public static function supportedPrimeClassName(): string;
 
     /**
      * Get the embedded classes list, in same order as the constructor
      *
-     * @return string[]
+     * @return list<class-string>
      */
-    public static function embeddedPrimeClasses();
+    public static function embeddedPrimeClasses(): array;
 }

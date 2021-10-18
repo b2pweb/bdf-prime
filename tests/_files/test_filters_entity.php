@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Mapper\Mapper;
 
 class TestFiltersEntityMapper extends Mapper
@@ -14,7 +15,7 @@ class TestFiltersEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -26,7 +27,7 @@ class TestFiltersEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->primary()
@@ -38,7 +39,7 @@ class TestFiltersEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function filters()
+    public function filters(): array
     {
         return $this->filters;
     }

@@ -88,7 +88,7 @@ class CustomTestGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array &$data, ServiceLocator $serviceLocator)
+    public function generate(array &$data, ServiceLocator $serviceLocator): void
     {
         $data[$this->property] = $this->value;
     }
@@ -96,7 +96,7 @@ class CustomTestGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function postProcess($entity)
+    public function postProcess($entity): void
     {
         $entity->{$this->property} = $this->value;
     }
@@ -104,7 +104,7 @@ class CustomTestGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function setCurrentConnection(ConnectionInterface $connection)
+    public function setCurrentConnection(ConnectionInterface $connection): void
     {
     }
 }

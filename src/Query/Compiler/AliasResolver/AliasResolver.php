@@ -108,8 +108,10 @@ class AliasResolver
 
     /**
      * Reset all registered aliases
+     *
+     * @return void
      */
-    public function reset()
+    public function reset(): void
     {
         $this->aliasToPath = [];
         $this->relationAlias = [];
@@ -133,7 +135,7 @@ class AliasResolver
      *
      * @return string The SQL valid expression, {table alias}.{table attribute}
      */
-    public function resolve($attribute, &$type = null)
+    public function resolve(string $attribute, &$type = null): string
     {
         // The root repository is not registered
         if (!$this->rootRepositoryRegistered) {
@@ -235,9 +237,9 @@ class AliasResolver
      *
      * @param string $expression
      *
-     * @return array  The attribute name and the owner metadata
+     * @return array{0: string|null, 1: string, 2: Metadata|null} The attribute name and the owner metadata
      */
-    protected function exploreExpression($expression)
+    protected function exploreExpression(string $expression): array
     {
         $tokens = ExpressionCompiler::instance()->compile($expression);
 
@@ -284,12 +286,15 @@ class AliasResolver
 
     /**
      * Resolve from an $ALIAS expression token
+     *
      * @see ExpressionCompiler
      *
      * @param string $alias The alias name
      * @param ExpressionExplorationState $state
+     *
+     * @return void
      */
-    protected function resolveAlias($alias, ExpressionExplorationState $state)
+    protected function resolveAlias(string $alias, ExpressionExplorationState $state): void
     {
         $state->alias = $alias;
         $state->path = $this->getRealPath($alias);
@@ -298,12 +303,15 @@ class AliasResolver
 
     /**
      * Revolve from a $STA expression token
+     *
      * @see ExpressionCompiler
      *
      * @param string $expression The static expression
      * @param ExpressionExplorationState $state
+     *
+     * @return void
      */
-    protected function resolveStatic($expression, ExpressionExplorationState $state)
+    protected function resolveStatic(string $expression, ExpressionExplorationState $state): void
     {
         // Static expression not resolved yet
         if (!isset($this->relationAlias[$expression])) {
@@ -317,12 +325,15 @@ class AliasResolver
 
     /**
      * Resolve from a $DYN expression
+     *
      * @see ExpressionCompiler
      *
      * @param array $expression Array of names
      * @param ExpressionExplorationState $state
+     *
+     * @return void
      */
-    protected function resolveDynamic(array $expression, ExpressionExplorationState $state)
+    protected function resolveDynamic(array $expression, ExpressionExplorationState $state): void
     {
         $attribute = implode('.', $expression);
 
@@ -381,8 +392,10 @@ class AliasResolver
      *
      * @param string $relationName The current relation name
      * @param ExpressionExplorationState $state
+     *
+     * @return void
      */
-    protected function declareRelation($relationName, ExpressionExplorationState $state)
+    protected function declareRelation(string $relationName, ExpressionExplorationState $state): void
     {
         // The path is an alias
         //  - Save the alias
@@ -429,7 +442,7 @@ class AliasResolver
      *
      * @return string
      */
-    public function getPathAlias($path = null)
+    public function getPathAlias(?string $path = null): string
     {
         if (empty($path)) {
             $path = $this->metadata->table;
@@ -453,9 +466,9 @@ class AliasResolver
      *
      * @return string
      */
-    protected function getRealPath($path)
+    protected function getRealPath(string $path): string
     {
-        return isset($this->aliasToPath[$path]) ? $this->aliasToPath[$path] : $path;
+        return $this->aliasToPath[$path] ?? $path;
     }
 
     /**
@@ -465,7 +478,7 @@ class AliasResolver
      *
      * @return string
      */
-    protected function getParentAlias($path)
+    protected function getParentAlias(string $path): string
     {
         $path = $this->getRealPath($path);
 
@@ -483,24 +496,24 @@ class AliasResolver
     /**
      * Check if the alias is registered
      *
-     * @param string $alias
+     * @param string|null $alias
      *
      * @return bool
      */
-    public function hasAlias($alias)
+    public function hasAlias(?string $alias): bool
     {
-        return isset($this->metadataByAlias[$alias]);
+        return isset($this->metadataByAlias[(string) $alias]);
     }
 
     /**
      * Get the metadata from the alias (or entity name)
      *
-     * @param string $alias
+     * @param string|null $alias
      *
      * @return Metadata
      */
-    public function getMetadata($alias)
+    public function getMetadata(?string $alias): Metadata
     {
-        return $this->metadataByAlias[$alias];
+        return $this->metadataByAlias[(string) $alias];
     }
 }

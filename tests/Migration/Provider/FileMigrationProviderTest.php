@@ -161,7 +161,7 @@ class FileMigrationProviderTest extends TestCase
 
         $content = file_get_contents($path);
         $this->assertStringContainsString(<<<PHP
-    public function stage()
+    public function stage(): string
     {
         return 'my_stage';
     }

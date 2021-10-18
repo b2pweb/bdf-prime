@@ -62,6 +62,7 @@ abstract class AbstractQuery extends AbstractReadCommand implements QueryInterfa
             && $this instanceof Limitable
             && $this->hasPagination()
         ) {
+            /** @var Paginable<R>&Limitable $this */
             return $this->paginate($this->getLimit(), $this->getPage());
         }
 

@@ -43,6 +43,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
 {
     use CompilableTrait;
     use LimitableTrait;
+    /** @use PaginableTrait<R> */
     use PaginableTrait;
     use ProjectionableTrait;
 

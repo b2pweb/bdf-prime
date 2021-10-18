@@ -14,16 +14,18 @@ interface ImportableInterface
      * @see HydratorInterface::hydrate()
      *
      * @param array $data
+     *
+     * @return void
      */
-    public function import(array $data);
+    public function import(array $data): void;
 
     /**
      * Export attributes to an array
      * @see HydratorInterface::extract()
      *
-     * @param string[] $attributes
+     * @param list<string> $attributes
      *
      * @return array
      */
-    public function export(array $attributes = []);
+    public function export(array $attributes = []): array;
 }

@@ -134,11 +134,13 @@ class Blameable extends Behavior
      * Before insert
      *
      * we set the user that created the entity
-     * 
+     *
      * @param E $entity
      * @param RepositoryInterface<E> $repository
+     *
+     * @return void
      */
-    public function beforeInsert($entity, RepositoryInterface $repository)
+    public function beforeInsert($entity, RepositoryInterface $repository): void
     {
         $resolver = $this->userResolver;
         $repository->mapper()->hydrateOne($entity, $this->createdBy['name'], $resolver());
@@ -152,8 +154,10 @@ class Blameable extends Behavior
      * @param E $entity
      * @param RepositoryInterface<E> $repository
      * @param null|\ArrayObject $attributes
+     *
+     * @return void
      */
-    public function beforeUpdate($entity, $repository, $attributes)
+    public function beforeUpdate($entity, RepositoryInterface $repository, $attributes): void
     {
         if ($attributes !== null) {
             $attributes[] = $this->updatedBy['name'];

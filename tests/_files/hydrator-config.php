@@ -27,7 +27,7 @@ if (!class_exists(Hydrator_Bdf_Prime_TestEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        final public function setPrimeInstantiator(InstantiatorInterface $instantiator)
+        final public function setPrimeInstantiator(InstantiatorInterface $instantiator): void
         {
             $this->__instantiator = $instantiator;
         }
@@ -35,14 +35,14 @@ if (!class_exists(Hydrator_Bdf_Prime_TestEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        final public function setPrimeMetadata(Metadata $metadata)
+        final public function setPrimeMetadata(Metadata $metadata): void
         {
         }
 
         /**
          * {@inheritdoc}
          */
-        final public function hydrate($object, array $data)
+        final public function hydrate($object, array $data): void
         {
             if (isset($data['id'])) {
                 $object->id = $data['id'];
@@ -75,7 +75,7 @@ if (!class_exists(Hydrator_Bdf_Prime_TestEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        final public function extract($object, array $attributes = [])
+        final public function extract($object, array $attributes = []): array
         {
             if (empty($attributes)) {
                 return ['id' => ($object->id), 'name' => ($object->name), 'foreign' => (($__rel_foreign = $object->foreign) === null ? null : $__rel_foreign instanceof \Bdf\Prime\TestEmbeddedEntity ? $this->__Bdf_Prime_TestEmbeddedEntity_hydrator->extract($__rel_foreign) : $__rel_foreign), 'dateInsert' => ($object->dateInsert)];
@@ -100,7 +100,7 @@ if (!class_exists(Hydrator_Bdf_Prime_TestEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        final public function flatExtract($object, array $attributes = null)
+        final public function flatExtract($object, array $attributes = null): array
         {
             if (empty($attributes)) {
                 $data = ['id' => ($object->id), 'name' => ($object->name), 'dateInsert' => ($object->dateInsert)];
@@ -151,7 +151,7 @@ if (!class_exists(Hydrator_Bdf_Prime_TestEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        final public function flatHydrate($object, array $data, PlatformTypesInterface $types)
+        final public function flatHydrate($object, array $data, PlatformTypesInterface $types): void
         {
             $typeinteger = $types->get('integer');
             $typestring = $types->get('string');
@@ -192,7 +192,7 @@ if (!class_exists(Hydrator_Bdf_Prime_TestEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        final public function extractOne($object, $attribute)
+        final public function extractOne($object, string $attribute)
         {
             switch($attribute) {
                 case 'id':
@@ -233,7 +233,7 @@ if (!class_exists(Hydrator_Bdf_Prime_TestEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        final public function hydrateOne($object, $attribute, $value)
+        final public function hydrateOne($object, string $attribute, $value): void
         {
             switch($attribute) {
                 case 'id':
@@ -269,7 +269,7 @@ if (!class_exists(Hydrator_Bdf_Prime_TestEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        public static function supportedPrimeClassName()
+        public static function supportedPrimeClassName(): string
         {
             return 'Bdf\Prime\TestEntity';
         }
@@ -277,7 +277,7 @@ if (!class_exists(Hydrator_Bdf_Prime_TestEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        public static function embeddedPrimeClasses()
+        public static function embeddedPrimeClasses(): array
         {
             return array (
                 0 => 'Bdf\\Prime\\TestEmbeddedEntity',
@@ -305,7 +305,7 @@ if (!class_exists(Hydrator_Bdf_Prime_EmbeddedEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        final public function setPrimeInstantiator(InstantiatorInterface $instantiator)
+        final public function setPrimeInstantiator(InstantiatorInterface $instantiator): void
         {
             $this->__instantiator = $instantiator;
         }
@@ -313,14 +313,14 @@ if (!class_exists(Hydrator_Bdf_Prime_EmbeddedEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        final public function setPrimeMetadata(Metadata $metadata)
+        final public function setPrimeMetadata(Metadata $metadata): void
         {
         }
 
         /**
          * {@inheritdoc}
          */
-        final public function hydrate($object, array $data)
+        final public function hydrate($object, array $data): void
         {
             if (isset($data['id'])) {
                 $object->setId($data['id']);
@@ -332,7 +332,7 @@ if (!class_exists(Hydrator_Bdf_Prime_EmbeddedEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        final public function extract($object, array $attributes = [])
+        final public function extract($object, array $attributes = []): array
         {
             if (empty($attributes)) {
                 return ['id' => ($object->getId())];
@@ -351,7 +351,7 @@ if (!class_exists(Hydrator_Bdf_Prime_EmbeddedEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        final public function flatExtract($object, array $attributes = null)
+        final public function flatExtract($object, array $attributes = null): array
         {
             if (empty($attributes)) {
                 $data = ['id' => ($object->getId())];
@@ -373,7 +373,7 @@ if (!class_exists(Hydrator_Bdf_Prime_EmbeddedEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        final public function flatHydrate($object, array $data, PlatformTypesInterface $types)
+        final public function flatHydrate($object, array $data, PlatformTypesInterface $types): void
         {
             $typeinteger = $types->get('integer');
             if (isset($data['id'])) {
@@ -385,7 +385,7 @@ if (!class_exists(Hydrator_Bdf_Prime_EmbeddedEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        final public function extractOne($object, $attribute)
+        final public function extractOne($object, string $attribute)
         {
             switch($attribute) {
                 case 'id':
@@ -398,7 +398,7 @@ if (!class_exists(Hydrator_Bdf_Prime_EmbeddedEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        final public function hydrateOne($object, $attribute, $value)
+        final public function hydrateOne($object, string $attribute, $value): void
         {
             switch($attribute) {
                 case 'id':
@@ -412,7 +412,7 @@ if (!class_exists(Hydrator_Bdf_Prime_EmbeddedEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        public static function supportedPrimeClassName()
+        public static function supportedPrimeClassName(): string
         {
             return 'Bdf\Prime\EmbeddedEntity';
         }
@@ -420,7 +420,7 @@ if (!class_exists(Hydrator_Bdf_Prime_EmbeddedEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        public static function embeddedPrimeClasses()
+        public static function embeddedPrimeClasses(): array
         {
             return array (
             );

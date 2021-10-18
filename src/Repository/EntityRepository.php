@@ -719,7 +719,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Repository extensions
      *
-     * @return array
+     * @return array<string, callable(\Bdf\Prime\Query\QueryInterface,mixed...):mixed>
      */
     public function scopes()
     {
@@ -923,7 +923,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param array $criteria
      * @param array $attributes
      * 
-     * @return array|CollectionInterface<E>
+     * @return E[]|CollectionInterface<E>
      * @throws PrimeException
      */
     #[ReadOperation]
@@ -947,9 +947,11 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
 
     /**
      * @see QueryInterface::where
-     * 
-     * @param string|array $relations
-     * 
+     *
+     * @param string|array<string,mixed>|callable(static):void $column The restriction predicates.
+     * @param string|mixed|null $operator The comparison operator, or the value is you want to use "=" operator
+     * @param mixed $value
+     *
      * @return QueryInterface<ConnectionInterface, E>
      */
     public function where($column, $operator = null, $value = null)
@@ -993,8 +995,10 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * After this call, the repository will be unusable
      *
      * @internal
+     *
+     * @return void
      */
-    public function destroy()
+    public function destroy(): void
     {
         $this->connection()->getEventManager()->removeEventSubscriber($this);
 
@@ -1040,8 +1044,10 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Reset the inner queries
      * Use for invalidate prepared queries, or when connection changed
+     *
+     * @return void
      */
-    private function reset()
+    private function reset(): void
     {
         // Reset queries
         $this->queries = new RepositoryQueryFactory($this, $this->resultCache);

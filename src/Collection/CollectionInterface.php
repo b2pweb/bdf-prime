@@ -11,8 +11,8 @@ use Traversable;
  * 
  * @template E
  *
- * @implements ArrayAccess<array-key, E>
- * @implements Traversable<array-key, E>
+ * @extends ArrayAccess<array-key, E>
+ * @extends Traversable<array-key, E>
  */
 interface CollectionInterface extends Countable, ArrayAccess, Traversable
 {

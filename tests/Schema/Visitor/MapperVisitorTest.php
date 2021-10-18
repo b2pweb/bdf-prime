@@ -62,10 +62,11 @@ class MapperVisitorTest extends TestCase
      */
     private function getExpectedDocumentMapper()
     {
-        return <<<EOF
+        return <<<'EOF'
 <?php
 
 use Bdf\Prime\Mapper\Mapper;
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 
 /**
  *
@@ -75,7 +76,7 @@ class DocumentMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -87,15 +88,15 @@ class DocumentMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields(\$builder)
+    public function buildFields(FieldBuilder $builder): void
     {
-        \$builder->integer('id')->autoincrement()->alias('id_');
-        \$builder->bigint('customerId')->alias('customer_id');
-        \$builder->string('uploaderType', 60)->alias('uploader_type');
-        \$builder->bigint('uploaderId')->alias('uploader_id');
-        \$builder->string('contactName', 255)->nillable()->alias('contact_name');
-        \$builder->string('contactAddress', 255)->nillable()->alias('contact_address');
-        \$builder->string('contactCity', 255)->nillable()->alias('contact_city');
+        $builder->integer('id')->autoincrement()->alias('id_');
+        $builder->bigint('customerId')->alias('customer_id');
+        $builder->string('uploaderType', 60)->alias('uploader_type');
+        $builder->bigint('uploaderId')->alias('uploader_id');
+        $builder->string('contactName', 255)->nillable()->alias('contact_name');
+        $builder->string('contactAddress', 255)->nillable()->alias('contact_address');
+        $builder->string('contactCity', 255)->nillable()->alias('contact_city');
     }
 }
 

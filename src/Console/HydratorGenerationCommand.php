@@ -106,8 +106,10 @@ class HydratorGenerationCommand extends Command
      * Configure output file and directory from options
      *
      * @param BdfStyle $io
+     *
+     * @return void
      */
-    private function configureOutputs($io)
+    private function configureOutputs($io): void
     {
         if ($io->option('loader') !== null) {
             $this->loaderFile = $io->option('loader');
@@ -128,8 +130,10 @@ class HydratorGenerationCommand extends Command
      * @param BdfStyle $io
      * @param string $className
      * @param Mapper $mapper
+     *
+     * @return void
      */
-    private function generateHydrator($io, $className, Mapper $mapper)
+    private function generateHydrator($io, $className, Mapper $mapper): void
     {
         $io->inline("Generate hydrator for ${className} ");
 
@@ -151,8 +155,10 @@ class HydratorGenerationCommand extends Command
      * Generate the hydrators loader
      *
      * @param BdfStyle $io
+     *
+     * @return void
      */
-    private function generateLoader($io)
+    private function generateLoader($io): void
     {
         $io->info('Generating loader file...');
 

@@ -28,7 +28,7 @@ class ComposableGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(array &$data, ServiceLocator $serviceLocator)
+    public function generate(array &$data, ServiceLocator $serviceLocator): void
     {
         foreach ($this->generators as $generator) {
             $generator->generate($data, $serviceLocator);
@@ -38,7 +38,7 @@ class ComposableGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function postProcess($entity)
+    public function postProcess($entity): void
     {
         foreach ($this->generators as $generator) {
             $generator->postProcess($entity);
@@ -48,7 +48,7 @@ class ComposableGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function setCurrentConnection(ConnectionInterface $connection)
+    public function setCurrentConnection(ConnectionInterface $connection): void
     {
         foreach ($this->generators as $generator) {
             $generator->setCurrentConnection($connection);

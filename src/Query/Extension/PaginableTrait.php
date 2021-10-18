@@ -9,6 +9,7 @@ use Bdf\Prime\Query\Pagination\PaginatorInterface;
 /**
  * Trait for @see Paginable queries
  *
+ * @template R as array|object
  * @psalm-require-implements Paginable
  */
 trait PaginableTrait
@@ -27,8 +28,6 @@ trait PaginableTrait
     }
 
     /**
-     * SPL - IteratorAggregate
-     *
      * {@inheritdoc}
      */
     public function getIterator()
@@ -41,6 +40,8 @@ trait PaginableTrait
      *
      * @see Paginable::paginate()
      * @psalm-suppress LessSpecificImplementedReturnType
+     *
+     * @return PaginatorInterface<R>
      */
     public function paginate(?int $maxRows = null, ?int $page = null, string $className = 'paginator'): PaginatorInterface
     {
@@ -54,6 +55,8 @@ trait PaginableTrait
      *
      * @see Paginable::walk()
      * @psalm-suppress LessSpecificImplementedReturnType
+     *
+     * @return PaginatorInterface<R>
      */
     public function walk(?int $maxRows = null, ?int $page = null): PaginatorInterface
     {

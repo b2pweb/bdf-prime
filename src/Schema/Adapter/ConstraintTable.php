@@ -2,7 +2,9 @@
 
 namespace Bdf\Prime\Schema\Adapter;
 
+use Bdf\Prime\Schema\ColumnInterface;
 use Bdf\Prime\Schema\ConstraintSetInterface;
+use Bdf\Prime\Schema\IndexSetInterface;
 use Bdf\Prime\Schema\TableInterface;
 
 /**
@@ -36,7 +38,7 @@ final class ConstraintTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return $this->table->name();
     }
@@ -44,7 +46,7 @@ final class ConstraintTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function column($name)
+    public function column(string $name): ColumnInterface
     {
         return $this->table->column($name);
     }
@@ -52,7 +54,7 @@ final class ConstraintTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function columns()
+    public function columns(): array
     {
         return $this->table->columns();
     }
@@ -60,7 +62,7 @@ final class ConstraintTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function indexes()
+    public function indexes(): IndexSetInterface
     {
         return $this->table->indexes();
     }
@@ -68,7 +70,7 @@ final class ConstraintTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function constraints()
+    public function constraints(): ConstraintSetInterface
     {
         return $this->constraints;
     }
@@ -76,7 +78,7 @@ final class ConstraintTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function options()
+    public function options(): array
     {
         return $this->table->options();
     }
@@ -84,7 +86,7 @@ final class ConstraintTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function option($name)
+    public function option(string $name)
     {
         return $this->table->option($name);
     }

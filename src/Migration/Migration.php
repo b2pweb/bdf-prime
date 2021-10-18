@@ -67,36 +67,33 @@ class Migration implements MigrationInterface
     }
 
     /**
-     * Initialize the migration
+     * {@inheritdoc}
      */
-    public function initialize()
+    public function initialize(): void
     {
         // To overwrite
     }
 
     /**
-     * Do the migration
+     * {@inheritdoc}
      */
-    public function up()
+    public function up(): void
     {
         // To overwrite
     }
 
     /**
-     * Undo the migration
+     * {@inheritdoc}
      */
-    public function down()
+    public function down(): void
     {
         // To overwrite
     }
 
     /**
-     * Get the migration stage
-     * A stage is used to separate migration process like before / after schema upgrade
-     *
-     * To override for set a custom stade
+     * {@inheritdoc}
      */
-    public function stage()
+    public function stage(): string
     {
         return self::STAGE_DEFAULT;
     }
@@ -135,8 +132,10 @@ class Migration implements MigrationInterface
      * Set the console input
      *
      * @param InputInterface $input
+     *
+     * @return void
      */
-    public function setInput(InputInterface $input)
+    public function setInput(InputInterface $input): void
     {
         $this->input = $input;
     }
@@ -155,8 +154,10 @@ class Migration implements MigrationInterface
      * Set the console output
      *
      * @param OutputInterface $output
+     *
+     * @return void
      */
-    public function setOutput(OutputInterface $output)
+    public function setOutput(OutputInterface $output): void
     {
         $this->output = $output;
     }
@@ -165,8 +166,10 @@ class Migration implements MigrationInterface
      * Sets the helper set.
      *
      * @param HelperSet $helperSet A HelperSet instance
+     *
+     * @return void
      */
-    public function setHelperSet(HelperSet $helperSet)
+    public function setHelperSet(HelperSet $helperSet): void
     {
         $this->helperSet = $helperSet;
     }

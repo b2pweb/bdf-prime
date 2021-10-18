@@ -16,19 +16,19 @@ class PsrDecorator implements SQLLogger, ConnectionAwareInterface
     /**
      * PSR logger
      * 
-     * @var LoggerInterface 
+     * @var LoggerInterface |null
      */
     private $logger;
     
     /**
      * Connection name
      * 
-     * @var string 
+     * @var string|null
      */
     private $connectionName;
     
     /**
-     * @param LoggerInterface $logger
+     * @param LoggerInterface|null $logger
      */
     public function __construct(LoggerInterface $logger = null)
     {
@@ -38,7 +38,7 @@ class PsrDecorator implements SQLLogger, ConnectionAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function setConnection(ConnectionInterface $connection)
+    public function setConnection(ConnectionInterface $connection): void
     {
         $this->connectionName = $connection->getName();
     }
@@ -77,11 +77,14 @@ class PsrDecorator implements SQLLogger, ConnectionAwareInterface
     
     /**
      * Get the type name of the type
-     * 
+     *
      * @param mixed $type
+     * @param array $params
+     * @param (\Doctrine\DBAL\Types\Type|int|null|string)[]|null $types
+     *
      * @return string
      */
-    protected function getFlattenParams($params, $types)
+    protected function getFlattenParams(array $params, ?array $types)
     {
         $buffer = [];
         

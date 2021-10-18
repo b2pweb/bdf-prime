@@ -3,7 +3,10 @@
 namespace Bdf\Prime\Schema\Adapter\Doctrine;
 
 use Bdf\Prime\Schema\Bag\IndexSet;
+use Bdf\Prime\Schema\ColumnInterface;
 use Bdf\Prime\Schema\Constraint\ConstraintSet;
+use Bdf\Prime\Schema\ConstraintSetInterface;
+use Bdf\Prime\Schema\IndexSetInterface;
 use Bdf\Prime\Schema\TableInterface;
 use Bdf\Prime\Types\TypesRegistryInterface;
 use Doctrine\DBAL\Schema\Table;
@@ -39,7 +42,7 @@ final class DoctrineTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return $this->table->getName();
     }
@@ -47,7 +50,7 @@ final class DoctrineTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function column($name)
+    public function column(string $name): ColumnInterface
     {
         return new DoctrineColumn($this->table->getColumn($name), $this->types);
     }
@@ -55,7 +58,7 @@ final class DoctrineTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function columns()
+    public function columns(): array
     {
         $columns = [];
 
@@ -68,9 +71,11 @@ final class DoctrineTable implements TableInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Get the primary key index of the table
+     *
+     * @return DoctrineIndex|null The index, or null if the table has no primary key
      */
-    public function primary()
+    public function primary(): ?DoctrineIndex
     {
         $primary = $this->table->getPrimaryKey();
 
@@ -84,13 +89,11 @@ final class DoctrineTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function indexes()
+    public function indexes(): IndexSetInterface
     {
         return new IndexSet(
             array_map(
-                function ($index) {
-                    return new DoctrineIndex($index);
-                },
+                static fn($index) => new DoctrineIndex($index),
                 $this->table->getIndexes()
             )
         );
@@ -99,13 +102,11 @@ final class DoctrineTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function constraints()
+    public function constraints(): ConstraintSetInterface
     {
         return new ConstraintSet(
             array_map(
-                function ($fk) {
-                    return new DoctrineForeignKey($fk);
-                },
+                static fn($fk) => new DoctrineForeignKey($fk),
                 $this->table->getForeignKeys()
             )
         );
@@ -114,7 +115,7 @@ final class DoctrineTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function options()
+    public function options(): array
     {
         return $this->table->getOptions();
     }
@@ -122,7 +123,7 @@ final class DoctrineTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function option($name)
+    public function option(string $name)
     {
         return $this->table->getOption($name);
     }
@@ -132,7 +133,7 @@ final class DoctrineTable implements TableInterface
      *
      * @return Table
      */
-    public function toDoctrine()
+    public function toDoctrine(): Table
     {
         return $this->table;
     }

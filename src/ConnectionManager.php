@@ -32,7 +32,7 @@ class ConnectionManager implements ConnectionRegistryInterface
     /**
      * Default connection to use
      * 
-     * @var string 
+     * @var string|null
      */
     private $defaultConnection;
 
@@ -54,8 +54,10 @@ class ConnectionManager implements ConnectionRegistryInterface
      * @param boolean             $default    Use this connection as the default? The first connection added is automatically set as the default, even if this flag is false.
      *
      * @throws LogicException if connection exists
+     *
+     * @return void
      */
-    public function addConnection(ConnectionInterface $connection, bool $default = false)
+    public function addConnection(ConnectionInterface $connection, bool $default = false): void
     {
         // Connection name must be unique
         if (isset($this->connections[$connection->getName()])) {
@@ -74,8 +76,10 @@ class ConnectionManager implements ConnectionRegistryInterface
      * Remove a connection by its name
      *
      * @param string $name
+     *
+     * @return void
      */
-    public function removeConnection(string $name)
+    public function removeConnection(string $name): void
     {
         if (!isset($this->connections[$name])) {
             return;
@@ -83,22 +87,6 @@ class ConnectionManager implements ConnectionRegistryInterface
         
         $this->connections[$name]->close();
         unset($this->connections[$name]);
-    }
-
-    /**
-     * Get connection by name
-     *
-     * @param string $name Unique name of the connection to be returned
-     * 
-     * @return ConnectionInterface
-     * 
-     * @throws DBALException
-     *
-     * @deprecated Since 1.1 use getConnection
-     */
-    public function connection(string $name = null): ConnectionInterface
-    {
-        return $this->getConnection($name);
     }
 
     /**
@@ -123,8 +111,10 @@ class ConnectionManager implements ConnectionRegistryInterface
      *
      * @param string $connectionName
      * @param string|array $parameters
+     *
+     * @return void
      */
-    public function declareConnection(string $connectionName, $parameters)
+    public function declareConnection(string $connectionName, $parameters): void
     {
         if ($this->registry instanceof ConnectionRegistry) {
             $this->registry->declareConnection($connectionName, $parameters);
@@ -136,7 +126,7 @@ class ConnectionManager implements ConnectionRegistryInterface
      *
      * @return ConnectionInterface[] Array of connection objects
      */
-    public function connections()
+    public function connections(): array
     {
         return $this->connections;
     }
@@ -161,8 +151,10 @@ class ConnectionManager implements ConnectionRegistryInterface
      * Set the default connection name
      *
      * @param string $name
+     *
+     * @return void
      */
-    public function setDefaultConnection($name)
+    public function setDefaultConnection(string $name): void
     {
         $this->defaultConnection = $name;
     }
@@ -170,9 +162,9 @@ class ConnectionManager implements ConnectionRegistryInterface
     /**
      * Get the default connection name
      *
-     * @return string
+     * @return string|null The default connection, or null if there is no available connections
      */
-    public function getDefaultConnection()
+    public function getDefaultConnection(): ?string
     {
         return $this->defaultConnection;
     }
@@ -187,7 +179,7 @@ class ConnectionManager implements ConnectionRegistryInterface
      * 
      * @return bool  The connection has been loaded
      */
-    private function loadSubConnection($connectionName)
+    private function loadSubConnection(string $connectionName): bool
     {
         $names = explode('.', $connectionName, 2);
 

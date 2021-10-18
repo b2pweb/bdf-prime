@@ -24,15 +24,19 @@ interface MapperHydratorInterface
      * Register the prime entity instantiator
      *
      * @param InstantiatorInterface $instantiator
+     *
+     * @return void
      */
-    public function setPrimeInstantiator(InstantiatorInterface $instantiator);
+    public function setPrimeInstantiator(InstantiatorInterface $instantiator): void;
 
     /**
      * Register the prime metadata for the hydrator
      *
      * @param Metadata $metadata
+     *
+     * @return void
      */
-    public function setPrimeMetadata(Metadata $metadata);
+    public function setPrimeMetadata(Metadata $metadata): void;
 
     /**
      * Extract attributes from the entity. The result array if a single dimensional array.
@@ -47,7 +51,7 @@ interface MapperHydratorInterface
      *
      * @throws UninitializedPropertyException When unititialized properties are tried to be extracted
      */
-    public function flatExtract($object, array $attributes = null);
+    public function flatExtract($object, array $attributes = null): array;
 
     /**
      * Hydrate the entity from a single-dimension array.
@@ -66,7 +70,7 @@ interface MapperHydratorInterface
      *
      * @throws InvalidTypeException When database type do not correspond with property type (expect null)
      */
-    public function flatHydrate($object, array $data, PlatformTypesInterface $types);
+    public function flatHydrate($object, array $data, PlatformTypesInterface $types): void;
 
     /**
      * Extract one attribute value from $object
@@ -86,7 +90,7 @@ interface MapperHydratorInterface
      *
      * @see MapperHydratorInterface::hydrateOne() For perform the reverse operation
      */
-    public function extractOne($object, $attribute);
+    public function extractOne($object, string $attribute);
 
     /**
      * Hydrate one attribute value of $object
@@ -100,10 +104,12 @@ interface MapperHydratorInterface
      * @param string $attribute
      * @param mixed $value
      *
+     * @return void
+     *
      * @throws FieldNotDeclaredException When given attribute is not declared or the owner object cannot be instantiated
      * @throws InvalidTypeException When trying to hydrate null on nonnull property
      *
      * @see MapperHydratorInterface::extractOne() For perform the reverse operation
      */
-    public function hydrateOne($object, $attribute, $value);
+    public function hydrateOne($object, string $attribute, $value): void;
 }

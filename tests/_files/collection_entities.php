@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Relations\Builder\RelationBuilder;
 use Bdf\Prime\Collection\EntityCollection;
 use Bdf\Prime\Entity\InitializableInterface;
 use Bdf\Prime\Entity\Model;
@@ -58,7 +59,7 @@ class FolderMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -69,7 +70,7 @@ class FolderMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->autoincrement()
@@ -81,7 +82,7 @@ class FolderMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('files')
             ->hasMany(TestFile::class.'::folderId')
@@ -145,7 +146,7 @@ class TestFileMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -156,7 +157,7 @@ class TestFileMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->autoincrement()
@@ -174,7 +175,7 @@ class TestFileMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('owner')
             ->belongsTo(FileUser::class, 'owner.name')
@@ -209,7 +210,7 @@ class FileUserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -220,7 +221,7 @@ class FileUserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->string('name')->primary()
@@ -230,7 +231,7 @@ class FileUserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('groups')
             ->belongsToMany(Group::class.'::name', 'name')
@@ -264,7 +265,7 @@ class GroupMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -275,7 +276,7 @@ class GroupMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->string('name')->primary()
@@ -285,7 +286,7 @@ class GroupMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('users')
             ->belongsToMany(FileUser::class, 'name')
@@ -312,7 +313,7 @@ class UserGroupMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -323,7 +324,7 @@ class UserGroupMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->string('userName')->primary()

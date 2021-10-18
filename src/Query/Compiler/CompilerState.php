@@ -48,8 +48,10 @@ class CompilerState
      * Invalidate compiled parts
      *
      * @param string|array $parts Parts to invalidate
+     *
+     * @return void
      */
-    public function invalidate($parts = [])
+    public function invalidate($parts = []): void
     {
         if ($this->compiling) {
             return;
@@ -72,7 +74,7 @@ class CompilerState
      *
      * @return bool
      */
-    public function needsCompile($part)
+    public function needsCompile(string $part): bool
     {
         return !isset($this->compiledParts[$part]);
     }
@@ -85,7 +87,7 @@ class CompilerState
      *
      * @return void
      */
-    public function bind($value)
+    public function bind($value): void
     {
         $this->bindings[$this->currentPart][] = $value;
     }

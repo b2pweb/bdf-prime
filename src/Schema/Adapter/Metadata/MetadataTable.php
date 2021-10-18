@@ -4,7 +4,11 @@ namespace Bdf\Prime\Schema\Adapter\Metadata;
 
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Platform\PlatformTypesInterface;
+use Bdf\Prime\Schema\ColumnInterface;
 use Bdf\Prime\Schema\Constraint\ConstraintSet;
+use Bdf\Prime\Schema\ConstraintSetInterface;
+use Bdf\Prime\Schema\IndexInterface;
+use Bdf\Prime\Schema\IndexSetInterface;
 use Bdf\Prime\Schema\TableInterface;
 
 /**
@@ -38,7 +42,7 @@ final class MetadataTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function column($name)
+    public function column(string $name): ColumnInterface
     {
         return new MetadataColumn($this->metadata->fields[$name], $this->types);
     }
@@ -46,25 +50,25 @@ final class MetadataTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function columns()
+    public function columns(): array
     {
-        return array_map(function ($meta) {
-            return $this->column($meta['field']);
-        }, $this->metadata->fields);
+        return array_map(fn($meta) => $this->column($meta['field']), $this->metadata->fields);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return $this->metadata->table;
     }
 
     /**
-     * {@inheritdoc}
+     * Get the primary key index of the table
+     *
+     * @return IndexInterface|null The index, or null if the table has no primary key
      */
-    public function primary()
+    public function primary(): ?IndexInterface
     {
         return $this->indexes()->primary();
     }
@@ -72,7 +76,7 @@ final class MetadataTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function indexes()
+    public function indexes(): IndexSetInterface
     {
         return new MetadataIndexSet($this->metadata);
     }
@@ -80,7 +84,7 @@ final class MetadataTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function constraints()
+    public function constraints(): ConstraintSetInterface
     {
         return ConstraintSet::blank();
     }
@@ -88,7 +92,7 @@ final class MetadataTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function options()
+    public function options(): array
     {
         return $this->metadata->tableOptions();
     }
@@ -96,7 +100,7 @@ final class MetadataTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function option($name)
+    public function option(string $name)
     {
         return $this->metadata->tableOptions()[$name];
     }

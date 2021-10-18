@@ -114,8 +114,10 @@ class ServiceLocator
      * @param RepositoryInterface<E> $repository
      *
      * @template E as object
+     *
+     * @return void
      */
-    public function registerRepository($entityClass, RepositoryInterface $repository)
+    public function registerRepository($entityClass, RepositoryInterface $repository): void
     {
         // https://github.com/vimeo/psalm/issues/4460
         /** @psalm-suppress InvalidPropertyAssignmentValue */
@@ -126,8 +128,10 @@ class ServiceLocator
      * Unregister a repository
      *
      * @param string $entityClass
+     *
+     * @return void
      */
-    public function unregisterRepository($entityClass)
+    public function unregisterRepository($entityClass): void
     {
         if (isset($this->repositories[$entityClass]) && $this->repositories[$entityClass] instanceof EntityRepository) {
             $this->repositories[$entityClass]->destroy();
@@ -271,8 +275,10 @@ class ServiceLocator
 
     /**
      * Clear all cache repositories
+     *
+     * @return void
      */
-    public function clearRepositories()
+    public function clearRepositories(): void
     {
         foreach ($this->repositories as $repository) {
             if ($repository instanceof EntityRepository) {

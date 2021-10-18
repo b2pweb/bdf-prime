@@ -172,8 +172,10 @@ class FileMigrationProvider implements MigrationProviderInterface
      * @param string $className
      *
      * @throws InvalidArgumentException
+     *
+     * @return void
      */
-    private function assertUnique($version, $className)
+    private function assertUnique($version, $className): void
     {
         // Check if version already exists
         if (isset($this->migrations[$version])) {

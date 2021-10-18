@@ -3,6 +3,8 @@
 namespace Bdf\Prime\Relations;
 
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Relations\Builder\RelationBuilder;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Mapper\Mapper;
 
@@ -30,7 +32,7 @@ class EntityWithCustomRelationMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -38,7 +40,7 @@ class EntityWithCustomRelationMapper extends Mapper
         ];
     }
 
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->string('key1')->primary()
@@ -47,7 +49,7 @@ class EntityWithCustomRelationMapper extends Mapper
         ;
     }
 
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('distant')
             ->custom(MyCustomRelation::class)
@@ -77,7 +79,7 @@ class DistantEntityForCustomRelationMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -85,7 +87,7 @@ class DistantEntityForCustomRelationMapper extends Mapper
         ];
     }
 
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->string('key1')->alias('dist_k1')->primary()
@@ -118,7 +120,7 @@ class EntityForeignInOwnerMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -126,7 +128,7 @@ class EntityForeignInOwnerMapper extends Mapper
         ];
     }
 
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->autoincrement()
@@ -135,7 +137,7 @@ class EntityForeignInOwnerMapper extends Mapper
         ;
     }
 
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('relation')
             ->custom(ForeignInRelation::class)
@@ -162,7 +164,7 @@ class EntityForeignInMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -170,7 +172,7 @@ class EntityForeignInMapper extends Mapper
         ];
     }
 
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->autoincrement()

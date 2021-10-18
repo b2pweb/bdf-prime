@@ -146,7 +146,7 @@ class SimpleEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -158,7 +158,7 @@ class SimpleEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function fields()
+    public function fields(): iterable
     {
         return [
             'id'          => ['type' => 'integer', 'primary' => Metadata::PK_AUTOINCREMENT],
@@ -176,7 +176,7 @@ class SimpleEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function relations()
+    public function relations(): array
     {
         return [
             'foreign' => [
@@ -194,7 +194,7 @@ class SimpleEmbeddedEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -206,7 +206,7 @@ class SimpleEmbeddedEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function fields()
+    public function fields(): iterable
     {
         return [
             'id'          => ['type' => 'integer', 'primary' => Metadata::PK_SEQUENCE, 'alias' => 'pk_id'],

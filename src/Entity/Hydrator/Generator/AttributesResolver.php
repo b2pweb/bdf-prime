@@ -187,8 +187,10 @@ class AttributesResolver
      * Build the attributes and embedded info
      *
      * @thows HydratorException
+     *
+     * @return void
      */
-    private function build()
+    private function build(): void
     {
         $this->buildMetadataProperties();
         $this->buildRootAttributes();
@@ -196,7 +198,7 @@ class AttributesResolver
         $this->buildRelationEmbeddeds();
     }
 
-    private function buildMetadataProperties()
+    private function buildMetadataProperties(): void
     {
         foreach ($this->mapper->metadata()->attributes() as $name => $meta) {
             $this->attributes[$name] = new AttributeInfo($name, $meta, $this);
@@ -207,7 +209,7 @@ class AttributesResolver
         }
     }
 
-    private function buildRootAttributes()
+    private function buildRootAttributes(): void
     {
         foreach ($this->attributes as $attribute) {
             if ($attribute->isEmbedded()) {
@@ -228,7 +230,7 @@ class AttributesResolver
         }
     }
 
-    private function buildRootEmbeddeds()
+    private function buildRootEmbeddeds(): void
     {
         foreach ($this->embeddeds as $embedded) {
             if ($embedded->isRoot() && ($embedded->isEntity() || $embedded->isImportable())) {
@@ -239,10 +241,12 @@ class AttributesResolver
 
     /**
      * @throws HydratorGenerationException
+     *
+     * @return void
      */
-    private function buildRelationEmbeddeds()
+    private function buildRelationEmbeddeds(): void
     {
-        foreach ($this->mapper->relations()->relations() as $name => $relation) {
+        foreach ($this->mapper->relations() as $name => $relation) {
             if (!empty($relation['detached'])) {
                 unset($this->rootEmbeddeds[$name]);
                 continue;
@@ -288,11 +292,11 @@ class AttributesResolver
      * @param array $relation The relation metadata
      * @param string $relationName The relation name
      *
-     * @return string[] List of entities classes
+     * @return list<class-string> List of entities classes
      *
      * @throws HydratorGenerationException
      */
-    private function resolveClassesFromRelation(array $relation, $relationName)
+    private function resolveClassesFromRelation(array $relation, string $relationName): array
     {
         switch ($relation['type']) {
             case RelationInterface::HAS_ONE:
@@ -321,7 +325,7 @@ class AttributesResolver
 
                 foreach ($this->mapper->getEntityMap() as $entityClass) {
                     $subMapper = $this->prime->mappers()->build($this->prime, $entityClass);
-                    $classes = array_merge($classes, $this->resolveClassesFromRelation($subMapper->relations()->relations()[$relationName], $relationName));
+                    $classes = [...$classes, ...$this->resolveClassesFromRelation($subMapper->relations()[$relationName], $relationName)];
                 }
 
                 return array_unique($classes);

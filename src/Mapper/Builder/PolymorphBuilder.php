@@ -14,8 +14,10 @@ class PolymorphBuilder extends FieldBuilder
 
     /**
      * Set the current field as type discriminator
+     *
+     * @return static
      */
-    public function discriminator()
+    public function discriminator(): self
     {
         $this->nillable(false); // Force not nillable
         $this->discriminator = $this->current;

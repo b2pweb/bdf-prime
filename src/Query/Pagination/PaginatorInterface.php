@@ -9,7 +9,7 @@ use Bdf\Prime\Query\Contract\Orderable;
  * PaginatorInterface
  * 
  * @template R as array|object
- * @implements CollectionInterface<R>
+ * @extends CollectionInterface<R>
  */
 interface PaginatorInterface extends CollectionInterface
 {

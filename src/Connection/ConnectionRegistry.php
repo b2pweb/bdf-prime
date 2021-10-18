@@ -81,8 +81,10 @@ class ConnectionRegistry implements ConnectionRegistryInterface
      *
      * @param string $connectionName
      * @param string|array $parameters
+     *
+     * @return void
      */
-    public function declareConnection(string $connectionName, $parameters)
+    public function declareConnection(string $connectionName, $parameters): void
     {
         $this->parametersMap[$connectionName] = $parameters;
     }

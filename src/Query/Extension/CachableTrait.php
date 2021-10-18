@@ -170,6 +170,8 @@ trait CachableTrait
 
     /**
      * Clear the cache when a write operation is performed
+     *
+     * @return void
      */
     protected function clearCacheOnWrite()
     {

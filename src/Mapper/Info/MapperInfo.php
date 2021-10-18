@@ -168,8 +168,10 @@ class MapperInfo
      * @psalm-assert !null $this->properties
      * @psalm-assert !null $this->embedded
      * @psalm-assert !null $this->primaries
+     *
+     * @return void
      */
-    private function buildProperties()
+    private function buildProperties(): void
     {
         $this->properties = [];
         $this->embedded = [];
@@ -223,8 +225,10 @@ class MapperInfo
 
     /**
      * @psalm-assert !null $this->objects
+     *
+     * @return void
      */
-    private function buildObjectProperties()
+    private function buildObjectProperties(): void
     {
         $this->objects = [];
         $relations = $this->mapper->relations();

@@ -144,6 +144,8 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      * {@inheritdoc}
      *
      * @internal Use internally for optimise "first" query. The offset parameter is not used
+     *
+     * @return static<R>
      */
     public function limit(?int $limit, ?int $offset = null)
     {
@@ -302,7 +304,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     /**
      * Get the targeted shard IDs
      *
-     * @return string[]
+     * @return list<string>
      */
     private function getShardIds(): array
     {

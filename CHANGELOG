@@ -43,6 +43,10 @@ BC Breaks
     * ping()
 * Class `Bdf\Prime\Query\CacheStatement` has been deleted. Use `Doctrine\DBAL\Cache\ArrayResult` instead
 * Class `Bdf\Prime\Query\Expression\Match` has been deleted. Use `Bdf\Prime\Query\Expression\FullTextMatch` instead
+* Remove method `Bdf\Prime\ConnectionManager::connection()`. Use getConnection instead
+* Typehint return of methods of `\Bdf\Prime\Migration\MigrationInterface`
+* Typehint return of methods of `\Bdf\Prime\Mapper\Mapper`
+* Change typehints of methods of `\Bdf\Prime\Entry\Hydrator` interfaces. Hydrators must be regenerated.
 
 v1.3.0
 ------

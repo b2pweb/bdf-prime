@@ -1300,8 +1300,10 @@ public function __construct(array $data = [])
      * Add interface to implement
      *
      * @api
+     *
+     * @return void
      */
-    public function addInterface(string $interface)
+    public function addInterface(string $interface): void
     {
         $this->interfaces[$interface] = $interface;
     }
@@ -1330,8 +1332,10 @@ public function __construct(array $data = [])
      * Add trait
      *
      * @api
+     *
+     * @return void
      */
-    public function addTrait(string $trait)
+    public function addTrait(string $trait): void
     {
         $this->traits[$trait] = $trait;
     }

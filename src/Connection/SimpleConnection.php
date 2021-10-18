@@ -386,8 +386,10 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
 
     /**
      * Setup the logger by setting the connection
+     *
+     * @return void
      */
-    protected function prepareLogger()
+    protected function prepareLogger(): void
     {
         /** @psalm-suppress InternalMethod */
         $logger = $this->getConfiguration()->getSQLLogger();

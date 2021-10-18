@@ -10,7 +10,7 @@ class NullResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function migrate($listDrop = true)
+    public function migrate(bool $listDrop = true): void
     {
         
     }
@@ -18,7 +18,7 @@ class NullResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function diff($listDrop = true)
+    public function diff(bool $listDrop = true): array
     {
         return [];
     }
@@ -26,7 +26,7 @@ class NullResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function truncate($cascade = false)
+    public function truncate(bool $cascade = false): bool
     {
         return true;
     }
@@ -34,7 +34,7 @@ class NullResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function drop()
+    public function drop(): bool
     {
         return true;
     }

@@ -2,6 +2,8 @@
 
 namespace Bdf\Prime\Bench;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Relations\Builder\RelationBuilder;
 use Bdf\Prime\Entity\Extensions\ArrayInjector;
 use Bdf\Prime\Entity\ImportableInterface;
 use Bdf\Prime\Mapper\Mapper;
@@ -75,7 +77,7 @@ class UserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -86,7 +88,7 @@ class UserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')
@@ -105,7 +107,7 @@ class UserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('customer')
             ->belongsTo('Bdf\Prime\Bench\Customer', 'customer.id');
@@ -117,7 +119,7 @@ class CustomerMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -128,7 +130,7 @@ class CustomerMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')
@@ -141,7 +143,7 @@ class CustomerMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('packs')
             ->belongsToMany('Bdf\Prime\Bench\Pack')
@@ -154,7 +156,7 @@ class PackMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -165,7 +167,7 @@ class PackMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')
@@ -181,7 +183,7 @@ class CustomerPackMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -192,7 +194,7 @@ class CustomerPackMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('customerId')

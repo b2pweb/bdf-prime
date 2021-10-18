@@ -36,6 +36,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 class Query extends AbstractQuery implements SqlQueryInterface, Paginable
 {
     use EntityJoinTrait;
+    /** @use PaginableTrait<R> */
     use PaginableTrait;
     use LimitableTrait;
     use OrderableTrait;
@@ -599,7 +600,10 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
 
     /**
      * {@inheritdoc}
+     *
      * @todo A reprendre: utiliser les types des bindings
+     *
+     * @return null|string
      */
     public function toRawSql()
     {

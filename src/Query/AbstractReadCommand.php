@@ -191,7 +191,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * {@inheritdoc}
      */
-    public function setExtension($extension)
+    public function setExtension($extension): void
     {
         $this->extension = $extension;
     }

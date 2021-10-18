@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Mapper;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Entity\Instantiator\InstantiatorInterface;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\TestEntity;
@@ -65,7 +66,7 @@ class TestStdClassMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection'   => 'test',
@@ -76,7 +77,7 @@ class TestStdClassMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder->string('id');
     }
@@ -91,7 +92,7 @@ class TestNoConstructorMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection'   => 'test',
@@ -102,7 +103,7 @@ class TestNoConstructorMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder->string('id');
     }
@@ -122,7 +123,7 @@ class TestNoOptionalMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection'   => 'test',
@@ -133,7 +134,7 @@ class TestNoOptionalMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder->string('id');
     }

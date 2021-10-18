@@ -46,10 +46,12 @@ class ObjectPropertyInfo implements InfoInterface
     
     /**
      * Set the relation info of this field
-     * 
+     *
      * @param array $metadata
+     *
+     * @return void
      */
-    public function setRelation(array $metadata)
+    public function setRelation(array $metadata): void
     {
         $this->relation = $metadata;
     }

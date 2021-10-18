@@ -44,8 +44,10 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      * </pre></code>
      *
      * @param object $extension
+     *
+     * @return void
      */
-    public function setExtension($extension);
+    public function setExtension($extension): void;
 
     /**
      * Get the collection factory

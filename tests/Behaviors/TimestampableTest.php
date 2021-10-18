@@ -2,6 +2,9 @@
 
 namespace Bdf\Prime\Behaviors;
 
+use DateTime;
+use DateTimeImmutable;
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Prime;
@@ -64,12 +67,12 @@ class TimestampableTest extends TestCase
     {
         $entity = new TimestampableEntity('name');
 
-        $now = new \DateTime();
+        $now = new DateTime();
         $entity->insert();
 
         $this->assertEqualsWithDelta($now, $entity->dateInsert, 1);
         $this->assertEquals(null, $entity->updatedAt);
-        $this->assertInstanceOf(\DateTime::class, $entity->dateInsert);
+        $this->assertInstanceOf(DateTime::class, $entity->dateInsert);
     }
 
     /**
@@ -79,13 +82,13 @@ class TimestampableTest extends TestCase
     {
         $entity = new TimestampableEntity('name');
 
-        $now = new \DateTime();
+        $now = new DateTime();
         $entity->id = 1;
         $entity->update();
 
         $this->assertEquals(null, $entity->dateInsert);
         $this->assertEqualsWithDelta($now, $entity->updatedAt, 1);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $entity->updatedAt);
+        $this->assertInstanceOf(DateTimeImmutable::class, $entity->updatedAt);
     }
 
     /**
@@ -93,7 +96,7 @@ class TimestampableTest extends TestCase
      */
     public function test_update_property()
     {
-        $now = new \DateTime();
+        $now = new DateTime();
 
         $entity = new TimestampableEntity('name');
         $entity->id = 1;
@@ -101,12 +104,12 @@ class TimestampableTest extends TestCase
         $entity->update(['name']);
 
         $this->assertEqualsWithDelta($now, $entity->updatedAt, 1);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $entity->updatedAt);
+        $this->assertInstanceOf(DateTimeImmutable::class, $entity->updatedAt);
 
         $entity = TimestampableEntity::repository()->refresh($entity);
 
         $this->assertEqualsWithDelta($now, $entity->updatedAt, 1);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $entity->updatedAt);
+        $this->assertInstanceOf(DateTimeImmutable::class, $entity->updatedAt);
     }
 }
 
@@ -129,7 +132,7 @@ class TimestampableEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -140,19 +143,19 @@ class TimestampableEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')->autoincrement()
             ->string('name', 60)
-            ->dateTime('updatedAt')->alias('updated_at')->nillable()->phpClass(\DateTimeImmutable::class)
+            ->dateTime('updatedAt')->alias('updated_at')->nillable()->phpClass(DateTimeImmutable::class)
         ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDefinedBehaviors()
+    public function getDefinedBehaviors(): array
     {
         return [
             new Timestampable(['dateInsert', 'date_insert'], 'updatedAt'),

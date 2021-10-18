@@ -12,7 +12,7 @@ class NullGenerator extends AbstractGenerator
     /**
      * {@inheritdoc}
      */
-    public function generate(array &$data, ServiceLocator $serviceLocator)
+    public function generate(array &$data, ServiceLocator $serviceLocator): void
     {
         //do nothing
     }
@@ -20,7 +20,7 @@ class NullGenerator extends AbstractGenerator
     /**
      * {@inheritdoc}
      */
-    public function postProcess($entity)
+    public function postProcess($entity): void
     {
         //do nothing
     }

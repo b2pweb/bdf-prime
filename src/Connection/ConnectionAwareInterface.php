@@ -13,6 +13,8 @@ interface ConnectionAwareInterface
      * Set the connection
      * 
      * @param ConnectionInterface $connection
+     *
+     * @return void
      */
-    public function setConnection(ConnectionInterface $connection);
+    public function setConnection(ConnectionInterface $connection): void;
 }

@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Mapper\Mapper;
 use PHPUnit\Framework\TestCase;
@@ -56,7 +57,7 @@ class SqliteMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -67,7 +68,7 @@ class SqliteMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder->bigint('id')->sequence();
     }
@@ -75,7 +76,7 @@ class SqliteMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function sequence()
+    public function sequence(): array
     {
         return [
             'connection'   => 'test',

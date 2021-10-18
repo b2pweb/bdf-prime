@@ -1094,9 +1094,7 @@ class SqlCompiler extends AbstractCompiler
     }
 
     /**
-     * @param SqlQueryInterface&CompilableClause $query
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getBindings(CompilableClause $query)
     {

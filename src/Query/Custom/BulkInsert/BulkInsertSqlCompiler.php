@@ -125,9 +125,12 @@ class BulkInsertSqlCompiler extends AbstractCompiler
      * Compile columns, and resolve types
      *
      * @param CompilableClause $query
+     *
      * @throws PrimeException
+     *
+     * @return void
      */
-    private function compileColumns(CompilableClause $query)
+    private function compileColumns(CompilableClause $query): void
     {
         $columns = [];
         $types = [];

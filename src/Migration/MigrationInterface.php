@@ -30,20 +30,20 @@ interface MigrationInterface
      *
      * @return string
      */
-    public function stage();
+    public function stage(): string;
 
     /**
      * Initialize the migration
      */
-    public function initialize();
+    public function initialize(): void;
 
     /**
      * Do the migration
      */
-    public function up();
+    public function up(): void;
 
     /**
      * Undo the migration
      */
-    public function down();
+    public function down(): void;
 }

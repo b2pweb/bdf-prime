@@ -58,7 +58,7 @@ abstract class DatabaseCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->addOption('connection', null, InputOption::VALUE_OPTIONAL, 'Interacts only on the database from this connection');
         $this->addOption('user', 'u', InputOption::VALUE_REQUIRED, 'Set the user name.', 'root');
@@ -140,19 +140,19 @@ abstract class DatabaseCommand extends Command
      * Interact if the database exists
      *
      * @param ConnectionInterface $connection
-     * @param string $dbName
+     * @param string|null $dbName
      *
      * @throws PrimeException
      */
-    abstract protected function interactWithDatabase($connection, $dbName);
+    abstract protected function interactWithDatabase(ConnectionInterface $connection, ?string $dbName): void;
 
     /**
      * Interact if the database does not exist
      *
      * @param ConnectionInterface $connection
-     * @param string $dbName
+     * @param string|null $dbName
      *
      * @throws PrimeException
      */
-    abstract protected function interactWithNoDatabase($connection, $dbName);
+    abstract protected function interactWithNoDatabase(ConnectionInterface $connection, ?string $dbName): void;
 }

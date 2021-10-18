@@ -121,7 +121,7 @@ class TestPack
      *
      * @return $this
      */
-    protected function storeEntities($entities, $mode)
+    protected function storeEntities($entities, string $mode)
     {
         if (!is_array($entities)) {
             $entities = [$entities];
@@ -303,8 +303,10 @@ class TestPack
      * Push entity to repository
      *
      * @param object $entity
+     *
+     * @return void
      */
-    public function pushEntity($entity)
+    public function pushEntity($entity): void
     {
         /** @var EntityRepository $repository */
         $repository = Prime::repository($entity);
@@ -324,8 +326,10 @@ class TestPack
      * Delete entity from repository
      *
      * @param object $entity
+     *
+     * @return void
      */
-    public function deleteEntity($entity)
+    public function deleteEntity($entity): void
     {
         /** @var EntityRepository $repository */
         $repository = Prime::repository($entity);
@@ -343,8 +347,10 @@ class TestPack
 
     /**
      * Create a save point on each active connections
+     *
+     * @return void
      */
-    protected function createSavePoint()
+    protected function createSavePoint(): void
     {
         foreach ($this->getActiveConnections() as $connection) {
             try {
@@ -358,8 +364,10 @@ class TestPack
 
     /**
      * Remove a save point on each active connections
+     *
+     * @return void
      */
-    protected function rollbackToSavePoint()
+    protected function rollbackToSavePoint(): void
     {
         foreach ($this->getActiveConnections() as $connection) {
             try {

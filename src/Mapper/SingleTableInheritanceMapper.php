@@ -29,7 +29,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
     /**
      * The discriminator map of mappers
      *
-     * @var array
+     * @var array<string, class-string<Mapper>>
      */
     protected $discriminatorMap = [];
 
@@ -37,8 +37,9 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
     /**
      * @todo voir pour retirer le mapper factory: passer par les depots
      * {@inheritdoc}
+     * @final
      */
-    public function setMapperFactory(MapperFactory $mapperFactory)
+    public function setMapperFactory(MapperFactory $mapperFactory): void
     {
         $this->mapperFactory = $mapperFactory;
     }
@@ -60,10 +61,10 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
     /**
      * {@inheritdoc}
      */
-    public function customConstraints()
+    public function customConstraints(): array
     {
         if ($this->isDiscriminatedMapper()) {
-            return [$this->discriminatorColumn => array_search(get_called_class(), $this->discriminatorMap)];
+            return [$this->discriminatorColumn => array_search(static::class, $this->discriminatorMap)];
         }
 
         return parent::customConstraints();
@@ -85,8 +86,9 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      * Get the discriminator map of mappers
      *
      * @return array
+     * @final
      */
-    public function getDiscriminatorMap()
+    public function getDiscriminatorMap(): array
     {
         return $this->discriminatorMap;
     }
@@ -94,9 +96,10 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
     /**
      * Get the discriminator map of entities
      *
-     * @return array
+     * @return array<string, class-string>
+     * @final
      */
-    public function getEntityMap()
+    public function getEntityMap(): array
     {
         $map = [];
         $resolver = $this->mapperFactory->getNameResolver();
@@ -112,8 +115,9 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      * Get the discriminator column
      *
      * @return string
+     * @final
      */
-    public function getDiscriminatorColumn()
+    public function getDiscriminatorColumn(): string
     {
         return $this->discriminatorColumn;
     }
@@ -125,8 +129,9 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      *
      * @return Mapper
      * @psalm-suppress InvalidNullableReturnType
+     * @final
      */
-    public function getMapperByDiscriminatorValue($value)
+    public function getMapperByDiscriminatorValue($value): Mapper
     {
         /** @psalm-suppress NullableReturnStatement */
         return $this->mapperFactory->createMapper(
@@ -143,6 +148,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      * @return mixed
      *
      * @throws \Exception if discriminator field not present in $data
+     * @final
      */
     public function getDiscriminatorValueByRawData(array $data)
     {
@@ -160,11 +166,12 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      *
      * @param mixed $discriminatorValue
      *
-     * @return string
+     * @return class-string<Mapper>
      *
      * @throws \Exception if discriminator value is unknown
+     * @final
      */
-    public function getDiscriminatorType($discriminatorValue)
+    public function getDiscriminatorType($discriminatorValue): string
     {
         if (empty($this->discriminatorMap[$discriminatorValue])) {
             throw new \Exception('Unknown discriminator type "' . $discriminatorValue . '"');
@@ -177,9 +184,10 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      * Check whether the class is a discriminated mapper
      *
      * @return boolean
+     * @final
      */
-    protected function isDiscriminatedMapper()
+    protected function isDiscriminatedMapper(): bool
     {
-        return in_array(get_called_class(), $this->discriminatorMap);
+        return in_array(static::class, $this->discriminatorMap);
     }
 }

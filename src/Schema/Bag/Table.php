@@ -45,14 +45,14 @@ final class Table implements TableInterface
      * @param string $name
      * @param ColumnInterface[] $columns
      * @param IndexSetInterface $indexes
-     * @param ConstraintSetInterface $constraints
+     * @param ConstraintSetInterface|null $constraints
      * @param array $options
      */
-    public function __construct($name, array $columns, IndexSetInterface $indexes, ConstraintSetInterface $constraints = null, array $options = [])
+    public function __construct(string $name, array $columns, IndexSetInterface $indexes, ?ConstraintSetInterface $constraints = null, array $options = [])
     {
         $this->name = $name;
         $this->indexes = $indexes;
-        $this->constraints = $constraints ?: new ConstraintSet([]);
+        $this->constraints = $constraints ?? new ConstraintSet([]);
         $this->options = $options;
 
         $this->columns = [];
@@ -65,7 +65,7 @@ final class Table implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return $this->name;
     }
@@ -73,7 +73,7 @@ final class Table implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function column($name)
+    public function column(string $name): ColumnInterface
     {
         return $this->columns[$name];
     }
@@ -81,7 +81,7 @@ final class Table implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function columns()
+    public function columns(): array
     {
         return $this->columns;
     }
@@ -89,7 +89,7 @@ final class Table implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function indexes()
+    public function indexes(): IndexSetInterface
     {
         return $this->indexes;
     }
@@ -97,7 +97,7 @@ final class Table implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function constraints()
+    public function constraints(): ConstraintSetInterface
     {
         return $this->constraints;
     }
@@ -105,7 +105,7 @@ final class Table implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function options()
+    public function options(): array
     {
         return $this->options;
     }
@@ -113,7 +113,7 @@ final class Table implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function option($name)
+    public function option(string $name)
     {
         return $this->options[$name];
     }

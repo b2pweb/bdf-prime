@@ -303,8 +303,10 @@ class MapperVisitor extends AbstractVisitor
      * Writes mappers files in path directory
      *
      * @param string $path
+     *
+     * @return void
      */
-    public function write($path)
+    public function write($path): void
     {
         $path = rtrim($path, DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
 
@@ -356,7 +358,7 @@ class MapperVisitor extends AbstractVisitor
     /**
      * {@inheritdoc}
      */
-    public function sequence()
+    public function sequence(): array
     {
         return [
             'table' => {$table},
@@ -385,7 +387,7 @@ EOF;
     /**
      * {@inheritdoc}
      */
-    public function indexes()
+    public function indexes(): array
     {
         return [
             $indexes

@@ -43,7 +43,7 @@ class DoctrineCacheAdapter implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function set(CacheKey $key, $data)
+    public function set(CacheKey $key, $data): void
     {
         $this->namespace($key->namespace())->save($key->key(), $data, $key->lifetime());
     }
@@ -51,7 +51,7 @@ class DoctrineCacheAdapter implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function delete(CacheKey $key)
+    public function delete(CacheKey $key): void
     {
         $this->namespace($key->namespace())->delete($key->key());
     }
@@ -59,7 +59,7 @@ class DoctrineCacheAdapter implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function flush($namespace)
+    public function flush(string $namespace): void
     {
         $this->namespace($namespace)->deleteAll();
     }
@@ -67,7 +67,7 @@ class DoctrineCacheAdapter implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): void
     {
         $this->driver->flushAll();
 

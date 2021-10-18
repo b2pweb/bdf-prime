@@ -30,8 +30,9 @@ interface CompilableClauseInterface extends ClauseInterface
      * Tell the compiler to quote identifiers (i.e. table, columns)
      *
      * @param bool $flag
+     * @return void
      */
-    public function useQuoteIdentifier($flag = true);
+    public function useQuoteIdentifier(bool $flag = true): void;
 
     /**
      * Check if the identifiers should be quoted

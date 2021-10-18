@@ -23,10 +23,12 @@ class Comparator extends BaseComparator
     
     /**
      * Set flag that allowed diff to list drop columns
-     * 
+     *
      * @param bool $flag
+     *
+     * @return void
      */
-    public function setListDropColumn($flag)
+    public function setListDropColumn($flag): void
     {
         $this->listDropColumn = (bool)$flag;
     }

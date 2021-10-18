@@ -153,8 +153,10 @@ class MapperFactory
      * Set meta cache
      *
      * @param null|Psr16CacheInterface $cache
+     *
+     * @return void
      */
-    public function setMetadataCache(?Psr16CacheInterface $cache)
+    public function setMetadataCache(?Psr16CacheInterface $cache): void
     {
         $this->metadataCache = $cache;
     }
@@ -173,8 +175,10 @@ class MapperFactory
      * Set the result cache
      *
      * @param null|CacheInterface $cache
+     *
+     * @return void
      */
-    public function setResultCache(?CacheInterface $cache)
+    public function setResultCache(?CacheInterface $cache): void
     {
         $this->resultCache = $cache;
     }

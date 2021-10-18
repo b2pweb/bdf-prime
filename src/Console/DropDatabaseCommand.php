@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Console;
 
+use Bdf\Prime\Connection\ConnectionInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
@@ -14,7 +15,7 @@ class DropDatabaseCommand extends DatabaseCommand
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         parent::configure();
 
@@ -27,7 +28,7 @@ class DropDatabaseCommand extends DatabaseCommand
     /**
      * {@inheritdoc}
      */
-    protected function interactWithDatabase($connection, $dbName)
+    protected function interactWithDatabase(ConnectionInterface $connection, ?string $dbName): void
     {
         if ($this->io->option('force') || $this->io->confirm("Would you like to drop database <comment>$dbName</comment>?")) {
             $connection->schema()->dropDatabase($dbName);
@@ -39,7 +40,7 @@ class DropDatabaseCommand extends DatabaseCommand
     /**
      * {@inheritdoc}
      */
-    protected function interactWithNoDatabase($connection, $dbName)
+    protected function interactWithNoDatabase(ConnectionInterface $connection, ?string $dbName): void
     {
         $this->io->line('Database <comment>%s</comment> for connection <comment>%s</comment> does not exist.', $dbName, $connection->getName());
     }

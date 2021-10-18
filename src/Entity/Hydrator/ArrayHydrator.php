@@ -33,15 +33,15 @@ class ArrayHydrator implements HydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function hydrate($object, array $data)
+    public function hydrate($object, array $data): void
     {
-        return $this->getHydratorForClass(get_class($object))($object, $data);
+        $this->getHydratorForClass(get_class($object))($object, $data);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function extract($object, array $attributes = [])
+    public function extract($object, array $attributes = []): array
     {
         $values = [];
         $attributes = array_flip($attributes);
@@ -75,7 +75,7 @@ class ArrayHydrator implements HydratorInterface
      *
      * @param class-string $entityClass The entity class name
      *
-     * @return callable(object, array)
+     * @return callable(object, array):void
      */
     private function getHydratorForClass(string $entityClass): callable
     {
@@ -83,7 +83,7 @@ class ArrayHydrator implements HydratorInterface
             return $this->hydratorsCache[$entityClass];
         }
 
-        $hydrator = static function ($object, array $data) {
+        $hydrator = static function ($object, array $data): void {
             foreach ($data as $property => $value) {
                 try {
                     if (isset($object->$property) && $object->$property instanceof ImportableInterface && is_array($value)) {

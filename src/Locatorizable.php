@@ -12,7 +12,7 @@ use Closure;
 abstract class Locatorizable
 {
     /**
-     * @var ServiceLocator|Closure
+     * @var ServiceLocator|Closure():ServiceLocator|null
      * @SerializeIgnore  Should be skipped by default as static property.
      */
     private static $locator;
@@ -21,9 +21,11 @@ abstract class Locatorizable
     /**
      * Set the prime service locator
      *
-     * @param Closure|ServiceLocator $locator
+     * @param Closure():ServiceLocator|ServiceLocator $locator
+     *
+     * @return void
      */
-    final public static function configure($locator)
+    final public static function configure($locator): void
     {
         self::$locator = $locator;
     }
@@ -31,9 +33,11 @@ abstract class Locatorizable
     /**
      * Get the prime service locator
      *
-     * @return ServiceLocator
+     * @return ServiceLocator|null
+     *
+     * @psalm-ignore-nullable-return
      */
-    final public static function locator()
+    final public static function locator(): ?ServiceLocator
     {
         // check if locator is a resolver
         if (self::$locator instanceof Closure) {
@@ -49,7 +53,7 @@ abstract class Locatorizable
      *
      * @return bool
      */
-    final public static function isActiveRecordEnabled()
+    final public static function isActiveRecordEnabled(): bool
     {
         return self::$locator !== null;
     }

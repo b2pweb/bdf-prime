@@ -76,6 +76,9 @@ interface CompilerInterface
      * @todo Supprimer ? Il est plus logique que ce soit la query elle même qui gère ses bindings. En l'état impossible, mais à voir pour gérer une autre stratégie de gestion des bindings
      *
      * @param Q $query
+     *
+     * @return array
+     *
      * @throws PrimeException
      */
     public function getBindings(CompilableClause $query);

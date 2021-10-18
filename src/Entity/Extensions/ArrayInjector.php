@@ -18,8 +18,10 @@ trait ArrayInjector
      *  * a valid attribute
      *
      * @param array $data
+     *
+     * @return void
      */
-    public function import(array $data)
+    public function import(array $data): void
     {
         if (empty($data)) {
             return;
@@ -42,11 +44,11 @@ trait ArrayInjector
     /**
      * Export attributes or all entity in array
      * 
-     * @param array $attributes
+     * @param list<string> $attributes
      *
      * @return array
      */
-    public function export(array $attributes = [])
+    public function export(array $attributes = []): array
     {
         $values = array();
 

@@ -108,8 +108,10 @@ class BelongsToMany extends Relation
      * @param RepositoryInterface $through
      * @param string $throughLocal
      * @param string $throughDistant
+     *
+     * @return void
      */
-    public function setThrough(RepositoryInterface $through, string $throughLocal, string $throughDistant)
+    public function setThrough(RepositoryInterface $through, string $throughLocal, string $throughDistant): void
     {
         $this->through        = $through;
         $this->throughLocal   = $throughLocal;
@@ -242,7 +244,7 @@ class BelongsToMany extends Relation
     /**
      * Build the query for find related entities
      */
-    protected function relationQuery($keys, $constraints): ReadCommandInterface
+    protected function relationQuery(array $keys, $constraints): ReadCommandInterface
     {
         // Constraints can be on relation attributes : builder must be used
         // @todo Handle "bulk select"

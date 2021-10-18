@@ -216,8 +216,10 @@ class ByInheritance extends AbstractRelation
      * Unused method by inheritance
      *
      * {@inheritdoc}
+     *
+     * @return void
      */
-    protected function relations($keys, $with, $constraints, $without)
+    protected function relations($keys, $with, $constraints, $without): void
     {
 
     }
@@ -226,8 +228,10 @@ class ByInheritance extends AbstractRelation
      * Unused method by inheritance
      *
      * {@inheritdoc}
+     *
+     * @return void
      */
-    protected function match($collection, $relations)
+    protected function match($collection, $relations): void
     {
 
     }

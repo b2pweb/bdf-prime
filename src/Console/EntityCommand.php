@@ -121,6 +121,8 @@ EOF
      * @param EntityGenerator $generator
      * @param \Bdf\Prime\Mapper\Mapper $mapper
      * @param PhpClassFile $classInfo
+     *
+     * @return void
      */
     protected function runUserActions($io, $generator, $mapper, $classInfo)
     {

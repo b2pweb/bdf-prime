@@ -13,7 +13,7 @@ use IteratorAggregate;
  * Most of Paginable queries should also be @see Limitable
  *
  * @template R as array|object
- * @implements IteratorAggregate<array-key, R>
+ * @extends IteratorAggregate<array-key, R>
  */
 interface Paginable extends IteratorAggregate
 {

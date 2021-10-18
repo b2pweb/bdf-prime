@@ -9,6 +9,8 @@ use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Relations\EntityRelation;
 use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
+use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Serializer\Metadata\Builder\ClassMetadataBuilder;
 
 /**
@@ -24,9 +26,12 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * Exclude all properties from serialization
      *
      * @param ClassMetadataBuilder $builder
+     *
      * @throws PrimeException
+     *
+     * @return void
      */
-    public static function loadSerializerMetadata($builder)
+    public static function loadSerializerMetadata(ClassMetadataBuilder $builder): void
     {
         if (!$repository = self::locator()->repository($builder->name())) {
             return;
@@ -71,7 +76,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * {@inheritdoc}
      */
-    public function import(array $data)
+    public function import(array $data): void
     {
         if (empty($data)) {
             return;
@@ -83,7 +88,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * {@inheritdoc}
      */
-    public function export(array $attributes = [])
+    public function export(array $attributes = []): array
     {
         return self::locator()->hydrator($this)->extract($this, $attributes);
     }
@@ -118,7 +123,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function save()
+    public function save(): int
     {
         return static::repository()->save($this);
     }
@@ -132,7 +137,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function insert($ignore = false)
+    public function insert(bool $ignore = false): int
     {
         return static::repository()->insert($this, $ignore);
     }
@@ -140,13 +145,13 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Update this entity
      * 
-     * @param array $attributes
+     * @param list<string>|null $attributes
      * 
      * @return int
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function update(array $attributes = null)
+    public function update(array $attributes = null): int
     {
         return static::repository()->update($this, $attributes);
     }
@@ -158,7 +163,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function replace()
+    public function replace(): int
     {
         return static::repository()->replace($this);
     }
@@ -170,7 +175,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function duplicate()
+    public function duplicate(): int
     {
         return static::repository()->duplicate($this);
     }
@@ -182,7 +187,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function delete()
+    public function delete(): int
     {
         return static::repository()->delete($this);
     }
@@ -232,7 +237,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * 
      * @return EntityRelation<static, object>
      */
-    public function relation($relation)
+    public function relation(string $relation): EntityRelation
     {
         return static::repository()->onRelation($relation, $this);
     }
@@ -246,7 +251,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function saveAll($relations)
+    public function saveAll($relations): int
     {
         return static::repository()->saveAll($this, $relations);
     }
@@ -260,7 +265,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function deleteAll($relations)
+    public function deleteAll($relations): int
     {
         return static::repository()->deleteAll($this, $relations);
     }
@@ -286,12 +291,12 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post load event
      * 
-     * @param callable $listener
-     * @param bool     $once    Register on event once
+     * @param callable(static,RepositoryInterface<static>):(bool|null) $listener
+     * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
      */
-    public static function loaded(callable $listener, $once = true)
+    public static function loaded(callable $listener, bool $once = true): RepositoryEventsSubscriberInterface
     {
         return static::repository()->loaded($listener, $once);
     }
@@ -299,12 +304,12 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register pre save event
      * 
-     * @param callable $listener
-     * @param bool     $once    Register on event once
+     * @param callable(static,RepositoryInterface<static>,bool):(bool|null) $listener
+     * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
      */
-    public static function saving(callable $listener, $once = true)
+    public static function saving(callable $listener, bool $once = true): RepositoryEventsSubscriberInterface
     {
         return static::repository()->saving($listener, $once);
     }
@@ -312,12 +317,12 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post save event
      * 
-     * @param callable $listener
-     * @param bool     $once    Register on event once
+     * @param callable(static,RepositoryInterface<static>,int,bool):(bool|null) $listener
+     * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
      */
-    public static function saved(callable $listener, $once = true)
+    public static function saved(callable $listener, bool $once = true): RepositoryEventsSubscriberInterface
     {
         return static::repository()->saved($listener, $once);
     }
@@ -325,12 +330,12 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post insert event
      * 
-     * @param callable $listener
-     * @param bool     $once    Register on event once
+     * @param callable(static,RepositoryInterface<static>):(bool|null) $listener
+     * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
      */
-    public static function inserting(callable $listener, $once = true)
+    public static function inserting(callable $listener, bool $once = true): RepositoryEventsSubscriberInterface
     {
         return static::repository()->inserting($listener, $once);
     }
@@ -338,12 +343,12 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post insert event
      * 
-     * @param callable $listener
-     * @param bool     $once    Register on event once
+     * @param callable(static,RepositoryInterface<static>,int):(bool|null) $listener
+     * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
      */
-    public static function inserted(callable $listener, $once = true)
+    public static function inserted(callable $listener, bool $once = true): RepositoryEventsSubscriberInterface
     {
         return static::repository()->inserted($listener, $once);
     }
@@ -351,12 +356,12 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post update event
      * 
-     * @param callable $listener
-     * @param bool     $once    Register on event once
+     * @param callable(static,RepositoryInterface<static>,\ArrayObject<int,string>):(bool|null) $listener
+     * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
      */
-    public static function updating(callable $listener, $once = true)
+    public static function updating(callable $listener, bool $once = true): RepositoryEventsSubscriberInterface
     {
         return static::repository()->updating($listener, $once);
     }
@@ -364,12 +369,12 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post update event
      * 
-     * @param callable $listener
-     * @param bool     $once    Register on event once
+     * @param callable(static,RepositoryInterface<static>,int):(bool|null) $listener
+     * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
      */
-    public static function updated(callable $listener, $once = true)
+    public static function updated(callable $listener, bool $once = true): RepositoryEventsSubscriberInterface
     {
         return static::repository()->updated($listener, $once);
     }
@@ -377,12 +382,12 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post delete event
      * 
-     * @param callable $listener
-     * @param bool     $once    Register on event once
+     * @param callable(static,RepositoryInterface<static>):(bool|null) $listener
+     * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
      */
-    public static function deleting(callable $listener, $once = true)
+    public static function deleting(callable $listener, bool $once = true): RepositoryEventsSubscriberInterface
     {
         return static::repository()->deleting($listener, $once);
     }
@@ -390,12 +395,12 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post delete event
      * 
-     * @param callable $listener
-     * @param bool     $once    Register on event once
+     * @param callable(static,RepositoryInterface<static>,int):(bool|null) $listener
+     * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
      */
-    public static function deleted(callable $listener, $once = true)
+    public static function deleted(callable $listener, bool $once = true): RepositoryEventsSubscriberInterface
     {
         return static::repository()->deleted($listener, $once);
     }

@@ -2,6 +2,8 @@
 
 namespace Bdf\Prime\Entity\Hydrator;
 
+use DateTimeImmutable;
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Admin;
 use Bdf\Prime\ArrayHydratorTestEntity;
 use Bdf\Prime\ArrayHydratorTestEntity2;
@@ -98,16 +100,16 @@ class HydratorGeneratorTest extends TestCase
         $code = $this->generator->generate();
 
         $this->assertStringContainsString('implements \Bdf\Prime\Entity\Hydrator\HydratorGeneratedInterface', $code);
-        $this->assertStringContainsString('public function setPrimeInstantiator(InstantiatorInterface $instantiator)', $code);
-        $this->assertStringContainsString('public function setPrimeMetadata(Metadata $metadata)', $code);
-        $this->assertStringContainsString('public function hydrate($object, array $data)', $code);
-        $this->assertStringContainsString('public function extract($object, array $attributes = [])', $code);
-        $this->assertStringContainsString('public function flatExtract($object, array $attributes = null)', $code);
-        $this->assertStringContainsString('public function flatHydrate($object, array $data, PlatformTypesInterface $types)', $code);
-        $this->assertStringContainsString('public function extractOne($object, $attribute)', $code);
-        $this->assertStringContainsString('public function hydrateOne($object, $attribute, $value)', $code);
-        $this->assertStringContainsString('public static function supportedPrimeClassName()', $code);
-        $this->assertStringContainsString('public static function embeddedPrimeClasses()', $code);
+        $this->assertStringContainsString('public function setPrimeInstantiator(InstantiatorInterface $instantiator): void', $code);
+        $this->assertStringContainsString('public function setPrimeMetadata(Metadata $metadata): void', $code);
+        $this->assertStringContainsString('public function hydrate($object, array $data): void', $code);
+        $this->assertStringContainsString('public function extract($object, array $attributes = []): array', $code);
+        $this->assertStringContainsString('public function flatExtract($object, array $attributes = null): array', $code);
+        $this->assertStringContainsString('public function flatHydrate($object, array $data, PlatformTypesInterface $types): void', $code);
+        $this->assertStringContainsString('public function extractOne($object, string $attribute)', $code);
+        $this->assertStringContainsString('public function hydrateOne($object, string $attribute, $value): void', $code);
+        $this->assertStringContainsString('public static function supportedPrimeClassName(): string', $code);
+        $this->assertStringContainsString('public static function embeddedPrimeClasses(): array', $code);
     }
 
     /**
@@ -1065,11 +1067,11 @@ EOL;
             'deletedAt' => '2019-06-10 10:09:20',
         ], Prime::service()->connection('test')->platform()->types());
 
-        $this->assertInstanceOf(\DateTimeImmutable::class, $task->createdAt);
-        $this->assertInstanceOf(\DateTimeImmutable::class, $task->updatedAt);
+        $this->assertInstanceOf(DateTimeImmutable::class, $task->createdAt);
+        $this->assertInstanceOf(DateTimeImmutable::class, $task->updatedAt);
         $this->assertInstanceOf(\DateTime::class, $task->deletedAt);
-        $this->assertEquals(new \DateTimeImmutable('2019-06-10T10:09:20+00:00'), $task->createdAt);
-        $this->assertEquals(new \DateTimeImmutable('2019-06-10T10:09:20+00:00'), $task->updatedAt);
+        $this->assertEquals(new DateTimeImmutable('2019-06-10T10:09:20+00:00'), $task->createdAt);
+        $this->assertEquals(new DateTimeImmutable('2019-06-10T10:09:20+00:00'), $task->updatedAt);
         $this->assertEquals(new \DateTime('2019-06-10T10:09:20+02:00'), $task->deletedAt);
     }
 
@@ -1270,7 +1272,7 @@ class TestInaccessiblePropertyEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [];
     }
@@ -1278,7 +1280,7 @@ class TestInaccessiblePropertyEntityMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder->add('inaccessible');
     }
@@ -1293,7 +1295,7 @@ class TestPropertyNotFoundEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [];
     }
@@ -1301,7 +1303,7 @@ class TestPropertyNotFoundEntityMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder->add('notFound');
     }
@@ -1328,7 +1330,7 @@ class ComplexConstructorEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [];
     }
@@ -1336,7 +1338,7 @@ class ComplexConstructorEntityMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder->string('id');
     }
@@ -1355,7 +1357,7 @@ class ArrayOfEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [];
     }
@@ -1363,7 +1365,7 @@ class ArrayOfEntityMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder->arrayOfInt('values');
     }

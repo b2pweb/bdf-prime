@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Mapper;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Entity\Instantiator\InstantiatorInterface;
 use Bdf\Prime\Location;
 use Bdf\Prime\Mapper\Builder\IndexBuilder;
@@ -200,7 +201,7 @@ class TestEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection'   => 'test',
@@ -215,7 +216,7 @@ class TestEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')
@@ -236,7 +237,7 @@ class TestEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('parent')
             ->belongsTo(TestEntity::class, 'parentId')
@@ -249,7 +250,7 @@ class TestEntityMapper extends Mapper
                 ->detached();
     }
 
-    public function buildIndexes(IndexBuilder $builder)
+    public function buildIndexes(IndexBuilder $builder): void
     {
         $builder
             ->add('name_search')->on('name', ['length' => 12])

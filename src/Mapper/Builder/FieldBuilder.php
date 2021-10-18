@@ -645,13 +645,19 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * Replace fields by another builder's fields
      *
-     * @param FieldBuilder $builder
+     * @param FieldBuilder|iterable<string, FieldDefinition> $fields
      *
      * @return $this
      */
-    public function fill(FieldBuilder $builder)
+    public function fill(iterable $fields)
     {
-        $this->fields = $builder->fields;
+        if ($fields instanceof FieldBuilder) {
+            $this->fields = $fields->fields;
+        } elseif (is_array($fields)) {
+            $this->fields = $fields;
+        } else {
+            $this->fields = iterator_to_array($fields);
+        }
 
         return $this;
     }
@@ -678,8 +684,6 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
 
     /**
      * {@inheritdoc}
-     *
-     * @return FieldDefinition
      */
     public function offsetGet($key)
     {

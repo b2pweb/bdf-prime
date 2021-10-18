@@ -5,7 +5,7 @@ namespace Bdf\Prime\Schema;
 use Bdf\Prime\Exception\PrimeException;
 
 /**
- * @package Bdf\Prime\Schema
+ * Perform schema operation like migration, deletion...
  */
 interface ResolverInterface
 {
@@ -17,7 +17,7 @@ interface ResolverInterface
      * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws PrimeException When migration fail
      */
-    public function migrate($listDrop = true);
+    public function migrate(bool $listDrop = true): void;
 
     /**
      * List table structure changes
@@ -27,23 +27,23 @@ interface ResolverInterface
      * @return array Array of queries
      * @throws PrimeException When diff fail
      */
-    public function diff($listDrop = true);
+    public function diff(bool $listDrop = true): array;
 
     /**
      * Truncate table
      * 
      * @param bool $cascade
      *
-     * @return bool
+     * @return bool true on success
      * @throws PrimeException When truncate fail
      */
-    public function truncate($cascade = false);
+    public function truncate(bool $cascade = false): bool;
 
     /**
      * Drop table and its sequence if exists
      * 
-     * @return bool
+     * @return bool true on success
      * @throws PrimeException When drop fail
      */
-    public function drop();
+    public function drop(): bool;
 }

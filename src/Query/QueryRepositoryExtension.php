@@ -307,8 +307,10 @@ class QueryRepositoryExtension extends QueryCompatExtension
      * Configure the query
      *
      * @param ReadCommandInterface $query
+     *
+     * @return void
      */
-    public function apply(ReadCommandInterface $query)
+    public function apply(ReadCommandInterface $query): void
     {
         $query->setExtension($this);
         $query->post([$this, 'processEntities'], false);

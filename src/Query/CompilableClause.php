@@ -61,11 +61,9 @@ class CompilableClause extends Clause implements CompilableClauseInterface
     }
 
     /**
-     * Tell the compiler to quote identifiers (i.e. table, columns)
-     *
-     * @param bool $flag
+     * {@inheritdoc}
      */
-    public function useQuoteIdentifier($flag = true)
+    public function useQuoteIdentifier(bool $flag = true): void
     {
         $this->quoteIdentifier = $flag;
     }
