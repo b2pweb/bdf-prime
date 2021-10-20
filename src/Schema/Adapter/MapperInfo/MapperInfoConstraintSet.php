@@ -6,6 +6,7 @@ use Bdf\Prime\Mapper\Info\MapperInfo;
 use Bdf\Prime\Schema\Adapter\MapperInfo\Resolver\MapperInfoResolverInterface;
 use Bdf\Prime\Schema\Constraint\ConstraintSet;
 use Bdf\Prime\Schema\Constraint\ConstraintVisitorInterface;
+use Bdf\Prime\Schema\ConstraintInterface;
 use Bdf\Prime\Schema\ConstraintSetInterface;
 
 /**
@@ -24,7 +25,7 @@ final class MapperInfoConstraintSet implements ConstraintSetInterface
     private $resolvers;
 
     /**
-     * @var ConstraintSet
+     * @var ConstraintSet|null
      */
     private $constraints;
 
@@ -54,7 +55,7 @@ final class MapperInfoConstraintSet implements ConstraintSetInterface
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function all(): array
     {
         return $this->loadConstraints()->all();
     }
@@ -62,15 +63,12 @@ final class MapperInfoConstraintSet implements ConstraintSetInterface
     /**
      * {@inheritdoc}
      */
-    public function get($name)
+    public function get(string $name): ConstraintInterface
     {
         return $this->loadConstraints()->get($name);
     }
 
-    /**
-     * @return ConstraintSet
-     */
-    private function loadConstraints()
+    private function loadConstraints(): ConstraintSet
     {
         if ($this->constraints !== null) {
             return $this->constraints;

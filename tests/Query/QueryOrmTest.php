@@ -291,10 +291,7 @@ class QueryOrmTest extends TestCase
     {
         $this->assertEquals("SELECT t0.* FROM $this->table t0 GROUP BY t0.name, t0.foreign_key", 
             $this->query
-            ->group([
-                'name',
-                'foreign.id'
-            ])
+            ->group('name', 'foreign.id')
             ->toSql());
     }
     

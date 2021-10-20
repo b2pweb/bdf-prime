@@ -32,7 +32,7 @@ final class MetadataIndexSet implements IndexSetInterface
     /**
      * {@inheritdoc}
      */
-    public function primary()
+    public function primary(): MetadataPrimaryKeyIndex
     {
         return new MetadataPrimaryKeyIndex($this->metadata->primary);
     }
@@ -40,7 +40,7 @@ final class MetadataIndexSet implements IndexSetInterface
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function all(): array
     {
         $indexes =  $this->extractIndexes($this->metadata->indexes);
 
@@ -54,7 +54,7 @@ final class MetadataIndexSet implements IndexSetInterface
     /**
      * {@inheritdoc}
      */
-    public function get($name)
+    public function get(string $name): IndexInterface
     {
         return $this->all()[strtolower($name)];
     }
@@ -62,7 +62,7 @@ final class MetadataIndexSet implements IndexSetInterface
     /**
      * {@inheritdoc}
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         return isset($this->all()[strtolower($name)]);
     }
@@ -70,7 +70,7 @@ final class MetadataIndexSet implements IndexSetInterface
     /**
      * @param array $indexes
      *
-     * @return array<string, IndexInterface>
+     * @return array<string, NamedIndex>
      */
     private function extractIndexes(array $indexes)
     {

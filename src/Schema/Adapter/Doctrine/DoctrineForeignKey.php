@@ -30,7 +30,7 @@ final class DoctrineForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return $this->fk->getName();
     }
@@ -38,7 +38,7 @@ final class DoctrineForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function visit(ConstraintVisitorInterface $visitor)
+    public function visit(ConstraintVisitorInterface $visitor): void
     {
         $visitor->onForeignKey($this);
     }
@@ -46,7 +46,7 @@ final class DoctrineForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function fields()
+    public function fields(): array
     {
         return $this->fk->getLocalColumns();
     }
@@ -54,7 +54,7 @@ final class DoctrineForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function match()
+    public function match(): string
     {
         if (!$this->fk->hasOption('match')) {
             return self::MATCH_SIMPLE;
@@ -66,7 +66,7 @@ final class DoctrineForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function table()
+    public function table(): string
     {
         return $this->fk->getForeignTableName();
     }
@@ -74,7 +74,7 @@ final class DoctrineForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function referred()
+    public function referred(): array
     {
         return $this->fk->getForeignColumns();
     }
@@ -82,7 +82,7 @@ final class DoctrineForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function onDelete()
+    public function onDelete(): string
     {
         if (!$this->fk->hasOption('onDelete')) {
             return self::MODE_RESTRICT;
@@ -94,7 +94,7 @@ final class DoctrineForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function onUpdate()
+    public function onUpdate(): string
     {
         if (!$this->fk->hasOption('onUpdate')) {
             return self::MODE_RESTRICT;

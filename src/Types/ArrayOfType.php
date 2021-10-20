@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Types;
 
 use Bdf\Prime\Platform\PlatformInterface;
+use Bdf\Prime\Platform\PlatformTypeInterface;
 
 /**
  * Typed array database type
@@ -65,7 +66,7 @@ class ArrayOfType implements FacadeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function phpType()
+    public function phpType(): string
     {
         return $this->baseArray->phpType();
     }
@@ -73,7 +74,7 @@ class ArrayOfType implements FacadeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function toPlatformType(PlatformInterface $platform)
+    public function toPlatformType(PlatformInterface $platform): PlatformTypeInterface
     {
         $registry = $platform->types();
 
@@ -81,9 +82,9 @@ class ArrayOfType implements FacadeTypeInterface
     }
 
     /**
-     * {@inheritdoc]
+     * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return $this->name;
     }

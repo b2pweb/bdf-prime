@@ -7,6 +7,8 @@ use Bdf\Prime\Schema\Adapter\NamedIndex;
 
 /**
  * Adapt primary key metadata for index
+ *
+ * @psalm-immutable
  */
 final class MetadataPrimaryKeyIndex extends AbstractIndex
 {
@@ -29,7 +31,7 @@ final class MetadataPrimaryKeyIndex extends AbstractIndex
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return NamedIndex::FOR_PRIMARY;
     }
@@ -37,7 +39,7 @@ final class MetadataPrimaryKeyIndex extends AbstractIndex
     /**
      * {@inheritdoc}
      */
-    public function type()
+    public function type(): int
     {
         return self::TYPE_PRIMARY;
     }
@@ -45,7 +47,7 @@ final class MetadataPrimaryKeyIndex extends AbstractIndex
     /**
      * {@inheritdoc}
      */
-    public function fields()
+    public function fields(): array
     {
         return $this->metadata['fields'];
     }
@@ -53,7 +55,7 @@ final class MetadataPrimaryKeyIndex extends AbstractIndex
     /**
      * {@inheritdoc}
      */
-    public function options()
+    public function options(): array
     {
         return [];
     }
@@ -61,7 +63,7 @@ final class MetadataPrimaryKeyIndex extends AbstractIndex
     /**
      * {@inheritdoc}
      */
-    public function fieldOptions($field)
+    public function fieldOptions(string $field): array
     {
         return [];
     }

@@ -348,7 +348,7 @@ class SimpleConnectionTest extends TestCase
                 return 'UPDATE test_ SET name = ? WHERE id = ?';
             }
 
-            public function getBindings()
+            public function getBindings(): array
             {
                 return ['new-name', 10];
             }
@@ -445,7 +445,7 @@ class SimpleConnectionTest extends TestCase
                 return $this->statement;
             }
 
-            public function getBindings()
+            public function getBindings(): array
             {
                 return [10];
             }
@@ -544,7 +544,7 @@ class SimpleConnectionTest extends TestCase
                 return $this->statement;
             }
 
-            public function getBindings()
+            public function getBindings(): array
             {
                 return [];
             }

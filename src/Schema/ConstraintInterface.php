@@ -14,7 +14,7 @@ interface ConstraintInterface
      *
      * @return string
      */
-    public function name();
+    public function name(): string;
 
     /**
      * Visit the constraint object
@@ -23,5 +23,5 @@ interface ConstraintInterface
      *
      * @return void
      */
-    public function visit(ConstraintVisitorInterface $visitor);
+    public function visit(ConstraintVisitorInterface $visitor): void;
 }

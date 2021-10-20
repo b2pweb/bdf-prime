@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Types;
 
 use Bdf\Prime\Platform\PlatformInterface;
+use Bdf\Prime\Platform\PlatformTypeInterface;
 
 /**
  * Abstract class adapter for facade type
@@ -28,7 +29,7 @@ abstract class AbstractFacadeType implements FacadeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function toPlatformType(PlatformInterface $platform)
+    public function toPlatformType(PlatformInterface $platform): PlatformTypeInterface
     {
         $registry = $platform->types();
 
@@ -45,7 +46,7 @@ abstract class AbstractFacadeType implements FacadeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return $this->type;
     }

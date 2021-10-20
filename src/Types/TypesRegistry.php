@@ -12,7 +12,7 @@ class TypesRegistry implements TypesRegistryInterface
     /**
      * Store type instances
      *
-     * @var TypeInterface[]|string[]
+     * @var array<string, class-string<TypeInterface>|TypeInterface>
      */
     private $types = [];
 
@@ -30,7 +30,7 @@ class TypesRegistry implements TypesRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function register($type, $alias = null)
+    public function register($type, ?string $alias = null)
     {
         if ($alias === null) {
             $alias = $type instanceof TypeInterface ? $type->name() : $type;
@@ -44,7 +44,7 @@ class TypesRegistry implements TypesRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function get($name)
+    public function get(string $name): TypeInterface
     {
         if (isset($this->types[$name])) {
             if (is_string($this->types[$name])) {
@@ -69,7 +69,7 @@ class TypesRegistry implements TypesRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function has($type)
+    public function has(string $type): bool
     {
         if (isset($this->types[$type])) {
             return true;
@@ -85,7 +85,7 @@ class TypesRegistry implements TypesRegistryInterface
     /**
      * Instantiate the facade type object
      *
-     * @param string $class
+     * @param class-string<TypeInterface> $class
      * @param string $name
      *
      * @return TypeInterface

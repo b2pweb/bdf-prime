@@ -92,7 +92,7 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
     /**
      * {@inheritdoc}
      */
-    public function getConnection($name)
+    public function getConnection(string $name): ConnectionInterface
     {
         if ($name === 'read') {
             return $this->readConnection;
@@ -144,7 +144,7 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
     /**
      * {@inheritdoc}
      */
-    public function close()
+    public function close(): void
     {
         parent::close();
 

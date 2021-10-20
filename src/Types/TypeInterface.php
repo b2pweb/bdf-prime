@@ -61,12 +61,12 @@ interface TypeInterface
      *
      * @return string
      */
-    public function name();
+    public function name(): string;
 
     /**
      * Get the php type name that map this type
      *
      * @return string
      */
-    public function phpType();
+    public function phpType(): string;
 }

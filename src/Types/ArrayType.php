@@ -77,7 +77,7 @@ class ArrayType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function phpType()
+    public function phpType(): string
     {
         return PhpTypeInterface::TARRAY;
     }

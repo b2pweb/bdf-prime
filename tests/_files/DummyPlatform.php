@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Bench;
 
 use Bdf\Prime\Platform\PlatformInterface;
+use Bdf\Prime\Platform\PlatformTypesInterface;
 use Bdf\Prime\Platform\Sql\SqlPlatform;
 use Bdf\Prime\Types\ArrayType;
 use Bdf\Prime\Types\JsonType;
@@ -25,7 +26,7 @@ class DummyPlatform implements PlatformInterface
     /**
      * @inheritDoc
      */
-    public function name()
+    public function name(): string
     {
         return $this->platform->name();
     }
@@ -33,7 +34,7 @@ class DummyPlatform implements PlatformInterface
     /**
      * @inheritDoc
      */
-    public function types()
+    public function types(): PlatformTypesInterface
     {
         return $this->platform->types();
     }

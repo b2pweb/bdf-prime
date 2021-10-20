@@ -45,7 +45,7 @@ abstract class AbstractCompiler implements CompilerInterface
     /**
      * {@inheritdoc}
      */
-    public function platform()
+    public function platform(): PlatformInterface
     {
         return $this->connection->platform();
     }

@@ -11,7 +11,9 @@ use Bdf\Prime\Connection\Result\UpdateResultSet;
 use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Exception\QueryExecutionException;
+use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Platform\Sql\SqlPlatform;
+use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Compiler\SqlCompiler;
 use Bdf\Prime\Query\Contract\Compilable;
@@ -24,6 +26,7 @@ use Bdf\Prime\Query\Custom\KeyValue\KeyValueSqlCompiler;
 use Bdf\Prime\Query\Factory\DefaultQueryFactory;
 use Bdf\Prime\Query\Factory\QueryFactoryInterface;
 use Bdf\Prime\Query\Query;
+use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Schema\SchemaManager;
 use Closure;
 use Doctrine\Common\EventManager;
@@ -102,7 +105,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function setName($name)
+    public function setName(string $name)
     {
         $this->name = $name;
         
@@ -112,9 +115,17 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDatabase(): ?string
+    {
+        return parent::getDatabase();
     }
 
     /**
@@ -128,7 +139,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): SchemaManager
     {
         if ($this->schema === null) {
             $this->schema = new SchemaManager($this);
@@ -140,7 +151,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function platform()
+    public function platform(): PlatformInterface
     {
         if ($this->platform === null) {
             try {
@@ -173,7 +184,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function builder(PreprocessorInterface $preprocessor = null)
+    public function builder(PreprocessorInterface $preprocessor = null): Query
     {
         return $this->factory->make(Query::class, $preprocessor);
     }
@@ -181,7 +192,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function make($query, PreprocessorInterface $preprocessor = null)
+    public function make(string $query, PreprocessorInterface $preprocessor = null): CommandInterface
     {
         return $this->factory->make($query, $preprocessor);
     }
@@ -189,7 +200,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function factory()
+    public function factory(): QueryFactoryInterface
     {
         return $this->factory;
     }
@@ -197,7 +208,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function from($table, string $alias = null)
+    public function from($table, ?string $alias = null): Query
     {
         return $this->builder()->from($table, $alias);
     }
@@ -229,9 +240,9 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function select($query, array $bindings = [], array $types = []): ResultSetInterface
+    public function select($query, array $bindings = []): ResultSetInterface
     {
-        return (new DoctrineResultSet($this->executeQuery($query, $bindings, $types)))->asObject();
+        return (new DoctrineResultSet($this->executeQuery($query, $bindings)))->asObject();
     }
 
     /**
@@ -377,7 +388,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function close()
+    public function close(): void
     {
         parent::close();
 

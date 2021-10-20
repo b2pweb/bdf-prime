@@ -16,14 +16,14 @@ interface ColumnInterface
      *
      * @return string
      */
-    public function name();
+    public function name(): string;
 
     /**
      * Get the platform type for this column
      *
      * @return PlatformTypeInterface
      */
-    public function type();
+    public function type(): PlatformTypeInterface;
 
     /**
      * Get the default value
@@ -38,63 +38,63 @@ interface ColumnInterface
      *
      * @return int|null
      */
-    public function length();
+    public function length(): ?int;
 
     /**
      * Does the column is on auto increment
      *
      * @return bool
      */
-    public function autoIncrement();
+    public function autoIncrement(): bool;
 
     /**
      * Does the encoded value should be unsigned ?
      *
      * @return bool
      */
-    public function unsigned();
+    public function unsigned(): bool;
 
     /**
      * Fixed column length (i.e. CHAR vs VARCHAR) ?
      *
      * @return bool
      */
-    public function fixed();
+    public function fixed(): bool;
 
     /**
      * Does the value can be null ?
      *
      * @return bool
      */
-    public function nillable();
+    public function nillable(): bool;
 
     /**
      * Get the column comment
      *
      * @return string|null
      */
-    public function comment();
+    public function comment(): ?string;
 
     /**
      * Get the decimal precision
      *
      * @return int|null
      */
-    public function precision();
+    public function precision(): ?int;
 
     /**
      * The number of digit after the decimal mark
      *
      * @return int|null
      */
-    public function scale();
+    public function scale(): ?int;
 
     /**
      * Get the array of options
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function options();
+    public function options(): array;
 
     /**
      * Get one option
@@ -103,5 +103,5 @@ interface ColumnInterface
      *
      * @return mixed
      */
-    public function option($name);
+    public function option(string $name);
 }

@@ -30,42 +30,42 @@ interface ForeignKeyInterface extends ConstraintInterface
      *
      * @return string[]
      */
-    public function fields();
+    public function fields(): array;
 
     /**
      * Get the match mode
      *
-     * @return string One of the ForeignKeyInterface::MATCH_* constant
+     * @return ForeignKeyInterface::MATCH_*
      *
      * @link http://sqlpro.developpez.com/cours/sqlaz/ddl/?page=partie2#L7.3.1
      */
-    public function match();
+    public function match(): string;
 
     /**
      * Get the referred table name
      *
      * @return string
      */
-    public function table();
+    public function table(): string;
 
     /**
      * Get list of referred column (i.e. the "source" field of the constraint)
      *
      * @return string[]
      */
-    public function referred();
+    public function referred(): array;
 
     /**
      * Get the ON DELETE mode
      *
      * @return string
      */
-    public function onDelete();
+    public function onDelete(): string;
 
     /**
      * Get the ON UPDATE mode
      *
      * @return string
      */
-    public function onUpdate();
+    public function onUpdate(): string;
 }

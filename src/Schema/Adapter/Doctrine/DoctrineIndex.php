@@ -29,7 +29,7 @@ final class DoctrineIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): ?string
     {
         return $this->index->getName();
     }
@@ -37,7 +37,7 @@ final class DoctrineIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function unique()
+    public function unique(): bool
     {
         return $this->index->isUnique();
     }
@@ -45,7 +45,7 @@ final class DoctrineIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function primary()
+    public function primary(): bool
     {
         return $this->index->isPrimary();
     }
@@ -53,7 +53,7 @@ final class DoctrineIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function type()
+    public function type(): int
     {
         if ($this->index->isSimpleIndex()) {
             return self::TYPE_SIMPLE;
@@ -69,7 +69,7 @@ final class DoctrineIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function fields()
+    public function fields(): array
     {
         return $this->index->getColumns();
     }
@@ -77,7 +77,7 @@ final class DoctrineIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function isComposite()
+    public function isComposite(): bool
     {
         return count($this->fields()) > 1;
     }
@@ -85,7 +85,7 @@ final class DoctrineIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function options()
+    public function options(): array
     {
         return array_merge(
             $this->index->getOptions(),
@@ -96,7 +96,7 @@ final class DoctrineIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function fieldOptions($field)
+    public function fieldOptions(string $field): array
     {
         $options = [];
 

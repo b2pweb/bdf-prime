@@ -64,7 +64,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getConnection()
+    public function getConnection(): ConnectionInterface
     {
         return $this->connection;
     }
@@ -83,7 +83,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function useDrop($flag = true)
+    public function useDrop(bool $flag = true)
     {
         $this->useDrop = $flag;
 
@@ -93,7 +93,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function getUseDrop()
+    public function getUseDrop(): bool
     {
         return $this->useDrop;
     }
@@ -101,7 +101,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function table($tableName, callable $callback)
+    public function table(string $tableName, callable $callback)
     {
         $table = new TypesHelperTableBuilder(
             new TableBuilder($tableName),
@@ -130,7 +130,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function change($tableName, callable $callback)
+    public function change(string $tableName, callable $callback)
     {
         $table = $this->loadTable($tableName);
         $builder = TableBuilder::fromTable($table);
@@ -200,7 +200,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function isBuffered()
+    public function isBuffered(): bool
     {
         return !$this->autoFlush;
     }

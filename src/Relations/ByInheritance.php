@@ -163,7 +163,7 @@ class ByInheritance extends AbstractRelation
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function add($owner, $related)
+    public function add($owner, $related): int
     {
         $this->updateDiscriminatorValue($owner);
 

@@ -120,7 +120,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function from($from, $alias = null)
+    public function from(string $from, ?string $alias = null)
     {
         return $this->into($from);
     }

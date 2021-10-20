@@ -3,16 +3,14 @@
 namespace Bdf\Prime\Entity;
 
 /**
- * Interface InitializableInterface
- * 
- * @package Bdf\Prime\Entity
+ * Base type for entities which need a post-construct initializer, like for instantiate embedded entities
  */
 interface InitializableInterface
 {
     /**
      * Call before constructor
      * 
-     * Usefull if your entity needs some constructor initialization that orm does not call
+     * Useful if your entity needs some constructor initialization that orm does not call
      */
-    public function initialize();
+    public function initialize(): void;
 }

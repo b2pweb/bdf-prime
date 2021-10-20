@@ -16,7 +16,7 @@ interface PlatformTypeInterface extends TypeInterface
      * @param PlatformInterface $platform
      * @param string $name
      */
-    public function __construct(PlatformInterface $platform, $name);
+    public function __construct(PlatformInterface $platform, string $name);
 
     /**
      * Get the field declaration for the platform

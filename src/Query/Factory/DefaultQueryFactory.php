@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query\Factory;
 
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 
@@ -25,14 +26,14 @@ class DefaultQueryFactory implements QueryFactoryInterface
     /**
      * Map query class name to compiler instance or class name
      *
-     * @var array
+     * @var array<class-string<CommandInterface>, class-string<CompilerInterface>|CompilerInterface>
      */
     private $compilers = [];
 
     /**
      * Map query name to query class name
      *
-     * @var string[]
+     * @var class-string-map<Q as CommandInterface, class-string<Q>>
      */
     private $alias = [];
 
@@ -42,8 +43,8 @@ class DefaultQueryFactory implements QueryFactoryInterface
      *
      * @param ConnectionInterface $connection
      * @param CompilerInterface $defaultCompiler
-     * @param array $compilers
-     * @param string[] $alias
+     * @param array<class-string<CommandInterface>, class-string<CompilerInterface>> $compilers
+     * @param array<class-string<CommandInterface>, class-string<CommandInterface>> $alias
      */
     public function __construct(ConnectionInterface $connection, CompilerInterface $defaultCompiler, array $compilers, array $alias)
     {
@@ -56,12 +57,12 @@ class DefaultQueryFactory implements QueryFactoryInterface
     /**
      * Register a custom compiler for a query
      *
-     * @param string $query The query class name
-     * @param string|CompilerInterface $compiler The query compiler, or its class name
+     * @param class-string<CommandInterface> $query The query class name
+     * @param class-string<CompilerInterface>|CompilerInterface $compiler The query compiler, or its class name
      *
      * @return void
      */
-    public function register($query, $compiler)
+    public function register(string $query, $compiler): void
     {
         $this->compilers[$query] = $compiler;
     }
@@ -69,12 +70,15 @@ class DefaultQueryFactory implements QueryFactoryInterface
     /**
      * Register a query alias
      *
-     * @param string $alias The query alias
-     * @param string $query The query class name
+     * @param class-string<Q> $alias The query alias
+     * @param class-string<Q> $query The query class name
      *
      * @return void
+     *
+     * @template C as ConnectionInterface
+     * @template Q as CommandInterface<C>
      */
-    public function alias($alias, $query)
+    public function alias(string $alias, string $query)
     {
         $this->alias[$alias] = $query;
     }
@@ -82,7 +86,7 @@ class DefaultQueryFactory implements QueryFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function make($name, PreprocessorInterface $preprocessor = null)
+    public function make(string $name, PreprocessorInterface $preprocessor = null): CommandInterface
     {
         $query = $this->alias[$name] ?? $name;
 
@@ -92,7 +96,7 @@ class DefaultQueryFactory implements QueryFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function compiler($query)
+    public function compiler(string $query): CompilerInterface
     {
          if (!isset($this->compilers[$query])) {
              return $this->defaultCompiler;

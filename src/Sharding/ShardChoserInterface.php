@@ -3,19 +3,19 @@
 namespace Bdf\Prime\Sharding;
 
 /**
- * ShardChoserInterface
+ * Choose a shard using a distribution value
  *
- * @package Bdf\Prime\Sharding
+ * @template V as scalar
  */
 interface ShardChoserInterface
 {
     /**
      * Picks a shard for the given distribution value.
      * 
-     * @param mixed              $distributionValue  The distribution value
-     * @param ShardingConnection $connection         The sharding connection
+     * @param V $distributionValue The distribution value
+     * @param ShardingConnection $connection The sharding connection
      *
      * @return string  Returns the shard id to use
      */
-    public function pick($distributionValue, ShardingConnection $connection);
+    public function pick($distributionValue, ShardingConnection $connection): string;
 }

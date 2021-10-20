@@ -7,6 +7,7 @@ use ArrayIterator;
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Types\TypeInterface;
 use Bdf\Prime\Types\TypesHelperInterface;
+use Closure;
 use IteratorAggregate;
 
 /**
@@ -62,7 +63,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @return array<string, FieldDefinition>
      */
-    public function fields()
+    public function fields(): array
     {
         return $this->fields;
     }
@@ -104,7 +105,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function string($name, $length = 255, $default = null)
+    public function string(string $name, int $length = 255, ?string $default = null)
     {
         $this->add($name, TypeInterface::STRING, $default);
 
@@ -114,7 +115,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function text($name, $default = null)
+    public function text(string $name, ?string $default = null)
     {
         return $this->add($name, TypeInterface::TEXT, $default);
     }
@@ -122,7 +123,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function integer($name, $default = null)
+    public function integer(string $name, ?int $default = null)
     {
         return $this->add($name, TypeInterface::INTEGER, $default);
     }
@@ -130,7 +131,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function bigint($name, $default = null)
+    public function bigint(string $name, $default = null)
     {
         return $this->add($name, TypeInterface::BIGINT, $default);
     }
@@ -138,7 +139,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function smallint($name, $default = null)
+    public function smallint(string $name, ?int $default = null)
     {
         return $this->add($name, TypeInterface::SMALLINT, $default);
     }
@@ -146,7 +147,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function tinyint($name, $default = null)
+    public function tinyint(string $name, ?int $default = null)
     {
         return $this->add($name, TypeInterface::TINYINT, $default);
     }
@@ -156,7 +157,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * {@inheritdoc}
      */
-    public function float($name, $default = null)
+    public function float(string $name, ?float $default = null)
     {
         return $this->double($name, $default);
     }
@@ -164,7 +165,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function double($name, $default = null)
+    public function double(string $name, ?float $default = null)
     {
         return $this->add($name, TypeInterface::DOUBLE, $default);
     }
@@ -172,7 +173,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function decimal($name, $default = null)
+    public function decimal(string $name, $default = null)
     {
         return $this->add($name, TypeInterface::DECIMAL, $default);
     }
@@ -180,15 +181,15 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function boolean($name, $default = null)
+    public function boolean(string $name, ?bool $default = null)
     {
-        return $this->add($name, TypeInterface::BOOLEAN, $default !== null ? (bool)$default : null);
+        return $this->add($name, TypeInterface::BOOLEAN, $default);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function date($name, $default = null)
+    public function date(string $name, $default = null)
     {
         return $this->add($name, TypeInterface::DATE, $default);
     }
@@ -196,7 +197,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function dateTime($name, $default = null)
+    public function dateTime(string $name, $default = null)
     {
         return $this->add($name, TypeInterface::DATETIME, $default);
     }
@@ -204,7 +205,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function dateTimeTz($name, $default = null)
+    public function dateTimeTz(string $name, $default = null)
     {
         return $this->add($name, TypeInterface::DATETIMETZ, $default);
     }
@@ -212,7 +213,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function time($name, $default = null)
+    public function time(string $name, $default = null)
     {
         return $this->add($name, TypeInterface::TIME, $default);
     }
@@ -220,7 +221,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function timestamp($name, $default = null)
+    public function timestamp(string $name, $default = null)
     {
         return $this->add($name, TypeInterface::TIMESTAMP, $default);
     }
@@ -228,7 +229,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function binary($name, $default = null)
+    public function binary(string $name, ?string $default = null)
     {
         return $this->add($name, TypeInterface::BINARY, $default);
     }
@@ -236,7 +237,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function blob($name, $default = null)
+    public function blob(string $name, ?string $default = null)
     {
         return $this->add($name, TypeInterface::BLOB, $default);
     }
@@ -244,7 +245,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function guid($name, $default = null)
+    public function guid(string $name, $default = null)
     {
         return $this->add($name, TypeInterface::GUID, $default);
     }
@@ -252,7 +253,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function json($name, $default = null)
+    public function json(string $name, $default = null)
     {
         return $this->add($name, TypeInterface::JSON, $default);
     }
@@ -260,7 +261,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function simpleArray($name, $default = null)
+    public function simpleArray(string $name, ?array $default = null)
     {
         return $this->add($name, TypeInterface::TARRAY, $default);
     }
@@ -268,7 +269,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function object($name, $default = null)
+    public function object(string $name, $default = null)
     {
         return $this->add($name, TypeInterface::OBJECT, $default);
     }
@@ -276,7 +277,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function arrayObject($name, $default = null)
+    public function arrayObject(string $name, ?array $default = null)
     {
         return $this->add($name, TypeInterface::ARRAY_OBJECT, $default);
     }
@@ -284,7 +285,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function searchableArray($name, $default = null)
+    public function searchableArray(string $name, ?array $default = null)
     {
         return $this->add($name, TypeInterface::TARRAY, $default);
     }
@@ -292,7 +293,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function arrayOf($name, $type, $default = null)
+    public function arrayOf(string $name, string $type, ?array $default = null)
     {
         return $this->add($name, $type.'[]', $default);
     }
@@ -300,7 +301,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function arrayOfInt($name, $default = null)
+    public function arrayOfInt(string $name, ?array $default = null)
     {
         return $this->arrayOf($name, TypeInterface::INTEGER, $default);
     }
@@ -308,7 +309,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function arrayOfDouble($name, $default = null)
+    public function arrayOfDouble(string $name, ?array $default = null)
     {
         return $this->arrayOf($name, TypeInterface::DOUBLE, $default);
     }
@@ -316,7 +317,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function arrayOfDateTime($name, $default = null)
+    public function arrayOfDateTime(string $name, ?array $default = null)
     {
         return $this->arrayOf($name, TypeInterface::DATETIME, $default);
     }
@@ -330,7 +331,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @return $this             This builder instance
      */
-    public function add($name, $type = TypeInterface::STRING, $default = null)
+    public function add(string $name, string $type = TypeInterface::STRING, $default = null)
     {
         $this->current = $name;
         
@@ -345,13 +346,13 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * Add an embedded field
      *
-     * @param string   $name      The property name
-     * @param string   $classname The embedded class name
-     * @param \Closure $resolver  Configure the meta for this embedded
+     * @param string $name The property name
+     * @param class-string $classname The embedded class name
+     * @param Closure(static):void $resolver Configure the meta for this embedded
      *
-     * @return $this              This builder instance
+     * @return $this This builder instance
      */
-    public function embedded($name, $classname, \Closure $resolver)
+    public function embedded(string $name, string $classname, Closure $resolver)
     {
         $builder = new static;
         $resolver($builder);
@@ -386,12 +387,12 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      * </code>
      *
      * @param string $name The property name
-     * @param array $classMap The class mapping, in form [ discriminatorValue => ClassName ]
-     * @param \Closure $resolver Configure the meta for this embedded
+     * @param array<string, class-string> $classMap The class mapping, in form [ discriminatorValue => ClassName ]
+     * @param Closure(PolymorphBuilder):void $resolver Configure the meta for this embedded
      *
      * @return $this              This builder instance
      */
-    public function polymorph($name, $classMap, \Closure $resolver)
+    public function polymorph(string $name, array $classMap, Closure $resolver)
     {
         $builder = new PolymorphBuilder();
         $resolver($builder);
@@ -410,11 +411,11 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * Set length of current string field
      *
-     * @param int $length        The length of the value
+     * @param int|null $length        The length of the value
      *
      * @return $this             This builder instance
      */
-    public function length($length)
+    public function length(?int $length)
     {
         $this->fields[$this->current]['length'] = $length;
 
@@ -424,11 +425,11 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * Set comment on current field
      *
-     * @param string $comment    The comment
+     * @param string|null $comment    The comment
      *
      * @return $this             This builder instance
      */
-    public function comment($comment)
+    public function comment(?string $comment)
     {
         $this->fields[$this->current]['comment'] = $comment;
 
@@ -442,7 +443,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @return $this             This builder instance
      */
-    public function alias($alias)
+    public function alias(string $alias)
     {
         $this->fields[$this->current]['alias'] = $alias;
 
@@ -471,7 +472,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @return $this             This builder instance
      */
-    public function precision($precision, $scale = 0)
+    public function precision(int $precision, int $scale = 0)
     {
         $this->fields[$this->current]['precision'] = $precision;
         $this->fields[$this->current]['scale'] = $scale;
@@ -486,7 +487,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @return $this             This builder instance
      */
-    public function nillable($flag = true)
+    public function nillable(bool $flag = true)
     {
         $this->fields[$this->current]['nillable'] = $flag;
 
@@ -500,7 +501,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @return $this             This builder instance
      */
-    public function unsigned($flag = true)
+    public function unsigned(bool $flag = true)
     {
         $this->fields[$this->current]['unsigned'] = $flag;
 
@@ -530,7 +531,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @return $this             This builder instance
      */
-    public function fixed($flag = true)
+    public function fixed(bool $flag = true)
     {
         $this->fields[$this->current]['fixed'] = $flag;
 
@@ -540,7 +541,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * Set php class name of the attribute.
      *
-     * @param string $className  The php class name
+     * @param class-string $className  The php class name
      *
      * @return $this             This builder instance
      */
@@ -564,12 +565,12 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * Set a php options use by type when database value is transformed to php.
      *
-     * @param string $key        The key option
-     * @param string $value      The value
+     * @param string $key The key option
+     * @param mixed $value The value
      *
      * @return $this             This builder instance
      */
-    public function phpOptions($key, $value)
+    public function phpOptions(string $key, $value)
     {
         $this->fields[$this->current]['phpOptions'][$key] = $value;
 
@@ -631,7 +632,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @return $this
      */
-    public function field($name)
+    public function field(string $name)
     {
         if (!isset($this->fields[$name])) {
             throw new \RuntimeException('Field ' . $name . ' not found');

@@ -15,24 +15,27 @@ interface QueryFactoryInterface
      * Make the query
      *
      * <code>
-     * $factory->make('myQuery');
      * $factory->make(KeyValueQuery::class);
      * </code>
      *
-     * @param string $name The query name, or class name
+     * @param class-string<Q> $name The query class name
      * @param PreprocessorInterface|null $preprocessor
      *
-     * @return CommandInterface
+     * @return Q
+     *
+     * @template Q as CommandInterface
      */
-    public function make($name, PreprocessorInterface $preprocessor = null);
+    public function make(string $name, PreprocessorInterface $preprocessor = null): CommandInterface;
 
     /**
      * Get the compiler for the given query class
      * If no custom compiler is found for the query, the default one is returned
      *
-     * @param string $query The query class name
+     * @param class-string<Q> $query The query class name
      *
-     * @return CompilerInterface
+     * @return CompilerInterface<Q>
+     *
+     * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\Contract\Compilable&CommandInterface
      */
-    public function compiler($query);
+    public function compiler(string $query): CompilerInterface;
 }

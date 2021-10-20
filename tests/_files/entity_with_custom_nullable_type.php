@@ -92,7 +92,7 @@ class FooType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function phpType()
+    public function phpType(): string
     {
         return Foo::class;
     }

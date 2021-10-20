@@ -68,7 +68,7 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
      *
      * @todo Optimize
      */
-    public function isNative($name)
+    public function isNative(string $name): bool
     {
         return parent::has($name) && parent::get($name) instanceof PlatformTypeInterface;
     }
@@ -76,7 +76,7 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
     /**
      * {@inheritdoc}
      */
-    public function get($name)
+    public function get(string $name): TypeInterface
     {
         if (parent::has($name)) {
             return parent::get($name);
@@ -88,7 +88,7 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
     /**
      * {@inheritdoc}
      */
-    public function native($name)
+    public function native(string $name): PlatformTypeInterface
     {
         $type = $this->get($name);
 
@@ -103,7 +103,7 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
     /**
      * {@inheritdoc}
      */
-    public function has($type)
+    public function has(string $type): bool
     {
         return parent::has($type) || $this->commons->has($type);
     }
@@ -113,7 +113,7 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
      *
      * @todo revoir la gestion. Doit on appeler une methode TypeInterface::support()
      */
-    public function resolve($value)
+    public function resolve($value): ?TypeInterface
     {
         $type = gettype($value);
 
@@ -184,7 +184,7 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
     /**
      * Instantiate the platform type object
      *
-     * @param string $class
+     * @param class-string<TypeInterface> $class
      * @param string $name
      *
      * @return PlatformTypeInterface

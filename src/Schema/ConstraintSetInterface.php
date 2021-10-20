@@ -23,7 +23,7 @@ interface ConstraintSetInterface
      *
      * @return ConstraintInterface[]
      */
-    public function all();
+    public function all(): array;
 
     /**
      * Get a constraint by its name
@@ -32,5 +32,5 @@ interface ConstraintSetInterface
      *
      * @return ConstraintInterface
      */
-    public function get($name);
+    public function get(string $name): ConstraintInterface;
 }

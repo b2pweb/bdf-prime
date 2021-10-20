@@ -26,7 +26,7 @@ class TestEntity extends Model implements InitializableInterface
         $this->import($attributes);
     }
 
-    public function initialize()
+    public function initialize(): void
     {
         $this->foreign = new TestEmbeddedEntity();
     }

@@ -47,7 +47,7 @@ interface MigrationProviderInterface
      *
      * @return MigrationInterface
      */
-    public function migration($version): MigrationInterface;
+    public function migration(string $version): MigrationInterface;
 
     /**
      * Check whether the version has a migration
@@ -56,7 +56,7 @@ interface MigrationProviderInterface
      *
      * @return boolean
      */
-    public function has($version): bool;
+    public function has(string $version): bool;
 
     /**
      * Import migration name by version from the directory path

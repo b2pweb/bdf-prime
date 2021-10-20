@@ -11,7 +11,7 @@ interface CheckInterface extends ConstraintInterface
 {
     /**
      * Get the check expression
-     * Depends of the SGBD
+     * Depends on the SGBD
      *
      * @return mixed
      */

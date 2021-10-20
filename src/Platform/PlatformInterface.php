@@ -14,17 +14,17 @@ interface PlatformInterface
      *
      * @return string
      */
-    public function name();
+    public function name(): string;
 
     /**
      * Get the platform dependant types
      *
      * Types used by related compiler SHOULD be present into.
-     * This types will be used by @see FacadeType, or by compiler when used without ORM
+     * This types will be used by {@link FacadeType}, or by compiler when used without ORM
      *
      * @return PlatformTypesInterface
      */
-    public function types();
+    public function types(): PlatformTypesInterface;
 
     /**
      * Get the platform grammar instance

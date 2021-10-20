@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Schema\Builder;
 
 use Bdf\Prime\Platform\PlatformTypeInterface;
+use Bdf\Prime\Schema\Constraint\ForeignKeyInterface;
 use Bdf\Prime\Schema\IndexInterface;
 use Bdf\Prime\Schema\TableInterface;
 
@@ -30,7 +31,7 @@ interface TableBuilderInterface
      *
      * @return $this
      */
-    public function name($name);
+    public function name(string $name);
 
     /**
      * Set table options
@@ -57,7 +58,7 @@ interface TableBuilderInterface
      * ]);
      * </code>
      *
-     * @param  array  $indexes
+     * @param array $indexes
      *
      * @return $this
      */
@@ -77,23 +78,23 @@ interface TableBuilderInterface
      * </code>
      *
      * @param string|array<int,string>|array<string,array> $columns The columns composed the index. If a string is passed, it will be transformed to an array with single column
-     * @param int $type The index type (one of the IndexInterface::TYPE_* constant)
-     * @param string $name The index name. If not specified, it will be generated
+     * @param IndexInterface::TYPE_* $type The index type (one of the IndexInterface::TYPE_* constant)
+     * @param string|null $name The index name. If not specified, it will be generated
      * @param array $options Options of the index
      *
      * @return $this
      */
-    public function index($columns, $type = IndexInterface::TYPE_SIMPLE, $name = null, array $options = []);
+    public function index($columns, int $type = IndexInterface::TYPE_SIMPLE, ?string $name = null, array $options = []);
 
     /**
      * Specify the primary key(s) for the table.
      *
-     * @param  string|array  $columns   The name of columns. Null to select the current one
-     * @param  string        $name      The name of the index. Null to generate one
+     * @param  string|list<string>|null $columns   The name of columns. Null to select the current one
+     * @param  string|null $name The name of the index. Null to generate one
      *
      * @return $this
      */
-    public function primary($columns = null, $name = null);
+    public function primary($columns = null, ?string $name = null);
 
     /**
      * Add a new column to the table
@@ -121,7 +122,7 @@ interface TableBuilderInterface
      *
      * @return ColumnBuilderInterface The new created column
      */
-    public function add($column, PlatformTypeInterface $type, array $options = []);
+    public function add(string $column, PlatformTypeInterface $type, array $options = []);
 
     /**
      * Get a column by its name
@@ -130,7 +131,7 @@ interface TableBuilderInterface
      *
      * @return ColumnBuilderInterface
      */
-    public function column($name = null);
+    public function column(?string $name = null);
 
     /**
      * Adds a foreign key constraint.
@@ -138,19 +139,19 @@ interface TableBuilderInterface
      * Name is inferred from the local columns.
      *
      * @param TableInterface|string $foreignTable Table schema instance or table name
-     * @param array        $localColumnNames
-     * @param array        $foreignColumnNames
-     * @param array        $options
-     * @param string|null  $constraintName
+     * @param array $localColumnNames
+     * @param array $foreignColumnNames
+     * @param array{onDelete?: ForeignKeyInterface::MODE_*, onUpdate?: ForeignKeyInterface::MODE_*, match?: ForeignKeyInterface::MATCH_*} $options
+     * @param string|null $constraintName
      *
      * @return $this
      */
-    public function foreignKey($foreignTable, array $localColumnNames, array $foreignColumnNames, array $options = [], $constraintName = null);
+    public function foreignKey($foreignTable, array $localColumnNames, array $foreignColumnNames, array $options = [], ?string $constraintName = null);
 
     /**
      * Build the table object
      *
      * @return TableInterface
      */
-    public function build();
+    public function build(): TableInterface;
 }

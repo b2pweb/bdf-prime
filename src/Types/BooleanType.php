@@ -56,7 +56,7 @@ class BooleanType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function phpType()
+    public function phpType(): string
     {
         return PhpTypeInterface::BOOLEAN;
     }

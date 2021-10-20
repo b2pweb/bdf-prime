@@ -3,9 +3,7 @@
 namespace Bdf\Prime\Connection;
 
 /**
- * SubConnectionManagerInterface
- *
- * @author admin
+ * Base type for connection which handle sub connection, like sharding or master slave
  */
 interface SubConnectionManagerInterface
 {
@@ -16,5 +14,5 @@ interface SubConnectionManagerInterface
      * 
      * @return ConnectionInterface
      */
-    public function getConnection($name);
+    public function getConnection(string $name): ConnectionInterface;
 }

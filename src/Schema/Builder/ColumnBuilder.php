@@ -4,6 +4,7 @@ namespace Bdf\Prime\Schema\Builder;
 
 use Bdf\Prime\Platform\PlatformTypeInterface;
 use Bdf\Prime\Schema\Bag\Column;
+use Bdf\Prime\Schema\ColumnInterface;
 use Bdf\Prime\Schema\IndexInterface;
 
 /**
@@ -29,7 +30,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     private $defaultValue;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $length;
 
@@ -54,17 +55,17 @@ final class ColumnBuilder implements ColumnBuilderInterface
     private $nillable = false;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $comment;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $precision;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $scale;
 
@@ -86,7 +87,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
      * @param PlatformTypeInterface $type
      * @param array $options
      */
-    public function __construct($name, PlatformTypeInterface $type, array $options = [])
+    public function __construct(string $name, PlatformTypeInterface $type, array $options = [])
     {
         $this->name = $name;
         $this->type = $type;
@@ -96,7 +97,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function autoincrement($flag = true)
+    public function autoincrement(bool $flag = true)
     {
         $this->autoIncrement = $flag;
 
@@ -106,7 +107,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function length($length)
+    public function length(?int $length)
     {
         $this->length = $length;
 
@@ -116,7 +117,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function comment($comment)
+    public function comment(?string $comment)
     {
         $this->comment = $comment;
 
@@ -136,7 +137,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function precision($precision, $scale = 0)
+    public function precision(?int $precision, ?int $scale = 0)
     {
         $this->precision = $precision;
         $this->scale     = $scale;
@@ -147,7 +148,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function nillable($flag = true)
+    public function nillable(bool $flag = true)
     {
         $this->nillable = $flag;
 
@@ -157,7 +158,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function unsigned($flag = true)
+    public function unsigned(bool $flag = true)
     {
         $this->unsigned = $flag;
 
@@ -181,7 +182,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function fixed($flag = true)
+    public function fixed(bool $flag = true)
     {
         $this->fixed = $flag;
 
@@ -191,7 +192,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function name($name)
+    public function name(string $name)
     {
         $this->name = $name;
 
@@ -221,7 +222,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function build()
+    public function build(): ColumnInterface
     {
         return new Column(
             $this->name,
@@ -243,7 +244,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function indexes()
+    public function indexes(): array
     {
         return $this->indexes;
     }
@@ -251,7 +252,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }

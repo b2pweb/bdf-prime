@@ -262,7 +262,7 @@ public function <methodName>(<methodTypeHint>$<variableName>)
 '/**
  * <description>
  */
-public function <methodName>()
+public function <methodName>()<return>
 {
 <spaces><content>
 }
@@ -570,7 +570,7 @@ public function __construct(array $data = [])
         }
         
         if (!$this->hasMethod('initialize') && $initializable) {
-            $methods[] = $this->generateMethod('{@inheritdoc}', 'initialize', implode("\n".$this->spaces, $collections));
+            $methods[] = $this->generateMethod('{@inheritdoc}', 'initialize', implode("\n".$this->spaces, $collections), 'void');
         }
 
         return implode("\n", $methods);
@@ -822,7 +822,7 @@ public function __construct(array $data = [])
      *
      * @return string
      */
-    protected function generateMethod(string $description, string $methodName, string $content)
+    protected function generateMethod(string $description, string $methodName, string $content, ?string $return = null)
     {
         if ($this->hasMethod($methodName)) {
             return '';
@@ -834,6 +834,7 @@ public function __construct(array $data = [])
             '<description>' => $description,
             '<methodName>'  => $methodName,
             '<content>'     => $content,
+            '<return>'      => $return ? ": $return" : '',
         );
 
         $method = str_replace(

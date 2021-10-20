@@ -3,24 +3,27 @@
 namespace Bdf\Prime\Schema\Bag;
 
 use Bdf\Prime\Schema\Adapter\AbstractIndex;
+use Bdf\Prime\Schema\IndexInterface;
 
 /**
  * Index using simple array of fields
+ *
+ * @psalm-immutable
  */
 final class Index extends AbstractIndex
 {
     /**
-     * @var array
+     * @var array<string, array>
      */
     private $fields;
 
     /**
-     * @var int
+     * @var IndexInterface::TYPE_*
      */
     private $type;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $name;
 
@@ -34,11 +37,11 @@ final class Index extends AbstractIndex
      * ArrayIndex constructor.
      *
      * @param array<string,array> $fields The fields as key, and option as value
-     * @param int $type
-     * @param string $name
+     * @param IndexInterface::TYPE_* $type
+     * @param string|null $name
      * @param array $options
      */
-    public function __construct(array $fields, $type = self::TYPE_SIMPLE, $name = null, array $options = [])
+    public function __construct(array $fields, int $type = self::TYPE_SIMPLE, ?string $name = null, array $options = [])
     {
         $this->fields = $fields;
         $this->type = $type;
@@ -49,7 +52,7 @@ final class Index extends AbstractIndex
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): ?string
     {
         return $this->name;
     }
@@ -57,7 +60,7 @@ final class Index extends AbstractIndex
     /**
      * {@inheritdoc}
      */
-    public function type()
+    public function type(): int
     {
         return $this->type;
     }
@@ -65,7 +68,7 @@ final class Index extends AbstractIndex
     /**
      * {@inheritdoc}
      */
-    public function fields()
+    public function fields(): array
     {
         return array_keys($this->fields);
     }
@@ -73,7 +76,7 @@ final class Index extends AbstractIndex
     /**
      * {@inheritdoc}
      */
-    public function options()
+    public function options(): array
     {
         return $this->options;
     }
@@ -81,7 +84,7 @@ final class Index extends AbstractIndex
     /**
      * {@inheritdoc}
      */
-    public function fieldOptions($field)
+    public function fieldOptions(string $field): array
     {
         return $this->fields[$field] ?? [];
     }

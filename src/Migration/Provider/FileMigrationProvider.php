@@ -124,7 +124,7 @@ class FileMigrationProvider implements MigrationProviderInterface
      *
      * @throws InvalidArgumentException
      */
-    public function migration($version): MigrationInterface
+    public function migration(string $version): MigrationInterface
     {
         if (!$this->has($version)) {
             throw new InvalidArgumentException("Unable to provide Migration for version $version");
@@ -136,7 +136,7 @@ class FileMigrationProvider implements MigrationProviderInterface
     /**
      *{@inheritDoc}
      */
-    public function has($version): bool
+    public function has(string $version): bool
     {
         return isset($this->migrations[$version]);
     }

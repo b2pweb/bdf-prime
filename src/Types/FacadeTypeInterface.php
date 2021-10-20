@@ -17,5 +17,5 @@ interface FacadeTypeInterface extends TypeInterface
      *
      * @return PlatformTypeInterface
      */
-    public function toPlatformType(PlatformInterface $platform);
+    public function toPlatformType(PlatformInterface $platform): PlatformTypeInterface;
 }

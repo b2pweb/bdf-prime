@@ -106,7 +106,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     /**
      * {@inheritdoc}
      */
-    public function from($from, $alias = null)
+    public function from(string $from, ?string $alias = null)
     {
         $this->statements['table'] = $from;
 

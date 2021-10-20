@@ -75,7 +75,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
-    public function from($from, $alias = null)
+    public function from(string $from, ?string $alias = null)
     {
         if ($this->statements['table'] !== $from) {
             $this->compilerState->invalidate('columns');
@@ -292,7 +292,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
-    public function getBindings()
+    public function getBindings(): array
     {
         return $this->compiler->getBindings($this);
     }

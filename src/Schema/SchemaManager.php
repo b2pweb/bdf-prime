@@ -51,7 +51,7 @@ class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function pending()
+    public function pending(): array
     {
         return $this->queries;
     }
@@ -69,7 +69,7 @@ class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function flush()
+    public function flush(): bool
     {
         $lastResult = false;
         $queries = $this->queries;
@@ -77,7 +77,7 @@ class SchemaManager extends AbstractSchemaManager
         $this->clear();
         
         foreach ($queries as $query) {
-            $lastResult = $this->connection->exec($query);
+            $lastResult = $this->connection->executeStatement($query);
         }
         
         return (bool) $lastResult;
@@ -117,7 +117,7 @@ class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function hasDatabase($database)
+    public function hasDatabase(string $database): bool
     {
         try {
             $databases = $this->getDoctrineManager()->listDatabases();
@@ -132,7 +132,7 @@ class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function getDatabases()
+    public function getDatabases(): array
     {
         try {
             return $this->getDoctrineManager()->listDatabases();
@@ -145,7 +145,7 @@ class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function createDatabase($database)
+    public function createDatabase(string $database)
     {
         try {
             return $this->push(
@@ -160,7 +160,7 @@ class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function dropDatabase($database)
+    public function dropDatabase(string $database)
     {
         try {
             return $this->push(
@@ -175,7 +175,7 @@ class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function hasTable($tableName)
+    public function hasTable(string $tableName): bool
     {
         try {
             return $this->getDoctrineManager()->tablesExist($tableName);
@@ -188,7 +188,7 @@ class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function loadTable($tableName)
+    public function loadTable(string $tableName): TableInterface
     {
         try {
             $manager = $this->getDoctrineManager();
@@ -218,7 +218,7 @@ class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function drop($tableName)
+    public function drop(string $tableName)
     {
         try {
             return $this->push(
@@ -233,7 +233,7 @@ class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function truncate($tableName, $cascade = false)
+    public function truncate(string $tableName, bool $cascade = false)
     {
         try {
             return $this->push(
@@ -262,7 +262,7 @@ class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function rename($from, $to)
+    public function rename(string $from, string $to)
     {
         $diff = new DoctrineTableDiff($from);
         $diff->newName = $to;

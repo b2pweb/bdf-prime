@@ -386,7 +386,7 @@ class BelongsToMany extends Relation
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function add($owner, $related)
+    public function add($owner, $related): int
     {
         return $this->attach($owner, $related);
     }

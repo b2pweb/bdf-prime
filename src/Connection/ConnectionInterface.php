@@ -3,7 +3,6 @@
 namespace Bdf\Prime\Connection;
 
 use Bdf\Prime\Connection\Result\ResultSetInterface;
-use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Exception\QueryBuildingException;
 use Bdf\Prime\Exception\QueryExecutionException;
@@ -13,12 +12,15 @@ use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Factory\QueryFactoryInterface;
 use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Schema\SchemaManagerInterface;
 use Bdf\Prime\Types\TypeInterface;
 use Doctrine\Common\EventManager;
 
 /**
- * ConnectionInterface
+ * Base connection type
+ *
+ * Allows creating and executing queries, and handle a platform
  */
 interface ConnectionInterface
 {
@@ -29,14 +31,14 @@ interface ConnectionInterface
      * 
      * @return $this
      */
-    public function setName($name);
+    public function setName(string $name);
 
     /**
      * Get the connection name
      * 
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 
     /**
      * Gets the SchemaManager.
@@ -44,7 +46,7 @@ interface ConnectionInterface
      * @return SchemaManagerInterface
      * @throws PrimeException
      */
-    public function schema();
+    public function schema(): SchemaManagerInterface;
 
     /**
      * Transform database value to PHP value
@@ -76,54 +78,55 @@ interface ConnectionInterface
      *
      * @param PreprocessorInterface|null $preprocessor The compiler preprocessor to use
      *
-     * @return CommandInterface
+     * @return ReadCommandInterface
      */
-    public function builder(PreprocessorInterface $preprocessor = null);
+    public function builder(PreprocessorInterface $preprocessor = null): ReadCommandInterface;
 
     /**
      * Make a new query
      *
-     * @param string $query The query name, or class name
+     * @param class-string<Q> $query The query name, or class name
      * @param PreprocessorInterface|null $preprocessor The compiler preprocessor to use
      *
-     * @return CommandInterface
+     * @return Q
+     *
+     * @template Q as CommandInterface
      */
-    public function make($query, PreprocessorInterface $preprocessor = null);
+    public function make(string $query, PreprocessorInterface $preprocessor = null): CommandInterface;
 
     /**
      * Get the query factory for this connection
      *
      * @return QueryFactoryInterface
      */
-    public function factory();
+    public function factory(): QueryFactoryInterface;
 
     /**
      * Get a select query builder from table
      *
-     * @param string|QueryInterface $table
-     * @param string $alias
+     * @param string|QueryInterface $table The "from" clause. Can be a table name or an embedded query
+     * @param string|null $alias The clause alias
      *
-     * @return QueryInterface
+     * @return ReadCommandInterface
      */
-    public function from($table, string $alias = null);
+    public function from($table, ?string $alias = null): ReadCommandInterface;
 
     /**
      * Executes a raw select query and returns array of object
      *
-     * @param string $query
-     * @param array  $bindings
-     * @param array  $types
+     * @param mixed $query The raw query to execute
+     * @param array $bindings The query bindings
      *
-     * @return ResultSetInterface<\stdClass> The database result
+     * @return ResultSetInterface<\stdClass> The database result, in object form
      * @throws PrimeException When select fail
      */
-    public function select($query, array $bindings = [], array $types = []): ResultSetInterface;
+    public function select($query, array $bindings = []): ResultSetInterface;
 
     /**
-     * Execute the query and get the result
+     * Execute the query and get the result.
      * The result may differ by the query type
      *
-     * @param Compilable $query
+     * @param Compilable $query Query to execute
      *
      * @return ResultSetInterface<array<string, mixed>>
      *
@@ -138,9 +141,9 @@ interface ConnectionInterface
     /**
      * Gets the name of the database this Connection is connected to.
      *
-     * @return string
+     * @return string|null
      */
-    public function getDatabase();
+    public function getDatabase(): ?string;
 
     /**
      * Get the platform instance
@@ -148,7 +151,7 @@ interface ConnectionInterface
      * @return PlatformInterface
      * @throws PrimeException
      */
-    public function platform();
+    public function platform(): PlatformInterface;
 
     /**
      * Gets the EventManager used by the Connection.
@@ -157,6 +160,8 @@ interface ConnectionInterface
      *
      * @todo Ne pas utiliser l'event manager de doctrine ?
      *       C'est actuellement le plus simple et léger, mais ajoute une dépendence forte à Doctrine
+     *
+     * @internal
      */
     public function getEventManager();
 
@@ -165,5 +170,5 @@ interface ConnectionInterface
      *
      * @return void
      */
-    public function close();
+    public function close(): void;
 }

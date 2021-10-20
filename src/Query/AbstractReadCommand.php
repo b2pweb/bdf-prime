@@ -104,7 +104,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * {@inheritdoc}
      */
-    public function collectionFactory()
+    public function collectionFactory(): CollectionFactory
     {
         if ($this->collectionFactory === null) {
             $this->collectionFactory = CollectionFactory::forDbal();
@@ -137,6 +137,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     public function on(ConnectionInterface $connection)
     {
         $this->connection = $connection;
+        /** @psalm-suppress InvalidArgument */
         $this->compiler = $connection->factory()->compiler(get_class($this));
 
         return $this;
@@ -155,7 +156,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * {@inheritdoc}
      */
-    public function wrapAs($wrapperClass)
+    public function wrapAs(string $wrapperClass)
     {
         $this->wrapper = $wrapperClass;
 

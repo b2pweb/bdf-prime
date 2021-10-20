@@ -59,7 +59,7 @@ class BulkInsertSqlCompiler extends AbstractCompiler
     /**
      * {@inheritdoc}
      */
-    public function quoteIdentifier(CompilableClause $query, $column)
+    public function quoteIdentifier(CompilableClause $query, string $column): string
     {
         if (!$query->isQuoteIdentifier()) {
             return $column;
@@ -71,7 +71,7 @@ class BulkInsertSqlCompiler extends AbstractCompiler
     /**
      * {@inheritdoc}
      */
-    public function getBindings(CompilableClause $query)
+    public function getBindings(CompilableClause $query): array
     {
         if ($query->statements['bulk']) {
             $bindings = [];

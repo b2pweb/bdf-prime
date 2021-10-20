@@ -30,10 +30,10 @@ interface Compilable
     /**
      * Get the query bindings
      *
-     * @return mixed
+     * @return array
      * @throws PrimeException
      */
-    public function getBindings();
+    public function getBindings(): array;
 
     /**
      * Get the query type

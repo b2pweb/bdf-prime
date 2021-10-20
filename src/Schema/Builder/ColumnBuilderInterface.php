@@ -28,7 +28,7 @@ interface ColumnBuilderInterface
      *
      * @return $this
      */
-    public function name($name);
+    public function name(string $name);
 
     /**
      * Set the column type
@@ -47,28 +47,29 @@ interface ColumnBuilderInterface
      *
      * @return $this
      */
-    public function autoincrement($flag = true);
+    public function autoincrement(bool $flag = true);
 
     /**
      * Set length of current string field
      *
-     * @param int $length        The length of the value
+     * @param int|null $length        The length of the value
      *
      * @return $this             This builder instance
      */
-    public function length($length);
+    public function length(?int $length);
 
     /**
      * Set comment on current field
      *
-     * @param string $comment     The comment
+     * @param string|null $comment     The comment
      *
      * @return $this             This builder instance
      */
-    public function comment($comment);
+    public function comment(?string $comment);
 
     /**
      * Set the default value of current field
+     * The value will be converted to the DB representation
      *
      * @param mixed $value       The repository name
      *
@@ -79,12 +80,12 @@ interface ColumnBuilderInterface
     /**
      * Set the precision and scale of a digit
      *
-     * @param int $precision     The number of significant digits that are stored for values
-     * @param int $scale         The number of digits that can be stored following the decimal point
+     * @param int|null $precision     The number of significant digits that are stored for values
+     * @param int|null $scale         The number of digits that can be stored following the decimal point
      *
      * @return $this             This builder instance
      */
-    public function precision($precision, $scale = 0);
+    public function precision(?int $precision, ?int $scale = 0);
 
     /**
      * Set nillable flag of current field
@@ -93,7 +94,7 @@ interface ColumnBuilderInterface
      *
      * @return $this             This builder instance
      */
-    public function nillable($flag = true);
+    public function nillable(bool $flag = true);
 
     /**
      * Set unsigned flag of current field
@@ -102,7 +103,7 @@ interface ColumnBuilderInterface
      *
      * @return $this             This builder instance
      */
-    public function unsigned($flag = true);
+    public function unsigned(bool $flag = true);
 
     /**
      * Set unique flag of current field
@@ -122,7 +123,7 @@ interface ColumnBuilderInterface
      *
      * @return $this             This builder instance
      */
-    public function fixed($flag = true);
+    public function fixed(bool $flag = true);
 
     /**
      * Set column options
@@ -138,19 +139,19 @@ interface ColumnBuilderInterface
      *
      * @return ColumnInterface
      */
-    public function build();
+    public function build(): ColumnInterface;
 
     /**
      * Get related indexes
      *
      * @return array Array of indexes, in form : [ [name] => [type] ]
      */
-    public function indexes();
+    public function indexes(): array;
 
     /**
      * Get the column name
      *
      * @return string
      */
-    public function getName();
+    public function getName(): string;
 }

@@ -15,7 +15,7 @@ class SuffixResolver implements ResolverInterface
     /**
      * @param string $suffix
      */
-    public function __construct($suffix = 'Mapper')
+    public function __construct(string $suffix = 'Mapper')
     {
         $this->suffix = $suffix;
     }
@@ -23,7 +23,7 @@ class SuffixResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve($entityClass)
+    public function resolve(string $entityClass): string
     {
         return $entityClass . $this->suffix;
     }
@@ -31,7 +31,7 @@ class SuffixResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function reverse($mapperClass)
+    public function reverse(string $mapperClass): string
     {
         return substr($mapperClass, 0, -1 * mb_strlen($this->suffix));
     }

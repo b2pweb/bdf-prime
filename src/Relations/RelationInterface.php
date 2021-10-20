@@ -211,7 +211,7 @@ interface RelationInterface
      * @throws PrimeException When cannot save entity
      */
     #[WriteOperation]
-    public function add($owner, $related);
+    public function add($owner, $related): int;
 
     /**
      * Create the relation entity and set its foreign key value

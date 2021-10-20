@@ -28,7 +28,7 @@ class DoubleJoinEntityMaster extends Model implements InitializableInterface
     /**
      * @inheritDoc
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->sub = new DoubleJoinEntitySub();
         $this->sub2 = new DoubleJoinEntitySub2();
@@ -58,7 +58,7 @@ class DoubleJoinEntitySub2 extends Model implements InitializableInterface
     /**
      * @inheritDoc
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->sub = new DoubleJoinEntitySub();
     }

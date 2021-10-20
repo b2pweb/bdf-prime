@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Sharding;
 
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Connection\SubConnectionManagerInterface;
 use Bdf\Prime\Exception\ShardingException;
@@ -135,7 +136,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function getDatabase()
+    public function getDatabase(): ?string
     {
         return null;
     }
@@ -258,7 +259,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function getConnection($name)
+    public function getConnection(string $name): ConnectionInterface
     {
         return $this->getShardConnection($name);
     }
@@ -290,7 +291,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function close()
+    public function close(): void
     {
         parent::close();
 
@@ -304,7 +305,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function builder(PreprocessorInterface $preprocessor = null)
+    public function builder(PreprocessorInterface $preprocessor = null): ShardingQuery
     {
         return $this->factory()->make(ShardingQuery::class, $preprocessor);
     }

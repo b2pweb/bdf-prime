@@ -70,16 +70,16 @@ interface PreprocessorInterface
      *
      * @return array
      */
-    public function expression(array $expression);
+    public function expression(array $expression): array;
 
     /**
      * Prepare an FROM clause
      *
-     * @param array $table
+     * @param array{table: string, alias: string|null} $table
      *
-     * @return array
+     * @return array{table: string, alias: string|null}
      */
-    public function table(array $table);
+    public function table(array $table): array;
 
     /**
      * Get the root table name
@@ -93,5 +93,5 @@ interface PreprocessorInterface
      *
      * @return void
      */
-    public function clear();
+    public function clear(): void;
 }

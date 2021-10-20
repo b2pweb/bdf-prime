@@ -17,14 +17,14 @@ interface IndexSetInterface
      *
      * @return IndexInterface|null
      */
-    public function primary();
+    public function primary(): ?IndexInterface;
 
     /**
      * Get list of all indexes
      *
      * @return array<string, IndexInterface>
      */
-    public function all();
+    public function all(): array;
 
     /**
      * Get one index by its name
@@ -33,7 +33,7 @@ interface IndexSetInterface
      *
      * @return IndexInterface
      */
-    public function get($name);
+    public function get(string $name): IndexInterface;
 
     /**
      * Check if an index exists
@@ -42,5 +42,5 @@ interface IndexSetInterface
      *
      * @return bool
      */
-    public function has($name);
+    public function has(string $name): bool;
 }

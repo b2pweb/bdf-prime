@@ -18,7 +18,7 @@ final class Name
      *
      * @return string
      */
-    public static function generate($prefix, array $parts, $length = self::DEFAULT_LENGTH)
+    public static function generate(string $prefix, array $parts, int $length = self::DEFAULT_LENGTH)
     {
         $hash = implode('', array_map(function ($part) {
             return dechex(crc32($part));
@@ -36,7 +36,7 @@ final class Name
      *
      * @return string
      */
-    public static function serialized($prefix, $data, $length = self::DEFAULT_LENGTH)
+    public static function serialized(string $prefix, $data, int $length = self::DEFAULT_LENGTH)
     {
         return substr(strtoupper($prefix.'_'.md5(serialize($data))), 0, $length);
     }

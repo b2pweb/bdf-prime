@@ -12,7 +12,7 @@ abstract class AbstractIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function unique()
+    public function unique(): bool
     {
         return ($this->type() & self::TYPE_UNIQUE) === self::TYPE_UNIQUE;
     }
@@ -20,7 +20,7 @@ abstract class AbstractIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function primary()
+    public function primary(): bool
     {
         return ($this->type() & self::TYPE_PRIMARY) === self::TYPE_PRIMARY;
     }
@@ -28,7 +28,7 @@ abstract class AbstractIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function isComposite()
+    public function isComposite(): bool
     {
         return count($this->fields()) > 1;
     }

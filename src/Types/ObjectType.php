@@ -18,7 +18,7 @@ class ObjectType extends AbstractSerializeType
     /**
      * {@inheritdoc}
      */
-    public function phpType()
+    public function phpType(): string
     {
         return PhpTypeInterface::OBJECT;
     }

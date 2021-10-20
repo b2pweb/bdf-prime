@@ -73,7 +73,7 @@ class SqlStringType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function phpType()
+    public function phpType(): string
     {
         return PhpTypeInterface::STRING;
     }

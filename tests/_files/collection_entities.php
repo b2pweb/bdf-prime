@@ -45,7 +45,7 @@ class Folder extends Model implements InitializableInterface
     /**
      * {@inheritdoc}
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->files = TestFile::collection();
     }
@@ -132,7 +132,7 @@ class TestFile extends Model implements InitializableInterface
     /**
      * @inheritDoc
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->owner = new FileUser();
         $this->group = new Group();

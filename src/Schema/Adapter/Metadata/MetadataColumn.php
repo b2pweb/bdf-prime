@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Schema\Adapter\Metadata;
 
 use Bdf\Prime\Mapper\Metadata;
+use Bdf\Prime\Platform\PlatformTypeInterface;
 use Bdf\Prime\Platform\PlatformTypesInterface;
 use Bdf\Prime\Schema\ColumnInterface;
 
@@ -37,7 +38,7 @@ final class MetadataColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return $this->metadata['field'];
     }
@@ -45,7 +46,7 @@ final class MetadataColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function type()
+    public function type(): PlatformTypeInterface
     {
         return $this->types->native($this->metadata['type']);
     }
@@ -61,15 +62,15 @@ final class MetadataColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function length()
+    public function length(): ?int
     {
-        return isset($this->metadata['length']) ? $this->metadata['length'] : null;
+        return $this->metadata['length'] ?? null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function autoIncrement()
+    public function autoIncrement(): bool
     {
         return !empty($this->metadata['primary']) && $this->metadata['primary'] === Metadata::PK_AUTOINCREMENT;
     }
@@ -77,63 +78,63 @@ final class MetadataColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function unsigned()
+    public function unsigned(): bool
     {
-        return isset($this->metadata['unsigned']) ? $this->metadata['unsigned'] : false;
+        return $this->metadata['unsigned'] ?? false;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function fixed()
+    public function fixed(): bool
     {
-        return isset($this->metadata['fixed']) ? $this->metadata['fixed'] : false;
+        return $this->metadata['fixed'] ?? false;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function nillable()
+    public function nillable(): bool
     {
-        return isset($this->metadata['nillable']) ? $this->metadata['nillable'] : false;
+        return $this->metadata['nillable'] ?? false;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function comment()
+    public function comment(): ?string
     {
-        return isset($this->metadata['comment']) ? $this->metadata['comment'] : null;
+        return $this->metadata['comment'] ?? null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function precision()
+    public function precision(): ?int
     {
-        return isset($this->metadata['precision']) ? $this->metadata['precision'] : null;
+        return $this->metadata['precision'] ?? null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function scale()
+    public function scale(): ?int
     {
-        return isset($this->metadata['scale']) ? $this->metadata['scale'] : null;
+        return $this->metadata['scale'] ?? null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function options()
+    public function options(): array
     {
-        return isset($this->metadata['customSchemaOptions']) ? $this->metadata['customSchemaOptions'] : [];
+        return $this->metadata['customSchemaOptions'] ?? [];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function option($name)
+    public function option(string $name)
     {
         return $this->metadata['customSchemaOptions'][$name];
     }
@@ -143,7 +144,7 @@ final class MetadataColumn implements ColumnInterface
      *
      * @return array
      */
-    public function toMetadata()
+    public function toMetadata(): array
     {
         return $this->metadata;
     }
