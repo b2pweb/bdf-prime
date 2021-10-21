@@ -6,6 +6,7 @@ use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Customer;
 use Bdf\Prime\Document;
 use Bdf\Prime\DoubleJoinEntityMaster;
+use Bdf\Prime\EntityWithCallableKey;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Expression\Attribute;
@@ -14,6 +15,7 @@ use Bdf\Prime\Query\Expression\RawValue;
 use Bdf\Prime\Query\Expression\Value;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Right;
+use Bdf\Prime\TestEmbeddedEntity;
 use Bdf\Prime\TestFiltersEntity;
 use Bdf\Prime\TestFiltersEntityMapper;
 use Bdf\Prime\User;
@@ -555,6 +557,17 @@ class QueryOrmTest extends TestCase
                 'foreign.city :like' => 'test%',
             ])
             ->toSql()
+        );
+    }
+
+    /**
+     *
+     */
+    public function test_entityJoin_with_callable_string_fk_should_be_used_as_string()
+    {
+        $this->assertEquals(
+            "SELECT t0.* FROM entity_with_callable_key t0 INNER JOIN entity_with_callable_key alias ON alias.key = t0.key",
+            EntityWithCallableKey::builder()->joinEntity(EntityWithCallableKey::class, 'key', 'key', 'alias')->toSql()
         );
     }
 

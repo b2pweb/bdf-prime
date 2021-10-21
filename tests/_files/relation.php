@@ -1294,3 +1294,33 @@ class RightMapper extends Mapper
         ;
     }
 }
+
+class EntityWithCallableKey extends Model
+{
+    /**
+     * @var string
+     */
+    public $key;
+}
+
+class EntityWithCallableKeyMapper extends Mapper
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function schema()
+    {
+        return [
+            'connection' => 'test',
+            'table' => 'entity_with_callable_key',
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildFields($builder): void
+    {
+        $builder->string('key')->primary();
+    }
+}

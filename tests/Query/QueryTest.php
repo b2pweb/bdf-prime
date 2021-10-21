@@ -326,7 +326,18 @@ class QueryTest extends TestCase
         $this->assertEquals('SELECT * FROM test_ WHERE id > ?', $query->toSql());
         $this->assertEquals('SELECT * FROM test_ WHERE id > 1', $query->toRawSql());
     }
-    
+
+    /**
+     *
+     */
+    public function test_where_with_column_which_is_a_callable_string_should_be_used_as_column()
+    {
+        $query = $this->query()->where('key', 1);
+
+        $this->assertEquals('SELECT * FROM test_ WHERE key = ?', $query->toSql());
+        $this->assertEquals('SELECT * FROM test_ WHERE key = 1', $query->toRawSql());
+    }
+
     /**
      * 
      */
@@ -483,6 +494,16 @@ class QueryTest extends TestCase
         $query = $this->query()->where('id', 1)->orWhereNull('id');
 
         $this->assertEquals('SELECT * FROM test_ WHERE id = 1 OR id IS NULL', $query->toRawSql());
+    }
+
+    /**
+     *
+     */
+    public function test_or_where_with_column_name_which_is_a_callable_string_should_be_used_as_string()
+    {
+        $query = $this->query()->where('id', 1)->orWhere('key', 5);
+
+        $this->assertEquals('SELECT * FROM test_ WHERE id = 1 OR key = 5', $query->toRawSql());
     }
 
     /**
@@ -1554,5 +1575,18 @@ class QueryTest extends TestCase
         );
 
         $this->assertEquals([1000, '%foo%'], $query->getBindings());
+    }
+
+    /**
+     *
+     */
+    public function test_join_with_fk_which_is_a_callable_string_should_be_used_as_string()
+    {
+        $query = $this->query()->join('other', 'key', '=', new Attribute('foo'));
+
+        $this->assertEquals(
+            'SELECT * FROM test_ INNER JOIN other ON key = foo',
+            $query->toSql()
+        );
     }
 }

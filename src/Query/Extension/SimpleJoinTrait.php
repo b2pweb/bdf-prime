@@ -34,10 +34,10 @@ trait SimpleJoinTrait
 
         $join = new JoinClause();
 
-        if (is_callable($key)) {
-            $key($join);
-        } else {
+        if (is_string($key)) {
             $join->on($key, $operator, $foreign);
+        } else {
+            $key($join);
         }
 
         $this->addStatement('joins', [

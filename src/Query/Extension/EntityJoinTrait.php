@@ -22,16 +22,14 @@ trait EntityJoinTrait
     public function joinEntity(string $entity, $key, ?string $foreign = null, string $alias = null, string $type = Joinable::INNER_JOIN)
     {
         if ($alias === null) {
-            throw new LogicException('Alias is required for entiy join "'.$entity.'"');
+            throw new LogicException('Alias is required for entity join "'.$entity.'"');
         }
 
-        if (is_callable($key)) {
+        if (is_string($key)) {
+            $this->join([$entity, $alias], $alias.'>'.$key, '=', new Attribute($foreign), $type);
+        } else {
             $this->join([$entity, $alias], $key, null, null, $type);
-
-            return $this;
         }
-
-        $this->join([$entity, $alias], $alias.'>'.$key, '=', new Attribute($foreign), $type);
 
         return $this;
     }
