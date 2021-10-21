@@ -24,7 +24,7 @@ trait SimpleWhereTrait
      */
     public function where($column, $operator = null, $value = null)
     {
-        if (is_callable($column)) {
+        if (!is_string($column) && is_callable($column)) {
             $this->nested($column, $operator ?: CompositeExpression::TYPE_AND);
         } else {
             $this->compilerState->invalidate('where');
@@ -42,7 +42,7 @@ trait SimpleWhereTrait
      */
     public function orWhere($column, $operator = null, $value = null)
     {
-        if (is_callable($column)) {
+        if (!is_string($column) && is_callable($column)) {
             $this->nested($column, $operator ?: CompositeExpression::TYPE_OR);
         } else {
             $this->compilerState->invalidate('where');
