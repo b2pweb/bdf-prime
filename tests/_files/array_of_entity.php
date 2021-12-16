@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Mapper\Mapper;
 
@@ -23,7 +24,7 @@ class EntityArrayOfMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -34,7 +35,7 @@ class EntityArrayOfMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->autoincrement()

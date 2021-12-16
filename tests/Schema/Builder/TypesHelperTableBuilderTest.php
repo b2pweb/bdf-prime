@@ -5,6 +5,7 @@ namespace Bdf\Prime\Schema\Builder;
 use Bdf\Prime\Bench\DummyPlatform;
 use Bdf\Prime\Platform\Sql\Types\SqlStringType;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Schema\TableInterface;
 use Bdf\Prime\Types\ArrayType;
 use Bdf\Prime\Types\JsonType;
 use Bdf\Prime\Types\TypeInterface;
@@ -71,6 +72,25 @@ class TypesHelperTableBuilderTest extends TestCase
     }
 
     /**
+     *
+     */
+    public function test_delegation_build()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject $mock */
+        $mock = $this->createMock(TableBuilderInterface::class);
+
+        $builder = new TypesHelperTableBuilder($mock, $this->types);
+        $return = $this->createMock(TableInterface::class);
+
+        $mock->expects($this->once())
+            ->method('build')
+            ->willReturn($return)
+        ;
+
+        $this->assertSame($return, $builder->build());
+    }
+
+    /**
      * @return array
      */
     public function delegatedMethods()
@@ -84,7 +104,6 @@ class TypesHelperTableBuilderTest extends TestCase
             ['column',      ['id_'],                                           false],
             ['foreignKey',  ['table_', [], []]],
             ['index',       ['name_']],
-            ['build',       [],                                                false],
         ];
     }
 

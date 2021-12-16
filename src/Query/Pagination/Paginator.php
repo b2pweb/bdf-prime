@@ -35,12 +35,12 @@ class Paginator extends AbstractPaginator implements IteratorAggregate, Paginato
      * Create a query paginator
      *
      * @param ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable $query
-     * @param int $maxRows
-     * @param int $page
+     * @param int|null $maxRows
+     * @param int|null $page
      *
      * @throws \Bdf\Prime\Exception\PrimeException
      */
-    public function __construct(ReadCommandInterface $query, $maxRows = null, $page = null)
+    public function __construct(ReadCommandInterface $query, ?int $maxRows = null, ?int $page = null)
     {
         $this->query = $query;
         $this->maxRows = $maxRows ?: self::DEFAULT_LIMIT;
@@ -52,7 +52,7 @@ class Paginator extends AbstractPaginator implements IteratorAggregate, Paginato
     /**
      * {@inheritdoc}
      */
-    protected function loadCollection()
+    protected function loadCollection(): void
     {
         parent::loadCollection();
         

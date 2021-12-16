@@ -214,7 +214,7 @@ class PolymorphContainerMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -222,7 +222,7 @@ class PolymorphContainerMapper extends Mapper
         ];
     }
 
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->autoincrement()

@@ -2,6 +2,9 @@
 
 namespace Bdf\Prime\Behaviors;
 
+use DateTime;
+use DateTimeImmutable;
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Prime;
@@ -66,9 +69,9 @@ class SoftdeleteableTest extends TestCase
         $this->assertEquals(null, $entity->deletedAt);
         
         
-        $now = new \DateTime();
+        $now = new DateTime();
         $entity->delete();
-        $this->assertInstanceOf(\DateTime::class, $entity->deletedAt);
+        $this->assertInstanceOf(DateTime::class, $entity->deletedAt);
         $this->assertEqualsWithDelta($now, $entity->deletedAt, 1);
     }
 
@@ -83,9 +86,9 @@ class SoftdeleteableTest extends TestCase
         $this->assertEquals(null, $entity->deletedAt);
 
 
-        $now = new \DateTimeImmutable();
+        $now = new DateTimeImmutable();
         $entity->delete();
-        $this->assertInstanceOf(\DateTimeImmutable::class, $entity->deletedAt);
+        $this->assertInstanceOf(DateTimeImmutable::class, $entity->deletedAt);
         $this->assertEqualsWithDelta($now, $entity->deletedAt, 1);
     }
 
@@ -134,7 +137,7 @@ class SoftDeleteableEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -145,7 +148,7 @@ class SoftDeleteableEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')->autoincrement()
@@ -156,7 +159,7 @@ class SoftDeleteableEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function getDefinedBehaviors()
+    public function getDefinedBehaviors(): array
     {
         return [
             new SoftDeleteable(),
@@ -181,7 +184,7 @@ class SoftDeleteableEntityImmutMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -192,19 +195,19 @@ class SoftDeleteableEntityImmutMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')->autoincrement()
             ->string('name', 60)
-            ->dateTime('deletedAt')->nillable()->phpClass(\DateTimeImmutable::class)
+            ->dateTime('deletedAt')->nillable()->phpClass(DateTimeImmutable::class)
         ;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDefinedBehaviors()
+    public function getDefinedBehaviors(): array
     {
         return [
             new SoftDeleteable('deletedAt'),

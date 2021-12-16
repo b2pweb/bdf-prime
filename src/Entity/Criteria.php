@@ -200,11 +200,13 @@ class Criteria implements ArrayAccess
 
     /**
      * Set attribute order
-     * 
+     *
      * @param string $attribute
      * @param Orderable::ORDER_* $type
+     *
+     * @return void
      */
-    public function order(string $attribute, string $type = Orderable::ORDER_ASC)
+    public function order(string $attribute, string $type = Orderable::ORDER_ASC): void
     {
         $this->specials[':order'][$attribute] = $type;
     }

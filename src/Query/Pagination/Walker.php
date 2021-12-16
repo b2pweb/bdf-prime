@@ -135,9 +135,11 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
      * Load the first page of collection
      *
      * @throws PrimeException
+     *
+     * @return void
      */
     #[ReadOperation]
-    public function load()
+    public function load(): void
     {
         $this->page = $this->startPage;
         $this->cursor = $this->getStrategy()->initialize($this->query, $this->maxRows, $this->page);
@@ -239,7 +241,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    protected function loadCollection()
+    protected function loadCollection(): void
     {
         $this->cursor = $this->strategy->next($this->cursor);
         $this->collection = $this->cursor->entities;

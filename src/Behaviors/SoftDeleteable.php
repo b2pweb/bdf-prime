@@ -96,8 +96,10 @@ class SoftDeleteable implements BehaviorInterface
      *
      * @param E $entity
      * @param EntityRepository<E> $repository
+     *
+     * @return bool
      */
-    public function beforeDelete($entity, $repository)
+    public function beforeDelete($entity, EntityRepository $repository): bool
     {
         // If the current delete is without constraints, we skip the soft delete management
         if ($repository->isWithoutConstraints()) {
@@ -123,7 +125,7 @@ class SoftDeleteable implements BehaviorInterface
      *
      * @return \DateTimeInterface|int
      */
-    private function createDate($name, $repository)
+    private function createDate(string $name, RepositoryInterface $repository)
     {
         if ($this->type === TypeInterface::BIGINT) {
             return time();

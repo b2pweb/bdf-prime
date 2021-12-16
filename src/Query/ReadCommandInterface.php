@@ -44,15 +44,17 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      * </pre></code>
      *
      * @param object $extension
+     *
+     * @return void
      */
-    public function setExtension($extension);
+    public function setExtension($extension): void;
 
     /**
      * Get the collection factory
      *
      * @return CollectionFactory
      */
-    public function collectionFactory();
+    public function collectionFactory(): CollectionFactory;
 
     /**
      * Set the collection factory
@@ -82,7 +84,7 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      *
      * @return $this
      */
-    public function wrapAs($wrapperClass);
+    public function wrapAs(string $wrapperClass);
 
     /**
      * Get all matched data.
@@ -139,11 +141,11 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      *
      * @param string $column
      *
-     * @return array
+     * @return list<mixed>
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]
-    public function inRows($column);
+    public function inRows(string $column): array;
 
     /**
      * Get a column value
@@ -159,9 +161,9 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      *
      * @param string $column
      *
-     * @return string
+     * @return mixed
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]
-    public function inRow($column);
+    public function inRow(string $column);
 }

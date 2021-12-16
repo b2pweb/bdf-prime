@@ -2,6 +2,7 @@
 
 namespace Php74;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 require_once __DIR__.'/_files/simple_entity.php';
 
 use Bdf\Prime\Entity\Hydrator\ArrayHydrator;
@@ -158,12 +159,12 @@ class WithoutSetterMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function schema()
+    public function schema(): array
     {
         return ['connection' => 'test', 'table' => 'without_setter'];
     }
 
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->autoincrement()

@@ -2,6 +2,9 @@
 
 namespace Bdf\Prime\Behaviors;
 
+use stdClass;
+use DateTime;
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
@@ -140,7 +143,7 @@ class VersionableTest extends TestCase
         $repository = Prime::repository('Bdf\Prime\Behaviors\BookAuthor');
         $versionRepository = Prime::repository('Bdf\Prime\Behaviors\BookAuthorVersion');
 
-        $bookAuthor = new \stdClass();
+        $bookAuthor = new stdClass();
         $bookAuthor->bookId = 1;
         $bookAuthor->authorId = 12;
         $bookAuthor->pseudo = 'Arthur';
@@ -160,11 +163,11 @@ class VersionableTest extends TestCase
      */
     public function test_integration_with_other_behavior()
     {
-        $now = new \DateTime();
+        $now = new DateTime();
         $repository = Prime::repository('Bdf\Prime\Behaviors\BookAuthor');
         $versionRepository = Prime::repository('Bdf\Prime\Behaviors\BookAuthorVersion');
 
-        $bookAuthor = new \stdClass();
+        $bookAuthor = new stdClass();
         $bookAuthor->bookId = 1;
         $bookAuthor->authorId = 12;
         $bookAuthor->pseudo = 'Arthur';
@@ -209,7 +212,7 @@ class BookMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -220,7 +223,7 @@ class BookMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')->autoincrement()
@@ -231,7 +234,7 @@ class BookMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function getDefinedBehaviors()
+    public function getDefinedBehaviors(): array
     {
         return [
             new Versionable('Bdf\Prime\Behaviors\BookVersion'),
@@ -244,7 +247,7 @@ class BookVersionMapper extends VersionableMapper
     /**
      * {@inheritdoc}
      */
-    public function getVersionedClass()
+    public function getVersionedClass(): string
     {
         return 'Bdf\Prime\Behaviors\Book';
     }
@@ -255,7 +258,7 @@ class BookAuthorMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -266,7 +269,7 @@ class BookAuthorMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('bookId')->alias('book_id')->primary(Metadata::PK_AUTO)
@@ -278,7 +281,7 @@ class BookAuthorMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function getDefinedBehaviors()
+    public function getDefinedBehaviors(): array
     {
         return [
             new Versionable('Bdf\Prime\Behaviors\BookAuthorVersion', true),
@@ -292,7 +295,7 @@ class BookAuthorVersionMapper extends VersionableMapper
     /**
      * {@inheritdoc}
      */
-    public function getVersionedClass()
+    public function getVersionedClass(): string
     {
         return 'Bdf\Prime\Behaviors\BookAuthor';
     }

@@ -313,7 +313,7 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
      * //   new Person(['name' => 'Mark']) ]
      * </code>
      */
-    public function import(array $data)
+    public function import(array $data): void
     {
         $entities = [];
 
@@ -331,7 +331,7 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
     /**
      * {@inheritdoc}
      */
-    public function export(array $attributes = [])
+    public function export(array $attributes = []): array
     {
         $data = [];
 

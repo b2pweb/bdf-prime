@@ -120,7 +120,7 @@ class ArrayHydratorTestEntity2Mapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -131,7 +131,7 @@ class ArrayHydratorTestEntity2Mapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->string('name')->primary()
@@ -185,7 +185,7 @@ class EmbeddedEntity2Mapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -196,7 +196,7 @@ class EmbeddedEntity2Mapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder->add('id');
     }

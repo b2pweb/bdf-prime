@@ -66,8 +66,10 @@ class Versionable extends Behavior
      *
      * @param E $entity
      * @param RepositoryInterface<E> $repository
+     *
+     * @return void
      */
-    public function beforeInsert($entity, $repository)
+    public function beforeInsert($entity, RepositoryInterface $repository): void
     {
         $this->incrementVersion($entity, $repository);
     }
@@ -79,9 +81,11 @@ class Versionable extends Behavior
      *
      * @param E $entity
      * @param RepositoryInterface<E> $repository
-     * @param integer $count
+     * @param int $count
+     *
+     * @return void
      */
-    public function afterInsert($entity, $repository, $count)
+    public function afterInsert($entity, RepositoryInterface $repository, int $count): void
     {
         if ($count != 0) {
             $this->insertVersion($entity, $repository);
@@ -96,8 +100,10 @@ class Versionable extends Behavior
      * @param E $entity
      * @param RepositoryInterface<E> $repository
      * @param null|\ArrayObject $attributes
+     *
+     * @return void
      */
-    public function beforeUpdate($entity, $repository, $attributes)
+    public function beforeUpdate($entity, RepositoryInterface $repository, $attributes): void
     {
         if ($attributes !== null) {
             $attributes[] = self::COLUMN_NAME;
@@ -113,9 +119,11 @@ class Versionable extends Behavior
      *
      * @param E $entity
      * @param RepositoryInterface<E> $repository
-     * @param integer $count
+     * @param int $count
+     *
+     * @return void
      */
-    public function afterUpdate($entity, $repository, $count)
+    public function afterUpdate($entity, RepositoryInterface $repository, int $count): void
     {
         if ($count != 0) {
             $this->insertVersion($entity, $repository);
@@ -127,8 +135,10 @@ class Versionable extends Behavior
      *
      * @param E $entity
      * @param RepositoryInterface<E> $repository
+     *
+     * @return void
      */
-    public function deleteAllVersions($entity, $repository)
+    public function deleteAllVersions($entity, RepositoryInterface $repository): void
     {
         $queries = $repository->repository($this->versionClass)->queries();
         $criteria = $repository->mapper()->primaryCriteria($entity);
@@ -161,8 +171,10 @@ class Versionable extends Behavior
      *
      * @param E $entity
      * @param RepositoryInterface<E> $repository
+     *
+     * @return void
      */
-    protected function incrementVersion($entity, $repository)
+    protected function incrementVersion($entity, RepositoryInterface $repository): void
     {
         $mapper = $repository->mapper();
 
@@ -178,8 +190,10 @@ class Versionable extends Behavior
      *
      * @param E $entity
      * @param RepositoryInterface<E> $repository
+     *
+     * @return void
      */
-    protected function insertVersion($entity, $repository)
+    protected function insertVersion($entity, RepositoryInterface $repository): void
     {
         $repository->repository($this->versionClass)->insert($entity);
     }

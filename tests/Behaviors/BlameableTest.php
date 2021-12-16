@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Behaviors;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Prime;
@@ -117,7 +118,7 @@ class BlameableEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -128,7 +129,7 @@ class BlameableEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')->autoincrement()
@@ -139,7 +140,7 @@ class BlameableEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function getDefinedBehaviors()
+    public function getDefinedBehaviors(): array
     {
         return [
             new Blameable(function() {

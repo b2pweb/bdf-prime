@@ -137,18 +137,7 @@ class QueryTest extends TestCase
         $this->assertSame($connection, $query->connection());
         $this->assertSame($compiler, $query->compiler());
     }
-    
-    /**
-     * 
-     */
-    public function test_raw()
-    {
-        $raw = $this->query()->raw('test sql');
-        
-        $this->assertInstanceOf('Bdf\Prime\Query\Expression\Raw', $raw);
-        $this->assertEquals('test sql', (string)$raw);
-    }
-    
+
     /**
      * 
      */

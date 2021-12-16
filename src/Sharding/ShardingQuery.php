@@ -47,7 +47,7 @@ class ShardingQuery extends Query
      * {@inheritdoc}
      */
     #[WriteOperation]
-    protected function executeUpdate($type)
+    protected function executeUpdate(string $type): int
     {
         $lastShard = $this->connection->getCurrentShardId();
 

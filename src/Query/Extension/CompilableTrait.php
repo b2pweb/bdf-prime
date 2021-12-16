@@ -38,7 +38,7 @@ trait CompilableTrait
     /**
      * {@inheritdoc}
      */
-    public function getBindings()
+    public function getBindings(): array
     {
         return $this->compiler->getBindings($this);
     }

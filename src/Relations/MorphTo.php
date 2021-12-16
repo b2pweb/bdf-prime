@@ -128,10 +128,12 @@ class MorphTo extends BelongsTo
     /**
      * Change the current discriminator value 
      * and update the distant repository of this relation
-     * 
+     *
      * @param mixed $type
+     *
+     * @return void
      */
-    protected function loadDistantFromType($type)
+    protected function loadDistantFromType($type): void
     {
         $this->discriminatorValue = $type;
 
@@ -141,10 +143,12 @@ class MorphTo extends BelongsTo
     /**
      * Change the current discriminator value from the entity
      * and update the distant repository of this relation
-     * 
+     *
      * @param object $entity
+     *
+     * @return void
      */
-    protected function loadDistantFrom($entity)
+    protected function loadDistantFrom($entity): void
     {
         $this->updateDiscriminatorValue($entity);
 
@@ -153,8 +157,10 @@ class MorphTo extends BelongsTo
 
     /**
      * Update the distant repository of this relation
+     *
+     * @return void
      */
-    protected function updateDistantInfos()
+    protected function updateDistantInfos(): void
     {
         $infos = $this->map($this->discriminatorValue);
 

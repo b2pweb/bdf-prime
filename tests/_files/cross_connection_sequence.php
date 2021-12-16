@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Mapper\Mapper;
 
@@ -21,7 +22,7 @@ class CrossConnectionSequenceEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -30,7 +31,7 @@ class CrossConnectionSequenceEntityMapper extends Mapper
         ];
     }
 
-    public function sequence()
+    public function sequence(): array
     {
         return [
             'connection'   => 'sequence',
@@ -42,7 +43,7 @@ class CrossConnectionSequenceEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->sequence()

@@ -34,7 +34,7 @@ final class NamedIndex implements IndexInterface
      * @param IndexInterface $index
      * @param string $tableName
      */
-    public function __construct(IndexInterface $index, $tableName)
+    public function __construct(IndexInterface $index, string $tableName)
     {
         $this->index     = $index;
         $this->tableName = $tableName;
@@ -48,7 +48,7 @@ final class NamedIndex implements IndexInterface
      *
      * @see AbstractAsset::_generateIdentifierName()
      */
-    public function name()
+    public function name(): string
     {
         $name = $this->index->name();
 
@@ -69,7 +69,7 @@ final class NamedIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function unique()
+    public function unique(): bool
     {
         return $this->index->unique();
     }
@@ -77,7 +77,7 @@ final class NamedIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function primary()
+    public function primary(): bool
     {
         return $this->index->primary();
     }
@@ -85,7 +85,7 @@ final class NamedIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function type()
+    public function type(): int
     {
         return $this->index->type();
     }
@@ -93,7 +93,7 @@ final class NamedIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function fields()
+    public function fields(): array
     {
         return $this->index->fields();
     }
@@ -101,7 +101,7 @@ final class NamedIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function isComposite()
+    public function isComposite(): bool
     {
         return $this->index->isComposite();
     }
@@ -109,7 +109,7 @@ final class NamedIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function options()
+    public function options(): array
     {
         return $this->index->options();
     }
@@ -117,7 +117,7 @@ final class NamedIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function fieldOptions($field)
+    public function fieldOptions(string $field): array
     {
         return $this->index->fieldOptions($field);
     }
@@ -128,6 +128,7 @@ final class NamedIndex implements IndexInterface
      * @param string $name
      *
      * @return bool
+     * @psalm-assert-if-true non-empty-string $name
      */
     protected function isValidName($name)
     {

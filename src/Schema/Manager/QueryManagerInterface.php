@@ -14,7 +14,7 @@ interface QueryManagerInterface
     /**
      * Push queries to execute
      *
-     * @param mixed $queries Can be one or multiple queries. The type of the query depends of the platform.
+     * @param mixed $queries Can be one or multiple queries. The type of the query depends on the platform.
      *
      * @return $this
      * @throws PrimeException If auto flush is enabled and the query fail
@@ -74,7 +74,7 @@ interface QueryManagerInterface
      *
      * @return boolean
      */
-    public function isBuffered();
+    public function isBuffered(): bool;
 
     /**
      * Clear the cached queries
@@ -95,12 +95,12 @@ interface QueryManagerInterface
      *
      * @throws PrimeException When a pending query fail
      */
-    public function flush();
+    public function flush(): bool;
 
     /**
      * Get pending queries
      *
      * @return array
      */
-    public function pending();
+    public function pending(): array;
 }

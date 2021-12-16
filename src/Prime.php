@@ -37,10 +37,12 @@ class Prime
 
     /**
      * Configure the locator
-     * 
+     *
      * @param array|ContainerInterface|ServiceLocator $config
+     *
+     * @return void
      */
-    public static function configure($config)
+    public static function configure($config): void
     {
         if ($config instanceof ServiceLocator) {
             static::$config = null;
@@ -86,50 +88,61 @@ class Prime
     
     /**
      * Create repositories
-     * 
+     *
      * @param string|array|RepositoryInterface $repositories
      * @param boolean                          $force @see EntityRepository::schema
+     *
      * @throws PrimeException
+     *
+     * @return void
      */
-    public static function create($repositories, $force = false)
+    public static function create($repositories, $force = false): void
     {
         static::callSchemaResolverMethod('migrate', $repositories, $force);
     }
 
     /**
      * Drop repositories
-     * 
+     *
      * @param string|array|RepositoryInterface $repositories
      * @param boolean                          $force @see EntityRepository::schema
+     *
      * @throws PrimeException
+     *
+     * @return void
      */
-    public static function drop($repositories, $force = false)
+    public static function drop($repositories, $force = false): void
     {
         static::callSchemaResolverMethod('drop', $repositories, $force);
     }
 
     /**
      * Truncate repositories
-     * 
+     *
      * @param string|array|RepositoryInterface $repositories
      * @param boolean                          $force @see EntityRepository::schema
+     *
      * @throws PrimeException
+     *
+     * @return void
      */
-    public static function truncate($repositories, $force = false)
+    public static function truncate($repositories, $force = false): void
     {
         static::callSchemaResolverMethod('truncate', $repositories, $force);
     }
 
     /**
      * Call schema resolver method
-     * 
+     *
      * @param string  $method
      * @param mixed   $repositories
      * @param boolean $force
      *
      * @throws PrimeException
+     *
+     * @return void
      */
-    protected static function callSchemaResolverMethod($method, $repositories, $force)
+    protected static function callSchemaResolverMethod($method, $repositories, $force): void
     {
         if (!is_array($repositories)) {
             $repositories = [$repositories];
@@ -147,12 +160,12 @@ class Prime
     /**
      * Push multiple entities in repository
      * launch replace method from repository
-     * 
+     *
      * User can add
      *  * entity object
      *  * collection of entity object
      *  * an array of entity attributes
-     * 
+     *
      * <code>
      *  Prime::push(new EntityClass());
      *  Prime::push([new EntityClass()]);
@@ -160,13 +173,15 @@ class Prime
      *  Prime::push('EntityClass', ['id' => '...']);
      *  Prime::push('EntityClass', [['id' => '...']]);
      * </code>
-     * 
+     *
      * @param mixed $repositoryName
      * @param mixed $entities
      *
      * @throws PrimeException
+     *
+     * @return void
      */
-    public static function push($repositoryName, $entities = null)
+    public static function push($repositoryName, $entities = null): void
     {
         static::callRepositoryMethod('replace', $repositoryName, $entities);
     }
@@ -174,12 +189,12 @@ class Prime
     /**
      * Save multiple entities in repository
      * launch save method from repository
-     * 
+     *
      * User can add
      *  * entity object
      *  * collection of entity object
      *  * an array of entity attributes
-     * 
+     *
      * <code>
      *  Prime::save(new EntityClass());
      *  Prime::save([new EntityClass()]);
@@ -187,25 +202,27 @@ class Prime
      *  Prime::save('EntityClass', ['id' => '...']);
      *  Prime::save('EntityClass', [['id' => '...']]);
      * </code>
-     * 
+     *
      * @param mixed $repositoryName
      * @param mixed $entities
      *
      * @throws PrimeException
+     *
+     * @return void
      */
-    public static function save($repositoryName, $entities = null)
+    public static function save($repositoryName, $entities = null): void
     {
         static::callRepositoryMethod('save', $repositoryName, $entities);
     }
 
     /**
      * Remove multiple entities in repository
-     * 
+     *
      * User can add
      *  * entity object
      *  * collection of entity object
      *  * an array of entity attributes
-     * 
+     *
      * <code>
      *  Prime::remove(new EntityClass());
      *  Prime::remove([new EntityClass()]);
@@ -213,27 +230,31 @@ class Prime
      *  Prime::remove('EntityClass', ['id' => '...']);
      *  Prime::remove('EntityClass', [['id' => '...']]);
      * </code>
-     * 
+     *
      * @param mixed $repositoryName
      * @param mixed $entities
      *
      * @throws PrimeException
+     *
+     * @return void
      */
-    public static function remove($repositoryName, $entities = null)
+    public static function remove($repositoryName, $entities = null): void
     {
         static::callRepositoryMethod('delete', $repositoryName, $entities);
     }
     
     /**
      * Call repository method for entities
-     *  
+     *
      * @param string $method
      * @param mixed $repositoryName
      * @param mixed $entities
      *
      * @throws PrimeException
+     *
+     * @return void
      */
-    protected static function callRepositoryMethod($method, $repositoryName, $entities)
+    protected static function callRepositoryMethod($method, $repositoryName, $entities): void
     {
         if (!is_string($repositoryName) && !$repositoryName instanceof RepositoryInterface) {
             $entities = $repositoryName;
@@ -395,6 +416,8 @@ class Prime
 
     /**
      * Initializes the service locator
+     *
+     * @return void
      */
     protected static function initialize()
     {

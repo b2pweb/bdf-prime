@@ -35,7 +35,7 @@ class ArrayEntity implements ImportableInterface, InitializableInterface
     protected $id;
     protected $embedded;
     
-    public function initialize()
+    public function initialize(): void
     {
         $this->embedded = new ArrayEmbeddedEntity();
     }

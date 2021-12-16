@@ -43,6 +43,20 @@ BC Breaks
     * ping()
 * Class `Bdf\Prime\Query\CacheStatement` has been deleted. Use `Doctrine\DBAL\Cache\ArrayResult` instead
 * Class `Bdf\Prime\Query\Expression\Match` has been deleted. Use `Bdf\Prime\Query\Expression\FullTextMatch` instead
+* Remove method `Bdf\Prime\ConnectionManager::connection()`. Use getConnection instead
+* Typehint return of methods of `\Bdf\Prime\Migration\MigrationInterface`
+* Typehint return of methods of `\Bdf\Prime\Mapper\Mapper`
+* Change typehints of methods of `\Bdf\Prime\Entry\Hydrator` interfaces. Hydrators must be regenerated.
+* Remove $types parameter of `Bdf\Prime\Connection\ConnectionInterface::select()`
+* Add void return type hint on `Bdf\Prime\Entity\InitializableInterface::initialize()`
+* Change signature of `Bdf\Prime\Query\SqlQueryInterface::group()` / `addGroup()` : disallow array
+* Delete method `Bdf\Prime\Query\SqlQueryInterface::raw()`. Use `new Raw()` instead
+* Add typehint on return of methods of `Bdf\Prime\Types\TypeInterface`.
+* Typehint defaultValue parameter of `Bdf\Prime\Types\TypesHelperInterface` of methods :
+    * simpleArray() - use array instead of string
+    * arrayObject() - use array instead of string
+    * searchableArray() - use array instead of string
+    * arrayOfXXX() - use array instead of string
 
 v1.3.0
 ------

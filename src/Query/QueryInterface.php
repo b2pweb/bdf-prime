@@ -11,6 +11,7 @@ use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\Whereable;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Pagination\PaginatorInterface;
+use Bdf\Prime\Types\TypeInterface;
 
 /**
  * QueryInterface
@@ -39,7 +40,7 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * @throws PrimeException When execute fail
      */
     #[WriteOperation]
-    public function update(array $data = [], array $types = []);
+    public function update(array $data = [], array $types = []): int;
 
     /**
      * Set update values
@@ -58,7 +59,7 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      *
      * @return $this This Query instance.
      */
-    public function set($column, $value, $type = null);
+    public function set(string $column, $value, $type = null);
 
     /**
      * Turns the query being built into an insert query that inserts into
@@ -79,7 +80,7 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * @throws PrimeException When execute fail
      */
     #[WriteOperation]
-    public function insert(array $data = []);
+    public function insert(array $data = []): int;
 
     /**
      * Set insert value
@@ -94,11 +95,11 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      *
      * @param string $column
      * @param mixed $value
-     * @param mixed $type
+     * @param string|TypeInterface|null $type
      *
      * @return $this
      */
-    public function setValue($column, $value, $type = null);
+    public function setValue(string $column, $value, $type = null);
 
     /**
      * Replace values from mapper table
@@ -111,7 +112,7 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * @throws PrimeException When execute fail
      */
     #[WriteOperation]
-    public function replace(array $values = []);
+    public function replace(array $values = []): int;
 
     /**
      * Get rows collection
@@ -119,7 +120,7 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * @param array $criteria
      * @param string|array $attributes
      *
-     * @return R[]|CollectionInterface<R>|PaginatorInterface
+     * @return R[]|CollectionInterface<R>|PaginatorInterface<R>
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]

@@ -199,7 +199,7 @@ class OrmPreprocessor implements PreprocessorInterface
      *
      * To ensure that the expression is converted as needed, use Expressions instead of plain value
      */
-    public function expression(array $expression)
+    public function expression(array $expression): array
     {
         if (isset($expression['column'])) {
             $type = true;
@@ -236,7 +236,7 @@ class OrmPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function table(array $table)
+    public function table(array $table): array
     {
         if ($this->aliasResolver === null) {
             return $table;
@@ -268,7 +268,7 @@ class OrmPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): void
     {
         if ($this->aliasResolver !== null) {
             $this->aliasResolver->setQuery(null);

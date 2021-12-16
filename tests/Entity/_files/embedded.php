@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Entity;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Mapper\Mapper;
 
 class Place extends Model
@@ -22,7 +23,7 @@ class PlaceMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -33,7 +34,7 @@ class PlaceMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder->bigint('id')->primary();
         $builder->embedded('bag', Bag::class, function($builder) {

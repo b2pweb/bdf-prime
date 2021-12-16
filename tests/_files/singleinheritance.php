@@ -1,10 +1,10 @@
 <?php
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Relations\Builder\RelationBuilder;
 use Bdf\Prime\Entity\Extensions\ArrayInjector;
 use Bdf\Prime\Mapper\SingleTableInheritanceMapper;
 use Bdf\Prime\Mapper\Mapper;
-
-
 class ParentEntity
 {
     use ArrayInjector;
@@ -22,7 +22,6 @@ class ParentEntity
         $this->import($attributes);
     }
 }
-
 class ParentEntityMapper extends SingleTableInheritanceMapper
 {
     protected $discriminatorColumn = 'typeId';
@@ -36,7 +35,7 @@ class ParentEntityMapper extends SingleTableInheritanceMapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -48,7 +47,7 @@ class ParentEntityMapper extends SingleTableInheritanceMapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')
@@ -69,24 +68,22 @@ class ParentEntityMapper extends SingleTableInheritanceMapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('target')
             ->inherit('targetId');
     }
 }
-
 class ChildEntity1 extends ParentEntity
 {
     public $typeId = 'child1';
 }
-
 class ChildEntity1Mapper extends ParentEntityMapper
 {
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         parent::buildRelations($builder);
 
@@ -94,18 +91,16 @@ class ChildEntity1Mapper extends ParentEntityMapper
             ->belongsTo('ChildRelation1', 'targetId');
     }
 }
-
 class ChildEntity2 extends ParentEntity
 {
     public $typeId = 'child2';
 }
-
 class ChildEntity2Mapper extends ParentEntityMapper
 {
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         parent::buildRelations($builder);
 
@@ -113,7 +108,6 @@ class ChildEntity2Mapper extends ParentEntityMapper
             ->belongsTo('ChildRelation2::id', 'targetId');
     }
 }
-
 class ChildRelation1
 {
     use ArrayInjector;
@@ -127,14 +121,12 @@ class ChildRelation1
         $this->import($attributes);
     }
 }
-
-
 class ChildRelation1Mapper extends Mapper
 {
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -146,7 +138,7 @@ class ChildRelation1Mapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')
@@ -163,13 +155,12 @@ class ChildRelation1Mapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('relation2')
             ->belongsTo('ChildRelation2::id', 'relation2.id');
     }
 }
-
 class ChildRelation2
 {
     use ArrayInjector;
@@ -182,14 +173,12 @@ class ChildRelation2
         $this->import($attributes);
     }
 }
-
-
 class ChildRelation2Mapper extends Mapper
 {
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -201,7 +190,7 @@ class ChildRelation2Mapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')

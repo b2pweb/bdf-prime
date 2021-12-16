@@ -27,7 +27,7 @@ class ArrayCache implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function set(CacheKey $key, $data)
+    public function set(CacheKey $key, $data): void
     {
         $this->data[$key->namespace()][$key->key()] = $data;
     }
@@ -35,7 +35,7 @@ class ArrayCache implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function delete(CacheKey $key)
+    public function delete(CacheKey $key): void
     {
         unset($this->data[$key->namespace()][$key->key()]);
     }
@@ -43,7 +43,7 @@ class ArrayCache implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function flush($namespace)
+    public function flush(string $namespace): void
     {
         unset($this->data[$namespace]);
     }
@@ -51,7 +51,7 @@ class ArrayCache implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function clear()
+    public function clear(): void
     {
         $this->data = [];
     }

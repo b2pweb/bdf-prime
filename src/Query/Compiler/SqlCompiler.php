@@ -41,7 +41,7 @@ class SqlCompiler extends AbstractCompiler
     /**
      * {@inheritdoc}
      */
-    public function quoteIdentifier(CompilableClause $query, $column)
+    public function quoteIdentifier(CompilableClause $query, string $column): string
     {
         if (!$query->isQuoteIdentifier()) {
             return $column;
@@ -1094,11 +1094,9 @@ class SqlCompiler extends AbstractCompiler
     }
 
     /**
-     * @param SqlQueryInterface&CompilableClause $query
-     *
-     * @return array
+     * {@inheritdoc}
      */
-    public function getBindings(CompilableClause $query)
+    public function getBindings(CompilableClause $query): array
     {
         return $this->mergeBindings($query->state()->bindings);
     }

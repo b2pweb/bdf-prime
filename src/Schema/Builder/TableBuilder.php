@@ -63,7 +63,7 @@ final class TableBuilder implements TableBuilderInterface
      *
      * @param string $name
      */
-    public function __construct($name)
+    public function __construct(string $name)
     {
         $this->name = $name;
     }
@@ -71,7 +71,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function name($name)
+    public function name(string $name)
     {
         $this->name = $name;
 
@@ -113,7 +113,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function index($columns, $type = IndexInterface::TYPE_SIMPLE, $name = null, array $options = [])
+    public function index($columns, int $type = IndexInterface::TYPE_SIMPLE, ?string $name = null, array $options = [])
     {
         if (is_string($columns)) {
             $normalizedColumns = [$columns => []];
@@ -145,7 +145,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function primary($columns = null, $name = null)
+    public function primary($columns = null, ?string $name = null)
     {
         return $this->index(
             $columns ?: [$this->current],
@@ -157,7 +157,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function add($column, PlatformTypeInterface $type, array $options = [])
+    public function add(string $column, PlatformTypeInterface $type, array $options = [])
     {
         $this->current = $column;
 
@@ -167,7 +167,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function column($name = null)
+    public function column(?string $name = null)
     {
         if ($name === null) {
             $name = $this->current;
@@ -179,16 +179,16 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function foreignKey($foreignTable, array $localColumnNames, array $foreignColumnNames, array $options = [], $constraintName = null)
+    public function foreignKey($foreignTable, array $localColumnNames, array $foreignColumnNames, array $options = [], ?string $constraintName = null)
     {
         $foreignKey = new ForeignKey(
             $localColumnNames,
             $foreignTable,
             $foreignColumnNames,
             $constraintName,
-            isset($options['onDelete']) ? $options['onDelete'] : ForeignKey::MODE_RESTRICT,
-            isset($options['onUpdate']) ? $options['onUpdate'] : ForeignKey::MODE_RESTRICT,
-            isset($options['match']) ?    $options['match']    : ForeignKey::MATCH_SIMPLE
+            $options['onDelete'] ?? ForeignKeyInterface::MODE_RESTRICT,
+            $options['onUpdate'] ?? ForeignKeyInterface::MODE_RESTRICT,
+            $options['match'] ?? ForeignKeyInterface::MATCH_SIMPLE
         );
 
         $this->foreignKeys[$foreignKey->name()] = $foreignKey;
@@ -199,7 +199,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function build()
+    public function build(): Table
     {
         return new Table(
             $this->name,
@@ -277,7 +277,7 @@ final class TableBuilder implements TableBuilderInterface
      *
      * @return self
      */
-    public static function fromTable(TableInterface $table)
+    public static function fromTable(TableInterface $table): self
     {
         $builder = new self($table->name());
 

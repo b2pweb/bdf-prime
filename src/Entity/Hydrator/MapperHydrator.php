@@ -41,7 +41,7 @@ class MapperHydrator implements MapperHydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function setPrimeInstantiator(InstantiatorInterface $instantiator)
+    public function setPrimeInstantiator(InstantiatorInterface $instantiator): void
     {
         $this->instantiator = $instantiator;
     }
@@ -49,7 +49,7 @@ class MapperHydrator implements MapperHydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function setPrimeMetadata(Metadata $metadata)
+    public function setPrimeMetadata(Metadata $metadata): void
     {
         $this->metadata = $metadata;
     }
@@ -57,7 +57,7 @@ class MapperHydrator implements MapperHydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function flatExtract($object, array $attributes = null)
+    public function flatExtract($object, array $attributes = null): array
     {
         $values = [];
         $cache  = [];
@@ -88,7 +88,7 @@ class MapperHydrator implements MapperHydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function flatHydrate($object, array $data, PlatformTypesInterface $types)
+    public function flatHydrate($object, array $data, PlatformTypesInterface $types): void
     {
         $metadata  = $this->metadata->fields;
         $embeddeds = $this->metadata->embeddeds;
@@ -148,7 +148,7 @@ class MapperHydrator implements MapperHydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function extractOne($object, $attribute)
+    public function extractOne($object, string $attribute)
     {
         if (!isset($this->metadata->attributes[$attribute])) {
             if (!isset($this->metadata->embeddeds[$attribute])) {
@@ -171,7 +171,7 @@ class MapperHydrator implements MapperHydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function hydrateOne($object, $attribute, $value)
+    public function hydrateOne($object, string $attribute, $value): void
     {
         if (!isset($this->metadata->attributes[$attribute])) {
             if (!isset($this->metadata->embeddeds[$attribute])) {
@@ -308,6 +308,8 @@ class MapperHydrator implements MapperHydratorInterface
      * @param object $entity
      * @param array $metadata
      * @param mixed $value
+     *
+     * @return void
      */
     protected function writeToAttribute($entity, array $metadata, $value, bool $skipInvalid)
     {
@@ -340,6 +342,8 @@ class MapperHydrator implements MapperHydratorInterface
      * @param object $entity
      * @param array $metadata
      * @param mixed $value
+     *
+     * @return void
      */
     protected function writeToEmbedded($entity, array $metadata, $value, bool $skipInvalid)
     {
@@ -422,8 +426,10 @@ class MapperHydrator implements MapperHydratorInterface
      * @param array $metadata
      *
      * @throws InvalidTypeException
+     *
+     * @return void
      */
-    private function writeToReflection(ReflectionProperty $reflectionProperty, $entity, $value, bool $skipInvalid, array $metadata)
+    private function writeToReflection(ReflectionProperty $reflectionProperty, $entity, $value, bool $skipInvalid, array $metadata): void
     {
         if (!$skipInvalid || !$this->shouldSkipValue($reflectionProperty, $value)) {
             try {

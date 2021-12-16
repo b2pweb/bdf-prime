@@ -54,7 +54,7 @@ class Resolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function migrate($listDrop = true)
+    public function migrate(bool $listDrop = true): void
     {
         $schema = $this->schema()->useDrop($listDrop);
         $schema->add($this->table());
@@ -70,7 +70,7 @@ class Resolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function diff($listDrop = true)
+    public function diff(bool $listDrop = true): array
     {
         $queries = $this->schema()
             ->simulate(function (SchemaManagerInterface $schema) use ($listDrop) {
@@ -101,7 +101,7 @@ class Resolver implements ResolverInterface
      * @return TableInterface
      * @throws PrimeException
      */
-    public function table($foreignKeys = false)
+    public function table(bool $foreignKeys = false): TableInterface
     {
         $table = new MetadataTable(
             $this->metadata,
@@ -126,10 +126,10 @@ class Resolver implements ResolverInterface
     /**
      * Create sequence schema from meta
      *
-     * @return null|TableInterface
+     * @return null|TableInterface The table or null if the current repository has no sequence
      * @throws PrimeException
      */
-    public function sequence()
+    public function sequence(): ?TableInterface
     {
         if (!$this->metadata->isSequencePrimaryKey()) {
             return null;
@@ -150,8 +150,10 @@ class Resolver implements ResolverInterface
      * Insert sequence id into sequence table
      *
      * @throws PrimeException
+     *
+     * @return void
      */
-    public function insertSequenceId()
+    public function insertSequenceId(): void
     {
         if (!$this->metadata->isSequencePrimaryKey()) {
             return;
@@ -172,7 +174,7 @@ class Resolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function truncate($cascade = false)
+    public function truncate(bool $cascade = false): bool
     {
         $this->schema()->truncate($this->metadata->table, $cascade);
 
@@ -182,7 +184,7 @@ class Resolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function drop()
+    public function drop(): bool
     {
         try {
             $this->schema()->drop($this->metadata->table);

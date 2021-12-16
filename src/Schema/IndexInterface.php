@@ -13,52 +13,54 @@ interface IndexInterface
 
     /**
      * Get the index name
+     * It may be null : in this case, use NamedIndex
      *
-     * @return string
+     * @return string|null
+     * @psalm-ignore-nullable-return
      */
-    public function name();
+    public function name(): ?string;
 
     /**
      * Check if the index is unique
      *
      * @return bool
      */
-    public function unique();
+    public function unique(): bool;
 
     /**
      * Check if the index is primary
      *
      * @return bool
      */
-    public function primary();
+    public function primary(): bool;
 
     /**
      * Get the index type
      *
-     * @return int
+     * @return IndexInterface::TYPE_*
      */
-    public function type();
+    public function type(): int;
 
     /**
      * Get list of composed fields
      *
      * @return string[]
      */
-    public function fields();
+    public function fields(): array;
 
     /**
      * Check if the index is composite (i.e. have multiple fields)
      *
      * @return bool
      */
-    public function isComposite();
+    public function isComposite(): bool;
 
     /**
      * Gets the index options
      *
      * @return array
      */
-    public function options();
+    public function options(): array;
 
     /**
      * Get options for one field
@@ -68,5 +70,5 @@ interface IndexInterface
      *
      * @return array
      */
-    public function fieldOptions($field);
+    public function fieldOptions(string $field): array;
 }

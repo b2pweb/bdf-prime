@@ -25,22 +25,22 @@ final class ForeignKey implements ForeignKeyInterface
     private $referred;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $name;
 
     /**
-     * @var string
+     * @var ForeignKeyInterface::MODE_*
      */
     private $onDelete;
 
     /**
-     * @var string
+     * @var ForeignKeyInterface::MODE_*
      */
     private $onUpdate;
 
     /**
-     * @var string
+     * @var ForeignKeyInterface::MATCH_*
      */
     private $match;
 
@@ -51,12 +51,12 @@ final class ForeignKey implements ForeignKeyInterface
      * @param string[] $fields
      * @param string $table
      * @param string[] $referred
-     * @param string $name
-     * @param string $onDelete
-     * @param string $onUpdate
-     * @param string $match
+     * @param string|null $name
+     * @param ForeignKeyInterface::MODE_* $onDelete
+     * @param ForeignKeyInterface::MODE_* $onUpdate
+     * @param ForeignKeyInterface::MATCH_* $match
      */
-    public function __construct(array $fields, $table, array $referred, $name = null, $onDelete = self::MODE_RESTRICT, $onUpdate = self::MODE_RESTRICT, $match = self::MATCH_SIMPLE)
+    public function __construct(array $fields, string $table, array $referred, ?string $name = null, string $onDelete = self::MODE_RESTRICT, string $onUpdate = self::MODE_RESTRICT, string $match = self::MATCH_SIMPLE)
     {
         $this->fields   = $fields;
         $this->table    = $table;
@@ -70,7 +70,7 @@ final class ForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         if (!$this->name) {
             $this->name = Name::generate('fk', array_merge([$this->table], $this->fields()));
@@ -82,7 +82,7 @@ final class ForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function visit(ConstraintVisitorInterface $visitor)
+    public function visit(ConstraintVisitorInterface $visitor): void
     {
         $visitor->onForeignKey($this);
     }
@@ -90,7 +90,7 @@ final class ForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function fields()
+    public function fields(): array
     {
         return $this->fields;
     }
@@ -98,7 +98,7 @@ final class ForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function match()
+    public function match(): string
     {
         return $this->match;
     }
@@ -106,7 +106,7 @@ final class ForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function table()
+    public function table(): string
     {
         return $this->table;
     }
@@ -114,7 +114,7 @@ final class ForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function referred()
+    public function referred(): array
     {
         return $this->referred;
     }
@@ -122,7 +122,7 @@ final class ForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function onDelete()
+    public function onDelete(): string
     {
         return $this->onDelete;
     }
@@ -130,7 +130,7 @@ final class ForeignKey implements ForeignKeyInterface
     /**
      * {@inheritdoc}
      */
-    public function onUpdate()
+    public function onUpdate(): string
     {
         return $this->onUpdate;
     }

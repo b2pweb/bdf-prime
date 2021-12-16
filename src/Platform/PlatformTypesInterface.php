@@ -21,7 +21,7 @@ interface PlatformTypesInterface extends TypesRegistryInterface
      *
      * @return bool
      */
-    public function isNative($name);
+    public function isNative(string $name): bool;
 
     /**
      * Get the native type related to the name
@@ -31,7 +31,7 @@ interface PlatformTypesInterface extends TypesRegistryInterface
      *
      * @return PlatformTypeInterface
      */
-    public function native($name);
+    public function native(string $name): PlatformTypeInterface;
 
     /**
      * Resolve the best type from a PHP value
@@ -41,7 +41,7 @@ interface PlatformTypesInterface extends TypesRegistryInterface
      *
      * @return TypeInterface|null The type, or null to let connection decide
      */
-    public function resolve($value);
+    public function resolve($value): ?TypeInterface;
 
     /**
      * Convert a PHP value to database value

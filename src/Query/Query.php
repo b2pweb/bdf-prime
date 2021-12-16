@@ -7,6 +7,7 @@ use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
+use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
@@ -18,6 +19,7 @@ use Bdf\Prime\Query\Extension\OrderableTrait;
 use Bdf\Prime\Query\Extension\PaginableTrait;
 use Bdf\Prime\Query\Extension\SimpleJoinTrait;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use Stringable;
 
 /**
  * Sql Query
@@ -33,9 +35,10 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
  * @implements SqlQueryInterface<C, R>
  * @implements Paginable<R>
  */
-class Query extends AbstractQuery implements SqlQueryInterface, Paginable
+class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Stringable
 {
     use EntityJoinTrait;
+    /** @use PaginableTrait<R> */
     use PaginableTrait;
     use LimitableTrait;
     use OrderableTrait;
@@ -74,7 +77,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
-    public function getBindings()
+    public function getBindings(): array
     {
         return $this->compiler->getBindings($this);
     }
@@ -82,25 +85,15 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
-    public function raw($sql)
-    {
-        return new Raw($sql);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function quote($value, $type = null)
+    public function quote($value, int $type = null): string
     {
         return $this->connection->quote($value, $type);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @todo Utile ?
      */
-    public function quoteIdentifier($column)
+    public function quoteIdentifier(string $column): string
     {
         return $this->compiler->quoteIdentifier($this, $column);
     }
@@ -111,19 +104,19 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     #[WriteOperation]
     public function delete(): int
     {
-        return (int) $this->executeUpdate(self::TYPE_DELETE);
+        return $this->executeUpdate(self::TYPE_DELETE);
     }
 
     /**
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function update(array $data = [], array $types = [])
+    public function update(array $data = [], array $types = []): int
     {
         if ($data) {
             $this->statements['values'] = [
-                'data'   => $data,
-                'types'  => $types,
+                'data' => $data,
+                'types' => $types,
             ];
         }
         
@@ -134,11 +127,11 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function insert(array $data = [])
+    public function insert(array $data = []): int
     {
         if ($data) {
             $this->statements['values'] = [
-                'data'   => $data,
+                'data' => $data,
             ];
         }
         
@@ -148,9 +141,9 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
-    public function ignore($flag = true)
+    public function ignore(bool $flag = true)
     {
-        $this->statements['ignore'] = (bool)$flag;
+        $this->statements['ignore'] = $flag;
         
         return $this;
     }
@@ -159,7 +152,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function replace(array $values = [])
+    public function replace(array $values = []): int
     {
         $this->statements['replace'] = true;
 
@@ -215,13 +208,13 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * Executes this query as an update query
      *
-     * @param string $type The query type
+     * @param Compilable::TYPE_* $type The query type
      *
      * @return int The number of updated rows
      *
      * @throws PrimeException
      */
-    protected function executeUpdate($type)
+    protected function executeUpdate(string $type): int
     {
         $this->setType($type);
 
@@ -380,19 +373,21 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
-    public function distinct($flag = true)
+    public function distinct(bool $flag = true)
     {
         $this->compilerState->invalidate('columns');
         
-        $this->statements['distinct'] = (bool)$flag;
+        $this->statements['distinct'] = $flag;
         
         return $this;
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @param string|Query $from The table name, or the embedded query
      */
-    public function from($from, $alias = null)
+    public function from($from, ?string $alias = null)
     {
         $this->compilerState->invalidate('from');
 
@@ -448,11 +443,11 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
-    public function group($column)
+    public function group(string ...$columns)
     {
         $this->compilerState->invalidate('groups');
         
-        $this->statements['groups'] = is_array($column) ? $column : func_get_args();
+        $this->statements['groups'] = $columns;
         
         return $this;
     }
@@ -460,11 +455,11 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
-    public function addGroup($column)
+    public function addGroup(string ...$columns)
     {
         $this->compilerState->invalidate('groups');
         
-        $this->statements['groups'] = array_merge($this->statements['groups'], is_array($column) ? $column : func_get_args());
+        $this->statements['groups'] = [...$this->statements['groups'], ...$columns];
         
         return $this;
     }
@@ -492,7 +487,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
-    public function havingNull($column, $type = CompositeExpression::TYPE_AND)
+    public function havingNull(string $column, string $type = CompositeExpression::TYPE_AND)
     {
         $this->compilerState->invalidate('having');
 
@@ -502,7 +497,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
-    public function havingNotNull($column, $type = CompositeExpression::TYPE_AND)
+    public function havingNotNull(string $column, string $type = CompositeExpression::TYPE_AND)
     {
         $this->compilerState->invalidate('having');
 
@@ -512,7 +507,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
-    public function orHavingNull($column)
+    public function orHavingNull(string $column)
     {
         return $this->havingNull($column, CompositeExpression::TYPE_OR);
     }
@@ -520,7 +515,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
-    public function orHavingNotNull($column)
+    public function orHavingNotNull(string $column)
     {
         return $this->havingNotNull($column, CompositeExpression::TYPE_OR);
     }
@@ -528,7 +523,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
-    public function havingRaw($raw, $type = CompositeExpression::TYPE_AND)
+    public function havingRaw($raw, string $type = CompositeExpression::TYPE_AND)
     {
         $this->compilerState->invalidate('having');
 
@@ -592,16 +587,19 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
     /**
      * {@inheritdoc}
      */
-    public function toSql()
+    public function toSql(): string
     {
         return $this->compile();
     }
 
     /**
      * {@inheritdoc}
+     *
      * @todo A reprendre: utiliser les types des bindings
+     *
+     * @return string
      */
-    public function toRawSql()
+    public function toRawSql(): string
     {
         $keys   = [];
         $sql    = $this->toSql();
@@ -637,7 +635,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable
      *
      * @return string The string representation of this Query.
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->toSql();
     }

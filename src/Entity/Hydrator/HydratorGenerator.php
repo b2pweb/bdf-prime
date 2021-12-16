@@ -93,7 +93,7 @@ class HydratorGenerator
         $this->accessors = new AccessorResolver($this->accessor, $this->resolver, $this->code);
     }
 
-    private function makeAccessor()
+    private function makeAccessor(): ClassAccessor
     {
         $subClass = [];
 
@@ -152,8 +152,10 @@ class HydratorGenerator
 
     /**
      * Resolve hydrator properties
+     *
+     * @return void
      */
-    protected function resolveHydrators()
+    protected function resolveHydrators(): void
     {
         $classes = [];
 

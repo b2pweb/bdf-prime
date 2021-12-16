@@ -167,7 +167,7 @@ abstract class OneOrMany extends Relation
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function add($owner, $related)
+    public function add($owner, $related): int
     {
         if ($this->isForeignKeyBarrier($owner)) {
             throw new InvalidArgumentException('The local entity is not the primary key barrier.');

@@ -50,7 +50,7 @@ final class ConstraintSet implements ConstraintSetInterface
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function all(): array
     {
         return $this->constraints;
     }
@@ -58,7 +58,7 @@ final class ConstraintSet implements ConstraintSetInterface
     /**
      * {@inheritdoc}
      */
-    public function get($name)
+    public function get(string $name): ConstraintInterface
     {
         return $this->constraints[strtoupper($name)];
     }
@@ -68,7 +68,7 @@ final class ConstraintSet implements ConstraintSetInterface
      *
      * @return self
      */
-    public static function blank()
+    public static function blank(): self
     {
         if (self::$blank === null) {
             self::$blank = new self([]);

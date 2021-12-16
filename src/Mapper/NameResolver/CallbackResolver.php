@@ -2,26 +2,29 @@
 
 namespace Bdf\Prime\Mapper\NameResolver;
 
+use Bdf\Prime\Mapper\Mapper;
 use Closure;
 
 /**
  * CallbackResolver
+ *
+ * @deprecated Prefer use anonymous class implementing ResolverInterface
  */
 class CallbackResolver implements ResolverInterface
 {
     /**
-     * @var Closure
+     * @var Closure(class-string):class-string<Mapper>
      */
     protected $resolver;
     
     /**
-     * @var Closure
+     * @var Closure(class-string<Mapper>):class-string
      */
     protected $reverser;
     
     /**
-     * @param Closure $resolver
-     * @param Closure $reverser
+     * @param Closure(class-string):class-string<Mapper> $resolver
+     * @param Closure(class-string<Mapper>):class-string $reverser
      */
     public function __construct(Closure $resolver, Closure $reverser)
     {
@@ -32,18 +35,16 @@ class CallbackResolver implements ResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve($entityClass)
+    public function resolve(string $entityClass): string
     {
-        $resolver = $this->resolver;
-        return $resolver($entityClass);
+        return ($this->resolver)($entityClass);
     }
     
     /**
      * {@inheritdoc}
      */
-    public function reverse($mapperClass)
+    public function reverse(string $mapperClass): string
     {
-        $reverser = $this->reverser;
-        return $reverser($mapperClass);
+        return ($this->reverser)($mapperClass);
     }
 }

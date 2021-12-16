@@ -36,7 +36,7 @@ interface KeyValueQueryInterface extends ReadCommandInterface, Projectionable, A
      *
      * @return $this This Query instance.
      */
-    public function from($from, $alias = null);
+    public function from(string $from, ?string $alias = null);
 
     /**
      * Filter fields

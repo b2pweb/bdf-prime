@@ -164,7 +164,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
      *
      * @see BulkInsertQuery::into()
      */
-    public function from($from, $alias = null)
+    public function from(string $from, ?string $alias = null)
     {
         return $this->into($from);
     }
@@ -272,7 +272,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
     /**
      * {@inheritdoc}
      */
-    public function getBindings()
+    public function getBindings(): array
     {
         return $this->compiler->getBindings($this);
     }

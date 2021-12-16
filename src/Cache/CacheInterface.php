@@ -12,7 +12,7 @@ interface CacheInterface
      * 
      * @param CacheKey $key
      * 
-     * @return array|null
+     * @return mixed|null
      */
     public function get(CacheKey $key);
 
@@ -20,26 +20,34 @@ interface CacheInterface
      * Write data on namespace
      * 
      * @param CacheKey $key
-     * @param array  $data
+     * @param mixed $data
+     *
+     * @return void
      */
-    public function set(CacheKey $key, $data);
+    public function set(CacheKey $key, $data): void;
 
     /**
      * Delete key from namespace
      * 
      * @param CacheKey $key
+     *
+     * @return void
      */
-    public function delete(CacheKey $key);
+    public function delete(CacheKey $key): void;
 
     /**
      * Flush namespace only
      * 
      * @param string $namespace
+     *
+     * @return void
      */
-    public function flush($namespace);
+    public function flush(string $namespace): void;
 
     /**
      * Clear all cache
+     *
+     * @return void
      */
-    public function clear();
+    public function clear(): void;
 }

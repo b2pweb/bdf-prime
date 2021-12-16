@@ -12,21 +12,21 @@ interface IndexSetComparatorInterface
     /**
      * Get list of added indexes
      *
-     * @return IndexInterface[]
+     * @return list<IndexInterface>
      */
-    public function added();
+    public function added(): array;
 
     /**
      * Get list of changed indexes
      *
-     * @return IndexInterface[]
+     * @return list<IndexInterface>
      */
-    public function changed();
+    public function changed(): array;
 
     /**
      * Get list of removed indexes
      *
-     * @return IndexInterface[]
+     * @return list<IndexInterface>
      */
-    public function removed();
+    public function removed(): array;
 }

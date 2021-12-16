@@ -57,7 +57,7 @@ class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function expression(array $expression)
+    public function expression(array $expression): array
     {
         return $expression;
     }
@@ -65,7 +65,7 @@ class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function table(array $table)
+    public function table(array $table): array
     {
         return $table;
     }
@@ -81,7 +81,7 @@ class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): void
     {
 
     }

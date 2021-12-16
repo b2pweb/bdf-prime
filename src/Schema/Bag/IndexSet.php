@@ -35,7 +35,7 @@ final class IndexSet implements IndexSetInterface
     /**
      * {@inheritdoc}
      */
-    public function primary()
+    public function primary(): ?IndexInterface
     {
         foreach ($this->indexes as $index) {
             if ($index->primary()) {
@@ -49,7 +49,7 @@ final class IndexSet implements IndexSetInterface
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function all(): array
     {
         return $this->indexes;
     }
@@ -57,7 +57,7 @@ final class IndexSet implements IndexSetInterface
     /**
      * {@inheritdoc}
      */
-    public function get($name)
+    public function get(string $name): IndexInterface
     {
         return $this->indexes[strtolower($name)];
     }
@@ -65,7 +65,7 @@ final class IndexSet implements IndexSetInterface
     /**
      * {@inheritdoc}
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         return isset($this->indexes[strtolower($name)]);
     }

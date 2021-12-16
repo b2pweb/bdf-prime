@@ -22,7 +22,7 @@ interface EntityJoinable extends Joinable, Whereable
      * @param class-string $entity
      * @param string|callable(\Bdf\Prime\Query\JoinClause):void $key
      * @param string|null $foreign
-     * @param string $alias Alias is mandatory
+     * @param string|null $alias Alias is mandatory
      * @param Joinable::* $type Type of join.
      *
      * @return $this This Query instance.
@@ -37,7 +37,7 @@ interface EntityJoinable extends Joinable, Whereable
      * @param class-string $entity
      * @param string|callable(\Bdf\Prime\Query\JoinClause):void $key
      * @param string|null $foreign
-     * @param string $alias
+     * @param string|null $alias
      *
      * @return $this This Query instance.
      */
@@ -49,7 +49,7 @@ interface EntityJoinable extends Joinable, Whereable
      * @param class-string $entity
      * @param string|callable(\Bdf\Prime\Query\JoinClause):void $key
      * @param string|null $foreign
-     * @param string $alias
+     * @param string|null $alias
      *
      * @return $this This Query instance.
      */

@@ -15,7 +15,7 @@ final class Check implements CheckInterface
     private $expression;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $name;
 
@@ -24,9 +24,9 @@ final class Check implements CheckInterface
      * Check constructor.
      *
      * @param mixed $expression
-     * @param string $name
+     * @param string|null $name
      */
-    public function __construct($expression, $name = null)
+    public function __construct($expression, ?string $name = null)
     {
         $this->expression = $expression;
         $this->name       = $name;
@@ -35,7 +35,7 @@ final class Check implements CheckInterface
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         if (!$this->name) {
             $this->name = Name::serialized('chk', $this->expression);
@@ -55,7 +55,7 @@ final class Check implements CheckInterface
     /**
      * {@inheritdoc}
      */
-    public function visit(ConstraintVisitorInterface $visitor)
+    public function visit(ConstraintVisitorInterface $visitor): void
     {
         $visitor->onCheck($this);
     }

@@ -12,7 +12,7 @@ final class NullRelationInfo implements RelationInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function isLoaded($entity)
+    public function isLoaded($entity): bool
     {
         return false;
     }
@@ -20,21 +20,21 @@ final class NullRelationInfo implements RelationInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function clear($entity)
+    public function clear($entity): void
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function markAsLoaded($entity)
+    public function markAsLoaded($entity): void
     {
     }
 
     /**
      * @return NullRelationInfo
      */
-    public static function instance()
+    public static function instance(): self
     {
         if (self::$instance === null)  {
             return self::$instance = new self;

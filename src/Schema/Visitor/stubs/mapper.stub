@@ -1,6 +1,7 @@
 <?php
 
 use Bdf\Prime\Mapper\Mapper;
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 
 /**
  *
@@ -10,7 +11,7 @@ class <className> extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => '<connection>',
@@ -22,7 +23,7 @@ class <className> extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         <fields>
     }<sequence><indexes>

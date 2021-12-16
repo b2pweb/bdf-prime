@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Mapper\Builder\IndexBuilder;
 use Bdf\Prime\Mapper\Mapper;
@@ -24,7 +25,7 @@ class EntityWithIndexMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection'   => 'test',
@@ -37,7 +38,7 @@ class EntityWithIndexMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->alias('id_')->autoincrement()
@@ -52,7 +53,7 @@ class EntityWithIndexMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function indexes()
+    public function indexes(): array
     {
         return [
             ['address', 'zipCode']
@@ -75,7 +76,7 @@ class EntityWithIndexV15Mapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection'   => 'test',
@@ -88,7 +89,7 @@ class EntityWithIndexV15Mapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->alias('id_')->autoincrement()
@@ -103,7 +104,7 @@ class EntityWithIndexV15Mapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildIndexes(IndexBuilder $builder)
+    public function buildIndexes(IndexBuilder $builder): void
     {
         $builder
             ->add()->on('guid')->unique()
@@ -126,7 +127,7 @@ class PartialIndexEntity extends Model
 
 class PartialIndexEntityMapper extends Mapper
 {
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection'   => 'test',
@@ -135,7 +136,7 @@ class PartialIndexEntityMapper extends Mapper
         ];
     }
 
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->autoincrement()
@@ -143,7 +144,7 @@ class PartialIndexEntityMapper extends Mapper
         ;
     }
 
-    public function buildIndexes(IndexBuilder $builder)
+    public function buildIndexes(IndexBuilder $builder): void
     {
         $builder
             ->add()->on('value')->option('where', 'value < 42')->unique()

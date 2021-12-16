@@ -86,7 +86,7 @@ class IntializedEntity implements InitializableInterface
     /**
      *
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->name = 'initialized';
     }

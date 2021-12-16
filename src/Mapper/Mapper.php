@@ -34,6 +34,9 @@ use LogicException;
  * @todo Convertir la donnée avec le type approprié sur les methodes setId, hydrateOne
  *
  * @template E as object
+ *
+ * @psalm-import-type FieldDefinition from FieldBuilder
+ * @psalm-import-type RelationDefinition from RelationBuilder
  */
 abstract class Mapper
 {
@@ -157,7 +160,7 @@ abstract class Mapper
     /**
      * Custom configuration
      */
-    public function configure()
+    public function configure(): void
     {
         // to overwrite
     }
@@ -165,7 +168,8 @@ abstract class Mapper
     /**
      * Get entity class
      * 
-     * @return class-string
+     * @return class-string<E>
+     * @final
      */
     public function getEntityClass(): string
     {
@@ -176,6 +180,7 @@ abstract class Mapper
      * Get metadata
      * 
      * @return Metadata
+     * @final
      */
     public function metadata(): Metadata
     {
@@ -186,6 +191,7 @@ abstract class Mapper
      * Set property accessor class name
      * 
      * @param class-string<PropertyAccessorInterface> $className
+     * @final
      */
     public function setPropertyAccessorClass(string $className): void
     {
@@ -196,6 +202,7 @@ abstract class Mapper
      * Get property accessor class name
      * 
      * @return class-string<PropertyAccessorInterface>
+     * @final
      */
     public function getPropertyAccessorClass(): string
     {
@@ -206,6 +213,7 @@ abstract class Mapper
      * Set repository class name
      *
      * @param class-string $className
+     * @final
      */
     public function setRepositoryClass(string $className): void
     {
@@ -216,6 +224,7 @@ abstract class Mapper
      * Get repository class name
      *
      * @return class-string
+     * @final
      */
     public function getRepositoryClass(): string
     {
@@ -226,6 +235,7 @@ abstract class Mapper
      * Set the repository read only
      * 
      * @param bool $flag
+     * @final
      */
     public function setReadOnly(bool $flag): void
     {
@@ -236,6 +246,7 @@ abstract class Mapper
      * Get repository read only state
      * 
      * @return bool
+     * @final
      */
     public function isReadOnly(): bool
     {
@@ -244,6 +255,7 @@ abstract class Mapper
     
     /**
      * Disable schema manager on repository
+     * @final
      */
     public function disableSchemaManager(): void
     {
@@ -254,6 +266,7 @@ abstract class Mapper
      * Does repository have a schema manager
      * 
      * @return bool
+     * @final
      */
     public function hasSchemaManager(): bool
     {
@@ -264,6 +277,7 @@ abstract class Mapper
      * Set the query builder quote identifier
      *
      * @param bool $flag
+     * @final
      */
     public function setQuoteIdentifier(bool $flag): void
     {
@@ -274,6 +288,7 @@ abstract class Mapper
      * Does query builder use quote identifier
      *
      * @return bool
+     * @final
      */
     public function hasQuoteIdentifier(): bool
     {
@@ -284,6 +299,7 @@ abstract class Mapper
      * Set generator ID
      * 
      * @param string|GeneratorInterface $generator
+     * @final
      */
     public function setGenerator($generator): void
     {
@@ -299,6 +315,7 @@ abstract class Mapper
      * 
      * @return GeneratorInterface
      * @psalm-assert GeneratorInterface $this->generator
+     * @final
      */
     public function generator(): GeneratorInterface
     {
@@ -320,6 +337,7 @@ abstract class Mapper
 
     /**
      * @return MapperHydratorInterface<E>
+     * @final
      */
     public function hydrator(): MapperHydratorInterface
     {
@@ -330,6 +348,7 @@ abstract class Mapper
      * @param MapperHydratorInterface<E> $hydrator
      *
      * @return $this
+     * @final
      */
     public function setHydrator(MapperHydratorInterface $hydrator)
     {
@@ -346,8 +365,11 @@ abstract class Mapper
      *
      * @param E $entity
      * @param mixed $value
+     *
+     * @return void
+     * @final
      */
-    public function setId($entity, $value)
+    public function setId($entity, $value): void
     {
         $this->hydrateOne($entity, $this->metadata->primary['attributes'][0], $value);
     }
@@ -359,6 +381,7 @@ abstract class Mapper
      * @param E $entity
      *
      * @return mixed
+     * @final
      */
     public function getId($entity)
     {
@@ -372,6 +395,7 @@ abstract class Mapper
      * @param string $attribute
      *
      * @return mixed
+     * @final
      */
     public function extractOne($entity, string $attribute)
     {
@@ -384,6 +408,9 @@ abstract class Mapper
      * @param E $entity
      * @param string $attribute
      * @param mixed  $value
+     *
+     * @return void
+     * @final
      */
     public function hydrateOne($entity, string $attribute, $value): void
     {
@@ -396,6 +423,7 @@ abstract class Mapper
      * @param E $entity
      *
      * @return array
+     * @final
      */
     public function primaryCriteria($entity): array
     {
@@ -406,6 +434,7 @@ abstract class Mapper
      * Instanciate the related class entity
      *
      * @return E
+     * @final
      */
     public function instantiate()
     {
@@ -420,6 +449,7 @@ abstract class Mapper
      * @param array $data
      *
      * @return E
+     * @final
      */
     public function entity(array $data)
     {
@@ -443,6 +473,7 @@ abstract class Mapper
      * @param array|null $attributes  Attribute should be flipped as ['key' => true]
      *
      * @return array
+     * @final
      */
     public function prepareToRepository($entity, array $attributes = null): array
     {
@@ -477,6 +508,7 @@ abstract class Mapper
      * Get the repository
      * 
      * @return RepositoryInterface<E>
+     * @final
      */
     public function repository(): RepositoryInterface
     {
@@ -490,6 +522,7 @@ abstract class Mapper
      *
      * @return MapperInfo
      * @throws PrimeException
+     * @final
      */
     public function info(): MapperInfo
     {
@@ -544,16 +577,17 @@ abstract class Mapper
      * 
      * @return array
      */
-    abstract public function schema();
+    abstract public function schema(): array;
     
     /**
      * Gets repository fields builder
      * 
-     * @return FieldBuilder
+     * @return iterable<string, FieldDefinition>
+     * @final
      *
      * @todo should be final
      */
-    public function fields()
+    public function fields(): iterable
     {
         $builder = new FieldBuilder();
         $this->buildFields($builder);
@@ -572,7 +606,7 @@ abstract class Mapper
      * 
      * @param FieldBuilder $builder
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         throw new LogicException('Fields must be defined in mapper '.__CLASS__);
     }
@@ -597,9 +631,14 @@ abstract class Mapper
      *  ];
      * </code>
      * 
-     * @return array
+     * @return array{
+     *     connection?: string|null,
+     *     table?: string|null,
+     *     column?: string|null,
+     *     tableOptions?: array,
+     * }
      */
-    public function sequence()
+    public function sequence(): array
     {
         return [
             'connection'   => null,
@@ -621,9 +660,9 @@ abstract class Mapper
      *  ];
      * </code>
      * 
-     * @return array
+     * @return array<string, callable(\Bdf\Prime\Query\QueryInterface,mixed...):void>
      */
-    public function filters()
+    public function filters(): array
     {
         return [];
     }
@@ -638,10 +677,11 @@ abstract class Mapper
      * </code>
      * 
      * @return array
+     * @final
      *
      * @todo Make final
      */
-    public function indexes()
+    public function indexes(): array
     {
         $builder = new IndexBuilder();
 
@@ -666,14 +706,14 @@ abstract class Mapper
      *
      * @param IndexBuilder $builder
      */
-    public function buildIndexes(IndexBuilder $builder)
+    public function buildIndexes(IndexBuilder $builder): void
     {
 
     }
     
     /**
      * Repository extension
-     * returns additionnals methods in repository
+     * returns additional methods in repository
      * 
      * <code>
      * return [
@@ -684,9 +724,9 @@ abstract class Mapper
      * 
      * $repository->customMethod('test');
      * </code>
-     * @return array
+     * @return array<string, callable(\Bdf\Prime\Query\QueryInterface,mixed...):mixed>
      */
-    public function scopes()
+    public function scopes(): array
     {
         throw new LogicException('No scopes have been defined in "' . get_class($this) . '"');
     }
@@ -706,9 +746,9 @@ abstract class Mapper
      * ];
      * </code>
      *
-     * @return callable[]
+     * @return array<string, callable(\Bdf\Prime\Repository\RepositoryInterface,mixed...):mixed>
      */
-    public function queries()
+    public function queries(): array
     {
         return [];
     }
@@ -717,8 +757,9 @@ abstract class Mapper
      * Register event on notifier
      * 
      * @param RepositoryEventsSubscriberInterface<E> $notifier
+     * @final
      */
-    public function events(RepositoryEventsSubscriberInterface $notifier)
+    public function events(RepositoryEventsSubscriberInterface $notifier): void
     {
         $this->customEvents($notifier);
 
@@ -734,7 +775,7 @@ abstract class Mapper
      *
      * @param RepositoryEventsSubscriberInterface<E> $notifier
      */
-    public function customEvents($notifier)
+    public function customEvents(RepositoryEventsSubscriberInterface $notifier): void
     {
         // To overwrite
     }
@@ -744,7 +785,7 @@ abstract class Mapper
      *
      * @return BehaviorInterface<E>[]
      */
-    final public function behaviors()
+    final public function behaviors(): array
     {
         if ($this->behaviors === null) {
             $this->behaviors = $this->getDefinedBehaviors();
@@ -760,7 +801,7 @@ abstract class Mapper
      *
      * @return BehaviorInterface<E>[]
      */
-    public function getDefinedBehaviors()
+    public function getDefinedBehaviors(): array
     {
         return [];
     }
@@ -768,18 +809,19 @@ abstract class Mapper
     /**
      * Get all relations
      *
-     * @return RelationBuilder
+     * @return array<string, RelationDefinition>
+     * @final
      *
      * @todo should be final
      */
-    public function relations()
+    public function relations(): array
     {
         if ($this->relationBuilder === null) {
             $this->relationBuilder = new RelationBuilder();
             $this->buildRelations($this->relationBuilder);
         }
 
-        return $this->relationBuilder;
+        return $this->relationBuilder->relations();
     }
 
     /**
@@ -789,7 +831,7 @@ abstract class Mapper
      *
      * @param RelationBuilder $builder
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         // to overwrite
     }
@@ -799,7 +841,7 @@ abstract class Mapper
      * 
      * @return array
      */
-    final public function constraints()
+    final public function constraints(): array
     {
         $constraints = $this->customConstraints();
 
@@ -823,7 +865,7 @@ abstract class Mapper
      * 
      * @return array
      */
-    public function customConstraints()
+    public function customConstraints(): array
     {
         return [];
     }

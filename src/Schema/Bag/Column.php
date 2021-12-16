@@ -7,6 +7,8 @@ use Bdf\Prime\Schema\ColumnInterface;
 
 /**
  * Column object representation
+ *
+ * @psalm-immutable
  */
 final class Column implements ColumnInterface
 {
@@ -26,7 +28,7 @@ final class Column implements ColumnInterface
     private $defaultValue;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $length;
 
@@ -51,22 +53,22 @@ final class Column implements ColumnInterface
     private $nillable;
 
     /**
-     * @var string
+     * @var string|null
      */
     private $comment;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $precision;
 
     /**
-     * @var int
+     * @var int|null
      */
     private $scale;
 
     /**
-     * @var array
+     * @var array<string, mixed>
      */
     private $options;
 
@@ -77,17 +79,17 @@ final class Column implements ColumnInterface
      * @param string $name
      * @param PlatformTypeInterface $type
      * @param mixed $defaultValue
-     * @param int $length
+     * @param int|null $length
      * @param bool $autoIncrement
      * @param bool $unsigned
      * @param bool $fixed
      * @param bool $nillable
-     * @param string $comment
-     * @param int $precision
-     * @param int $scale
-     * @param array $options
+     * @param string|null $comment
+     * @param int|null $precision
+     * @param int|null $scale
+     * @param array<string, mixed> $options
      */
-    public function __construct($name, PlatformTypeInterface $type, $defaultValue = null, $length = null, $autoIncrement = false, $unsigned = false, $fixed = false, $nillable = false, $comment = null, $precision = 10, $scale = 0, array $options = [])
+    public function __construct(string $name, PlatformTypeInterface $type, $defaultValue = null, ?int $length = null, bool $autoIncrement = false, bool $unsigned = false, bool $fixed = false, bool $nillable = false, ?string $comment = null, ?int $precision = 10, ?int $scale = 0, array $options = [])
     {
         $this->name = $name;
         $this->type = $type;
@@ -106,7 +108,7 @@ final class Column implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return $this->name;
     }
@@ -114,7 +116,7 @@ final class Column implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function type()
+    public function type(): PlatformTypeInterface
     {
         return $this->type;
     }
@@ -130,7 +132,7 @@ final class Column implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function length()
+    public function length(): ?int
     {
         return $this->length;
     }
@@ -138,7 +140,7 @@ final class Column implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function autoIncrement()
+    public function autoIncrement(): bool
     {
         return $this->autoIncrement;
     }
@@ -146,7 +148,7 @@ final class Column implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function unsigned()
+    public function unsigned(): bool
     {
         return $this->unsigned;
     }
@@ -154,7 +156,7 @@ final class Column implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function fixed()
+    public function fixed(): bool
     {
         return $this->fixed;
     }
@@ -162,7 +164,7 @@ final class Column implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function nillable()
+    public function nillable(): bool
     {
         return $this->nillable;
     }
@@ -170,7 +172,7 @@ final class Column implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function comment()
+    public function comment(): ?string
     {
         return $this->comment;
     }
@@ -178,7 +180,7 @@ final class Column implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function precision()
+    public function precision(): ?int
     {
         return $this->precision;
     }
@@ -186,7 +188,7 @@ final class Column implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function scale()
+    public function scale(): ?int
     {
         return $this->scale;
     }
@@ -194,7 +196,7 @@ final class Column implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function options()
+    public function options(): array
     {
         return $this->options;
     }
@@ -202,7 +204,7 @@ final class Column implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function option($name)
+    public function option(string $name)
     {
         return $this->options[$name];
     }

@@ -11,32 +11,32 @@ final class LocalHashTableRelationInfo implements RelationInfoInterface
      * Store loaded state of entities relations
      * Use the entity object id as key, and boolean as value
      *
-     * @var array<string, boolean>
+     * @var array<int, boolean>
      */
     private $loaded = [];
 
     /**
      * {@inheritdoc}
      */
-    public function isLoaded($entity)
+    public function isLoaded($entity): bool
     {
-        return !empty($this->loaded[spl_object_hash($entity)]);
+        return !empty($this->loaded[spl_object_id($entity)]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function clear($entity)
+    public function clear($entity): void
     {
-        unset($this->loaded[spl_object_hash($entity)]);
+        unset($this->loaded[spl_object_id($entity)]);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function markAsLoaded($entity)
+    public function markAsLoaded($entity): void
     {
         // @todo que faire avec les stdClass ?
-        $this->loaded[spl_object_hash($entity)] = true;
+        $this->loaded[spl_object_id($entity)] = true;
     }
 }

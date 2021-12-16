@@ -18,7 +18,7 @@ class ArrayObjectType extends AbstractSerializeType
     /**
      * {@inheritdoc}
      */
-    public function phpType()
+    public function phpType(): string
     {
         return PhpTypeInterface::TARRAY;
     }

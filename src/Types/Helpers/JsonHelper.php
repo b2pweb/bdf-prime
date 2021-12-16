@@ -43,7 +43,7 @@ trait JsonHelper
     /**
      * {@inheritdoc}
      */
-    public function phpType()
+    public function phpType(): string
     {
         return $this->toArray ? PhpTypeInterface::TARRAY : PhpTypeInterface::OBJECT;
     }

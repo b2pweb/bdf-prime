@@ -2,6 +2,10 @@
 
 namespace Php74;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
+use Bdf\Serializer\Metadata\Builder\ClassMetadataBuilder;
+use DateTimeImmutable;
 use Bdf\Prime\Entity\Extensions\ArrayInjector;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Mapper\Mapper;
@@ -28,7 +32,7 @@ class DocumentMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -39,7 +43,7 @@ class DocumentMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')
@@ -69,7 +73,7 @@ class DocumentMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('uploader')
             ->morphTo('uploaderId', 'uploaderType', [
@@ -106,7 +110,7 @@ class DocumentEagerMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -117,7 +121,7 @@ class DocumentEagerMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')
@@ -147,7 +151,7 @@ class DocumentEagerMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('uploader')
             ->morphTo('uploaderId', 'uploaderType', [
@@ -198,7 +202,7 @@ class UserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -209,7 +213,7 @@ class UserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')
@@ -234,7 +238,7 @@ class UserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('customer')
             ->belongsTo(Customer::class, 'customer.id');
@@ -250,7 +254,7 @@ class UserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function customEvents($notifier)
+    public function customEvents(RepositoryEventsSubscriberInterface $notifier): void
     {
         $notifier->listen('afterLoad', function($entity) {
             if ($entity->name === 'TEST1 to check event') {
@@ -262,7 +266,7 @@ class UserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function filters()
+    public function filters(): array
     {
         return [
             'nameLike' => function($query, $value) {
@@ -274,7 +278,7 @@ class UserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function scopes()
+    public function scopes(): array
     {
         return [
             'testScope' => function($query, $value) {
@@ -304,7 +308,7 @@ class AdminMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -315,7 +319,7 @@ class AdminMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')
@@ -336,7 +340,7 @@ class AdminMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('faction')
                 ->belongsTo(Faction::class, 'faction.id')
@@ -367,7 +371,7 @@ class FactionMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -379,7 +383,7 @@ class FactionMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')
@@ -399,7 +403,7 @@ class FactionMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function customConstraints()
+    public function customConstraints(): array
     {
         return [
             'enabled' => true
@@ -409,7 +413,7 @@ class FactionMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('adminFaction')
             ->hasMany(Admin::class.'::faction.id')
@@ -444,7 +448,7 @@ class CustomerMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -455,7 +459,7 @@ class CustomerMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function sequence()
+    public function sequence(): array
     {
         return [
             'connection'   => 'test',
@@ -468,7 +472,7 @@ class CustomerMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')
@@ -484,7 +488,7 @@ class CustomerMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('packs')
             ->belongsToMany(Pack::class)
@@ -531,7 +535,7 @@ class LocationMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -542,7 +546,7 @@ class LocationMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')
@@ -559,7 +563,7 @@ class LocationMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('customer')
             ->belongsTo(Customer::class, 'id')
@@ -583,7 +587,7 @@ class PackMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -594,7 +598,7 @@ class PackMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')
@@ -608,7 +612,7 @@ class PackMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('customers')
             ->belongsToMany(Customer::class)
@@ -633,7 +637,7 @@ class CustomerPackMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -644,7 +648,7 @@ class CustomerPackMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('customerId')
@@ -676,7 +680,7 @@ class ProjectMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -687,7 +691,7 @@ class ProjectMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')
@@ -700,7 +704,7 @@ class ProjectMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('developers')
             ->hasMany(Developer::class.'::project.id')
@@ -741,7 +745,7 @@ class CommitMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -752,7 +756,7 @@ class CommitMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')
@@ -773,7 +777,7 @@ class CommitMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('project')
             ->belongsTo(Project::class, 'project.id');
@@ -807,7 +811,7 @@ class DeveloperMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -818,7 +822,7 @@ class DeveloperMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')
@@ -841,7 +845,7 @@ class DeveloperMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('commits')
             ->hasMany(Commit::class.'::authorId');
@@ -874,7 +878,7 @@ class IntegratorMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -885,7 +889,7 @@ class IntegratorMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->primary()
@@ -899,7 +903,7 @@ class IntegratorMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('company')
             ->belongsTo(Company::class, 'company.id')
@@ -929,7 +933,7 @@ class ProjectIntegratorMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -940,7 +944,7 @@ class ProjectIntegratorMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('projectId')->primary()
@@ -965,7 +969,7 @@ class CompanyMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -976,7 +980,7 @@ class CompanyMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->primary()
@@ -1052,7 +1056,7 @@ class TaskMapper extends SingleTableInheritanceMapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -1064,7 +1068,7 @@ class TaskMapper extends SingleTableInheritanceMapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->autoincrement()
@@ -1073,7 +1077,7 @@ class TaskMapper extends SingleTableInheritanceMapper
             ->bigint('targetId', 0)
             ->string('overridenProperty')->nillable()
             ->add('createdAt', 'date_utc', 'CURRENT_DATE')->nillable()
-            ->dateTime('updatedAt', 'CURRENT_DATE')->timezone('UTC')->phpClass(\DateTimeImmutable::class)->nillable()
+            ->dateTime('updatedAt', 'CURRENT_DATE')->timezone('UTC')->phpClass(DateTimeImmutable::class)->nillable()
             ->dateTime('deletedAt', 'CURRENT_DATE')->nillable()
         ;
     }
@@ -1081,7 +1085,7 @@ class TaskMapper extends SingleTableInheritanceMapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('target')->inherit('targetId');
         $builder->on('targetEager')->inherit('targetId')->mode(RelationBuilder::MODE_EAGER);
@@ -1092,7 +1096,7 @@ class DocumentControlTaskMapper extends TaskMapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         parent::buildRelations($builder);
 
@@ -1108,7 +1112,7 @@ class CustomerControlTaskMapper extends TaskMapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         parent::buildRelations($builder);
 
@@ -1133,7 +1137,7 @@ class UserCustomMetadata extends Model
     /**
      * {@inheritdoc}
      */
-    public static function loadSerializerMetadata($metadata)
+    public static function loadSerializerMetadata(ClassMetadataBuilder $metadata): void
     {
         $metadata->property('id')->configure([
             'type' => 'string',
@@ -1150,7 +1154,7 @@ class UserCustomMetadataMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -1161,7 +1165,7 @@ class UserCustomMetadataMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')
@@ -1179,7 +1183,7 @@ class UserCustomMetadataMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('customer')
             ->belongsTo(Customer::class, 'customer.id');
@@ -1212,7 +1216,7 @@ class UserInheritedMetadataMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -1223,7 +1227,7 @@ class UserInheritedMetadataMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')
@@ -1241,7 +1245,7 @@ class UserInheritedMetadataMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('customer')
             ->belongsTo(Customer::class, 'customer.id');
@@ -1266,7 +1270,7 @@ class RightMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function configure()
+    public function configure(): void
     {
         $this->setQuoteIdentifier(true);
     }
@@ -1274,7 +1278,7 @@ class RightMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -1285,7 +1289,7 @@ class RightMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')->primary()->alias('id_')

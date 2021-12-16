@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Schema\Adapter\Doctrine;
 
+use Bdf\Prime\Platform\PlatformTypeInterface;
 use Bdf\Prime\Schema\ColumnInterface;
 use Bdf\Prime\Types\TypesRegistryInterface;
 use Doctrine\DBAL\Schema\Column;
@@ -37,7 +38,7 @@ final class DoctrineColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return $this->column->getName();
     }
@@ -47,7 +48,7 @@ final class DoctrineColumn implements ColumnInterface
      *
      * @todo Handle type mapping ?
      */
-    public function type()
+    public function type(): PlatformTypeInterface
     {
         return $this->types->get($this->column->getType()->getName());
     }
@@ -63,7 +64,7 @@ final class DoctrineColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function length()
+    public function length(): ?int
     {
         return $this->column->getLength();
     }
@@ -71,7 +72,7 @@ final class DoctrineColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function autoIncrement()
+    public function autoIncrement(): bool
     {
         return $this->column->getAutoincrement();
     }
@@ -79,7 +80,7 @@ final class DoctrineColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function unsigned()
+    public function unsigned(): bool
     {
         return $this->column->getUnsigned();
     }
@@ -87,7 +88,7 @@ final class DoctrineColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function fixed()
+    public function fixed(): bool
     {
         return $this->column->getFixed();
     }
@@ -95,7 +96,7 @@ final class DoctrineColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function nillable()
+    public function nillable(): bool
     {
         return !$this->column->getNotnull();
     }
@@ -103,7 +104,7 @@ final class DoctrineColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function comment()
+    public function comment(): ?string
     {
         return $this->column->getComment();
     }
@@ -111,7 +112,7 @@ final class DoctrineColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function precision()
+    public function precision(): ?int
     {
         return $this->column->getPrecision();
     }
@@ -119,7 +120,7 @@ final class DoctrineColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function scale()
+    public function scale(): ?int
     {
         return $this->column->getScale();
     }
@@ -127,7 +128,7 @@ final class DoctrineColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function options()
+    public function options(): array
     {
         return $this->column->getCustomSchemaOptions();
     }
@@ -135,7 +136,7 @@ final class DoctrineColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function option($name)
+    public function option(string $name)
     {
         return $this->column->getCustomSchemaOption($name);
     }

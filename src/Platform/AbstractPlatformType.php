@@ -21,7 +21,7 @@ abstract class AbstractPlatformType implements PlatformTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function __construct(PlatformInterface $platform, $name)
+    public function __construct(PlatformInterface $platform, string $name)
     {
         $this->platform = $platform;
         $this->name     = $name;
@@ -46,7 +46,7 @@ abstract class AbstractPlatformType implements PlatformTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return $this->name;
     }

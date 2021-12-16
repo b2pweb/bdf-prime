@@ -39,43 +39,33 @@ class CompilableClause extends Clause implements CompilableClauseInterface
     }
 
     /**
-     * Get the preprocessor of the query
-     *
-     * @return PreprocessorInterface
+     * {@inheritdoc}
      */
-    public function preprocessor()
+    public function preprocessor(): PreprocessorInterface
     {
         return $this->preprocessor;
     }
 
     /**
-     * Get the query compiler state
-     *
-     * @return CompilerState
-     *
-     * @internal
+     * {@inheritdoc}
      */
-    public function state()
+    public function state(): CompilerState
     {
         return $this->compilerState;
     }
 
     /**
-     * Tell the compiler to quote identifiers (i.e. table, columns)
-     *
-     * @param bool $flag
+     * {@inheritdoc}
      */
-    public function useQuoteIdentifier($flag = true)
+    public function useQuoteIdentifier(bool $flag = true): void
     {
         $this->quoteIdentifier = $flag;
     }
 
     /**
-     * Check if the identifiers should be quoted
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    public function isQuoteIdentifier()
+    public function isQuoteIdentifier(): bool
     {
         return $this->quoteIdentifier;
     }

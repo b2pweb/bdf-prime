@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\IdGenerators;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
@@ -89,7 +90,7 @@ class AutoIncrementUserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -100,7 +101,7 @@ class AutoIncrementUserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')->autoincrement()

@@ -89,7 +89,7 @@ trait DateTimeHelper
     /**
      * {@inheritdoc}
      */
-    public function phpType()
+    public function phpType(): string
     {
         return $this->className[0] !== '\\' ? '\\'.$this->className : $this->className;
     }

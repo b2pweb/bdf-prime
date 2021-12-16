@@ -5,14 +5,12 @@ namespace Bdf\Prime\Sharding\Query;
 use BadMethodCallException;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
-use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Contract\Cachable;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
-use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Custom\BulkInsert\BulkInsertQuery;
 use Bdf\Prime\Query\Extension\CachableTrait;
@@ -23,9 +21,9 @@ use Bdf\Prime\Sharding\ShardingConnection;
  * Handle INSERT operations on Sharding connection set
  * The shard will be choosed using inserted data value, and the operation will be delegated to the shard connection
  *
- * @implements CommandInterface<ShardingConnection>
+ * @implements InsertQueryInterface<ShardingConnection>
  */
-class ShardingInsertQuery extends CompilableClause implements InsertQueryInterface, CommandInterface, Cachable
+class ShardingInsertQuery extends CompilableClause implements InsertQueryInterface, Cachable
 {
     use CachableTrait;
     use ShardPicker;
@@ -122,7 +120,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function from($from, $alias = null)
+    public function from(string $from, ?string $alias = null)
     {
         return $this->into($from);
     }
@@ -276,7 +274,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    protected function cacheNamespace()
+    protected function cacheNamespace(): string
     {
         return $this->connection->getName().':'.$this->table;
     }

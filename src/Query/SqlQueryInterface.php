@@ -29,44 +29,44 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      *
      * @return array The currently defined query parameters indexed by parameter index or name.
      */
-    public function getBindings();
+    public function getBindings(): array;
 
     /**
      * Specifies a grouping over the results of the query.
      * Replaces any previously specified groupings, if any.
      *
      * <code>
-     *     $query ->group('u.id'); // GROUP BY u.id
-     *     $query ->group('u.id', 'name'); // GROUP BY u.id, name
+     *     $query->group('u.id'); // GROUP BY u.id
+     *     $query->group('u.id', 'name'); // GROUP BY u.id, name
      * </code>
      *
-     * @param mixed $column The grouping expression.
+     * @param string ...$columns The grouping columns.
      *
      * @return $this This Query instance.
      */
-    public function group($column);
+    public function group(string ...$columns);
 
     /**
      * Add a grouping over the results of the query.
      *
      * <code>
-     *     $query ->addGroup('u.id'); // GROUP BY u.id
-     *     $query ->addGroup('u.date', 'name'); // GROUP BY u.id, u.date, name
+     *     $query->addGroup('u.id'); // GROUP BY u.id
+     *     $query->addGroup('u.date', 'name'); // GROUP BY u.id, u.date, name
      * </code>
      *
-     * @param mixed $column The grouping expression.
+     * @param string ...$columns The grouping columns.
      *
      * @return $this This Query instance.
      */
-    public function addGroup($column);
+    public function addGroup(string ...$columns);
 
     /**
      * Specifies a restriction over the groups of the query.
      * Replaces any previous having restrictions, if any.
      *
-     * @param  string|array $column The restriction predicates.
-     * @param  string $operator
-     * @param  mixed $value
+     * @param string|array<string,mixed>|callable(static):void $column The restriction predicates.
+     * @param string|mixed|null $operator The comparison operator, or the value is you want to use "=" operator
+     * @param mixed $value
      *
      * @return $this This Query instance.
      *
@@ -78,9 +78,9 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * Adds a restriction over the groups of the query, forming a logical
      * disjunction with any existing having restrictions.
      *
-     * @param  string|array $column The restriction predicates.
-     * @param  string $operator
-     * @param  mixed $value
+     * @param string|array<string,mixed>|callable(static):void $column The restriction predicates.
+     * @param string|mixed|null $operator The comparison operator, or the value is you want to use "=" operator
+     * @param mixed $value
      *
      * @return $this This Query instance.
      *
@@ -96,7 +96,7 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      *
      * @return $this This Query instance.
      */
-    public function havingNull($column, $type = CompositeExpression::TYPE_AND);
+    public function havingNull(string $column, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add having IS NOT NULL expression
@@ -106,7 +106,7 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      *
      * @return $this This Query instance.
      */
-    public function havingNotNull($column, $type = CompositeExpression::TYPE_AND);
+    public function havingNotNull(string $column, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add OR having IS NULL expression
@@ -115,7 +115,7 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      *
      * @return $this This Query instance.
      */
-    public function orHavingNull($column);
+    public function orHavingNull(string $column);
 
     /**
      * Add OR having IS NOT NULL expression
@@ -124,35 +124,26 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      *
      * @return $this This Query instance.
      */
-    public function orHavingNotNull($column);
+    public function orHavingNotNull(string $column);
 
     /**
      * Add having SQL expression
      *
-     * @param string $raw
+     * @param string|\Bdf\Prime\Query\QueryInterface|\Bdf\Prime\Query\Expression\ExpressionInterface $raw
      * @param string $type
      *
      * @return $this This Query instance.
      */
-    public function havingRaw($raw, $type = CompositeExpression::TYPE_AND);
+    public function havingRaw($raw, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add OR having SQL expression
      *
-     * @param string $raw
+     * @param string|\Bdf\Prime\Query\QueryInterface|\Bdf\Prime\Query\Expression\ExpressionInterface $raw
      *
      * @return $this This Query instance.
      */
     public function orHavingRaw($raw);
-
-    /**
-     * Add a raw query
-     *
-     * @param string $sql
-     *
-     * @return Raw
-     */
-    public function raw($sql);
 
     /**
      * Add key word IGNORE on insert
@@ -169,7 +160,7 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      *
      * @return $this
      */
-    public function ignore($flag = true);
+    public function ignore(bool $flag = true);
 
     /**
      * Add key word DISTINCT on select
@@ -185,18 +176,18 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      *
      * @return $this This Query instance.
      */
-    public function distinct($flag = true);
+    public function distinct(bool $flag = true);
 
     /**
      * Quote a value
      *
-     * @param string $value
-     * @param int $type
+     * @param scalar $value
+     * @param \Doctrine\DBAL\ParameterType::* $type
      *
      * @return string
      * @throws PrimeException
      */
-    public function quote($value, $type = null);
+    public function quote($value, int $type = null): string;
 
     /**
      * Quote a identifier
@@ -206,7 +197,7 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * @return string
      * @throws PrimeException
      */
-    public function quoteIdentifier($column);
+    public function quoteIdentifier(string $column): string;
 
     /**
      * Get the count of the query for pagination
@@ -231,11 +222,16 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * @return string The SQL query string.
      * @throws PrimeException When compilation fail
      */
-    public function toSql();
+    public function toSql(): string;
 
     /**
+     * Return SQL representation of the query with bindings
+     * Works like `toSql()` but replace placeholders by bound values
+     *
+     * @return string
+     *
      * @todo A reprendre: utiliser les types des bindings
      * @throws PrimeException When compilation fail
      */
-    public function toRawSql();
+    public function toRawSql(): string;
 }

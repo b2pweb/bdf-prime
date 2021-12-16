@@ -4,6 +4,7 @@ namespace Bdf\Prime\Platform\Sql;
 
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Platform\PlatformTypes;
+use Bdf\Prime\Platform\PlatformTypesInterface;
 use Bdf\Prime\Platform\Sql\Types\SqlBooleanType;
 use Bdf\Prime\Platform\Sql\Types\SqlDateTimeType;
 use Bdf\Prime\Platform\Sql\Types\SqlDateTimeTzType;
@@ -71,7 +72,7 @@ class SqlPlatform implements PlatformInterface
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return $this->grammar->getName();
     }
@@ -79,7 +80,7 @@ class SqlPlatform implements PlatformInterface
     /**
      * {@inheritdoc}
      */
-    public function types()
+    public function types(): PlatformTypesInterface
     {
         return $this->types;
     }

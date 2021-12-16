@@ -27,18 +27,15 @@ class ReplaceIndexSetComparator implements IndexSetComparatorInterface
     /**
      * {@inheritdoc}
      */
-    public function added()
+    public function added(): array
     {
-        return array_merge(
-            $this->comparator->added(),
-            $this->comparator->changed()
-        );
+        return [...$this->comparator->added(), ...$this->comparator->changed()];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function changed()
+    public function changed(): array
     {
         return [];
     }
@@ -46,11 +43,8 @@ class ReplaceIndexSetComparator implements IndexSetComparatorInterface
     /**
      * {@inheritdoc}
      */
-    public function removed()
+    public function removed(): array
     {
-        return array_merge(
-            $this->comparator->removed(),
-            $this->comparator->changed()
-        );
+        return [...$this->comparator->removed(), ...$this->comparator->changed()];
     }
 }

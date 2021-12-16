@@ -29,7 +29,7 @@ abstract class AbstractQuery extends AbstractReadCommand implements QueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function set($column, $value, $type = null)
+    public function set(string $column, $value, $type = null)
     {
         return $this->setValue($column, $value, $type);
     }
@@ -37,7 +37,7 @@ abstract class AbstractQuery extends AbstractReadCommand implements QueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function setValue($column, $value, $type = null)
+    public function setValue(string $column, $value, $type = null)
     {
         $this->statements['values']['data'][$column] = $value;
         $this->statements['values']['types'][$column] = $type;
@@ -62,6 +62,7 @@ abstract class AbstractQuery extends AbstractReadCommand implements QueryInterfa
             && $this instanceof Limitable
             && $this->hasPagination()
         ) {
+            /** @var Paginable<R>&Limitable $this */
             return $this->paginate($this->getLimit(), $this->getPage());
         }
 

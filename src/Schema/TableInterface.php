@@ -14,7 +14,7 @@ interface TableInterface
      *
      * @return string
      */
-    public function name();
+    public function name(): string;
 
     /**
      * Get the column object
@@ -23,35 +23,35 @@ interface TableInterface
      *
      * @return ColumnInterface
      */
-    public function column($name);
+    public function column(string $name): ColumnInterface;
 
     /**
      * Get all columns, index by there names
      *
-     * @return ColumnInterface[]
+     * @return array<string, ColumnInterface>
      */
-    public function columns();
+    public function columns(): array;
 
     /**
      * Get set of indexes
      *
      * @return IndexSetInterface
      */
-    public function indexes();
+    public function indexes(): IndexSetInterface;
 
     /**
      * Get set of constraints
      *
      * @return ConstraintSetInterface
      */
-    public function constraints();
+    public function constraints(): ConstraintSetInterface;
 
     /**
      * Get the array of options
      *
-     * @return array
+     * @return array<string, mixed>
      */
-    public function options();
+    public function options(): array;
 
     /**
      * Get one option
@@ -60,5 +60,5 @@ interface TableInterface
      *
      * @return mixed
      */
-    public function option($name);
+    public function option(string $name);
 }

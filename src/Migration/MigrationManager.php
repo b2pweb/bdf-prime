@@ -346,8 +346,10 @@ class MigrationManager
      *
      * @param MigrationInterface $migration
      * @param string $direction
+     *
+     * @return void
      */
-    private function run(MigrationInterface $migration, string $direction)
+    private function run(MigrationInterface $migration, string $direction): void
     {
         $this->applyConsoleContext($migration);
 
@@ -371,6 +373,8 @@ class MigrationManager
      * Add console context on the migration
      *
      * @param MigrationInterface $migration
+     *
+     * @return void
      */
     private function applyConsoleContext(MigrationInterface $migration)
     {
@@ -390,24 +394,30 @@ class MigrationManager
 
     /**
      * @param OutputInterface $output
+     *
+     * @return void
      */
-    public function setOutput(OutputInterface $output)
+    public function setOutput(OutputInterface $output): void
     {
         $this->output = $output;
     }
 
     /**
      * @param InputInterface $input
+     *
+     * @return void
      */
-    public function setInput(InputInterface $input)
+    public function setInput(InputInterface $input): void
     {
         $this->input = $input;
     }
 
     /**
      * @param HelperSet $helper
+     *
+     * @return void
      */
-    public function setHelper(HelperSet $helper)
+    public function setHelper(HelperSet $helper): void
     {
         $this->helper = $helper;
     }

@@ -21,7 +21,7 @@ final class <hydratorClassName> extends <normalizedEntityClassName> implements <
     /**
      * {@inheritdoc}
      */
-    final public function setPrimeInstantiator(InstantiatorInterface $instantiator)
+    final public function setPrimeInstantiator(InstantiatorInterface $instantiator): void
     {
         $this->__instantiator = $instantiator;
     }
@@ -29,7 +29,7 @@ final class <hydratorClassName> extends <normalizedEntityClassName> implements <
     /**
      * {@inheritdoc}
      */
-    final public function setPrimeMetadata(Metadata $metadata)
+    final public function setPrimeMetadata(Metadata $metadata): void
     {
         $this->__metadata = $metadata;
     }
@@ -37,7 +37,7 @@ final class <hydratorClassName> extends <normalizedEntityClassName> implements <
     /**
      * {@inheritdoc}
      */
-    final public function hydrate($object, array $data)
+    final public function hydrate($object, array $data): void
     {
         <hydrateBody>
     }
@@ -45,7 +45,7 @@ final class <hydratorClassName> extends <normalizedEntityClassName> implements <
     /**
      * {@inheritdoc}
      */
-    final public function extract($object, array $attributes = [])
+    final public function extract($object, array $attributes = []): array
     {
         <extractBody>
     }
@@ -53,7 +53,7 @@ final class <hydratorClassName> extends <normalizedEntityClassName> implements <
     /**
      * {@inheritdoc}
      */
-    final public function flatExtract($object, array $attributes = null)
+    final public function flatExtract($object, array $attributes = null): array
     {
         <flatExtractBody>
     }
@@ -61,7 +61,7 @@ final class <hydratorClassName> extends <normalizedEntityClassName> implements <
     /**
      * {@inheritdoc}
      */
-    final public function flatHydrate($object, array $data, PlatformTypesInterface $types)
+    final public function flatHydrate($object, array $data, PlatformTypesInterface $types): void
     {
         <flatHydrateBody>
     }
@@ -69,7 +69,7 @@ final class <hydratorClassName> extends <normalizedEntityClassName> implements <
     /**
      * {@inheritdoc}
      */
-    final public function extractOne($object, $attribute)
+    final public function extractOne($object, string $attribute)
     {
         <extractOneBody>
     }
@@ -77,7 +77,7 @@ final class <hydratorClassName> extends <normalizedEntityClassName> implements <
     /**
      * {@inheritdoc}
      */
-    final public function hydrateOne($object, $attribute, $value)
+    final public function hydrateOne($object, string $attribute, $value): void
     {
         <hydrateOneBody>
     }
@@ -85,7 +85,7 @@ final class <hydratorClassName> extends <normalizedEntityClassName> implements <
     /**
      * {@inheritdoc}
      */
-    public static function supportedPrimeClassName()
+    public static function supportedPrimeClassName(): string
     {
         return '<entityClassName>';
     }
@@ -93,7 +93,7 @@ final class <hydratorClassName> extends <normalizedEntityClassName> implements <
     /**
      * {@inheritdoc}
      */
-    public static function embeddedPrimeClasses()
+    public static function embeddedPrimeClasses(): array
     {
         return <embeddedClasses>;
     }

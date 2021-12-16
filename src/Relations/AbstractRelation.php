@@ -446,7 +446,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function add($owner, $related)
+    public function add($owner, $related): int
     {
         throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }

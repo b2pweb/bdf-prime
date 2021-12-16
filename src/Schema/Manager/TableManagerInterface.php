@@ -20,14 +20,14 @@ interface TableManagerInterface
      *
      * @return $this
      */
-    public function useDrop($flag = true);
+    public function useDrop(bool $flag = true);
 
     /**
      * Get the use drop flag
      *
      * @return bool
      */
-    public function getUseDrop();
+    public function getUseDrop(): bool;
 
     /**
      * Create table or extract alteration on existing table.
@@ -42,15 +42,15 @@ interface TableManagerInterface
      * });
      * </code>
      *
-     * @param  string $tableName The name of the table
-     * @param  callable $callback The table build method
+     * @param string $tableName The name of the table
+     * @param callable(\Bdf\Prime\Schema\Builder\TypesHelperTableBuilder):void $callback The table build method
      *
      * @return $this
      *
      * @see \Bdf\Prime\Schema\Builder\TypesHelperTableBuilder
      * @throws PrimeException
      */
-    public function table($tableName, callable $callback);
+    public function table(string $tableName, callable $callback);
 
     /**
      * Add a table to the schema.
@@ -68,11 +68,11 @@ interface TableManagerInterface
     /**
      * Change table.
      *
-     * @param  string $tableName
-     * @param  callable $callback
+     * @param string $tableName
+     * @param callable(\Bdf\Prime\Schema\Builder\TypesHelperTableBuilder):void $callback
      *
      * @return $this
      * @throws PrimeException
      */
-    public function change($tableName, callable $callback);
+    public function change(string $tableName, callable $callback);
 }

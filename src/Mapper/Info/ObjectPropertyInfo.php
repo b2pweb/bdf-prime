@@ -38,7 +38,7 @@ class ObjectPropertyInfo implements InfoInterface
      * 
      * @param array $metadata  The property metadata or the relation metadata
      */
-    public function __construct($name, array $metadata = [])
+    public function __construct(string $name, array $metadata = [])
     {
         $this->name = $name;
         $this->metadata = $metadata;
@@ -46,10 +46,12 @@ class ObjectPropertyInfo implements InfoInterface
     
     /**
      * Set the relation info of this field
-     * 
+     *
      * @param array $metadata
+     *
+     * @return void
      */
-    public function setRelation(array $metadata)
+    public function setRelation(array $metadata): void
     {
         $this->relation = $metadata;
     }
@@ -57,7 +59,7 @@ class ObjectPropertyInfo implements InfoInterface
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return $this->name;
     }
@@ -65,7 +67,7 @@ class ObjectPropertyInfo implements InfoInterface
     /**
      * {@inheritdoc}
      */
-    public function isObject()
+    public function isObject(): bool
     {
         return true;
     }
@@ -75,7 +77,7 @@ class ObjectPropertyInfo implements InfoInterface
      * 
      * @return bool
      */
-    public function isRelation()
+    public function isRelation(): bool
     {
         return $this->relation !== null;
     }
@@ -83,7 +85,7 @@ class ObjectPropertyInfo implements InfoInterface
     /**
      * {@inheritdoc}
      */
-    public function isArray()
+    public function isArray(): bool
     {
         return $this->isRelation() && !$this->isSingleRelation($this->relation['type']);
     }
@@ -103,7 +105,7 @@ class ObjectPropertyInfo implements InfoInterface
     /**
      * {@inheritdoc}
      */
-    public function isEmbedded()
+    public function isEmbedded(): bool
     {
         if ($this->isRelation() && !empty($this->relation['detached'])) {
             return false;
@@ -115,7 +117,7 @@ class ObjectPropertyInfo implements InfoInterface
     /**
      * {@inheritdoc}
      */
-    public function belongsToRoot()
+    public function belongsToRoot(): bool
     {
         return $this->isEmbedded() && $this->metadata['parentPath'] === 'root';
     }
@@ -141,9 +143,9 @@ class ObjectPropertyInfo implements InfoInterface
     /**
      * Get the foreign info from relation
      *
-     * @return null|array
+     * @return array{0: class-string|null, 1: string|null}
      */
-    public function foreignInfos()
+    public function foreignInfos(): array
     {
         if ($this->relation['type'] === RelationInterface::BELONGS_TO) {
             return [$this->relation['entity'], $this->relation['distantKey']];
@@ -157,7 +159,7 @@ class ObjectPropertyInfo implements InfoInterface
      *
      * @return string
      */
-    public function relationKey()
+    public function relationKey(): string
     {
         return $this->relation['localKey'];
     }
@@ -169,7 +171,7 @@ class ObjectPropertyInfo implements InfoInterface
      * 
      * @return bool
      */
-    protected function isSingleRelation($relationType)
+    protected function isSingleRelation(string $relationType): bool
     {
         return in_array($relationType, [RelationInterface::HAS_ONE, RelationInterface::MORPH_TO, RelationInterface::BELONGS_TO]);
     }

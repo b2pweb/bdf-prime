@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Mapper;
 
 use Bdf\Prime\Behaviors\Versionable;
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 
 /**
  * Class VersionableMapper
@@ -16,9 +17,9 @@ abstract class VersionableMapper extends Mapper
     /**
      * Get versioned class name
      *
-     * @return string
+     * @return class-string
      */
-    abstract public function getVersionedClass();
+    abstract public function getVersionedClass(): string;
 
     /**
      * {@inheritdoc}
@@ -31,7 +32,7 @@ abstract class VersionableMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         $entitySchema = $this->getVersionedMapper()->schema();
 
@@ -43,7 +44,7 @@ abstract class VersionableMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder->fill($this->getVersionedMapper()->fields());
 
@@ -59,7 +60,7 @@ abstract class VersionableMapper extends Mapper
      *
      * @return Mapper
      */
-    private function getVersionedMapper()
+    private function getVersionedMapper(): Mapper
     {
         return $this->serviceLocator->repository($this->getVersionedClass())->mapper();
     }

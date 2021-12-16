@@ -37,7 +37,7 @@ abstract class AbstractCommand extends Command
      *
      * @return MigrationManager
      */
-    public function manager(InputInterface $input, OutputInterface $output)
+    public function manager(InputInterface $input, OutputInterface $output): MigrationManager
     {
         $this->manager->setOutput($output);
         $this->manager->setInput($input);

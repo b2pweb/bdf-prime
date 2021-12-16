@@ -53,7 +53,7 @@ class KeyValueSqlCompiler extends AbstractCompiler
     /**
      * {@inheritdoc}
      */
-    public function quoteIdentifier(CompilableClause $query, $column)
+    public function quoteIdentifier(CompilableClause $query, string $column): string
     {
         return $query->isQuoteIdentifier()
             ? $this->platform()->grammar()->quoteIdentifier($column)
@@ -64,7 +64,7 @@ class KeyValueSqlCompiler extends AbstractCompiler
     /**
      * {@inheritdoc}
      */
-    public function getBindings(CompilableClause $query)
+    public function getBindings(CompilableClause $query): array
     {
         $bindings = [];
 

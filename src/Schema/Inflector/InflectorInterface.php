@@ -12,9 +12,9 @@ interface InflectorInterface
      *
      * @param string $table
      *
-     * @return string
+     * @return class-string
      */
-    public function getClassName($table);
+    public function getClassName(string $table): string;
 
     /**
      * Get the property name from a field name
@@ -24,7 +24,7 @@ interface InflectorInterface
      *
      * @return string
      */
-    public function getPropertyName($table, $field);
+    public function getPropertyName(string $table, string $field): string;
 
     /**
      * Get the sequence table name from table name
@@ -33,5 +33,5 @@ interface InflectorInterface
      *
      * @return string
      */
-    public function getSequenceName($table);
+    public function getSequenceName(string $table): string;
 }

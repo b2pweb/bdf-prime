@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\IdGenerators;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
@@ -94,7 +95,7 @@ class TableUserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -105,7 +106,7 @@ class TableUserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function sequence()
+    public function sequence(): array
     {
         return [
             'connection' => 'test',
@@ -118,7 +119,7 @@ class TableUserMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')->sequence()

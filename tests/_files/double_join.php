@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Relations\Builder\RelationBuilder;
 use Bdf\Prime\Entity\InitializableInterface;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
@@ -27,7 +28,7 @@ class DoubleJoinEntityMaster extends Model implements InitializableInterface
     /**
      * @inheritDoc
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->sub = new DoubleJoinEntitySub();
         $this->sub2 = new DoubleJoinEntitySub2();
@@ -57,7 +58,7 @@ class DoubleJoinEntitySub2 extends Model implements InitializableInterface
     /**
      * @inheritDoc
      */
-    public function initialize()
+    public function initialize(): void
     {
         $this->sub = new DoubleJoinEntitySub();
     }
@@ -68,7 +69,7 @@ class DoubleJoinEntityMasterMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -79,7 +80,7 @@ class DoubleJoinEntityMasterMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->embedded('sub', DoubleJoinEntitySub::class, function (FieldBuilder $builder) {
@@ -94,7 +95,7 @@ class DoubleJoinEntityMasterMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder
             ->on('sub')->belongsTo(DoubleJoinEntitySub::class, 'sub.id')
@@ -109,7 +110,7 @@ class DoubleJoinEntitySubMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -120,7 +121,7 @@ class DoubleJoinEntitySubMapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->autoincrement()
@@ -136,7 +137,7 @@ class DoubleJoinEntitySub2Mapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -147,7 +148,7 @@ class DoubleJoinEntitySub2Mapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')->autoincrement()
@@ -160,7 +161,7 @@ class DoubleJoinEntitySub2Mapper extends Mapper
     /**
      * @inheritDoc
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder
             ->on('sub')->belongsTo(DoubleJoinEntitySub::class, 'sub.id');

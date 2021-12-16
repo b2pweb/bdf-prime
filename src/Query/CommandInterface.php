@@ -72,5 +72,5 @@ interface CommandInterface extends CompilableClauseInterface
      *
      * @return $this This Query instance.
      */
-    public function from($from, $alias = null);
+    public function from(string $from, ?string $alias = null);
 }

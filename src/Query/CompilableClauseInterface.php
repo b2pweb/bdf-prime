@@ -15,7 +15,7 @@ interface CompilableClauseInterface extends ClauseInterface
      *
      * @return PreprocessorInterface
      */
-    public function preprocessor();
+    public function preprocessor(): PreprocessorInterface;
 
     /**
      * Get the query compiler state
@@ -24,19 +24,20 @@ interface CompilableClauseInterface extends ClauseInterface
      *
      * @internal
      */
-    public function state();
+    public function state(): CompilerState;
 
     /**
      * Tell the compiler to quote identifiers (i.e. table, columns)
      *
      * @param bool $flag
+     * @return void
      */
-    public function useQuoteIdentifier($flag = true);
+    public function useQuoteIdentifier(bool $flag = true): void;
 
     /**
      * Check if the identifiers should be quoted
      *
      * @return bool
      */
-    public function isQuoteIdentifier();
+    public function isQuoteIdentifier(): bool;
 }

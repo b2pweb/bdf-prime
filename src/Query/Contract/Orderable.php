@@ -34,11 +34,11 @@ interface Orderable
      * Replaces any previously specified orderings, if any.
      *
      * <code>
-     *     $query ->addOrder('id'); // ORDER BY id ASC
-     *     $query ->addOrder('date', 'name'); // GROUP BY id ASC, date ASC, name ASC
+     *     $query->addOrder('id'); // ORDER BY id ASC
+     *     $query->addOrder('date', 'name'); // GROUP BY id ASC, date ASC, name ASC
      * </code>
      *
-     * @param string|array|ExpressionInterface $sort The ordering expression.
+     * @param string|array<string,Orderable::ORDER_*>|ExpressionInterface $sort The ordering expression.
      * @param Orderable::ORDER_*|null $order The ordering direction.
      *
      * @return $this This Query instance.

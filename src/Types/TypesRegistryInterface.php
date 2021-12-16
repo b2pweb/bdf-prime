@@ -15,7 +15,7 @@ interface TypesRegistryInterface
      *
      * @return $this
      */
-    public function register($type, $alias = null);
+    public function register($type, ?string $alias = null);
 
     /**
      * Get the type object from its name
@@ -24,14 +24,14 @@ interface TypesRegistryInterface
      *
      * @return TypeInterface
      */
-    public function get($type);
+    public function get(string $type): TypeInterface;
 
     /**
      * Check if the registry has the requested type
      *
      * @param string $type
      *
-     * @return boolean
+     * @return bool
      */
-    public function has($type);
+    public function has(string $type): bool;
 }

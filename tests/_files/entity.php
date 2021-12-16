@@ -2,6 +2,9 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Relations\Builder\RelationBuilder;
+use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Entity\InitializableInterface;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Mapper\Mapper;
@@ -23,7 +26,7 @@ class TestEntity extends Model implements InitializableInterface
         $this->import($attributes);
     }
 
-    public function initialize()
+    public function initialize(): void
     {
         $this->foreign = new TestEmbeddedEntity();
     }
@@ -34,7 +37,7 @@ class TestEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',
@@ -49,7 +52,7 @@ class TestEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->integer('id')
@@ -68,7 +71,7 @@ class TestEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         $builder->on('foreign')
             ->belongsTo('Bdf\Prime\TestEmbeddedEntity', 'foreign.id');
@@ -77,7 +80,7 @@ class TestEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function filters()
+    public function filters(): array
     {
         return [
             'idLike' => function($query, $value) {
@@ -96,7 +99,7 @@ class TestEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function scopes()
+    public function scopes(): array
     {
         return [
             'testScope' => function($query) {
@@ -108,7 +111,7 @@ class TestEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function queries()
+    public function queries(): array
     {
         return [
             'testQuery' => function (EntityRepository $repository, $id) {
@@ -120,7 +123,7 @@ class TestEntityMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function customEvents($notifier)
+    public function customEvents(RepositoryEventsSubscriberInterface $notifier): void
     {
         $notifier->listen('afterLoad', function($entity) {
             if ($entity->name === 'event') {

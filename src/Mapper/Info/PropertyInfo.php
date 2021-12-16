@@ -6,6 +6,7 @@ use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Types\PhpTypeInterface;
 use Bdf\Prime\Types\TypeInterface;
 use Bdf\Prime\Types\TypesRegistryInterface;
+use DateTimeInterface;
 
 /**
  * PropertyInfo
@@ -44,11 +45,11 @@ class PropertyInfo implements InfoInterface
     /**
      * Constructor
      *
-     * @param string $name                            The property name
-     * @param array $metadata                         The property metadata or the relation metadata
-     * @param TypesRegistryInterface $typesRegistry   The types registry
+     * @param string $name The property name
+     * @param array $metadata The property metadata or the relation metadata
+     * @param TypesRegistryInterface|null $typesRegistry The types registry
      */
-    public function __construct($name, array $metadata = [], TypesRegistryInterface $typesRegistry = null)
+    public function __construct(string $name, array $metadata = [], ?TypesRegistryInterface $typesRegistry = null)
     {
         $this->name = $name;
         $this->metadata = $metadata;
@@ -58,7 +59,7 @@ class PropertyInfo implements InfoInterface
     /**
      * {@inheritdoc}
      */
-    public function name()
+    public function name(): string
     {
         return $this->name;
     }
@@ -68,7 +69,7 @@ class PropertyInfo implements InfoInterface
      * 
      * @return string
      */
-    public function type()
+    public function type(): string
     {
         return $this->metadata['type'];
     }
@@ -78,7 +79,7 @@ class PropertyInfo implements InfoInterface
      *
      * @return string|null
      */
-    public function alias()
+    public function alias(): ?string
     {
         return $this->metadata['field'] !== $this->metadata['attribute']
             ? $this->metadata['field']
@@ -91,7 +92,7 @@ class PropertyInfo implements InfoInterface
      * 
      * @return string
      */
-    public function phpType()
+    public function phpType(): string
     {
         if (isset($this->metadata['phpOptions']['className'])) {
             return '\\'.ltrim($this->metadata['phpOptions']['className'], '\\');
@@ -111,7 +112,7 @@ class PropertyInfo implements InfoInterface
      * 
      * @return bool
      */
-    public function isPrimary()
+    public function isPrimary(): bool
     {
         return $this->metadata['primary'] !== null;
     }
@@ -142,7 +143,7 @@ class PropertyInfo implements InfoInterface
     /**
      * {@inheritdoc}
      */
-    public function isEmbedded()
+    public function isEmbedded(): bool
     {
         return $this->metadata['embedded'] !== null;
     }
@@ -150,7 +151,7 @@ class PropertyInfo implements InfoInterface
     /**
      * {@inheritdoc}
      */
-    public function belongsToRoot()
+    public function belongsToRoot(): bool
     {
         return !$this->isEmbedded();
     }
@@ -158,7 +159,7 @@ class PropertyInfo implements InfoInterface
     /**
      * {@inheritdoc}
      */
-    public function isObject()
+    public function isObject(): bool
     {
         return false;
     }
@@ -168,9 +169,9 @@ class PropertyInfo implements InfoInterface
      * 
      * @return bool
      */
-    public function isDateTime()
+    public function isDateTime(): bool
     {
-        return is_subclass_of($this->phpType(), \DateTimeInterface::class);
+        return is_subclass_of($this->phpType(), DateTimeInterface::class);
     }
 
     /**
@@ -199,7 +200,7 @@ class PropertyInfo implements InfoInterface
     /**
      * {@inheritdoc}
      */
-    public function isArray()
+    public function isArray(): bool
     {
         return $this->phpType() === PhpTypeInterface::TARRAY;
     }
@@ -209,7 +210,7 @@ class PropertyInfo implements InfoInterface
      * 
      * @return bool
      */
-    public function hasDefault()
+    public function hasDefault(): bool
     {
         return $this->getDefault() !== null;
     }
@@ -233,7 +234,7 @@ class PropertyInfo implements InfoInterface
      *
      * @return mixed
      */
-    public function convert($value, $toPhp = true, array $fieldOptions = [])
+    public function convert($value, bool $toPhp = true, array $fieldOptions = [])
     {
         if ($toPhp) {
             return $this->getType()->fromDatabase($value, $fieldOptions);

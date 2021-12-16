@@ -39,7 +39,7 @@ class IndexSetComparator implements IndexSetComparatorInterface
     /**
      * {@inheritdoc}
      */
-    public function added()
+    public function added(): array
     {
         $added = [];
 
@@ -63,7 +63,7 @@ class IndexSetComparator implements IndexSetComparatorInterface
     /**
      * {@inheritdoc}
      */
-    public function changed()
+    public function changed(): array
     {
         $changed = [];
 
@@ -92,7 +92,7 @@ class IndexSetComparator implements IndexSetComparatorInterface
     /**
      * {@inheritdoc}
      */
-    public function removed()
+    public function removed(): array
     {
         $removed = [];
 
@@ -122,7 +122,7 @@ class IndexSetComparator implements IndexSetComparatorInterface
      *
      * @return bool
      */
-    private function equals(IndexInterface $index1, IndexInterface $index2)
+    private function equals(IndexInterface $index1, IndexInterface $index2): bool
     {
         if ($index1->fields() != $index2->fields() || $index1->type() != $index2->type() || $index1->options() != $index2->options()) {
             return false;

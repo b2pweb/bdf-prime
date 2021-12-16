@@ -26,8 +26,10 @@ class HydratorRegistry
      * Set the base hydrator.
      *
      * @param HydratorInterface $baseHydrator
+     *
+     * @return void
      */
-    public function setBaseHydrator(HydratorInterface $baseHydrator)
+    public function setBaseHydrator(HydratorInterface $baseHydrator): void
     {
         $this->baseHydrator = $baseHydrator;
     }
@@ -36,8 +38,10 @@ class HydratorRegistry
      * Register all hydrators
      *
      * @param HydratorInterface[] $hydrators
+     *
+     * @return void
      */
-    public function setHydrators(array $hydrators)
+    public function setHydrators(array $hydrators): void
     {
         $this->hydrators = $hydrators;
     }
@@ -47,8 +51,10 @@ class HydratorRegistry
      *
      * @param string $entityClass
      * @param HydratorInterface $hydrator
+     *
+     * @return void
      */
-    public function add($entityClass, HydratorInterface $hydrator)
+    public function add($entityClass, HydratorInterface $hydrator): void
     {
         $this->hydrators[$entityClass] = $hydrator;
     }
@@ -57,8 +63,10 @@ class HydratorRegistry
      * Register all hydrator factory
      *
      * @param callable[] $factories
+     *
+     * @return void
      */
-    public function setFactories(array $factories)
+    public function setFactories(array $factories): void
     {
         $this->factories = $factories;
     }
@@ -68,8 +76,10 @@ class HydratorRegistry
      *
      * @param string $entityClass
      * @param callable $factory
+     *
+     * @return void
      */
-    public function factory($entityClass, $factory)
+    public function factory($entityClass, $factory): void
     {
         $this->factories[$entityClass] = $factory;
     }

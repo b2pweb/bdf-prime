@@ -21,12 +21,12 @@ interface DatabaseManagerInterface
      *
      * @return C
      */
-    public function getConnection();
+    public function getConnection(): ConnectionInterface;
 
     /**
      * Set the database connection instance.
      *
-     * @param  C $connection
+     * @param C $connection
      *
      * @return $this
      *
@@ -38,20 +38,20 @@ interface DatabaseManagerInterface
     /**
      * Determine if the given database exists.
      *
-     * @param  string $database
+     * @param string $database
      *
      * @return bool
      * @throws PrimeException When list databases fail
      */
-    public function hasDatabase($database);
+    public function hasDatabase(string $database): bool;
 
     /**
      * Get the databases listing.
      *
-     * @return array
+     * @return list<string>
      * @throws PrimeException When list databases fail
      */
-    public function getDatabases();
+    public function getDatabases(): array;
 
     /**
      * Creates a new database.
@@ -61,7 +61,7 @@ interface DatabaseManagerInterface
      * @return $this
      * @throws PrimeException When query fail
      */
-    public function createDatabase($database);
+    public function createDatabase(string $database);
 
     /**
      * Drops a database.
@@ -73,17 +73,17 @@ interface DatabaseManagerInterface
      * @return $this
      * @throws PrimeException When query fail
      */
-    public function dropDatabase($database);
+    public function dropDatabase(string $database);
 
     /**
      * Determine if the given table exists.
      *
-     * @param  string $tableName
+     * @param string $tableName
      *
      * @return bool
      * @throws PrimeException When query fail
      */
-    public function hasTable($tableName);
+    public function hasTable(string $tableName): bool;
 
     /**
      * Determine load the table structure
@@ -93,7 +93,7 @@ interface DatabaseManagerInterface
      * @return TableInterface
      * @throws PrimeException When query fail
      */
-    public function loadTable($tableName);
+    public function loadTable(string $tableName): TableInterface;
 
     /**
      * Drop a table from the schema.
@@ -103,7 +103,7 @@ interface DatabaseManagerInterface
      * @return $this
      * @throws PrimeException When query fail
      */
-    public function drop($tableName);
+    public function drop(string $tableName);
 
     /**
      * Truncate a table
@@ -114,16 +114,16 @@ interface DatabaseManagerInterface
      * @return $this
      * @throws PrimeException When query fail
      */
-    public function truncate($tableName, $cascade = false);
+    public function truncate(string $tableName, bool $cascade = false);
 
     /**
      * Rename a table on the schema.
      *
-     * @param  string $from
-     * @param  string $to
+     * @param string $from
+     * @param string $to
      *
      * @return $this
      * @throws PrimeException When query fail
      */
-    public function rename($from, $to);
+    public function rename(string $from, string $to);
 }

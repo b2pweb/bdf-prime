@@ -25,7 +25,7 @@ class SimpleInfector implements InflectorInterface
     /**
      * {@inheritdoc}
      */
-    public function getClassName($table)
+    public function getClassName(string $table): string
     {
         return $this->inflector->classify($this->inflector->singularize(strtolower($table)));
     }
@@ -33,7 +33,7 @@ class SimpleInfector implements InflectorInterface
     /**
      * {@inheritdoc}
      */
-    public function getPropertyName($table, $field)
+    public function getPropertyName(string $table, string $field): string
     {
         return $this->inflector->camelize(strtolower($field));
     }
@@ -41,7 +41,7 @@ class SimpleInfector implements InflectorInterface
     /**
      * {@inheritdoc}
      */
-    public function getSequenceName($table)
+    public function getSequenceName(string $table): string
     {
         return "${table}_seq";
     }

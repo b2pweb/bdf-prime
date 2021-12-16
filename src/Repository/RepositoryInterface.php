@@ -71,9 +71,9 @@ interface RepositoryInterface
     public function criteria(array $criteria = []): Criteria;
     
     /**
-     * Instanciate entity
+     * Instantiate entity
      *
-     * @param array $data
+     * @param array<string, mixed> $data
      *
      * @return E
      */
@@ -84,14 +84,14 @@ interface RepositoryInterface
      *
      * @return string
      */
-    public function entityName();
+    public function entityName(): string;
 
     /**
      * Get the entity class name to use
      *
      * @return class-string<E>
      */
-    public function entityClass();
+    public function entityClass(): string;
 
     /**
      * Create an EntityCollection
@@ -223,7 +223,7 @@ interface RepositoryInterface
     public function update($entity, ?array $attributes = null): int;
 
     /**
-     * Remove a entity
+     * Remove an entity
      *
      * @param E $entity
      *

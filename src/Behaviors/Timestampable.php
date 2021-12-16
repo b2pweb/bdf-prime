@@ -125,8 +125,10 @@ final class Timestampable extends Behavior
      *
      * @param E $entity
      * @param RepositoryInterface<E> $repository
+     *
+     * @return void
      */
-    public function beforeInsert($entity, $repository)
+    public function beforeInsert($entity, RepositoryInterface $repository): void
     {
         $now = $this->createDate($this->createdAt['name'], $repository);
         $repository->mapper()->hydrateOne($entity, $this->createdAt['name'], $now);
@@ -140,8 +142,10 @@ final class Timestampable extends Behavior
      * @param E $entity
      * @param RepositoryInterface<E> $repository
      * @param null|\ArrayObject $attributes
+     *
+     * @return void
      */
-    public function beforeUpdate($entity, $repository, $attributes)
+    public function beforeUpdate($entity, RepositoryInterface $repository, $attributes): void
     {
         if ($attributes !== null) {
             $attributes[] = $this->updatedAt['name'];
@@ -155,11 +159,11 @@ final class Timestampable extends Behavior
      * Get the field infos from option
      *
      * @param string $name
-     * @param RepositoryInterface $repository
+     * @param RepositoryInterface<E> $repository
      *
      * @return int|\DateTimeInterface
      */
-    private function createDate($name, $repository)
+    private function createDate(string $name, RepositoryInterface $repository)
     {
         if ($this->type === TypeInterface::BIGINT) {
             return time();

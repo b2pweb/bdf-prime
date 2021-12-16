@@ -30,10 +30,12 @@ class RegistryInstantiator implements InstantiatorInterface
     /**
      * Register an instantiator for this class
      *
-     * @param string $className
+     * @param class-string $className
      * @param InstantiatorInterface $instantiator
+     *
+     * @return void
      */
-    public function register($className, InstantiatorInterface $instantiator)
+    public function register(string $className, InstantiatorInterface $instantiator): void
     {
         $this->registry[$className] = $instantiator;
     }
