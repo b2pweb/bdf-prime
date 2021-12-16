@@ -1312,7 +1312,7 @@ class EntityWithCallableKeyMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'test',

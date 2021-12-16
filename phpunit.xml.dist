@@ -1,32 +1,24 @@
-<?xml version="1.0" encoding="utf-8" ?>
-<phpunit bootstrap="tests/autoload.php"
-         colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         processIsolation="false"
-         stopOnFailure="false"
->
-    <php>
-        <!-- php -r 'echo -1 & ~E_USER_DEPRECATED;' -->
-        <!--<ini name="error_reporting" value="-16385"/>-->
-        <ini name="error_reporting" value="-1" />
-        <ini name="zend.enable_gc" value="0" />
-        <ini name="memory_limit" value="-1" />
-    </php>
-
-    <testsuites>
-        <testsuite name="All Test Suite">
-            <directory suffix="Test.php">tests</directory>
-            <exclude>tests/Php74</exclude>
-        </testsuite>
-        <testsuite name="PHP 7.4 compatiblity">
-            <directory suffix="Test.php" phpVersion="7.4.0" phpVersionOperator=">=">tests/Php74</directory>
-        </testsuite>
-    </testsuites>
-    <filter>
-        <whitelist>
-            <directory suffix=".php">src</directory>
-        </whitelist>
-    </filter>
+<?xml version="1.0" encoding="utf-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="tests/autoload.php" colors="true" convertErrorsToExceptions="true" convertNoticesToExceptions="true" convertWarningsToExceptions="true" processIsolation="false" stopOnFailure="false" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage>
+    <include>
+      <directory suffix=".php">src</directory>
+    </include>
+  </coverage>
+  <php>
+    <!-- php -r 'echo -1 & ~E_USER_DEPRECATED;' -->
+    <!--<ini name="error_reporting" value="-16385"/>-->
+    <ini name="error_reporting" value="-1"/>
+    <ini name="zend.enable_gc" value="0"/>
+    <ini name="memory_limit" value="-1"/>
+  </php>
+  <testsuites>
+    <testsuite name="All Test Suite">
+      <directory suffix="Test.php">tests</directory>
+      <exclude>tests/Php74</exclude>
+    </testsuite>
+    <testsuite name="PHP 7.4 compatiblity">
+      <directory suffix="Test.php" phpVersion="7.4.0" phpVersionOperator="&gt;=">tests/Php74</directory>
+    </testsuite>
+  </testsuites>
 </phpunit>
