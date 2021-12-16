@@ -256,9 +256,9 @@ class Metadata
     /**
      * Get table name
      * 
-     * @return string|null
+     * @return string
      */
-    public function table(): ?string
+    public function table(): string
     {
         return $this->table;
     }

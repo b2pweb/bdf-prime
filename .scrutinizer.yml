@@ -1,5 +1,10 @@
 build:
   nodes:
+    analysis:
+      tests:
+        override:
+          - php-scrutinizer-run
+
     tests:
       environment:
         timezone: FR
@@ -11,7 +16,11 @@ build:
 
       tests:
         override:
-          - command: composer run tests-with-coverage
+          - command: XDEBUG_MODE=coverage composer run tests-with-coverage
             coverage:
               file: coverage.xml
               format: clover
+
+filter:
+  excluded_paths:
+    - 'tests/*'

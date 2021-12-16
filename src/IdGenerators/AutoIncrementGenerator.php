@@ -24,6 +24,6 @@ class AutoIncrementGenerator extends AbstractGenerator
      */
     protected function lastGeneratedId()
     {
-        return $this->connection()->lastInsertId();
+        return (string) $this->connection()->lastInsertId();
     }
 }
