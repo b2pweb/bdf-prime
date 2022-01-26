@@ -250,6 +250,7 @@ class SchemaManager extends AbstractSchemaManager
      */
     public function diff(TableInterface $newTable, TableInterface $oldTable)
     {
+        /** @psalm-suppress InternalMethod */
         $comparator = new Comparator();
         $comparator->setListDropColumn($this->useDrop);
 

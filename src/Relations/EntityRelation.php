@@ -12,14 +12,22 @@ use Bdf\Prime\Query\ReadCommandInterface;
  * EntityRelation
  *
  * Relation wrapper. Link an entity to an relation object
- * 
- * @package Bdf\Prime\Relations
  *
  * @template E as object
  * @template R as object
  *
  * @api
- * @mixin ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, E>
+ *
+ * @psalm-method QueryInterface<\Bdf\Prime\Connection\ConnectionInterface, R> with(string|string[] $relations) Relations to load
+ * @psalm-method QueryInterface<\Bdf\Prime\Connection\ConnectionInterface, R> by(string $attribute, bool $combine = false) Indexing entities by an attribute value. Use combine for multiple entities with same attribute value
+ * @psalm-method QueryInterface<\Bdf\Prime\Connection\ConnectionInterface, R> where(string|array|callable $column, mixed|null $operator = null, mixed $value = null)
+ * @psalm-method R|null get($pk) Get one entity by its identifier
+ * @psalm-method R getOrFail($pk) Get one entity or throws when entity is not found
+ * @psalm-method R getOrNew($pk) Get one entity or return a new one if not found in repository
+ * @psalm-method int count()
+ *
+ * @mixin ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>
+ *
  * @noinspection PhpHierarchyChecksInspection
  */
 class EntityRelation

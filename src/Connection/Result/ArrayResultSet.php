@@ -28,11 +28,13 @@ final class ArrayResultSet extends ArrayIterator implements ResultSetInterface
     /**
      * @param list<array<string, mixed>> $array
      * @param int $flags
+     * @psalm-this-out ArrayResultSet<array<string, mixed>>
      */
     public function __construct($array = [], $flags = 0)
     {
         parent::__construct($array, $flags);
 
+        /** @var ArrayResultSet<array<string, mixed>> $this */
         $this->strategy = AssociativeArrayFetch::instance();
     }
 

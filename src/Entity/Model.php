@@ -18,7 +18,30 @@ use Bdf\Serializer\Metadata\Builder\ClassMetadataBuilder;
  * 
  * Active record pattern
  *
+ * @psalm-type EntityCollection = \Bdf\Prime\Collection\EntityCollection<static>
+ * @psalm-type EntityQuery = QueryInterface<\Bdf\Prime\Connection\ConnectionInterface, static>
+ *
  * @method static \Bdf\Prime\Collection\EntityCollection collection(array $entities = [])
+ * @psalm-method static EntityCollection collection(array<self> $entities = [])
+ * @method static Criteria criteria(array $criteria = [])
+ *
+ * @method static static|null get(mixed $key)
+ * @method static static getOrNew(mixed $key)
+ * @method static static getOrFail(mixed $key)
+ * @method static static|null findById(mixed $key)
+ * @method static static|null findOne(array $criteria, ?array $attributes = null)
+ *
+ * @method static QueryInterface where(string|array|callable $column, mixed|null $operator = null, mixed $value = null)
+ * @psalm-method static EntityQuery where(string|array|callable $column, mixed|null $operator = null, mixed $value = null)
+ * @method static QueryInterface with(string|array $relations)
+ * @psalm-method static EntityQuery with(string|array $relations)
+ * @method static QueryInterface by(string $attribute, bool $combine = false)
+ * @psalm-method static EntityQuery by(string $attribute, bool $combine = false)
+ *
+ * @method static int updateBy(array $attributes, array $criteria = [])
+ * @method static int count(array $criteria = [], $attributes = null)
+ * @method static bool exists(self $entity)
+ * @method static static|null refresh(self $entity)
  */
 class Model extends PrimeSerializable implements EntityInterface, ImportableInterface
 {
@@ -109,7 +132,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @param string $name
      * @param array $arguments
      * 
-     * @return EntityRepository|QueryInterface
+     * @return EntityRepository|QueryInterface|mixed
      */
     public static function __callStatic($name, $arguments)
     {

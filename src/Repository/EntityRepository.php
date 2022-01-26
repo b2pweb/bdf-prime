@@ -14,6 +14,7 @@ use Bdf\Prime\Connection\Event\ConnectionClosedListenerInterface;
 use Bdf\Prime\Connection\TransactionManagerInterface;
 use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Events;
+use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
@@ -48,6 +49,11 @@ use Exception;
  * @implements RepositoryEventsSubscriberInterface<E>
  *
  * @mixin RepositoryQueryFactory<E>
+ * @mixin QueryInterface<ConnectionInterface, E>
+ *
+ * @method E|null get(mixed $key)
+ * @method E getOrFail(mixed $key)
+ * @method E getOrNew(mixed $key)
  */
 class EntityRepository implements RepositoryInterface, EventSubscriber, ConnectionClosedListenerInterface, RepositoryEventsSubscriberInterface
 {
@@ -861,7 +867,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param string $name         Query builder method
      * @param array  $arguments
      * 
-     * @return int|QueryInterface
+     * @return int|QueryInterface|array|E
      */
     public function __call($name, $arguments)
     {
@@ -906,7 +912,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     {
         return $this->builder()->by($attribute, $combine);
     }
-    
+
     /**
      * @see QueryInterface::wrapAs
      * 

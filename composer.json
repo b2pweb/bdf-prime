@@ -15,7 +15,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Php74\\": "tests/Php74"
+      "Php74\\": "tests/Php74",
+      "StaticAnalysis\\": "tests/StaticAnalysis"
     },
     "classmap": [
       "tests/_files/PrimeTestCase.php",
@@ -51,7 +52,7 @@
     "symfony/http-foundation": "~4.3|~5.0",
     "symfony/http-kernel": "~4.3|~5.0",
     "symfony/validator": "~4.3|~5.0",
-    "vimeo/psalm": "~4.6.0"
+    "vimeo/psalm": "dev-master#5c4be6bc217231b710b6dcb5f2cffe7c69b6ff21"
   },
   "scripts": {
     "tests": "phpunit",

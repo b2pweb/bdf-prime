@@ -531,8 +531,10 @@ class Metadata
     
     /**
      * @param Mapper $mapper
+     * @psalm-param Mapper<E> $mapper
+     * @template E as object
      */
-    public function build($mapper): void
+    public function build(Mapper $mapper): void
     {
         if (!$this->built) {
             $this->entityName = $mapper->getEntityClass();

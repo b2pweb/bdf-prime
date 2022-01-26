@@ -440,6 +440,7 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
      * {@inheritdoc}
      *
      * @psalm-suppress InvalidReturnType
+     * @psalm-suppress InvalidArgument
      */
     public function map($callback)
     {

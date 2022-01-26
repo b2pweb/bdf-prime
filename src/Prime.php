@@ -325,6 +325,7 @@ class Prime
      */
     public static function find($repositoryName, $criteria = null)
     {
+        /** @psalm-suppress InvalidArgument */
         $repository = static::repository($repositoryName);
         
         // if $repositoryName is an entity
@@ -355,6 +356,7 @@ class Prime
      */
     public static function one($repositoryName, $criteria = null)
     {
+        /** @psalm-suppress InvalidArgument */
         $repository = static::repository($repositoryName);
         
         // if $repositoryName is an entity

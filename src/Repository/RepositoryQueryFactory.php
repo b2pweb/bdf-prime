@@ -22,6 +22,7 @@ use Bdf\Prime\Query\ReadCommandInterface;
  * Factory for repository queries
  *
  * @template E as object
+ * @mixin QueryInterface<ConnectionInterface, E>
  */
 class RepositoryQueryFactory
 {
