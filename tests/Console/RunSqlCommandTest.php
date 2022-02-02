@@ -72,16 +72,17 @@ class RunSqlCommandTest extends TestCase
         $tester = new CommandTester($this->command);
         $tester->execute(['sql' => 'SELECT * from user_']);
 
-        $dbalValues = [
-            'id_' => '1',
-            'name_' => 'TEST1',
-            'roles_' => ',2,',
-            'customer_id' => '1',
-            'faction_id' => null,
-        ];
+        $display = $tester->getDisplay();
 
-        $display = Dumper::dump([$dbalValues], 7);
+        $this->assertStringContainsString('id_', $display);
+        $this->assertStringContainsString('name_', $display);
+        $this->assertStringContainsString('roles_', $display);
+        $this->assertStringContainsString('customer_id', $display);
+        $this->assertStringContainsString('faction_id', $display);
 
-        $this->assertSame($display, $tester->getDisplay());
+        $this->assertStringContainsString('1', $display);
+        $this->assertStringContainsString('TEST1', $display);
+        $this->assertStringContainsString(',2,', $display);
+        $this->assertStringContainsString('1', $display);
     }
 }

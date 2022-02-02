@@ -30,7 +30,7 @@ trait PaginableTrait
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Iterator
     {
         return $this->walk();
     }

@@ -35,7 +35,7 @@ class SqlCompiler extends AbstractCompiler
      */
     public function quote($value)
     {
-        return $this->connection->quote($this->autoConvertValue($value));
+        return $this->connection->quote((string) $this->autoConvertValue($value));
     }
 
     /**

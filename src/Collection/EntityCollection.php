@@ -507,7 +507,7 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return $this->storage->offsetExists($offset);
     }
@@ -515,6 +515,7 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->storage->offsetGet($offset);
@@ -523,7 +524,7 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value)
+    public function offsetSet($offset, $value): void
     {
         $this->storage->offsetSet($offset, $value);
     }
@@ -531,7 +532,7 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         $this->storage->offsetUnset($offset);
     }
@@ -539,7 +540,7 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
     /**
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return $this->storage->count();
     }
@@ -547,7 +548,7 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Iterator
     {
         return new \ArrayIterator($this->storage->all());
     }

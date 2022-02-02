@@ -495,7 +495,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Iterator
     {
         return new \ArrayIterator($this->relations);
     }
@@ -505,7 +505,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->relations[$offset]);
     }
@@ -513,6 +513,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->relations[$key];
@@ -521,7 +522,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($key, $value)
+    public function offsetSet($key, $value): void
     {
         // not allowed
     }
@@ -529,7 +530,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         // not allowed
     }

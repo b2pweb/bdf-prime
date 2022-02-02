@@ -668,7 +668,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Iterator
     {
         return new ArrayIterator($this->fields);
     }
@@ -678,7 +678,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         return isset($this->fields[$offset]);
     }
@@ -686,6 +686,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->fields[$key];
@@ -694,7 +695,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($key, $value)
+    public function offsetSet($key, $value): void
     {
         // not allowed
     }
@@ -702,7 +703,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset)
+    public function offsetUnset($offset): void
     {
         // not allowed
     }

@@ -269,6 +269,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->collection[$key];

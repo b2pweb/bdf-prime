@@ -409,11 +409,11 @@ public function __construct(array $data = [])
     protected function generateEntityUse()
     {
         $use = [];
-        
-        if ($this->hasNamespace($this->getClassToExtend())) {
-            $use[$this->getClassToExtend()] = 'use ' . $this->getClassToExtend() . ';';
+
+        if (($parentClass = $this->getClassToExtend()) && $this->hasNamespace($parentClass)) {
+            $use[$parentClass] = 'use ' . $parentClass . ';';
         }
-        
+
         foreach ($this->interfaces as $interface) {
             if ($this->hasNamespace($interface)) {
                 $use[$interface] = 'use ' . $interface . ';';
