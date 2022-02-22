@@ -51,7 +51,7 @@ class TableGenerator extends AbstractGenerator
             case 'mysql':
                 $connection->executeUpdate('UPDATE '.$metadata->sequence['table']
                     .' SET '. $metadata->sequence['column'].' = LAST_INSERT_ID('.$metadata->sequence['column'].'+1)');
-                return $connection->lastInsertId();
+                return (string) $connection->lastInsertId();
             
             case 'sqlite':
                 $connection->executeUpdate('UPDATE '.$metadata->sequence['table']
