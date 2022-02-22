@@ -79,7 +79,7 @@ final class UpdateResultSet extends \EmptyIterator implements ResultSetInterface
      */
     public function rewind(): void
     {
-        parent::rewind();
+        // No-op
     }
 
     /**

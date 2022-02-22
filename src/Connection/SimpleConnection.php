@@ -316,6 +316,8 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      * @return ResultSetInterface The query result
      * @throws DoctrineDBALException
      * @throws PrimeException
+     *
+     * @psalm-suppress InternalMethod
      */
     protected function executePrepared(Statement $statement, Compilable $query)
     {
@@ -421,6 +423,8 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      * @throws DBALException When any other error occurs
      *
      * @template T
+     *
+     * @psalm-suppress InternalMethod
      */
     protected function runOrReconnect(Closure $callback)
     {
