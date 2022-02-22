@@ -77,6 +77,14 @@ final class UpdateResultSet extends \EmptyIterator implements ResultSetInterface
     /**
      * {@inheritdoc}
      */
+    public function rewind(): void
+    {
+        parent::rewind();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function all(): array
     {
         return [];

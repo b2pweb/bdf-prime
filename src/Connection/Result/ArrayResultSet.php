@@ -150,6 +150,14 @@ final class ArrayResultSet extends ArrayIterator implements ResultSetInterface
     /**
      * {@inheritdoc}
      */
+    public function rewind(): void
+    {
+        parent::rewind();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function count(): int
     {
         return parent::count();
