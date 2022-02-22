@@ -52,6 +52,7 @@ final class DoctrineResultSet implements ResultSetInterface
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         if ($this->current === null) {
@@ -65,7 +66,7 @@ final class DoctrineResultSet implements ResultSetInterface
     /**
      * {@inheritdoc}
      */
-    public function next()
+    public function next(): void
     {
         $this->current = $this->strategy->one($this->result);
         ++$this->key;
@@ -74,6 +75,7 @@ final class DoctrineResultSet implements ResultSetInterface
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function key()
     {
         return $this->key;
@@ -82,7 +84,7 @@ final class DoctrineResultSet implements ResultSetInterface
     /**
      * {@inheritdoc}
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->current !== false;
     }
@@ -186,7 +188,7 @@ final class DoctrineResultSet implements ResultSetInterface
     /**
      * {@inheritdoc}
      */
-    public function rewind()
+    public function rewind(): void
     {
         $this->current = $this->strategy->one($this->result);
         $this->key = 0;

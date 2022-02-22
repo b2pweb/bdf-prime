@@ -135,6 +135,7 @@ final class ArrayResultSet extends ArrayIterator implements ResultSetInterface
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         $value = parent::current();
