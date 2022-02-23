@@ -137,6 +137,7 @@ final class ArrayResultSet extends ArrayIterator implements ResultSetInterface
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function current()
     {
         $value = parent::current();
@@ -146,6 +147,14 @@ final class ArrayResultSet extends ArrayIterator implements ResultSetInterface
         }
 
         return $this->strategy->one($value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rewind(): void
+    {
+        parent::rewind();
     }
 
     /**

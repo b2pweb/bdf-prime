@@ -108,7 +108,7 @@ class IndexBuilder
      *
      * Actual supported flags by MySQL :
      * - fulltext
-     * - spacial
+     * - spatial
      * - unique
      *
      * @param string $name The flag name to set

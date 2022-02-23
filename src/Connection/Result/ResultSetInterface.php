@@ -132,7 +132,7 @@ interface ResultSetInterface extends Iterator, Countable
      *
      * The rewind operation is not guaranteed to works, and may be a no-op on some connections
      */
-    public function rewind();
+    public function rewind(): void;
 
     /**
      * {@inheritdoc}

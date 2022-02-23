@@ -5,6 +5,7 @@ namespace Bdf\Prime\Query\Extension;
 use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\Pagination\PaginatorFactory;
 use Bdf\Prime\Query\Pagination\PaginatorInterface;
+use Bdf\Prime\Query\Pagination\Walker;
 
 /**
  * Trait for @see Paginable queries
@@ -29,8 +30,10 @@ trait PaginableTrait
 
     /**
      * {@inheritdoc}
+     *
+     * @return Walker<R>
      */
-    public function getIterator()
+    public function getIterator(): \Iterator
     {
         return $this->walk();
     }
@@ -56,7 +59,7 @@ trait PaginableTrait
      * @see Paginable::walk()
      * @psalm-suppress LessSpecificImplementedReturnType
      *
-     * @return PaginatorInterface<R>
+     * @return Walker<R>
      */
     public function walk(?int $maxRows = null, ?int $page = null): PaginatorInterface
     {

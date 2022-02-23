@@ -66,7 +66,7 @@ final class MultiResult implements IteratorAggregate, DriverResult
     /**
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Iterator
     {
         return new ArrayIterator($this->fetchAllAssociative());
     }

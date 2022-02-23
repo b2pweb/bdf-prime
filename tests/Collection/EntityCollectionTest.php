@@ -495,7 +495,7 @@ class EntityCollectionTest extends TestCase
     /**
      * @dataProvider delegationMethods
      */
-    public function test_delegation($method, array $arguments = [], $retType)
+    public function test_delegation($method, array $arguments, $retType)
     {
         $retVal = new stdClass();
         $storage = $this->createMock(CollectionInterface::class);
@@ -527,6 +527,29 @@ class EntityCollectionTest extends TestCase
     }
 
     /**
+     *
+     */
+    public function test_array_access_delegation()
+    {
+        $storage = $this->createMock(CollectionInterface::class);
+
+        $storage->expects($this->once())->method('offsetGet')->with('a')->willReturn('bar');
+        $storage->expects($this->once())->method('offsetSet')->with('a', 'b');
+        $storage->expects($this->once())->method('offsetExists')->with('a')->willReturn(true);
+        $storage->expects($this->once())->method('offsetUnset')->with('a');
+        $storage->expects($this->once())->method('count')->willReturn(5);
+
+        $collection = new EntityCollection($this->createMock(RepositoryInterface::class), $storage);
+
+        $this->assertSame('bar', $collection['a']);
+        $collection['a'] = 'b';
+        $this->assertTrue(isset($collection['a']));
+        unset($collection['a']);
+
+        $this->assertCount(5, $collection);
+    }
+
+    /**
      * @return array
      */
     public function delegationMethods()
@@ -550,11 +573,6 @@ class EntityCollectionTest extends TestCase
             ['merge',        [[]],                                   'self'],
             ['sort',         [],                                     'self'],
             ['toArray',      [],                                     'rtrn'],
-            ['offsetExists', ['a'],                                  'rtrn'],
-            ['offsetGet',    ['a'],                                  'rtrn'],
-            ['offsetSet',    ['a', new stdClass()],                  'null'],
-            ['offsetUnset',  ['a'],                                  'null'],
-            ['count',        [],                                     'rtrn'],
         ];
     }
 

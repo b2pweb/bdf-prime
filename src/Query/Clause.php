@@ -118,12 +118,12 @@ class Clause implements ClauseInterface
                 if (isset($this->customFilters[$key])) {
                     // Custom filter
                     $this->customFilters[$key]($this, $value);
-                } elseif ($key[0] === ':') {
-                    // Special command
-                    $this->addCommand($key, $value);
                 } elseif (is_int($key)) {
                     // Raw value
                     $this->buildRaw($statement, $value, $glue);
+                } elseif ($key[0] === ':') {
+                    // Special command
+                    $this->addCommand($key, $value);
                 } else {
                     // Column with operator
                     $key  = explode(' ', trim($key), 2);

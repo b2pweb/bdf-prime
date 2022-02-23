@@ -424,6 +424,8 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      * @throws DBALException When any other error occurs
      *
      * @template T
+     *
+     * @psalm-suppress InternalMethod
      */
     protected function runOrReconnect(Closure $callback)
     {

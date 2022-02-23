@@ -48,7 +48,7 @@ class IndexTransformerTest extends TestCase
      */
     public function test_toDoctrine_with_options_and_flags()
     {
-        $doctrine = (new IndexTransformer(new Index(['email_' => []], Index::TYPE_SIMPLE, null, ['fulltext' => true, 'my_option' => 'val'])))->toDoctrine();
+        $doctrine = (new IndexTransformer(new NamedIndex(new Index(['email_' => []], Index::TYPE_SIMPLE, null, ['fulltext' => true, 'my_option' => 'val']), 'tbl')))->toDoctrine();
 
         $this->assertSame(['fulltext'], $doctrine->getFlags());
         $this->assertSame(['my_option' => 'val'], $doctrine->getOptions());
@@ -59,7 +59,7 @@ class IndexTransformerTest extends TestCase
      */
     public function test_toDoctrine_with_field_length_option()
     {
-        $doctrine = (new IndexTransformer(new Index(['name_' => [], 'email_' => ['length' => 12]], Index::TYPE_SIMPLE, null, [])))->toDoctrine();
+        $doctrine = (new IndexTransformer(new NamedIndex(new Index(['name_' => [], 'email_' => ['length' => 12]], Index::TYPE_SIMPLE, null, []), 'tbl')))->toDoctrine();
 
         $this->assertSame([null, 12], $doctrine->getOption('lengths'));
     }

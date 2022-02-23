@@ -74,7 +74,7 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
      *
      * {@inheritdoc}
      */
-    public function offsetSet($key, $value)
+    public function offsetSet($key, $value): void
     {
         $this->put($key, $value);
     }
@@ -104,6 +104,7 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
      *
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($key)
     {
         return $this->items[$key];
@@ -122,7 +123,7 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
      *
      * {@inheritdoc}
      */
-    public function offsetExists($key)
+    public function offsetExists($key): bool
     {
         return isset($this->items[$key]);
     }
@@ -142,7 +143,7 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
      *
      * {@inheritdoc}
      */
-    public function offsetUnset($key)
+    public function offsetUnset($key): void
     {
         $this->remove($key);
     }
@@ -170,7 +171,7 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
      *
      * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         return count($this->items);
     }
@@ -180,7 +181,7 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
      *
      * {@inheritdoc}
      */
-    public function getIterator()
+    public function getIterator(): \Iterator
     {
         return new ArrayIterator($this->items);
     }
