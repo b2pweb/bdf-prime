@@ -4,15 +4,15 @@ namespace Bdf\Prime\Relations;
 
 use Bdf\Prime\Collection\Indexer\EntityIndexer;
 use Bdf\Prime\Collection\Indexer\SingleEntityIndexer;
+use Bdf\Prime\Customer;
+use Bdf\Prime\CustomerControlTask;
+use Bdf\Prime\Document;
+use Bdf\Prime\DocumentControlTask;
 use Bdf\Prime\DocumentEager;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
-use Bdf\Prime\CustomerControlTask;
-use Bdf\Prime\Customer;
-use Bdf\Prime\DocumentControlTask;
-use Bdf\Prime\Document;
-use Bdf\Prime\User;
 use Bdf\Prime\Task;
+use Bdf\Prime\User;
 use PHPUnit\Framework\TestCase;
 
 /**

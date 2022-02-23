@@ -3,6 +3,7 @@
 namespace Bdf\Prime;
 
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Mapper\Builder\PolymorphBuilder;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Serializer\Metadata\Builder\ClassMetadataBuilder;
 use DateTimeImmutable;
@@ -87,6 +88,70 @@ class DocumentMapper extends Mapper
         $builder->on('customer')
             ->belongsTo(Customer::class, 'customerId')
             ->detached();
+    }
+}
+
+class DocumentNullablePolymorph extends Model
+{
+    public $id;
+    public $uploaderType;
+    public $uploaderId;
+    public $uploader;
+    public $contact;
+
+    public function __construct(array $attributes = [])
+    {
+        $this->import($attributes);
+    }
+}
+
+class DocumentNullablePolymorphMapper extends Mapper
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function schema(): array
+    {
+        return [
+            'connection' => 'test',
+            'table'      => 'document_nullable_poly',
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildFields(FieldBuilder $builder): void
+    {
+        $builder
+            ->bigint('id')->autoincrement()
+            ->string('uploaderType', 60)->nillable()
+            ->bigint('uploaderId')->nillable()
+            ->embedded('contact', Contact::class, function($builder) {
+                $builder
+                    ->string('name')->alias('contact_name')->nillable()
+                    ->embedded('location', Location::class, function($builder) {
+                        $builder
+                            ->string('address')->alias('contact_address')->nillable()
+                            ->string('city')->alias('contact_city')->nillable();
+                    });
+            })
+        ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildRelations(RelationBuilder $builder): void
+    {
+        $builder->on('uploader')
+            ->morphTo('uploaderId', 'uploaderType', [
+                'admin' => Admin::class.'::id',
+                'user' => [
+                    'entity'           => User::class,
+                    'distantKey'       => 'id',
+                ],
+            ]);
     }
 }
 
