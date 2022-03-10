@@ -7,6 +7,7 @@ use Bdf\Prime\Cache\CacheInterface;
 use Bdf\Prime\Collection\CollectionFactory;
 use Bdf\Prime\Collection\EntityCollection;
 use Bdf\Prime\Collection\Indexer\SingleEntityIndexer;
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\Event\ConnectionClosedListenerInterface;
 use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Events;
@@ -90,6 +91,11 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     protected $writer;
 
+    /**
+     * @var ConnectionInterface
+     */
+    protected $connection;
+
 
     /**
      * Constructor
@@ -109,7 +115,6 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
         $this->writer = new Writer($this, $serviceLocator);
 
         $this->mapper->events($this);
-        $this->connection()->getEventManager()->addEventSubscriber($this);
     }
     
     /**
@@ -228,7 +233,13 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function connection()
     {
-        return $this->serviceLocator->connection($this->mapper->metadata()->connection);
+        if ($this->connection === null) {
+            //Repository query factory load the connection on its constructor. Use lazy to let the connection being loaded as late as possible.
+            $this->connection = $this->serviceLocator->connection($this->mapper->metadata()->connection);
+            $this->connection->getEventManager()->addEventSubscriber($this);
+        }
+
+        return $this->connection;
     }
     
     /**
@@ -1062,21 +1073,17 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function destroy()
     {
-        $this->connection()->getEventManager()->removeEventSubscriber($this);
+        $this->reset();
 
         $this->serviceLocator = null;
         $this->queries = null;
         $this->writer = null;
-        $this->relations = [];
         $this->collectionFactory = null;
 
         $this->mapper->destroy();
         $this->mapper = null;
 
-        if ($this->resultCache) {
-            $this->resultCache->clear();
-            $this->resultCache = null;
-        }
+        $this->resultCache = null;
     }
 
     /**
@@ -1091,23 +1098,25 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     private function changeActiveConnection($connectionName)
     {
-        $this->connection()->getEventManager()->removeEventSubscriber($this);
+        $this->reset();
 
         $original = $this->mapper->metadata()->connection;
         $this->mapper->metadata()->connection = $connectionName;
-
-        $this->connection()->getEventManager()->addEventSubscriber($this);
-        $this->reset();
 
         return $original;
     }
 
     /**
-     * Reset the inner queries
+     * Reset the inner queries and the connection.
      * Use for invalidate prepared queries, or when connection changed
      */
     private function reset()
     {
+        if ($this->connection !== null) {
+            $this->connection->getEventManager()->removeEventSubscriber($this);
+            $this->connection = null;
+        }
+
         // Reset queries
         $this->queries = new RepositoryQueryFactory($this, $this->resultCache);
         $this->writer = new Writer($this, $this->serviceLocator);

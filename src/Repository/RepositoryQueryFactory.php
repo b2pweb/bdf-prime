@@ -3,7 +3,6 @@
 namespace Bdf\Prime\Repository;
 
 use Bdf\Prime\Cache\CacheInterface;
-use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Exception\QueryException;
 use Bdf\Prime\Mapper\Metadata;
@@ -14,9 +13,6 @@ use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Pagination\PaginatorFactory;
-use Bdf\Prime\Query\Pagination\Walker;
-use Bdf\Prime\Query\Pagination\WalkStrategy\KeyWalkStrategy;
-use Bdf\Prime\Query\Pagination\WalkStrategy\MapperPrimaryKey;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\QueryRepositoryExtension;
 use Bdf\Prime\Query\ReadCommandInterface;
@@ -30,11 +26,6 @@ class RepositoryQueryFactory
      * @var RepositoryInterface
      */
     private $repository;
-
-    /**
-     * @var ConnectionInterface
-     */
-    private $connection;
 
     /**
      * @var Metadata
@@ -103,7 +94,6 @@ class RepositoryQueryFactory
 
         $this->supportsKeyValue = empty($repository->constraints());
 
-        $this->connection = $repository->connection();
         $this->queries = $repository->mapper()->queries();
         $this->metadata = $repository->metadata();
     }
@@ -129,7 +119,7 @@ class RepositoryQueryFactory
      */
     public function fromAlias(?string $alias = null)
     {
-        return $this->configure($this->connection->builder(new OrmPreprocessor($this->repository)), $alias);
+        return $this->configure($this->repository->connection()->builder(new OrmPreprocessor($this->repository)), $alias);
     }
 
     /**
@@ -141,7 +131,7 @@ class RepositoryQueryFactory
      */
     public function make($query)
     {
-        return $this->configure($this->connection->make($query, new OrmPreprocessor($this->repository)));
+        return $this->configure($this->repository->connection()->make($query, new OrmPreprocessor($this->repository)));
     }
 
     /**
