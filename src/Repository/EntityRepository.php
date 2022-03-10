@@ -101,6 +101,11 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     protected $writer;
 
+    /**
+     * @var ConnectionInterface|null
+     */
+    protected $connection;
+
 
     /**
      * Constructor
@@ -120,7 +125,6 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
         $this->writer = new Writer($this, $serviceLocator);
 
         $this->mapper->events($this);
-        $this->connection()->getEventManager()->addEventSubscriber($this);
     }
     
     /**
@@ -239,7 +243,13 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function connection(): ConnectionInterface
     {
-        return $this->serviceLocator->connection($this->mapper->metadata()->connection);
+        if ($this->connection === null) {
+            //Repository query factory load the connection on its constructor. Use lazy to let the connection being loaded as late as possible.
+            $this->connection = $this->serviceLocator->connection($this->mapper->metadata()->connection);
+            $this->connection->getEventManager()->addEventSubscriber($this);
+        }
+
+        return $this->connection;
     }
     
     /**
@@ -1000,7 +1010,10 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function destroy(): void
     {
-        $this->connection()->getEventManager()->removeEventSubscriber($this);
+        if ($this->connection !== null) {
+            $this->connection->getEventManager()->removeEventSubscriber($this);
+            $this->connection = null;
+        }
 
         $this->serviceLocator = null;
         $this->queries = null;
@@ -1029,26 +1042,28 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     private function changeActiveConnection($connectionName)
     {
-        $this->connection()->getEventManager()->removeEventSubscriber($this);
+        $this->reset();
 
         /** @var string $original */
         $original = $this->mapper->metadata()->connection;
         $this->mapper->metadata()->connection = $connectionName;
 
-        $this->connection()->getEventManager()->addEventSubscriber($this);
-        $this->reset();
-
         return $original;
     }
 
     /**
-     * Reset the inner queries
+     * Reset the inner queries and the connection.
      * Use for invalidate prepared queries, or when connection changed
      *
      * @return void
      */
     private function reset(): void
     {
+        if ($this->connection !== null) {
+            $this->connection->getEventManager()->removeEventSubscriber($this);
+            $this->connection = null;
+        }
+
         // Reset queries
         $this->queries = new RepositoryQueryFactory($this, $this->resultCache);
         $this->writer = new Writer($this, $this->serviceLocator);

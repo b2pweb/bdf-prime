@@ -90,6 +90,12 @@ BC Breaks
 * Add close method in `Bdf\Prime\Connection\ConnectionInterface` interface.
 
 
+v1.2.2
+------
+
+* Fix: Fix lazy loading of the connection on repository.
+
+
 v1.2.1
 ------
 
