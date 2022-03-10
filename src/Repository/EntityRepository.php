@@ -92,7 +92,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     protected $writer;
 
     /**
-     * @var ConnectionInterface
+     * @var ConnectionInterface|null
      */
     protected $connection;
 
@@ -1073,17 +1073,24 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function destroy()
     {
-        $this->reset();
+        if ($this->connection !== null) {
+            $this->connection->getEventManager()->removeEventSubscriber($this);
+            $this->connection = null;
+        }
 
         $this->serviceLocator = null;
         $this->queries = null;
         $this->writer = null;
+        $this->relations = [];
         $this->collectionFactory = null;
 
         $this->mapper->destroy();
         $this->mapper = null;
 
-        $this->resultCache = null;
+        if ($this->resultCache) {
+            $this->resultCache->clear();
+            $this->resultCache = null;
+        }
     }
 
     /**
