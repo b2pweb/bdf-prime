@@ -730,7 +730,7 @@ class TestLazyLoadingConnectionMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'lazytest',
@@ -741,7 +741,7 @@ class TestLazyLoadingConnectionMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function buildFields($builder)
+    public function buildFields($builder): void
     {
         $builder
             ->integer('id')
