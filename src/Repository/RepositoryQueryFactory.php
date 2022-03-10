@@ -31,11 +31,6 @@ class RepositoryQueryFactory
     private $repository;
 
     /**
-     * @var ConnectionInterface
-     */
-    private $connection;
-
-    /**
      * @var Metadata
      */
     private $metadata;
@@ -102,7 +97,6 @@ class RepositoryQueryFactory
 
         $this->supportsKeyValue = empty($repository->constraints());
 
-        $this->connection = $repository->connection();
         $this->queries = $repository->mapper()->queries();
         $this->metadata = $repository->metadata();
     }
@@ -128,7 +122,7 @@ class RepositoryQueryFactory
      */
     public function fromAlias(?string $alias = null)
     {
-        return $this->configure($this->connection->builder(new OrmPreprocessor($this->repository)), $alias);
+        return $this->configure($this->repository->connection()->builder(new OrmPreprocessor($this->repository)), $alias);
     }
 
     /**
@@ -147,7 +141,7 @@ class RepositoryQueryFactory
     public function make(string $query)
     {
         /** @psalm-suppress InvalidReturnStatement */
-        return $this->configure($this->connection->make($query, new OrmPreprocessor($this->repository)));
+        return $this->configure($this->repository->connection()->make($query, new OrmPreprocessor($this->repository)));
     }
 
     /**

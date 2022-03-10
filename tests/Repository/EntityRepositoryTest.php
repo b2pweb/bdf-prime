@@ -2,7 +2,9 @@
 
 namespace Bdf\Prime\Repository;
 
+use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Events;
+use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Right;
@@ -691,4 +693,61 @@ class EntityRepositoryTest extends TestCase
         // Data is removed
         $this->assertNull($respository->findById(1));
     }
+
+    /**
+     *
+     */
+    public function test_lazy_loading_connection()
+    {
+        $this->prime()->connections()->declareConnection('lazytest', [
+            'adapter' => 'sqlite',
+            'memory' => true
+        ]);
+        $this->assertNotContains('lazytest', $this->prime()->connections()->getCurrentConnectionNames());
+
+        $respository = TestLazyLoadingConnection::repository();
+        $this->assertNotContains('lazytest', $this->prime()->connections()->getCurrentConnectionNames());
+
+        $entity = new TestLazyLoadingConnection();
+        $respository->free($entity);
+
+        $this->assertNotContains('lazytest', $this->prime()->connections()->getCurrentConnectionNames());
+
+        $respository->builder();
+        $this->assertContains('lazytest', $this->prime()->connections()->getCurrentConnectionNames());
+    }
+}
+
+
+
+class TestLazyLoadingConnection extends Model
+{
+    public $id;
+}
+
+class TestLazyLoadingConnectionMapper extends Mapper
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function schema()
+    {
+        return [
+            'connection' => 'lazytest',
+            'table' => 'test_',
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildFields($builder)
+    {
+        $builder
+            ->integer('id')
+            ->autoincrement()
+        ;
+    }
+
+
 }
