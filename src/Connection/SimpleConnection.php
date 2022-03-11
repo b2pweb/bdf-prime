@@ -292,7 +292,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
                 return new DoctrineResultSet($this->executeQuery($statement, $query->getBindings()));
             }
 
-            return new UpdateResultSet($this->executeStatement($statement, $query->getBindings()));
+            return new UpdateResultSet((int) $this->executeStatement($statement, $query->getBindings()));
         } catch (DriverException $e) {
             throw new QueryExecutionException(
                 'Error on execute : ' . $e->getMessage(),

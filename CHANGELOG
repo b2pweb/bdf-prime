@@ -8,7 +8,8 @@ v2.0.0
 
 BC Breaks
 * Change: PHP minimal version set to 7.4.
-* Change: `Bdf\Prime\Query\Contract\Query\InsertQueryInterface` now implements `CommandInterface`
+* Change: `Bdf\Prime\Query\Contract\Query\InsertQueryInterface` now implements `CommandInterface` and `BulkWriteBuilderInterface`
+* Change: `Bdf\Prime\Query\Contract\CommandInterface` now implements `SelfExecutable`
 * Change signature of `Bdf\Prime\Query\AbstractReadCommand#postProcessResult()` : $data is now type of `Bdf\Prime\Connection\Result\ResultSetInterface`
 * The return type of `Bdf\Prime\Query\CommandInterface#execute()` changed from array to `Bdf\Prime\Connection\Result\ResultSetInterface`
 * The return type of `Bdf\Prime\Query\Contract\Query\InsertQueryInterface#execute()` changed from int to `Bdf\Prime\Connection\Result\ResultSetInterface`

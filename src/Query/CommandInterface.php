@@ -6,13 +6,14 @@ use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
+use Bdf\Prime\Query\Contract\SelfExecutable;
 
 /**
  * Base type for perform an SGBD command
  *
  * @template C as ConnectionInterface
  */
-interface CommandInterface extends CompilableClauseInterface
+interface CommandInterface extends CompilableClauseInterface, SelfExecutable
 {
     /**
      * Gets the query language compiler
@@ -47,9 +48,9 @@ interface CommandInterface extends CompilableClauseInterface
     public function on(ConnectionInterface $connection);
 
     /**
-     * Get all matched data. Return the raw data from connection
+     * {@inheritdoc}
      *
-     * @param string|array $columns
+     * @param string|array $columns Filter result columns
      *
      * @return ResultSetInterface<array<string, mixed>>
      * @throws PrimeException When execute fail
