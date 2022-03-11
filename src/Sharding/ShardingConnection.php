@@ -129,7 +129,9 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
         /** @var DefaultQueryFactory $queryFactory */
         $queryFactory = $this->factory();
 
+        /** @psalm-suppress InvalidArgument */
         $queryFactory->alias(InsertQueryInterface::class, ShardingInsertQuery::class);
+        /** @psalm-suppress InvalidArgument */
         $queryFactory->alias(KeyValueQueryInterface::class, ShardingKeyValueQuery::class);
     }
 
@@ -325,6 +327,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
             $result->add($shard->executeQuery($sql, $params, $types, $qcp));
         }
 
+        /** @psalm-suppress InternalMethod */
         return new Result($result, $this);
     }
 
@@ -423,14 +426,14 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function lastInsertId($seqName = null)
+    public function lastInsertId($name = null)
     {
         if ($this->isUsingShard()) {
-            return $this->getSelectedShard()->lastInsertId($seqName);
+            return $this->getSelectedShard()->lastInsertId($name);
         }
 
         // TODO doit on lever une exception ?
-        return parent::lastInsertId($seqName);
+        return parent::lastInsertId($name);
     }
 
     /**

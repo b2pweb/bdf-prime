@@ -57,6 +57,7 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * @param string ...$columns The grouping columns.
      *
      * @return $this This Query instance.
+     * @no-named-arguments
      */
     public function addGroup(string ...$columns);
 

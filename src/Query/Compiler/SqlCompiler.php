@@ -965,7 +965,7 @@ class SqlCompiler extends AbstractCompiler
             return '';
         }
 
-        $fields = array_map([$query->preprocessor(), 'field'], $query->statements['groups']);
+        $fields = array_map(fn (string $group) => $query->preprocessor()->field($group), $query->statements['groups']);
 
         if ($query->isQuoteIdentifier()) {
             $fields = $this->quoteIdentifiers($query, $fields);

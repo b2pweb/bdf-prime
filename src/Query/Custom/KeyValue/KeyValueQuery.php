@@ -193,7 +193,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function paginationCount(?string $columns = null): int
+    public function paginationCount(?string $column = null): int
     {
         $statements = $this->statements;
 
@@ -201,7 +201,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
 
         $this->statements['limit'] = null;
         $this->statements['offset'] = null;
-        $this->statements['aggregate'] = ['count', $columns ?: '*'];
+        $this->statements['aggregate'] = ['count', $column ?: '*'];
 
         $count = (int)$this->execute()->current()['aggregate'];
 

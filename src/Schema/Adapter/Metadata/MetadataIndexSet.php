@@ -44,9 +44,8 @@ final class MetadataIndexSet implements IndexSetInterface
     {
         $indexes =  $this->extractIndexes($this->metadata->indexes);
 
-        if ($primary = $this->primary()) {
-            $indexes[$primary->name()] = $primary;
-        }
+        $primary = $this->primary();
+        $indexes[$primary->name()] = $primary;
 
         return array_change_key_case($indexes, CASE_LOWER);
     }

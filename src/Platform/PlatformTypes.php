@@ -76,13 +76,13 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
     /**
      * {@inheritdoc}
      */
-    public function get(string $name): TypeInterface
+    public function get(string $type): TypeInterface
     {
-        if (parent::has($name)) {
-            return parent::get($name);
+        if (parent::has($type)) {
+            return parent::get($type);
         }
 
-        return $this->commons->get($name);
+        return $this->commons->get($type);
     }
 
     /**

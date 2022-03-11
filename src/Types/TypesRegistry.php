@@ -44,26 +44,26 @@ class TypesRegistry implements TypesRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function get(string $name): TypeInterface
+    public function get(string $type): TypeInterface
     {
-        if (isset($this->types[$name])) {
-            if (is_string($this->types[$name])) {
-                $class = $this->types[$name];
+        if (isset($this->types[$type])) {
+            if (is_string($this->types[$type])) {
+                $class = $this->types[$type];
 
-                return $this->types[$name] = $this->instantiate($class, $name);
+                return $this->types[$type] = $this->instantiate($class, $type);
             }
 
-            return $this->types[$name];
+            return $this->types[$type];
         }
 
-        if (strpos($name, '[]', -2) !== false) {
-            return $this->types[$name] = new ArrayOfType(
+        if (strpos($type, '[]', -2) !== false) {
+            return $this->types[$type] = new ArrayOfType(
                 $this->get(TypeInterface::TARRAY),
-                $this->get(substr($name, 0, -2))
+                $this->get(substr($type, 0, -2))
             );
         }
 
-        throw new TypeNotFoundException($name);
+        throw new TypeNotFoundException($type);
     }
 
     /**

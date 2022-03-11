@@ -61,7 +61,7 @@ abstract class Mapper
      * Could be defined as string (generator class name). It would be instantiated
      * by mapper on generator() method
      * 
-     * @var \Bdf\Prime\IdGenerators\GeneratorInterface
+     * @var \Bdf\Prime\IdGenerators\GeneratorInterface|null
      */
     protected $generator;
     
@@ -314,7 +314,6 @@ abstract class Mapper
      * Get generator ID
      * 
      * @return GeneratorInterface
-     * @psalm-assert GeneratorInterface $this->generator
      * @final
      */
     public function generator(): GeneratorInterface
@@ -660,7 +659,7 @@ abstract class Mapper
      *  ];
      * </code>
      * 
-     * @return array<string, callable(\Bdf\Prime\Query\QueryInterface,mixed...):void>
+     * @return array<string, callable>
      */
     public function filters(): array
     {
@@ -724,7 +723,8 @@ abstract class Mapper
      * 
      * $repository->customMethod('test');
      * </code>
-     * @return array<string, callable(\Bdf\Prime\Query\QueryInterface,mixed...):mixed>
+     *
+     * @return array<string, callable>
      */
     public function scopes(): array
     {
@@ -746,7 +746,7 @@ abstract class Mapper
      * ];
      * </code>
      *
-     * @return array<string, callable(\Bdf\Prime\Repository\RepositoryInterface,mixed...):mixed>
+     * @return array<string, callable(\Bdf\Prime\Repository\RepositoryInterface<E>,mixed...):mixed>
      */
     public function queries(): array
     {

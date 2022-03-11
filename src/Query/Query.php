@@ -454,6 +454,8 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
 
     /**
      * {@inheritdoc}
+     * 
+     * @no-named-arguments
      */
     public function addGroup(string ...$columns)
     {

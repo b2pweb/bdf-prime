@@ -314,6 +314,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      * @param Compilable $query
      *
      * @return ResultSetInterface The query result
+     *
      * @throws DoctrineDBALException
      * @throws PrimeException
      *
@@ -437,6 +438,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
                     // Only reconnect the start transaction.
                     // Should raise exception during transaction.
                     $this->close();
+                    /** @psalm-suppress InternalMethod */
                     $this->connect();
 
                     return $callback();

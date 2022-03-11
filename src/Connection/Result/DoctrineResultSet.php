@@ -42,10 +42,12 @@ final class DoctrineResultSet implements ResultSetInterface
      * PdoResultSet constructor.
      *
      * @param Result $result
+     * @psalm-this-out DoctrineResultSet<array<string, mixed>>
      */
     public function __construct(Result $result)
     {
         $this->result = $result;
+        /** @var DoctrineResultSet<array<string, mixed>> $this */
         $this->strategy = AssociativeDoctrineFetch::instance();
     }
 

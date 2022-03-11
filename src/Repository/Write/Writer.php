@@ -69,21 +69,23 @@ class Writer implements WriterInterface
     #[WriteOperation]
     public function insert($entity, array $options = []): int
     {
-        /** @var EntityRepository<E> $this->repository */
-        if ($this->repository->notify(Events::PRE_INSERT, [$entity, $this->repository]) === false) {
+        /** @var EntityRepository<E> $repository */
+        $repository = $this->repository;
+
+        if ($repository->notify(Events::PRE_INSERT, [$entity, $repository]) === false) {
             return 0;
         }
 
-        $data = $this->repository->mapper()->prepareToRepository($entity);
-        $generator = $this->repository->mapper()->generator();
-        $generator->setCurrentConnection($this->repository->connection());
+        $data = $repository->mapper()->prepareToRepository($entity);
+        $generator = $repository->mapper()->generator();
+        $generator->setCurrentConnection($repository->connection());
         $generator->generate($data, $this->serviceLocator);
 
         $count = $this->insertQuery()->ignore(!empty($options['ignore']))->values($data)->execute()->count();
 
         $generator->postProcess($entity);
 
-        $this->repository->notify(Events::POST_INSERT, [$entity, $this->repository, $count]);
+        $repository->notify(Events::POST_INSERT, [$entity, $this->repository, $count]);
 
         return $count;
     }

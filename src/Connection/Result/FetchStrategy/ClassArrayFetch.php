@@ -9,23 +9,24 @@ use Closure;
  *
  * @template T as object
  * @implements ArrayFetchStrategyInterface<T>
- *
- * @psalm-immutable
  */
 final class ClassArrayFetch implements ArrayFetchStrategyInterface
 {
     /**
      * @var class-string<T>
+     * @readonly
      */
     private string $className;
 
     /**
      * @var list<mixed>
+     * @readonly
      */
     private array $constructorArguments;
 
     /**
      * @var Closure(array<string, mixed>, T):void
+     * @readonly
      */
     private Closure $hydrator;
 
@@ -70,10 +71,13 @@ final class ClassArrayFetch implements ArrayFetchStrategyInterface
      * Create the properties hydrator function
      *
      * @param class-string<T> $className
-     * @return Closure
+     * @return Closure(array<string, mixed>, T):void
+     *
+     * @psalm-ignore-falsable-return
      */
     private function createHydrator(string $className): Closure
     {
+        /** @var Closure(array<string, mixed>, T):void */
         return Closure::bind(static function (array $row, object $entity) {
             foreach ($row as $property => $value) {
                 $entity->$property = $value;
