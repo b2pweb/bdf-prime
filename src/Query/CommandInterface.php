@@ -18,18 +18,9 @@ interface CommandInterface extends CompilableClauseInterface, SelfExecutable
     /**
      * Gets the query language compiler
      *
-     * @return CompilerInterface
+     * @return object
      */
-    public function compiler(): CompilerInterface;
-
-    /**
-     * Set the query language compiler
-     *
-     * @param CompilerInterface $compiler
-     *
-     * @return $this
-     */
-    public function setCompiler(CompilerInterface $compiler);
+    public function compiler(): object;
 
     /**
      * Gets the associated DBAL Connection for this command

@@ -2,13 +2,13 @@
 
 namespace Bdf\Prime\Query\Extension;
 
-use Bdf\Prime\Query\Compiler\CompilerInterface;
+use Bdf\Prime\Query\Compiler\CompilerState;
 use Doctrine\DBAL\LockMode;
 
 /**
  * Trait for @see Lockable
  *
- * @property CompilerInterface $compiler
+ * @property CompilerState $compilerState
  * @property array $statements
  *
  * @psalm-require-implements \Bdf\Prime\Query\Contract\Lockable

@@ -1,13 +1,12 @@
 <?php
 
 namespace Bdf\Prime\Query\Extension;
-use Bdf\Prime\Query\Compiler\CompilerInterface;
+
 use Bdf\Prime\Query\Contract\Orderable;
 
 /**
  * Trait for @see Orderable
  *
- * @property CompilerInterface $compiler
  * @property array{orders:array<array{sort:string,order:Orderable::ORDER_*}>} $statements
  *
  * @psalm-require-implements Orderable

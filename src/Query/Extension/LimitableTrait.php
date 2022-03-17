@@ -2,7 +2,7 @@
 
 namespace Bdf\Prime\Query\Extension;
 
-use Bdf\Prime\Query\Compiler\CompilerInterface;
+use Bdf\Prime\Query\Compiler\CompilerState;
 use Bdf\Prime\Query\Contract\Limitable;
 
 /**
@@ -12,7 +12,7 @@ use Bdf\Prime\Query\Contract\Limitable;
  * @psalm-require-implements Limitable
  *
  * @property array $statements
- * @property CompilerInterface $compiler
+ * @property CompilerState $compilerState
  */
 trait LimitableTrait
 {

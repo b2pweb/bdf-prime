@@ -5,6 +5,7 @@ namespace Bdf\Prime\Query\Custom\KeyValue;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\AbstractCompiler;
+use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Doctrine\DBAL\Statement;
@@ -13,8 +14,9 @@ use Doctrine\DBAL\Statement;
  * SQL compiler for KeyValueQuery
  *
  * @extends AbstractCompiler<KeyValueQuery, \Doctrine\DBAL\Connection&\Bdf\Prime\Connection\ConnectionInterface>
+ * @implements QuoteCompilerInterface<KeyValueQuery>
  */
-class KeyValueSqlCompiler extends AbstractCompiler
+class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
 {
     /**
      * {@inheritdoc}
@@ -59,6 +61,14 @@ class KeyValueSqlCompiler extends AbstractCompiler
             ? $this->platform()->grammar()->quoteIdentifier($column)
             : $column
         ;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function quote($value)
+    {
+        return $this->connection->quote($value);
     }
 
     /**

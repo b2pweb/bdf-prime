@@ -4,6 +4,7 @@ namespace Bdf\Prime\Query\Expression;
 
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
+use Bdf\Prime\Query\Compiler\SqlCompiler;
 
 /**
  * FullTextMatch
@@ -47,11 +48,12 @@ class FullTextMatch implements ExpressionInterface
     }
     
     /**
-     * FULLTEXT search
-     * 
      * {@inheritdoc}
+     *
+     * @param Q $query
+     * @param SqlCompiler $compiler
      */
-    public function build(CompilableClause $query, CompilerInterface $compiler)
+    public function build(CompilableClause $query, object $compiler)
     {
         $sql = 'MATCH('.$compiler->quoteIdentifier($query, $query->preprocessor()->field($this->search)).' AGAINST('.$compiler->quote($this->value).')';
         

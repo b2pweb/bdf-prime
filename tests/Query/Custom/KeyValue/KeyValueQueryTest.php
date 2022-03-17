@@ -11,6 +11,7 @@ use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\Exception\QueryExecutionException;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Query\AbstractReadCommand;
 use Bdf\Prime\Query\Compiler\Preprocessor\OrmPreprocessor;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\QueryRepositoryExtension;
@@ -62,7 +63,10 @@ class KeyValueQueryTest extends TestCase
     public function query($preprocessor = null)
     {
         $query = new KeyValueQuery($this->connection, $preprocessor);
-        $query->setCompiler(new KeyValueSqlCompiler($this->connection));
+
+        $p = new \ReflectionProperty(AbstractReadCommand::class, 'compiler');
+        $p->setAccessible(true);
+        $p->setValue($query, new KeyValueSqlCompiler($this->connection));
 
         return $query;
     }

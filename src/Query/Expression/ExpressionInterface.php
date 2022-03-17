@@ -4,7 +4,6 @@ namespace Bdf\Prime\Query\Expression;
 
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\CompilableClause;
-use Bdf\Prime\Query\Compiler\CompilerInterface;
 
 /**
  * SQL Expression
@@ -14,7 +13,7 @@ use Bdf\Prime\Query\Compiler\CompilerInterface;
  * @package Bdf\Prime\Query\Expression
  *
  * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\Contract\Compilable
- * @template C as CompilerInterface<Q>
+ * @template C as object
  */
 interface ExpressionInterface
 {
@@ -27,5 +26,5 @@ interface ExpressionInterface
      * @return string
      * @throws PrimeException
      */
-    public function build(CompilableClause $query, CompilerInterface $compiler);
+    public function build(CompilableClause $query, object $compiler);
 }

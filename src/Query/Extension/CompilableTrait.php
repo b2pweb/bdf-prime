@@ -2,15 +2,19 @@
 
 namespace Bdf\Prime\Query\Extension;
 
-use Bdf\Prime\Query\Compiler\CompilerInterface;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Compiler\CompilerState;
+use Bdf\Prime\Query\Compiler\DeleteCompilerInterface;
+use Bdf\Prime\Query\Compiler\InsertCompilerInterface;
+use Bdf\Prime\Query\Compiler\SelectCompilerInterface;
+use Bdf\Prime\Query\Compiler\UpdateCompilerInterface;
 use Bdf\Prime\Query\Contract\Compilable;
 
 /**
  * Simple implementation for @see Compilable
  *
  * @property CompilerState $compilerState
- * @property CompilerInterface $compiler
+ * @property object $compiler
  *
  * @psalm-require-implements Compilable
  */
@@ -32,7 +36,7 @@ trait CompilableTrait
             return $this->compilerState->compiled;
         }
 
-        return $this->compilerState->compiled = $this->compiler->{'compile'.$this->type}($this);
+        return $this->compilerState->compiled = $this->doCompilation($this->type, $this->compiler);
     }
 
     /**
@@ -66,6 +70,38 @@ trait CompilableTrait
         if ($this->type !== $type) {
             $this->compilerState->invalidate();
             $this->type = $type;
+        }
+    }
+
+    /**
+     * Perform the query compilation
+     * Can be overridden for perform custom compilation process
+     *
+     * @param Compilable::TYPE_* $type The query type
+     * @param object $compiler The related compiler
+     *
+     * @return mixed The compiled query
+     *
+     * @throws PrimeException When the compilation fail
+     * @throws \LogicException If type is not supported by the query or the compiler
+     */
+    protected function doCompilation(string $type, object $compiler)
+    {
+        switch (true) {
+            case $type === Compilable::TYPE_SELECT && $compiler instanceof SelectCompilerInterface:
+                return $compiler->compileSelect($this);
+
+            case $type === Compilable::TYPE_UPDATE && $compiler instanceof UpdateCompilerInterface:
+                return $compiler->compileUpdate($this);
+
+            case $type === Compilable::TYPE_INSERT && $compiler instanceof InsertCompilerInterface:
+                return $compiler->compileInsert($this);
+
+            case $type === Compilable::TYPE_DELETE && $compiler instanceof DeleteCompilerInterface:
+                return $compiler->compileDelete($this);
+
+            default:
+                throw new \LogicException('The query ' . static::class . ' do not supports type ' . $type);
         }
     }
 }

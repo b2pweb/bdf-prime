@@ -10,6 +10,7 @@ use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
+use Bdf\Prime\Query\Compiler\SqlCompiler;
 use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Expression\Attribute;
 use Bdf\Prime\Query\Expression\Like;
@@ -91,20 +92,7 @@ class QueryTest extends TestCase
     {
         $this->query()->insert((array)$entity);
     }
-    
-    /**
-     * 
-     */
-    public function test_set_get_compiler()
-    {
-        $compiler = $this->createMock('Bdf\Prime\Query\Compiler\CompilerInterface');
-        
-        $query = $this->query();
-        $query->setCompiler($compiler);
-        
-        $this->assertSame($compiler, $query->compiler());
-    }
-    
+
     /**
      * 
      */
@@ -123,7 +111,7 @@ class QueryTest extends TestCase
      */
     public function test_set_get_connection()
     {
-        $compiler = $this->createMock(CompilerInterface::class);
+        $compiler = $this->createMock(SqlCompiler::class);
         $connection = $this->getMockBuilder(SimpleConnection::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -1139,6 +1127,40 @@ class QueryTest extends TestCase
 
         $this->assertSame([], $query->all(['id', 'name']));
         $this->assertEquals('SELECT id, name FROM test_ WHERE id = ?', $query->compile());
+    }
+
+    /**
+     *
+     */
+    public function test_compile_unsupported_type()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The query Bdf\Prime\Query\Query do not supports type invalid');
+
+        $query = $this->query();
+
+        $r = new \ReflectionProperty(Query::class, 'type');
+        $r->setAccessible(true);
+        $r->setValue($query, 'invalid');
+
+        $query->compile();
+    }
+
+    /**
+     *
+     */
+    public function test_compile_invalid_compiler()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('The query Bdf\Prime\Query\Query do not supports type select');
+
+        $query = $this->query();
+
+        $r = new \ReflectionProperty(Query::class, 'compiler');
+        $r->setAccessible(true);
+        $r->setValue($query, new \stdClass());
+
+        $query->compile();
     }
 
     /**

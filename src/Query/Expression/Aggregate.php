@@ -4,6 +4,7 @@ namespace Bdf\Prime\Query\Expression;
 
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
+use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
@@ -18,6 +19,8 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
  *     'count' => Aggregate::count(id),
  * ]);
  * </code>
+ *
+ * @implements ExpressionInterface<CompilableClause&\Bdf\Prime\Query\Contract\Compilable, CompilerInterface&QuoteCompilerInterface>
  */
 abstract class Aggregate implements ExpressionInterface
 {
@@ -38,8 +41,10 @@ abstract class Aggregate implements ExpressionInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @param CompilerInterface&QuoteCompilerInterface $compiler
      */
-    final public function build(CompilableClause $query, CompilerInterface $compiler)
+    final public function build(CompilableClause $query, object $compiler)
     {
         return $this->expression(
             $compiler->platform()->grammar(),

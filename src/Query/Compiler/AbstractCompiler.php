@@ -5,7 +5,6 @@ namespace Bdf\Prime\Query\Compiler;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Platform\PlatformInterface;
-use Bdf\Prime\Query\CompilableClause;
 
 /**
  * Base class for create compilers
@@ -17,19 +16,31 @@ use Bdf\Prime\Query\CompilableClause;
  * - preprocessor->table() for register new tables / relations (FROM & JOIN)
  * - Use preprocessor->expression() for compile filter (WHERE, ON, HAVING) expression
  *
- * @template Q as CompilableClause&\Bdf\Prime\Query\Contract\Compilable
+ * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\Contract\Compilable
  * @template C as ConnectionInterface
  *
  * @implements CompilerInterface<Q>
  */
 abstract class AbstractCompiler implements CompilerInterface
 {
+    /** @use InsertCompilerTrait<Q> */
+    use InsertCompilerTrait;
+
+    /** @use UpdateCompilerTrait<Q> */
+    use UpdateCompilerTrait;
+
+    /** @use DeleteCompilerTrait<Q> */
+    use DeleteCompilerTrait;
+
+    /** @use SelectCompilerTrait<Q> */
+    use SelectCompilerTrait;
+
     /**
      * The connection platform
      *
      * @var C
      */
-    protected $connection;
+    protected ConnectionInterface $connection;
 
 
     /**
@@ -48,70 +59,6 @@ abstract class AbstractCompiler implements CompilerInterface
     public function platform(): PlatformInterface
     {
         return $this->connection->platform();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function compileInsert(CompilableClause $query)
-    {
-        try {
-            $query->state()->compiling = true;
-            $query = $query->preprocessor()->forInsert($query);
-
-            return $this->doCompileInsert($query);
-        } finally {
-            $query->state()->compiling = false;
-            $query->preprocessor()->clear();
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function compileUpdate(CompilableClause $query)
-    {
-        try {
-            $query->state()->compiling = true;
-            $query = $query->preprocessor()->forUpdate($query);
-
-            return $this->doCompileUpdate($query);
-        } finally {
-            $query->state()->compiling = false;
-            $query->preprocessor()->clear();
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function compileDelete(CompilableClause $query)
-    {
-        try {
-            $query->state()->compiling = true;
-            $query = $query->preprocessor()->forDelete($query);
-
-            return $this->doCompileDelete($query);
-        } finally {
-            $query->state()->compiling = false;
-            $query->preprocessor()->clear();
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function compileSelect(CompilableClause $query)
-    {
-        try {
-            $query->state()->compiling = true;
-            $query = $query->preprocessor()->forSelect($query);
-
-            return $this->doCompileSelect($query);
-        } finally {
-            $query->state()->compiling = false;
-            $query->preprocessor()->clear();
-        }
     }
 
     /**
@@ -153,44 +100,4 @@ abstract class AbstractCompiler implements CompilerInterface
 
         return $values;
     }
-
-    /**
-     * Compile an insert query
-     *
-     * @param Q $query
-     *
-     * @return mixed
-     * @throws PrimeException
-     */
-    abstract protected function doCompileInsert(CompilableClause $query);
-
-    /**
-     * Compile an update query
-     *
-     * @param Q $query
-     *
-     * @return mixed
-     * @throws PrimeException
-     */
-    abstract protected function doCompileUpdate(CompilableClause $query);
-
-    /**
-     * Compile a delete query
-     *
-     * @param Q $query
-     *
-     * @return mixed
-     * @throws PrimeException
-     */
-    abstract protected function doCompileDelete(CompilableClause $query);
-
-    /**
-     * Compile a select query
-     *
-     * @param Q $query
-     *
-     * @return mixed
-     * @throws PrimeException
-     */
-    abstract protected function doCompileSelect(CompilableClause $query);
 }

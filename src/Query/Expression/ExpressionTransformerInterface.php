@@ -30,7 +30,7 @@ interface ExpressionTransformerInterface
     /**
      * Set the expression context
      *
-     * @param CompilerInterface $compiler
+     * @param object $compiler
      * @param string $column
      * @param string $operator
      *
@@ -38,7 +38,7 @@ interface ExpressionTransformerInterface
      *
      * @return void
      */
-    public function setContext(CompilerInterface $compiler, string $column, string $operator): void;
+    public function setContext(object $compiler, string $column, string $operator): void;
 
     /**
      * Transform and get the value, according to the compiler

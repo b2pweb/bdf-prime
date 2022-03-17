@@ -55,7 +55,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * The SQL compiler
      *
-     * @var CompilerInterface
+     * @var object
      */
     protected $compiler;
 
@@ -86,19 +86,9 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * {@inheritdoc}
      */
-    public function compiler(): CompilerInterface
+    public function compiler(): object
     {
         return $this->compiler;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setCompiler(CompilerInterface $compiler)
-    {
-        $this->compiler = $compiler;
-
-        return $this;
     }
 
     /**

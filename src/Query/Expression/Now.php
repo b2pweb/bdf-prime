@@ -11,13 +11,18 @@ use Bdf\Prime\Query\Compiler\CompilerInterface;
  * create the 'now'NOW()" function expression
  * 
  * @package Bdf\Prime\Query\Expression
+ *
+ *
+ * @implements ExpressionInterface<CompilableClause&\Bdf\Prime\Query\Contract\Compilable, CompilerInterface>
  */
 class Now implements ExpressionInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @param CompilerInterface $compiler
      */
-    public function build(CompilableClause $query, CompilerInterface $compiler)
+    public function build(CompilableClause $query, object $compiler)
     {
         return $compiler->platform()->grammar()->getCurrentDateSQL();
     }

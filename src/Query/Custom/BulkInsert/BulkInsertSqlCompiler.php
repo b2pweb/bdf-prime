@@ -5,6 +5,7 @@ namespace Bdf\Prime\Query\Custom\BulkInsert;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\AbstractCompiler;
+use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 use Bdf\Prime\Types\TypeInterface;
 
 /**
@@ -13,8 +14,9 @@ use Bdf\Prime\Types\TypeInterface;
  * The query will be compiled into a prepared statement
  *
  * @extends AbstractCompiler<BulkInsertQuery, \Doctrine\DBAL\Connection&\Bdf\Prime\Connection\ConnectionInterface>
+ * @implements QuoteCompilerInterface<BulkInsertQuery>
  */
-class BulkInsertSqlCompiler extends AbstractCompiler
+class BulkInsertSqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
 {
     /**
      * {@inheritdoc}
@@ -66,6 +68,14 @@ class BulkInsertSqlCompiler extends AbstractCompiler
         }
 
         return $this->platform()->grammar()->quoteIdentifier($column);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function quote($value)
+    {
+        return $this->connection->quote($value);
     }
 
     /**

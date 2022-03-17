@@ -3,7 +3,7 @@
 namespace Bdf\Prime\Query\Extension;
 
 use Bdf\Prime\Query\Clause;
-use Bdf\Prime\Query\Compiler\CompilerInterface;
+use Bdf\Prime\Query\Compiler\CompilerState;
 use Bdf\Prime\Query\Contract\Joinable;
 use Bdf\Prime\Query\JoinClause;
 
@@ -13,7 +13,7 @@ use Bdf\Prime\Query\JoinClause;
  * @see Joinable
  * @psalm-require-implements Joinable
  *
- * @property CompilerInterface $compiler
+ * @property CompilerState $compilerState
  */
 trait SimpleJoinTrait
 {

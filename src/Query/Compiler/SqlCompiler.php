@@ -22,16 +22,12 @@ use UnexpectedValueException;
  *
  * @template C as \Doctrine\DBAL\Connection
  * @extends AbstractCompiler<\Bdf\Prime\Query\SqlQueryInterface&CompilableClause, \Doctrine\DBAL\Connection&\Bdf\Prime\Connection\ConnectionInterface>
+ * @implements QuoteCompilerInterface<\Bdf\Prime\Query\SqlQueryInterface&CompilableClause>
  */
-class SqlCompiler extends AbstractCompiler
+class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
 {
     /**
-     * Quote a value
-     * 
-     * @param mixed $value
-     *
-     * @return string
-     * @throws PrimeException
+     * {@inheritdoc}
      */
     public function quote($value)
     {

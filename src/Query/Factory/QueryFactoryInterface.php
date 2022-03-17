@@ -3,7 +3,6 @@
 namespace Bdf\Prime\Query\Factory;
 
 use Bdf\Prime\Query\CommandInterface;
-use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 
 /**
@@ -33,9 +32,9 @@ interface QueryFactoryInterface
      *
      * @param class-string<Q> $query The query class name
      *
-     * @return CompilerInterface<Q>
+     * @return object
      *
      * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\Contract\Compilable&CommandInterface
      */
-    public function compiler(string $query): CompilerInterface;
+    public function compiler(string $query): object;
 }

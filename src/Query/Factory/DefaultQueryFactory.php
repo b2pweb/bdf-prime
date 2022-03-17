@@ -19,14 +19,14 @@ class DefaultQueryFactory implements QueryFactoryInterface
     private $connection;
 
     /**
-     * @var CompilerInterface
+     * @var object
      */
     private $defaultCompiler;
 
     /**
      * Map query class name to compiler instance or class name
      *
-     * @var array<class-string<CommandInterface>, class-string<CompilerInterface>|CompilerInterface>
+     * @var array<class-string<CommandInterface>, class-string|object>
      */
     private $compilers = [];
 
@@ -42,11 +42,11 @@ class DefaultQueryFactory implements QueryFactoryInterface
      * DefaultQueryFactory constructor.
      *
      * @param ConnectionInterface $connection
-     * @param CompilerInterface $defaultCompiler
-     * @param array<class-string<CommandInterface>, class-string<CompilerInterface>> $compilers
+     * @param object $defaultCompiler
+     * @param array<class-string<CommandInterface>, class-string> $compilers
      * @param array<class-string<CommandInterface>, class-string<CommandInterface>> $alias
      */
-    public function __construct(ConnectionInterface $connection, CompilerInterface $defaultCompiler, array $compilers, array $alias)
+    public function __construct(ConnectionInterface $connection, object $defaultCompiler, array $compilers, array $alias)
     {
         $this->connection = $connection;
         $this->defaultCompiler = $defaultCompiler;
@@ -58,7 +58,7 @@ class DefaultQueryFactory implements QueryFactoryInterface
      * Register a custom compiler for a query
      *
      * @param class-string<CommandInterface> $query The query class name
-     * @param class-string<CompilerInterface>|CompilerInterface $compiler The query compiler, or its class name
+     * @param class-string|object $compiler The query compiler, or its class name
      *
      * @return void
      */
@@ -96,7 +96,7 @@ class DefaultQueryFactory implements QueryFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function compiler(string $query): CompilerInterface
+    public function compiler(string $query): object
     {
          if (!isset($this->compilers[$query])) {
              return $this->defaultCompiler;

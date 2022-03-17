@@ -45,6 +45,10 @@ BC Breaks
 * Class `Bdf\Prime\Query\CacheStatement` has been deleted. Use `Doctrine\DBAL\Cache\ArrayResult` instead
 * Class `Bdf\Prime\Query\Expression\Match` has been deleted. Use `Bdf\Prime\Query\Expression\FullTextMatch` instead
 * Remove method `Bdf\Prime\ConnectionManager::connection()`. Use getConnection instead
+* Remove method `Bdf\Prime\Query\CommandInterface::setCompiler()`
+* Change return type of `Bdf\Prime\Query\CommandInterface::compiler()` to object
+* Change type of parameter $compiler of method `Bdf\Prime\Query\Expression\ExpressionInterface::build()` to object
+* Change type of parameter $compiler of method `Bdf\Prime\Query\Expression\ExpressionTransformerInterface::setContext()` to object
 * Typehint return of methods of `\Bdf\Prime\Migration\MigrationInterface`
 * Typehint return of methods of `\Bdf\Prime\Mapper\Mapper`
 * Change typehints of methods of `\Bdf\Prime\Entry\Hydrator` interfaces. Hydrators must be regenerated.
@@ -58,6 +62,7 @@ BC Breaks
     * arrayObject() - use array instead of string
     * searchableArray() - use array instead of string
     * arrayOfXXX() - use array instead of string
+* Change compiler types on `Bdf\Prime\Query\Factory\QueryFactoryInterface` to object
 
 v1.3.0
 ------

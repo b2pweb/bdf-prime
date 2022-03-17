@@ -3,7 +3,7 @@
 namespace Bdf\Prime\Query\Expression;
 
 use Bdf\Prime\Query\CompilableClause;
-use Bdf\Prime\Query\Compiler\CompilerInterface;
+use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 
 /**
  * Attribute
@@ -11,6 +11,8 @@ use Bdf\Prime\Query\Compiler\CompilerInterface;
  * The expression is a mapper attribute
  * 
  * @package Bdf\Prime\Query\Expression
+ *
+ * @implements ExpressionInterface<CompilableClause&\Bdf\Prime\Query\Contract\Compilable, QuoteCompilerInterface>
  */
 class Attribute implements ExpressionInterface
 {
@@ -38,8 +40,10 @@ class Attribute implements ExpressionInterface
     
     /**
      * {@inheritdoc}
+     *
+     * @param QuoteCompilerInterface $compiler
      */
-    public function build(CompilableClause $query, CompilerInterface $compiler)
+    public function build(CompilableClause $query, object $compiler)
     {
         return sprintf($this->pattern, $compiler->quoteIdentifier($query, $query->preprocessor()->field($this->attribute)));
     }

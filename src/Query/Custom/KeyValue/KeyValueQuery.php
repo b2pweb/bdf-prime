@@ -6,6 +6,7 @@ use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\AbstractReadCommand;
+use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Contract\Compilable;
@@ -292,9 +293,17 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
+    public function compiler(): KeyValueSqlCompiler
+    {
+        return parent::compiler();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getBindings(): array
     {
-        return $this->compiler->getBindings($this);
+        return $this->compiler()->getBindings($this);
     }
 
     /**

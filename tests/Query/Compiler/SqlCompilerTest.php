@@ -9,6 +9,7 @@ use Bdf\Prime\Exception\QueryBuildingException;
 use Bdf\Prime\Faction;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Query\AbstractReadCommand;
 use Bdf\Prime\Query\CacheStatement;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
@@ -226,7 +227,7 @@ class SqlCompilerTest extends TestCase
 
         /** @var Query $query */
         $query = User::builder();
-        $query->setCompiler($compiler);
+        $this->setCompiler($query, $compiler);
 
 
         $query->where('faction.domain', 'orc');
@@ -271,7 +272,7 @@ class SqlCompilerTest extends TestCase
 
         /** @var Query $query */
         $query = User::builder();
-        $query->setCompiler($compiler);
+        $this->setCompiler($query, $compiler);
 
         $query->where('faction.domain', 'orc');
 
@@ -321,7 +322,7 @@ class SqlCompilerTest extends TestCase
 
         /** @var Query $query */
         $query = User::builder();
-        $query->setCompiler($compiler);
+        $this->setCompiler($query, $compiler);
 
         $query->where('faction.domain', 'orc')->limit(10, 0);
 
@@ -349,7 +350,7 @@ class SqlCompilerTest extends TestCase
     {
         /** @var Query $query */
         $query = User::builder();
-        $query->setCompiler($this->compiler);
+        $this->setCompiler($query, $this->compiler);
 
         $this->assertEquals('SELECT t0.* FROM user_ t0', $this->compiler->compileSelect($query));
 
@@ -374,7 +375,7 @@ class SqlCompilerTest extends TestCase
     {
         /** @var Query $query */
         $query = Right::builder();
-        $query->setCompiler($this->compiler);
+        $this->setCompiler($query, $this->compiler);
 
         $query
             ->setValue('id', 1)
@@ -392,7 +393,7 @@ class SqlCompilerTest extends TestCase
     {
         /** @var Query $query */
         $query = Right::builder();
-        $query->setCompiler($this->compiler);
+        $this->setCompiler($query, $this->compiler);
 
         $query
             ->where('id', 1)
@@ -409,7 +410,7 @@ class SqlCompilerTest extends TestCase
     {
         /** @var Query $query */
         $query = Right::builder();
-        $query->setCompiler($this->compiler);
+        $this->setCompiler($query, $this->compiler);
 
         $query->where('id', 1);
 
@@ -606,5 +607,12 @@ class SqlCompilerTest extends TestCase
 
         $query = new Query(Prime::connection('test'));
         $this->compiler->compileDelete($query);
+    }
+
+    private function setCompiler(AbstractReadCommand $query, CompilerInterface $compiler)
+    {
+        $p = new \ReflectionProperty(AbstractReadCommand::class, 'compiler');
+        $p->setAccessible(true);
+        $p->setValue($query, $compiler);
     }
 }

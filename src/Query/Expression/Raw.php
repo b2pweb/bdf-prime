@@ -42,7 +42,7 @@ class Raw implements ExpressionInterface
     /**
      * {@inheritdoc}
      */
-    public function build(CompilableClause $query, CompilerInterface $compiler)
+    public function build(CompilableClause $query, object $compiler)
     {
         return $this->__toString();
     }

@@ -7,6 +7,7 @@ use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
+use Bdf\Prime\Query\Compiler\SqlCompiler;
 use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\Contract\ReadOperation;
@@ -77,9 +78,17 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     /**
      * {@inheritdoc}
      */
+    public function compiler(): SqlCompiler
+    {
+        return parent::compiler();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getBindings(): array
     {
-        return $this->compiler->getBindings($this);
+        return $this->compiler()->getBindings($this);
     }
 
     /**
@@ -95,7 +104,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
      */
     public function quoteIdentifier(string $column): string
     {
-        return $this->compiler->quoteIdentifier($this, $column);
+        return $this->compiler()->quoteIdentifier($this, $column);
     }
 
     /**
@@ -605,7 +614,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     {
         $keys   = [];
         $sql    = $this->toSql();
-        $values = $this->compiler->getBindings($this);
+        $values = $this->compiler()->getBindings($this);
 
         # build a regular expression for each parameter
         foreach ($values as $key => $value) {
