@@ -3,15 +3,15 @@
 namespace Bdf\Prime\Query\Extension;
 
 use Bdf\Prime\Query\Clause;
+use Bdf\Prime\Query\Compiler\CompilerState;
 use Bdf\Prime\Query\Contract\Whereable;
-use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 /**
  * Trait for where() method
  *
  * @see Whereable
- * @property CompilerInterface $compiler
+ * @property CompilerState $compilerState
  *
  * @psalm-require-implements Whereable
  */
