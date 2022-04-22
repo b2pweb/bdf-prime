@@ -27,9 +27,9 @@ use Bdf\Prime\Relations\Relation;
 use Bdf\Prime\Relations\RelationInterface;
 use Bdf\Prime\Repository\Write\Writer;
 use Bdf\Prime\Repository\Write\WriterInterface;
-use Bdf\Prime\Schema\NullResolver;
-use Bdf\Prime\Schema\Resolver;
-use Bdf\Prime\Schema\ResolverInterface;
+use Bdf\Prime\Schema\NullStructureUpgrader;
+use Bdf\Prime\Schema\RepositoryUpgrader;
+use Bdf\Prime\Schema\StructureUpgraderInterface;
 use Bdf\Prime\ServiceLocator;
 use Closure;
 use Doctrine\Common\EventSubscriber;
@@ -713,13 +713,13 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function schema(bool $force = false): ResolverInterface
+    public function schema(bool $force = false): StructureUpgraderInterface
     {
         if (!$this->mapper->hasSchemaManager() && !$force) {
-            return new NullResolver();
+            return new NullStructureUpgrader();
         }
         
-        return new Resolver($this->serviceLocator, $this->mapper->metadata());
+        return new RepositoryUpgrader($this->serviceLocator, $this->mapper->metadata());
     }
     
     /**

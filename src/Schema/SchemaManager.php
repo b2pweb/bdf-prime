@@ -175,7 +175,7 @@ class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function hasTable(string $tableName): bool
+    public function has(string $tableName): bool
     {
         try {
             return $this->getDoctrineManager()->tablesExist($tableName);
@@ -188,7 +188,7 @@ class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function loadTable(string $tableName): TableInterface
+    public function load(string $name): TableInterface
     {
         try {
             $manager = $this->getDoctrineManager();
@@ -196,14 +196,14 @@ class SchemaManager extends AbstractSchemaManager
             $foreignKeys = [];
 
             if ($this->platform->grammar()->supportsForeignKeyConstraints()) {
-                $foreignKeys = $manager->listTableForeignKeys($tableName);
+                $foreignKeys = $manager->listTableForeignKeys($name);
             }
 
             return new PrimeTableAdapter(
                 new DoctrineTable(
-                    $tableName,
-                    $manager->listTableColumns($tableName),
-                    $manager->listTableIndexes($tableName),
+                    $name,
+                    $manager->listTableColumns($name),
+                    $manager->listTableIndexes($name),
                     [],
                     $foreignKeys
                 ),
@@ -248,15 +248,15 @@ class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function diff(TableInterface $newTable, TableInterface $oldTable)
+    public function diff($new, $old)
     {
         /** @psalm-suppress InternalMethod */
         $comparator = new Comparator();
         $comparator->setListDropColumn($this->useDrop);
 
         return $comparator->compare(
-            $this->schema($oldTable),
-            $this->schema($newTable)
+            $this->schema($old),
+            $this->schema($new)
         );
     }
 

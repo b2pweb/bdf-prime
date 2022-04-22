@@ -79,8 +79,8 @@ class SchemaManagerTest extends TestCase
      */
     public function test_has_table()
     {
-        $this->assertFalse($this->schema->hasTable('unknow'));
-        $this->assertTrue($this->schema->hasTable('test_'));
+        $this->assertFalse($this->schema->has('unknow'));
+        $this->assertTrue($this->schema->has('test_'));
     }
 
     /**
@@ -88,7 +88,7 @@ class SchemaManagerTest extends TestCase
      */
     public function test_load_unknown_table()
     {
-        $table = $this->schema->loadTable('unknow');
+        $table = $this->schema->load('unknow');
         
         $this->assertEquals('unknow', $table->name());
         $this->assertEquals([], $table->columns());
@@ -99,7 +99,7 @@ class SchemaManagerTest extends TestCase
      */
     public function test_load_table()
     {
-        $table = $this->schema->loadTable('test_');
+        $table = $this->schema->load('test_');
         
         $this->assertEquals('test_', $table->name());
         $this->assertInstanceOf(ColumnInterface::class, $table->column('id'));
@@ -124,7 +124,7 @@ class SchemaManagerTest extends TestCase
     {
         $this->schema->rename('test_', 'test');
         
-        $this->assertTrue($this->schema->hasTable('test'));
+        $this->assertTrue($this->schema->has('test'));
     }
     
     /**
@@ -145,7 +145,7 @@ class SchemaManagerTest extends TestCase
     {
         $this->schema->drop('test_');
         
-        $this->assertFalse($this->schema->hasTable('test_'));
+        $this->assertFalse($this->schema->has('test_'));
     }
     
     /**

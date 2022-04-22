@@ -14,7 +14,7 @@ use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Relations\RelationInterface;
 use Bdf\Prime\Repository\Write\WriterInterface;
-use Bdf\Prime\Schema\ResolverInterface;
+use Bdf\Prime\Schema\StructureUpgraderInterface;
 
 /**
  * RepositoryInterface
@@ -134,9 +134,9 @@ interface RepositoryInterface
      *
      * @param bool $force Allowed user to force schema resolver
      *
-     * @return ResolverInterface
+     * @return StructureUpgraderInterface
      */
-    public function schema(bool $force = false): ResolverInterface;
+    public function schema(bool $force = false): StructureUpgraderInterface;
 
     /**
      * Get the repository queries

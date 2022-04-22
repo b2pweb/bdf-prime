@@ -3,7 +3,6 @@
 namespace Bdf\Prime\Schema\Manager;
 
 use Bdf\Prime\Exception\PrimeException;
-use Closure;
 use Exception;
 
 /**
@@ -36,7 +35,7 @@ interface QueryManagerInterface
      * $buffered->flush();
      * </code>
      *
-     * To perform operations, you should use @see SchemaManagerInterface::flush()
+     * To perform operations, you should use @see QueryManagerInterface::flush()
      *
      * @param callable(static):void|null $operations Operations to perform, or null for create a buffered SchemaManager
      *
@@ -69,8 +68,8 @@ interface QueryManagerInterface
      * Check if the SchemaManager use a buffer
      *
      * The schema manager is marqued as buffered on :
-     * @see SchemaManagerInterface::simulate()
-     * @see SchemaManagerInterface::transaction()
+     * @see QueryManagerInterface::simulate()
+     * @see QueryManagerInterface::transaction()
      *
      * @return boolean
      */
@@ -87,9 +86,9 @@ interface QueryManagerInterface
      * Execute the modification to build / modify the schema.
      * This method do nothing if it's not buffered
      *
-     * @see SchemaManager::isBuffered()
-     * @see SchemaManager::simulate()
-     * @see SchemaManager::transaction()
+     * @see QueryManagerInterface::isBuffered()
+     * @see QueryManagerInterface::simulate()
+     * @see QueryManagerInterface::transaction()
      *
      * @return bool
      *

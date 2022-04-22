@@ -48,7 +48,7 @@ class MapperVisitorTest extends TestCase
         $schemaManager = $connection->schema();
 
         $schema = $schemaManager->schema(
-            $schemaManager->loadTable('document_')
+            $schemaManager->load('document_')
         );
 
         $visitor = new MapperVisitor($connection->getName());

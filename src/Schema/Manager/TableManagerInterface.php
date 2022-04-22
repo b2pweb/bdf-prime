@@ -10,8 +10,10 @@ use Bdf\Prime\Schema\TableInterface;
  *
  * - The operations are done only on tables
  * - All operations will results to a diff, an changes will be applied (or simulated)
+ *
+ * @extends DatabaseStructureManagerInterface<TableInterface>
  */
-interface TableManagerInterface
+interface TableManagerInterface extends DatabaseStructureManagerInterface
 {
     /**
      * Set the use drop flag
@@ -58,12 +60,12 @@ interface TableManagerInterface
      * - If the table exists, but differs, change the table
      * - Else, do nothing
      *
-     * @param TableInterface $table
+     * @param TableInterface $structure
      *
      * @return $this
      * @throws PrimeException
      */
-    public function add(TableInterface $table);
+    public function add($structure);
 
     /**
      * Change table.

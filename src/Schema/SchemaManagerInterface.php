@@ -23,7 +23,7 @@ interface SchemaManagerInterface extends DatabaseManagerInterface, TableManagerI
      *
      * @return DoctrineSchema
      *
-     * @deprecated since 1.3 Doctrine schema should be used only internally
+     * @internal Doctrine schema should be used only internally
      */
     public function schema($tables = []);
 
@@ -32,19 +32,7 @@ interface SchemaManagerInterface extends DatabaseManagerInterface, TableManagerI
      *
      * @return Schema
      *
-     * @deprecated since 1.3 Doctrine schema should be used only internally
+     * @internal Doctrine schema should be used only internally
      */
     public function loadSchema();
-
-    /**
-     * Get the diff queries from two tables
-     *
-     * @param TableInterface $newTable
-     * @param TableInterface $oldTable
-     *
-     * @return mixed
-     *
-     * @internal The return value depends of the platform. You should not rely on the return of this method
-     */
-    public function diff(TableInterface $newTable, TableInterface $oldTable);
 }

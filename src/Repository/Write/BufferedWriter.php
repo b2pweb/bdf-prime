@@ -2,7 +2,6 @@
 
 namespace Bdf\Prime\Repository\Write;
 
-use Bdf\Event\EventNotifier;
 use Bdf\Prime\Events;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\WriteOperation;
@@ -33,9 +32,9 @@ use Bdf\Prime\Repository\RepositoryInterface;
  * Note 2: Because operations will be performed later, the WriterInterface methods will always returns 1
  *
  * @template E as object
- * @implements WriterInterface<E>
+ * @implements BufferedWriterInterface<E>
  */
-class BufferedWriter implements WriterInterface
+class BufferedWriter implements BufferedWriterInterface
 {
     /**
      * @var RepositoryInterface&RepositoryEventsSubscriberInterface
@@ -106,9 +105,7 @@ class BufferedWriter implements WriterInterface
     }
 
     /**
-     * Get pending operations count
-     *
-     * @return int
+     * {@inheritdoc}
      */
     public function pending(): int
     {
@@ -116,10 +113,7 @@ class BufferedWriter implements WriterInterface
     }
 
     /**
-     * Flush pending operations
-     *
-     * @return int Number of affected rows
-     * @throws PrimeException When pending query fail
+     * {@inheritdoc}
      */
     #[WriteOperation]
     public function flush(): int
@@ -132,7 +126,7 @@ class BufferedWriter implements WriterInterface
     }
 
     /**
-     * Clear pending operations
+     * {@inheritdoc}
      */
     public function clear(): void
     {
