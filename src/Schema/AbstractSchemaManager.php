@@ -58,7 +58,8 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
      */
     public function __construct(ConnectionInterface $connection)
     {
-        $this->setConnection($connection);
+        $this->connection = $connection;
+        $this->platform = $connection->platform();
     }
 
     /**
@@ -67,17 +68,6 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     public function getConnection(): ConnectionInterface
     {
         return $this->connection;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setConnection(ConnectionInterface $connection)
-    {
-        $this->connection = $connection;
-        $this->platform   = $connection->platform();
-
-        return $this;
     }
 
     /**
@@ -116,15 +106,15 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function add(TableInterface $table)
+    public function add($structure)
     {
-        if ($this->hasTable($table->name())) {
+        if ($this->has($structure->name())) {
             return $this->push(
-                $this->diff($table, $this->loadTable($table->name()))
+                $this->diff($structure, $this->load($structure->name()))
             );
         }
 
-        return $this->push($this->schema($table));
+        return $this->push($this->schema($structure));
     }
 
     /**
@@ -132,7 +122,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
      */
     public function change(string $tableName, callable $callback)
     {
-        $table = $this->loadTable($tableName);
+        $table = $this->load($tableName);
         $builder = TableBuilder::fromTable($table);
 
         $callback(

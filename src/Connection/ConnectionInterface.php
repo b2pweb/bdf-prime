@@ -13,6 +13,7 @@ use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Factory\QueryFactoryInterface;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
+use Bdf\Prime\Schema\Manager\DatabaseManagerInterface;
 use Bdf\Prime\Schema\SchemaManagerInterface;
 use Bdf\Prime\Types\TypeInterface;
 use Doctrine\Common\EventManager;
@@ -43,10 +44,10 @@ interface ConnectionInterface
     /**
      * Gets the SchemaManager.
      *
-     * @return SchemaManagerInterface
+     * @return DatabaseManagerInterface
      * @throws PrimeException
      */
-    public function schema(): SchemaManagerInterface;
+    public function schema(): DatabaseManagerInterface;
 
     /**
      * Transform database value to PHP value

@@ -3,9 +3,9 @@
 namespace Bdf\Prime\Schema;
 
 /**
- * Null Schema resolver
+ * Null object for structure upgrader
  */
-class NullResolver implements ResolverInterface
+class NullStructureUpgrader implements StructureUpgraderInterface
 {
     /**
      * {@inheritdoc}

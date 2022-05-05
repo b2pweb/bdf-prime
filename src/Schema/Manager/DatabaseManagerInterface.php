@@ -24,18 +24,6 @@ interface DatabaseManagerInterface
     public function getConnection(): ConnectionInterface;
 
     /**
-     * Set the database connection instance.
-     *
-     * @param C $connection
-     *
-     * @return $this
-     *
-     * @internal
-     * @throws PrimeException
-     */
-    public function setConnection(ConnectionInterface $connection);
-
-    /**
      * Determine if the given database exists.
      *
      * @param string $database
@@ -83,17 +71,7 @@ interface DatabaseManagerInterface
      * @return bool
      * @throws PrimeException When query fail
      */
-    public function hasTable(string $tableName): bool;
-
-    /**
-     * Determine load the table structure
-     *
-     * @param string $tableName
-     *
-     * @return TableInterface
-     * @throws PrimeException When query fail
-     */
-    public function loadTable(string $tableName): TableInterface;
+    public function has(string $tableName): bool;
 
     /**
      * Drop a table from the schema.

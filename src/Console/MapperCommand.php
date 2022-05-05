@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Console;
 
+use Bdf\Prime\Schema\SchemaManagerInterface;
 use Bdf\Prime\Schema\Visitor\MapperVisitor;
 use Bdf\Prime\ServiceLocator;
 use Bdf\Util\Console\BdfStyle;
@@ -57,9 +58,14 @@ class MapperCommand extends Command
         $connection = $this->locator->connection($io->option('connection'));
         $schemaManager = $connection->schema();
 
+        if (!$schemaManager instanceof SchemaManagerInterface) {
+            $io->error('The connection "%s" do not handle schema', $io->option('connection'));
+            return 1;
+        }
+
         if ($io->option('table')) {
             $schema = $schemaManager->schema(
-                $schemaManager->loadTable($io->option('table'))
+                $schemaManager->load($io->option('table'))
             );
         } else {
             $schema = $schemaManager->loadSchema();

@@ -63,11 +63,10 @@ class AbstractSchemaManagerTest extends TestCase
     /**
      * 
      */
-    public function test_set_get_connection()
+    public function test_getConnection()
     {
         $connection = Prime::connection('test');
-        $this->schema->setConnection($connection);
-        
+
         $this->assertSame($connection, $this->schema->getConnection());
     }
     

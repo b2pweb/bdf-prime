@@ -678,14 +678,14 @@ class EntityRepositoryTest extends TestCase
     public function test_close_connection_should_reset_queries()
     {
         $respository = TestEntity::repository();
-        $this->assertTrue($this->prime()->connection('test')->schema()->hasTable('test_'));
+        $this->assertTrue($this->prime()->connection('test')->schema()->has('test_'));
 
         $this->assertEquals($this->getTestPack()->get('entity'), $respository->findById(1));
 
 
         // Close connection : will destroy all data
         $this->prime()->connection('test')->close();
-        $this->assertFalse($this->prime()->connection('test')->schema()->hasTable('test_'));
+        $this->assertFalse($this->prime()->connection('test')->schema()->has('test_'));
 
         // Recreate the schema
         TestEntity::repository()->schema()->migrate();

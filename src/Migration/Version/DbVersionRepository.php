@@ -5,6 +5,7 @@ namespace Bdf\Prime\Migration\Version;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Migration\VersionRepositoryInterface;
+use Bdf\Prime\Schema\Manager\TableManagerInterface;
 
 /**
  * DbVersionRepository
@@ -170,7 +171,7 @@ class DbVersionRepository implements VersionRepositoryInterface
     public function hasSchema(): bool
     {
         if (null === $this->hasSchema) {
-            $this->hasSchema = $this->connection->schema()->hasTable($this->tableName);
+            $this->hasSchema = $this->connection->schema()->has($this->tableName);
         }
 
         return $this->hasSchema;
@@ -184,7 +185,13 @@ class DbVersionRepository implements VersionRepositoryInterface
      */
     public function createSchema()
     {
-        $this->connection->schema()->table($this->tableName, function($table) {
+        $schemaManager = $this->connection->schema();
+
+        if (!$schemaManager instanceof TableManagerInterface) {
+            throw new \LogicException('The connection "' . $this->connection->getName() . '" do not supports table configuration');
+        }
+
+        $schemaManager->table($this->tableName, function($table) {
             $table->string('version');
         });
 

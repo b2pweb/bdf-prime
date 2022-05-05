@@ -3,7 +3,8 @@
 namespace Bdf\Prime\Console;
 
 use Bdf\Prime\Exception\PrimeException;
-use Bdf\Prime\Schema\Resolver;
+use Bdf\Prime\Schema\RepositoryUpgrader;
+use Bdf\Prime\Schema\SchemaManagerInterface;
 use Bdf\Prime\Schema\Transformer\Doctrine\TableTransformer;
 use Bdf\Prime\Schema\Visitor\Graphviz;
 use Bdf\Prime\ServiceLocator;
@@ -11,9 +12,9 @@ use Bdf\Util\Console\BdfStyle;
 use Bdf\Util\File\ClassFileLocator;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -101,7 +102,7 @@ class GraphCommand extends Command
             }
 
             $mapper = $this->locator->mappers()->createMapper($this->locator, $className);
-            /** @var Resolver $schemaManager */
+            /** @var RepositoryUpgrader $schemaManager */
             $schemaManager = $mapper->repository()->schema(true);
             $platform = $mapper->repository()->connection()->platform();
 
@@ -125,7 +126,13 @@ class GraphCommand extends Command
      */
     protected function getSchemaFromDatabase()
     {
+        $manager = $this->locator->connection()->schema();
+
+        if (!$manager instanceof SchemaManagerInterface) {
+            throw new \InvalidArgumentException('The default connection do not support schema loading');
+        }
+
         // TODO parcourir les connections (database unique) et merger les tables ?
-        return $this->locator->connection()->schema()->loadSchema();
+        return $manager->loadSchema();
     }
 }

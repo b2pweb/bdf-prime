@@ -7,14 +7,13 @@ use Bdf\Prime\Exception\PrimeException;
 /**
  * Perform schema operation like migration, deletion...
  */
-interface ResolverInterface
+interface StructureUpgraderInterface
 {
     /**
      * Migrate table structure changes to database
      *
      * @param bool $listDrop
      *
-     * @throws \Doctrine\DBAL\Schema\SchemaException
      * @throws PrimeException When migration fail
      */
     public function migrate(bool $listDrop = true): void;

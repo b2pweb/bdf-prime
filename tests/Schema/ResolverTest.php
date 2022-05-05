@@ -124,13 +124,13 @@ class ResolverTest extends TestCase
 
         $manager = $this->prime()->connection('test')->schema();
 
-        $this->assertTrue($manager->hasTable('customer_'));
-        $this->assertTrue($manager->hasTable('customer_seq_'));
+        $this->assertTrue($manager->has('customer_'));
+        $this->assertTrue($manager->has('customer_seq_'));
 
         $resolver->drop();
 
-        $this->assertFalse($manager->hasTable('customer_'));
-        $this->assertFalse($manager->hasTable('customer_seq_'));
+        $this->assertFalse($manager->has('customer_'));
+        $this->assertFalse($manager->has('customer_seq_'));
     }
 
     /**
@@ -170,17 +170,17 @@ class ResolverTest extends TestCase
         $resolver = CrossConnectionSequenceEntity::repository()->schema();
         $resolver->migrate();
 
-        $this->assertTrue($this->prime()->connection('test')->schema()->hasTable('test_cross_connection_'));
-        $this->assertFalse($this->prime()->connection('test')->schema()->hasTable('test_cross_connection_seq_'));
+        $this->assertTrue($this->prime()->connection('test')->schema()->has('test_cross_connection_'));
+        $this->assertFalse($this->prime()->connection('test')->schema()->has('test_cross_connection_seq_'));
 
-        $this->assertFalse($this->prime()->connection('sequence')->schema()->hasTable('test_cross_connection_'));
-        $this->assertTrue($this->prime()->connection('sequence')->schema()->hasTable('test_cross_connection_seq_'));
+        $this->assertFalse($this->prime()->connection('sequence')->schema()->has('test_cross_connection_'));
+        $this->assertTrue($this->prime()->connection('sequence')->schema()->has('test_cross_connection_seq_'));
 
         $this->assertEquals([['id' => 0]], $this->prime()->connection('sequence')->from('test_cross_connection_seq_')->all());
 
         $resolver->drop();
-        $this->assertFalse($this->prime()->connection('test')->schema()->hasTable('test_cross_connection_'));
-        $this->assertFalse($this->prime()->connection('sequence')->schema()->hasTable('test_cross_connection_seq_'));
+        $this->assertFalse($this->prime()->connection('test')->schema()->has('test_cross_connection_'));
+        $this->assertFalse($this->prime()->connection('sequence')->schema()->has('test_cross_connection_seq_'));
     }
 
     /**

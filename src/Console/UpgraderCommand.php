@@ -2,13 +2,15 @@
 
 namespace Bdf\Prime\Console;
 
+use Bdf\Prime\Schema\RepositoryUpgraderResolver;
+use Bdf\Prime\Schema\StructureUpgraderResolverInterface;
 use Bdf\Prime\ServiceLocator;
 use Bdf\Util\Console\BdfStyle;
 use Bdf\Util\File\ClassFileLocator;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
@@ -18,19 +20,20 @@ class UpgraderCommand extends Command
 {
     protected static $defaultName = 'prime:upgrade';
 
-    /**
-     * @var ServiceLocator
-     */
-    private $locator;
+    private StructureUpgraderResolverInterface $resolver;
 
     /**
      * UpgraderCommand constructor.
      *
-     * @param ServiceLocator $locator
+     * @param StructureUpgraderResolverInterface|ServiceLocator $resolver
      */
-    public function __construct(ServiceLocator $locator)
+    public function __construct($resolver)
     {
-        $this->locator = $locator;
+        if ($resolver instanceof ServiceLocator) {
+            $resolver = new RepositoryUpgraderResolver($resolver);
+        }
+
+        $this->resolver = $resolver;
 
         parent::__construct(static::$defaultName);
     }
@@ -64,14 +67,15 @@ class UpgraderCommand extends Command
         foreach ((new ClassFileLocator(realpath($io->argument('path')))) as $classInfo) {
             $className = $classInfo->getClass();
 
+            // Get the upgrader from the mapper class name
+            $schema = $this->resolver->resolveByMapperClass($className, $force);
+
             // walk on mapper only
-            if (!$this->locator->mappers()->isMapper($className)) {
+            if (!$schema) {
                 $io->debug("{$className} is not mapper class");
                 continue;
             }
 
-            // get the entity class name to get the repository
-            $schema = $this->locator->mappers()->createMapper($this->locator, $className)->repository()->schema($force);
             $queries = $schema->diff($useDrop);
 
             if (!$queries) {

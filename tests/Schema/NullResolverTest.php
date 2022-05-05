@@ -14,7 +14,7 @@ class NullResolverTest extends TestCase
      */
     public function test_interface()
     {
-        $schema = new NullResolver();
+        $schema = new NullStructureUpgrader();
 
         $schema->migrate();
         $this->assertEquals([], $schema->diff());

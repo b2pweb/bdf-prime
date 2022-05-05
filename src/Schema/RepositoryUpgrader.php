@@ -15,13 +15,11 @@ use Bdf\Prime\Mapper\Metadata;
 use Doctrine\DBAL\Exception\TableNotFoundException;
 
 /**
- * Schema resolver
- * 
- * manage update on schema
+ * Handle structure migration of repository tables
  * 
  * @todo gestion du renommage de champs dans le cas où d'autres attributs ont été changés
  */
-class Resolver implements ResolverInterface
+class RepositoryUpgrader implements StructureUpgraderInterface
 {
     /**
      * @var ServiceLocator 
