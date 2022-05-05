@@ -43,6 +43,10 @@ class MorphTo extends BelongsTo
      */
     public function joinRepositories(EntityJoinable $query, string $alias, $discriminator = null): array
     {
+        if ($discriminator === null) {
+            throw new LogicException('Joins are not supported on polymorph without discriminator');
+        }
+
         $this->loadDistantFromType($discriminator);
 
         return [
@@ -66,6 +70,11 @@ class MorphTo extends BelongsTo
         foreach ($collection->by($this->discriminator) as $type => $chunk) {
             $this->loadDistantFromType($type);
 
+            // Relation fk or discriminator is null : ignore the relation (same behavior as other relations)
+            if ($this->distant === null || $this->distantKey === null) {
+                continue;
+            }
+
             parent::load(
                 EntityIndexer::fromArray($this->local->mapper(), $chunk),
                 $with[$type],
@@ -87,6 +96,10 @@ class MorphTo extends BelongsTo
         }
 
         $this->loadDistantFrom($owner);
+
+        if ($this->discriminatorValue === null) {
+            throw new InvalidArgumentException('The discriminator is missing on the owner entity');
+        }
 
         return parent::link($owner);
     }
@@ -110,6 +123,11 @@ class MorphTo extends BelongsTo
         $relations = $this->rearrangeWith($relations);
         $this->loadDistantFrom($owner);
 
+        // No discriminator on the owner : there is no relation
+        if ($this->discriminatorValue === null) {
+            return 0;
+        }
+
         return parent::saveAll($owner, $relations[$this->discriminatorValue]);
     }
 
@@ -121,6 +139,11 @@ class MorphTo extends BelongsTo
     {
         $relations = $this->rearrangeWith($relations);
         $this->loadDistantFrom($owner);
+
+        // No discriminator on the owner : there is no relation
+        if ($this->discriminatorValue === null) {
+            return 0;
+        }
 
         return parent::deleteAll($owner, $relations[$this->discriminatorValue]);
     }
@@ -164,10 +187,14 @@ class MorphTo extends BelongsTo
     {
         $infos = $this->map($this->discriminatorValue);
 
-        $this->distant    = $this->local->repository($infos['entity']);
-        $this->distantKey = $infos['distantKey'];
-
-        $this->setConstraints(isset($infos['constraints']) ? $infos['constraints'] : []);
+        if ($infos) {
+            $this->distant = $this->local->repository($infos['entity']);
+            $this->distantKey = $infos['distantKey'];
+            $this->setConstraints($infos['constraints'] ?? []);
+        } else {
+            $this->distant = null;
+            $this->distantKey = null;
+        }
     }
 
     /**

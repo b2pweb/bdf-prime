@@ -2,20 +2,22 @@
 
 namespace Bdf\Prime\Relations;
 
+use Bdf\Prime\Admin;
 use Bdf\Prime\Collection\Indexer\EntityIndexer;
 use Bdf\Prime\Collection\Indexer\SingleEntityIndexer;
 use Bdf\Prime\Commit;
 use Bdf\Prime\Company;
+use Bdf\Prime\Customer;
 use Bdf\Prime\Developer;
+use Bdf\Prime\Document;
+use Bdf\Prime\DocumentNullablePolymorph;
+use Bdf\Prime\EmbeddedPolymorph;
 use Bdf\Prime\Integrator;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Project;
 use Bdf\Prime\Test\RepositoryAssertion;
 use Bdf\Prime\Test\TestPack;
-use Bdf\Prime\Admin;
-use Bdf\Prime\Customer;
-use Bdf\Prime\Document;
 use Bdf\Prime\User;
 use PHPUnit\Framework\TestCase;
 
@@ -603,5 +605,47 @@ class MorphToTest extends TestCase
 
         $document->reload('uploader.customer');
         $this->assertNotSame($loadedUploader, $document->uploader);
+    }
+
+    /**
+     * @return void
+     */
+    public function test_null_relation()
+    {
+        TestPack::pack()->nonPersist([
+            $allNull = new DocumentNullablePolymorph(['id' => '20']),
+            $fkNull = new DocumentNullablePolymorph(['id' => '21', 'uploaderType' => 'admin']),
+        ]);
+
+        $this->assertNull($allNull->load('uploader')->uploader);
+        $this->assertNull($fkNull->load('uploader')->uploader);
+
+        $entities = DocumentNullablePolymorph::with('uploader')->all();
+
+        $this->assertNull($entities[0]->uploader);
+        $this->assertNull($entities[1]->uploader);
+
+        $this->assertEmpty(DocumentNullablePolymorph::where('uploader#admin.name', 5)->all());
+        $this->assertEmpty(DocumentNullablePolymorph::where('uploader#user.name', 5)->all());
+        $this->assertEmpty(DocumentNullablePolymorph::where('uploader#admin.name', null)->all());
+
+        $this->assertSame(1, $allNull->saveAll(['uploader.faction']));
+        $this->assertSame(1, $fkNull->saveAll(['uploader.faction']));
+
+        $this->assertSame(0, $allNull->relation('uploader')->deleteAll(['faction']));
+        $this->assertSame(0, $fkNull->relation('uploader')->deleteAll(['faction']));
+
+        (clone $allNull)->relation('uploader')->dissociate();
+        (clone $fkNull)->relation('uploader')->dissociate();
+
+        try {
+            $allNull->relation('uploader')->query();
+            $this->fail('Expects InvalidArgumentException');
+        } catch (\InvalidArgumentException $e) {
+            $this->assertEquals('The discriminator is missing on the owner entity', $e->getMessage());
+        }
+
+        // Works because the type is given, so the repository can be resolved
+        $fkNull->relation('uploader')->query();
     }
 }

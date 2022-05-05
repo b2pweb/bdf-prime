@@ -28,7 +28,7 @@ trait Polymorph
     /**
      * The discriminator value for polymorphic relation
      *
-     * @var int|string
+     * @var int|string|null
      */
     protected $discriminatorValue;
 
@@ -49,14 +49,20 @@ trait Polymorph
     /**
      * Get the map from the discriminator value
      *
-     * @param mixed $value   The discriminator value
+     * @param string|int|null $value The discriminator value. Can be null
      *
-     * @return array
+     * @return array{entity:class-string,distantKey:string,constraints?:mixed}|null Resolved parameters, or null if the relation is not set
      *
-     * @throws InvalidArgumentException   If the value has no map
+     * @throws InvalidArgumentException If the value has no map
      */
     public function map($value)
     {
+        // empty string are considered as null due to the implicit cast of null key in array
+        // do not use empty() to allow 0 as discriminator value
+        if ($value === null || $value === '') {
+            return null;
+        }
+
         if (empty($this->map[$value])) {
             throw new InvalidArgumentException('Unknown discriminator type "'.$value.'"');
         }
@@ -81,7 +87,7 @@ trait Polymorph
     /**
      * Set the discriminator value
      *
-     * @param mixed $value
+     * @param string|int|null $value
      *
      * @return $this
      */
@@ -105,9 +111,9 @@ trait Polymorph
     /**
      * Get the map from the discriminator value
      *
-     * @param string $className
+     * @param class-string $className
      *
-     * @return mixed   The discriminator value
+     * @return string|int The discriminator value
      *
      * @throws InvalidArgumentException   If the class name has no discriminator
      */
