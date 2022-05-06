@@ -70,7 +70,7 @@ OUT
         $tester = new CommandTester($this->command);
         $tester->execute(['path' => __DIR__.'/UpgradeModels', '--execute' => true]);
 
-        $this->assertEquals(<<<OUT
+        $this->assertOutput(<<<OUT
 Console\UpgradeModels\AddressMapper needs upgrade
 CREATE TABLE address (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, street VARCHAR(255) NOT NULL, number INTEGER NOT NULL, city VARCHAR(255) NOT NULL, zipCode VARCHAR(255) NOT NULL, country VARCHAR(255) NOT NULL)
 launching query 
@@ -84,7 +84,7 @@ launching query
 Found 2 upgrade(s)
 
 OUT
- , $tester->getDisplay()
+ , $tester
 );
 
         $this->assertTrue($this->prime()->connection()->schema()->has('person'));
@@ -102,13 +102,13 @@ OUT
         $tester = new CommandTester($this->command);
         $tester->execute(['path' => __DIR__.'/UpgradeModels', '--execute' => true]);
 
-        $this->assertEquals(<<<OUT
+        $this->assertOutput(<<<OUT
 Console\UpgradeModels\AddressMapper is up to date
 Console\UpgradeModels\PersonMapper is up to date
 Found 0 upgrade(s)
 
 OUT
- , $tester->getDisplay()
+ , $tester
 );
     }
 
@@ -129,7 +129,7 @@ OUT
         $tester = new CommandTester($this->command);
         $tester->execute(['path' => __DIR__.'/UpgradeModels']);
 
-        $this->assertEquals(<<<OUT
+        $this->assertOutput(<<<OUT
 Console\UpgradeModels\AddressMapper is up to date
 Console\UpgradeModels\PersonMapper needs upgrade
 ALTER TABLE person ADD COLUMN address_id INTEGER NOT NULL
@@ -137,13 +137,13 @@ ALTER TABLE person ADD COLUMN address_id INTEGER NOT NULL
 Found 1 upgrade(s)
 
 OUT
- , $tester->getDisplay()
+ , $tester
 );
 
 
         $tester->execute(['path' => __DIR__.'/UpgradeModels', '--useDrop' => true]);
 
-        $this->assertEquals(<<<OUT
+        $this->assertOutput(<<<OUT
 Console\UpgradeModels\AddressMapper is up to date
 Console\UpgradeModels\PersonMapper needs upgrade
 CREATE TEMPORARY TABLE __temp__person AS SELECT id, firstName, lastName FROM person
@@ -155,7 +155,12 @@ DROP TABLE __temp__person
 Found 5 upgrade(s)
 
 OUT
-            , $tester->getDisplay()
+            , $tester
         );
+    }
+
+    private function assertOutput(string $expected, CommandTester $tester): void
+    {
+        $this->assertEqualsCanonicalizing(explode(PHP_EOL, $expected), explode(PHP_EOL, $tester->getDisplay(true)));
     }
 }
