@@ -45,7 +45,7 @@ class UpgraderCommandTest extends TestCase
         $tester = new CommandTester($this->command);
         $tester->execute(['path' => __DIR__.'/UpgradeModels']);
 
-        $this->assertEquals(<<<OUT
+        $this->assertOutput(<<<OUT
 Console\UpgradeModels\AddressMapper needs upgrade
 CREATE TABLE address (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, street VARCHAR(255) NOT NULL, number INTEGER NOT NULL, city VARCHAR(255) NOT NULL, zipCode VARCHAR(255) NOT NULL, country VARCHAR(255) NOT NULL)
 
@@ -55,7 +55,7 @@ CREATE TABLE person (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, firstName VA
 Found 2 upgrade(s)
 
 OUT
- , $tester->getDisplay()
+ , $tester
 );
 
         $this->assertFalse($this->prime()->connection()->schema()->has('person'));
