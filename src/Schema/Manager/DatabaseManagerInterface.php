@@ -74,6 +74,28 @@ interface DatabaseManagerInterface
     public function has(string $tableName): bool;
 
     /**
+     * Determine if the given table exists.
+     *
+     * @param string $tableName
+     *
+     * @return bool
+     * @throws PrimeException When query fail
+     * @deprecated Since 2.0. Use DatabaseManagerInterface#has() instead
+     */
+    public function hasTable($tableName);
+
+    /**
+     * Determine load the table structure
+     *
+     * @param string $tableName
+     *
+     * @return TableInterface
+     * @throws PrimeException When query fail
+     * @deprecated Since 2.0. Use DatabaseStructureManagerInterface::load() instead
+     */
+    public function loadTable($tableName);
+
+    /**
      * Drop a table from the schema.
      *
      * @param string $tableName

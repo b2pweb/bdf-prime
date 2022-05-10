@@ -105,6 +105,23 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
 
     /**
      * {@inheritdoc}
+     * @deprecated
+     */
+    public function hasTable($tableName)
+    {
+        return $this->has($tableName);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadTable($tableName)
+    {
+        return $this->load($tableName);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function add($structure)
     {
