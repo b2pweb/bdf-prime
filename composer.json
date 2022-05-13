@@ -59,12 +59,6 @@
     "tests-with-coverage": "phpunit --coverage-clover coverage.xml",
     "psalm": "psalm --shepherd --no-cache --output-format=github"
   },
-  "extra": {
-    "branch-alias": {
-      "dev-master": "1.3-dev",
-      "dev-2.0": "2.0-dev"
-    }
-  },
   "suggest": {
     "b2p/bdf-console": "required to use prime commands (~1.5)",
     "b2p/bdf-web": "required to use service provider (~1.5)",
