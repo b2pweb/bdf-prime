@@ -4,7 +4,7 @@ Prime is a Data mapper ORM based on doctrine DBAL.
 The goal of prime is to lightweight usage of data mapper and doctrine DBAL.
 
 [![build](https://github.com/b2pweb/bdf-prime/actions/workflows/php.yml/badge.svg)](https://github.com/b2pweb/bdf-prime/actions/workflows/php.yml)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/b2pweb/bdf-prime/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/b2pweb/bdf-prime/?branch=master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/b2pweb/bdf-prime/badges/quality-score.png?b=2.0)](https://scrutinizer-ci.com/g/b2pweb/bdf-prime/?branch=2.0)
 [![Packagist Version](https://img.shields.io/packagist/v/b2pweb/bdf-prime.svg)](https://packagist.org/packages/b2pweb/bdf-prime)
 [![Total Downloads](https://img.shields.io/packagist/dt/b2pweb/bdf-prime.svg)](https://packagist.org/packages/b2pweb/bdf-prime)
 [![Type Coverage](https://shepherd.dev/github/b2pweb/bdf-prime/coverage.svg)](https://shepherd.dev/github/b2pweb/bdf-prime)
@@ -73,28 +73,28 @@ $connexions->declareConnection('mysql', [
 
 #### Available options
 
-| Option              | Type       | Description  |
-|---------------------|------------|--------------|
-| `driver`            | string     | The driver name (ex: `pdo_mysql`, `mysqli`). See doctrine drivers for more informations. |
-| `adapter`           | string     | PDO adapter.  `pdo_` prefix will be added. |
-| `dbname`            | string     | The database name. |
-| `host`              | string     | The host name.  |
-| `port`              | string     | The connection port. |
-| `user`              | string     | The user credentials. |
-| `password`          | string     | The password credentials. |
-| `path`              | string     | The file path used by sqlite to store data. |
-| `url`               | string     | The DSN string. All data extract from the dsn will be erased the others options. |
-| `driverOptions`     | array      | The driver options. |
-| `memory`            | bool       | The sqlite option for memory. |
-| `unix_socket`       | string     | The unix socket file. |
-| `charset`           | string     | The client charset. |
-| `server_version`    | string     |  |
-| `wrapper_class`     | string     |  |
-| `driver_class`      | string     |  |
-| `platform_service`  | string     |  |
-| `logging`           | bool       |  |
-| `shards`            | array      | Sharding connection: contains an array with shard name in key and options in value. The shard options will be merged onto the master connection. |
-| `read`              | array      | Master/slave connection: contains an array of options for the read connection. |
+| Option             | Type   | Description                                                                                                                                      |
+|--------------------|--------|--------------------------------------------------------------------------------------------------------------------------------------------------|
+| `driver`           | string | The driver name (ex: `pdo_mysql`, `mysqli`). See doctrine drivers for more informations.                                                         |
+| `adapter`          | string | PDO adapter.  `pdo_` prefix will be added.                                                                                                       |
+| `dbname`           | string | The database name.                                                                                                                               |
+| `host`             | string | The host name.                                                                                                                                   |
+| `port`             | string | The connection port.                                                                                                                             |
+| `user`             | string | The user credentials.                                                                                                                            |
+| `password`         | string | The password credentials.                                                                                                                        |
+| `path`             | string | The file path used by sqlite to store data.                                                                                                      |
+| `url`              | string | The DSN string. All data extract from the dsn will be erased the others options.                                                                 |
+| `driverOptions`    | array  | The driver options.                                                                                                                              |
+| `memory`           | bool   | The sqlite option for memory.                                                                                                                    |
+| `unix_socket`      | string | The unix socket file.                                                                                                                            |
+| `charset`          | string | The client charset.                                                                                                                              |
+| `server_version`   | string |                                                                                                                                                  |
+| `wrapper_class`    | string |                                                                                                                                                  |
+| `driver_class`     | string |                                                                                                                                                  |
+| `platform_service` | string |                                                                                                                                                  |
+| `logging`          | bool   |                                                                                                                                                  |
+| `shards`           | array  | Sharding connection: contains an array with shard name in key and options in value. The shard options will be merged onto the master connection. |
+| `read`             | array  | Master/slave connection: contains an array of options for the read connection.                                                                   |
 
 
 ### Create your mapper
@@ -107,6 +107,8 @@ Use the class `Bdf\Prime\Mapper\Mapper` to create your mappers.
 <?php
 
 use Bdf\Prime\Mapper\Mapper;
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Mapper\Builder\IndexBuilder;
 
 class UserMapper extends Mapper
 {
@@ -130,7 +132,7 @@ class UserMapper extends Mapper
      * 
      * @return array|null
      */
-    public function schema()
+    public function schema(): array
     {
         return [
             'connection' => 'myDB',
@@ -143,28 +145,20 @@ class UserMapper extends Mapper
      * 
      * @param \Bdf\Prime\Mapper\Builder\FieldBuilder $builder
      */
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->bigint('id')->autoincrement()
             ->string('name')
         ;
     }
-    
+
     /**
-     * Array of index
-     * 
-     * <code>
-     *  return [
-     *      ['attribute1', 'attribute2']
-     *  ];
-     * </code>
-     * 
-     * @return array
-     */
-    public function indexes()
+    * {@inheritdoc}
+    */
+    public function buildIndexes(IndexBuilder $builder): void
     {
-        return ['name'];
+        $builder->add()->on('name');
     }
 }
 ```
@@ -188,7 +182,7 @@ Prime allows custom filters definition. You can define filter alias for complex 
      * 
      * @return array
      */
-    public function filters()
+    public function filters(): array
     {
         return [
             'nameLike' => function($query, $value) {
@@ -222,7 +216,7 @@ The scope is a custom method of a repository.
      * </code>
      * @return array
      */
-    public function scopes()
+    public function scopes(): array
     {
         return [
             'countName' => function(\Bdf\Prime\Query\QueryInterface $query, $value) {
@@ -264,7 +258,7 @@ $count = $repository->countName('john');
      * 
      * @return array
      */
-    public function sequence()
+    public function sequence(): array
     {
         return [
             'connection'   => 'myDB',
@@ -282,10 +276,11 @@ You can define a model with default constraints. Those constraints will be appli
 ```PHP
 <?php
 use Bdf\Prime\Mapper\Mapper;
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 
 class EnabledUserMapper extends Mapper
 {
-    public function buildFields($builder)
+    public function buildFields(FieldBuilder $builder): void
     {
         $builder
             ->boolean('enabled')
@@ -303,7 +298,7 @@ class EnabledUserMapper extends Mapper
      * 
      * @return array
      */
-    public function customConstraints()
+    public function customConstraints(): array
     {
         return [
             'enabled' => true
@@ -346,7 +341,7 @@ Static shortcuts for all repository methods (event scopes):
 ```PHP
 <?php
 $users = User::where('id', '<', 2)->all();
-$count = User::countName('john');
+$count = User::count(['name' => 'john');
 ```
 
 Access to the repository:
@@ -372,7 +367,7 @@ You have access to a relation builder to declare all relations of an entity in t
      *
      * @param \Bdf\Prime\Relations\Builder\RelationBuilder $builder
      */
-    public function buildRelations($builder)
+    public function buildRelations(RelationBuilder $builder): void
     {
         // The property User::customer is an object Customer.
         // The relation join is key Customer::id on User::customerId
@@ -386,17 +381,17 @@ You have access to a relation builder to declare all relations of an entity in t
     }
 ```
 
-| *Methods*         | *Description* |
-| ------------------| ------------- | 
-| `belongsTo`       | `$builder->on('customer')->belongsTo('Customer::id', 'customer.id');` |
-| `hasOne`          | `$builder->on('contact')->hasOne('Contact::distantId', 'localId');` |
-| `hasMany`         | `$builder->on('documents')->hasMany('Document::distantId', 'localId');` |
+| *Methods*         | *Description*                                                                                                   |
+|-------------------|-----------------------------------------------------------------------------------------------------------------| 
+| `belongsTo`       | `$builder->on('customer')->belongsTo('Customer::id', 'customer.id');`                                           |
+| `hasOne`          | `$builder->on('contact')->hasOne('Contact::distantId', 'localId');`                                             |
+| `hasMany`         | `$builder->on('documents')->hasMany('Document::distantId', 'localId');`                                         |
 | `belongsToMany`   | `$builder->on('packs')->belongsToMany('Pack::id', 'localId')->through('CustomerPack', 'customerId', 'packId');` |
-| `morphTo`         |  |
-| `morphOne`        |  |
-| `morphMany`       |  |
-| `inherit`         | `$builder->on('target')->inherit('targetId');` Should be defined in subclasses |
-| `custom`          |  |
+| `morphTo`         |                                                                                                                 |
+| `morphOne`        |                                                                                                                 |
+| `morphMany`       |                                                                                                                 |
+| `inherit`         | `$builder->on('target')->inherit('targetId');` Should be defined in subclasses                                  |
+| `custom`          |                                                                                                                 |
 
 
 #### Load relation
@@ -441,7 +436,7 @@ Use the `Mapper::customEvents` method to declare your listeners
      *
      * @param \Bdf\Event\EventNotifier $notifier
      */
-    public function customEvents($notifier)
+    public function customEvents(RepositoryEventsSubscriberInterface $notifier): void
     {
         $notifier->saving(function($entity, $repository, $isNew) {
             // do something
@@ -452,16 +447,16 @@ Use the `Mapper::customEvents` method to declare your listeners
 The list of prime events:
 
 | *Event*             | *Repository method*        | *context* |
-| ------------------- | -------------------------- | ------------- |
-| Events::POST_LOAD   | `$repository->loaded()`    |  |
-| Events::PRE_SAVE    | `$repository->saving()`    |  |
-| Events::POST_SAVE   | `$repository->saved()`     |  |
-| Events::PRE_INSERT  | `$repository->inserting()` |  |
-| Events::POST_INSERT | `$repository->inserted()`  |  |
-| Events::PRE_UPDATE  | `$repository->updating()`  |  |
-| Events::POST_UPDATE | `$repository->updated()`   |  |
-| Events::PRE_DELETE  | `$repository->deleting()`  |  |
-| Events::POST_DELETE | `$repository->deleted()`   |  |
+|---------------------|----------------------------|-----------|
+| Events::POST_LOAD   | `$repository->loaded()`    |           |
+| Events::PRE_SAVE    | `$repository->saving()`    |           |
+| Events::POST_SAVE   | `$repository->saved()`     |           |
+| Events::PRE_INSERT  | `$repository->inserting()` |           |
+| Events::POST_INSERT | `$repository->inserted()`  |           |
+| Events::PRE_UPDATE  | `$repository->updating()`  |           |
+| Events::POST_UPDATE | `$repository->updated()`   |           |
+| Events::PRE_DELETE  | `$repository->deleting()`  |           |
+| Events::POST_DELETE | `$repository->deleted()`   |           |
 
 ### Behaviors
 
@@ -474,18 +469,19 @@ You can defined the model behaviors in your mapper using the method `Mapper::get
      *
      * @return \Bdf\Prime\Behaviors\BehaviorInterface[]
      */
-    public function getDefinedBehaviors()
+    public function getDefinedBehaviors(): array
     {
         return [
             new \Bdf\Prime\Behaviors\Timestampable()
         ];
     }
 ```
+
 Available behaviors:
 
-| *Class name*                          | *Description*|
-| --------------------------------------| -------------------------- | 
+| *Class name*                          | *Description*                                                                  |
+|---------------------------------------|--------------------------------------------------------------------------------| 
 | `Bdf\Prime\Behaviors\Blameable`       | Automatically add user name that has realize update or creation on the entity. |
-| `Bdf\Prime\Behaviors\SoftDeletable`   | Mark entity as deleted but keep the data in storage. |
-| `Bdf\Prime\Behaviors\Timestampable`   | Automatically add created and updated date time on the entity. |
-| `Bdf\Prime\Behaviors\Versionable`     |     |
+| `Bdf\Prime\Behaviors\SoftDeletable`   | Mark entity as deleted but keep the data in storage.                           |
+| `Bdf\Prime\Behaviors\Timestampable`   | Automatically add created and updated date time on the entity.                 |
+| `Bdf\Prime\Behaviors\Versionable`     |                                                                                |
