@@ -958,6 +958,7 @@ class SqlCompiler extends AbstractCompiler
      * 
      * @return string
      * @throws PrimeException
+     * @psalm-suppress UndefinedClass
      */
     protected function compileGroup(CompilableClause $query)
     {

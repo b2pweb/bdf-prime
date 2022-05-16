@@ -288,12 +288,12 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      *
      * @throws PrimeException
      */
-    public function exec($statement)
+    public function exec($sql)
     {
         $this->prepareLogger();
         
-        return $this->runOrReconnect(function() use ($statement) {
-            return parent::exec($statement);
+        return $this->runOrReconnect(function() use ($sql) {
+            return parent::exec($sql);
         });
     }
 
@@ -302,10 +302,10 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      *
      * @throws PrimeException
      */
-    public function prepare($statement)
+    public function prepare($sql)
     {
-        return $this->runOrReconnect(function() use ($statement) {
-            return parent::prepare($statement);
+        return $this->runOrReconnect(function() use ($sql) {
+            return parent::prepare($sql);
         });
     }
 
@@ -328,7 +328,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
                 return new DoctrineResultSet($stmt);
             }
 
-            return new UpdateResultSet($this->executeUpdate($statement, $query->getBindings()));
+            return new UpdateResultSet((int) $this->executeUpdate($statement, $query->getBindings()));
         } catch (DoctrineDBALException $e) {
             /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException('Error on execute : '.$e->getMessage(), $e->getCode(), $e);

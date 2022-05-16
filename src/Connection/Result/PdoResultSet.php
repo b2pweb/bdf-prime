@@ -174,7 +174,7 @@ use Doctrine\DBAL\Driver\Statement;
      */
     public function count()
     {
-        return $this->statement->rowCount();
+        return (int) $this->statement->rowCount();
     }
 
     /**

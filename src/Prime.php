@@ -301,6 +301,7 @@ class Prime
      * @throws PrimeException
      *
      * @template T as object
+     * @psalm-suppress InvalidArgument
      */
     public static function find($repositoryName, $criteria = null)
     {
@@ -331,6 +332,7 @@ class Prime
      * @throws PrimeException
      *
      * @template T as object
+     * @psalm-suppress InvalidArgument
      */
     public static function one($repositoryName, $criteria = null)
     {

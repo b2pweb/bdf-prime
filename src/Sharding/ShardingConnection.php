@@ -359,12 +359,12 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function exec($statement)
+    public function exec($sql)
     {
         $result = 0;
 
         foreach ($this->getSelectedShards() as $shard) {
-            $result += $shard->exec($statement);
+            $result += $shard->exec($sql);
         }
 
         return $result;
@@ -451,14 +451,14 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function lastInsertId($seqName = null)
+    public function lastInsertId($name = null)
     {
         if ($this->isUsingShard()) {
-            return $this->getSelectedShard()->lastInsertId($seqName);
+            return $this->getSelectedShard()->lastInsertId($name);
         }
 
         // TODO doit on lever une exception ?
-        return parent::lastInsertId($seqName);
+        return parent::lastInsertId($name);
     }
 
     /**

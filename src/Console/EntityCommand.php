@@ -23,6 +23,9 @@ use Symfony\Component\Filesystem\Filesystem;
  * EntityCommand
  * 
  * @package Bdf\Prime\Console
+ *
+ * @psalm-suppress ReservedWord
+ * @psalm-suppress TypeDoesNotContainType
  */
 class EntityCommand extends Command
 {

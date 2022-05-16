@@ -298,7 +298,6 @@ abstract class Mapper
      * Get generator ID
      * 
      * @return GeneratorInterface
-     * @psalm-assert GeneratorInterface $this->generator
      */
     public function generator(): GeneratorInterface
     {
