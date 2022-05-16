@@ -5,6 +5,11 @@ v2.0.0
 * Feat: Add helper methods `isRead`, `isWrite`, `hasWrite` on `ResultSetInterface`
 * Feat: Add "fetch mode" `asXXX` methods instead of generalist `fetchMode` method on `ResultSetInterface`
 * Feat: Add executed query on execution exception (cd: `QueryExecutionException`)
+* Feat: New schema management system
+* Change: rename schema resolver to structure upgrader :
+    * ResolverInterface -> StructureUpgraderInterface
+    * NullResolver -> NullStructureUpgrader
+    * Resolver -> RepositoryUpgrader
 
 BC Breaks
 * Change: PHP minimal version set to 7.4.
@@ -63,6 +68,13 @@ BC Breaks
     * searchableArray() - use array instead of string
     * arrayOfXXX() - use array instead of string
 * Change compiler types on `Bdf\Prime\Query\Factory\QueryFactoryInterface` to object
+* Add methods `add()`, `has()`, `load()` and `diff()` on `SchemaManagerInterface`
+* Typehint on parameters and return value of `Bdf\Prime\Entity\Model::loadSerializerMetadata()`
+* Typehint on parameters of methods of `Bdf\Prime\Entity\Model`
+* Parameter 0 of Bdf\Prime\Schema\Manager\TableManagerInterface#add() changed name from $table to $structure, without type
+* Method Bdf\Prime\Schema\AbstractSchemaManager#setConnection() was removed
+* Parameters of `Bdf\Prime\Schema\SchemaManagerInterface#diff()` changed from `Bdf\Prime\Schema\TableInterface` to no type
+* Return type of `Bdf\Prime\Connection\ConnectionInterface#schema()` changed from no type to `Bdf\Prime\Schema\Manager\DatabaseManagerInterface`
 
 v1.3.0
 ------
