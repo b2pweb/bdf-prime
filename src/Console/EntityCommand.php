@@ -23,6 +23,9 @@ use Symfony\Component\Filesystem\Filesystem;
  * EntityCommand
  * 
  * @package Bdf\Prime\Console
+ *
+ * @psalm-suppress ReservedWord
+ * @psalm-suppress InvalidCast
  */
 class EntityCommand extends Command
 {
@@ -132,7 +135,7 @@ EOF
         $doCreate = false;
         
         if (file_exists($fileName)) {
-            $userChoice = $io->choice("'$fileName' exists. what do you want ?", [
+            $userChoice = (string) $io->choice("'$fileName' exists. what do you want ?", [
                 '1'     => 'Regenerate: will replace the existing entity',
                 '2'     => 'Update: will complete entity with new properties and methods',
                 '3'     => 'Cancel',
@@ -171,7 +174,7 @@ EOF
         }
 
         while (true) {
-            switch ($io->choice("'$className' found", $choices, 'auto')) {
+            switch ((string) $io->choice("'$className' found", $choices, 'auto')) {
                 case 'Auto+create':
                     $doCreate = true;
                 case 'Auto':
@@ -201,7 +204,7 @@ EOF
                     break;
                     
                 case 'Extends class':
-                    $generator->setClassToExtend($io->ask('Enter full name class'));
+                    $generator->setClassToExtend((string) $io->ask('Enter full name class'));
                     break;
                     
                 case 'Implements interface':
@@ -212,10 +215,10 @@ EOF
                         '4'     => 'other',
                     ];
                     
-                    $userChoice = $io->choice('Choose interface', $knownInterfaces);
+                    $userChoice = (string) $io->choice('Choose interface', $knownInterfaces);
                     
                     if ($userChoice === 'other') {
-                        $generator->addInterface($io->ask('Enter full name class:'));
+                        $generator->addInterface((string) $io->ask('Enter full name class:'));
                     } else {
                         $generator->addInterface($userChoice);
                     }
@@ -227,10 +230,10 @@ EOF
                         '2'     => 'other',
                     ];
                     
-                    $userChoice = $io->choice('Choose extension', $knownTraits);
+                    $userChoice = (string) $io->choice('Choose extension', $knownTraits);
                     
                     if ($userChoice === 'other') {
-                        $generator->addTrait($io->ask('Enter full name class:'));
+                        $generator->addTrait((string) $io->ask('Enter full name class:'));
                     } else {
                         $generator->addTrait($userChoice);
                     }
