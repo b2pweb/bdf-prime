@@ -3,6 +3,10 @@
 namespace Bdf\Prime\Migration;
 
 use Bdf\Prime\Prime;
+use Composer\Autoload\ClassLoader;
+use Composer\Composer;
+use Composer\InstalledVersions;
+use Composer\Installer;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
@@ -102,22 +106,67 @@ class MigrationTest extends TestCase
     }
 }
 
-class Container implements ContainerInterface
-{
-    private $service;
-
-    public function __construct(array $service)
+if ((new \ReflectionMethod(ContainerInterface::class, 'has'))->getReturnType() !== null) {
+    // psr/container v2
+    class Container implements ContainerInterface
     {
-        $this->service = $service;
+        private $service;
+
+        public function __construct(array $service)
+        {
+            $this->service = $service;
+        }
+
+        public function get(string $id)
+        {
+            return $this->service[$id] ?? null;
+        }
+
+        public function has(string $id): bool
+        {
+            return isset($this->service[$id]);
+        }
     }
-
-    public function get($id)
+} elseif ((new \ReflectionMethod(ContainerInterface::class, 'has'))->getParameters()[0]->getType() !== null) {
+    // psr/container v1.1
+    class Container implements ContainerInterface
     {
-        return $this->service[$id] ?? null;
+        private $service;
+
+        public function __construct(array $service)
+        {
+            $this->service = $service;
+        }
+
+        public function get(string $id)
+        {
+            return $this->service[$id] ?? null;
+        }
+
+        public function has(string $id)
+        {
+            return isset($this->service[$id]);
+        }
     }
-
-    public function has($id)
+} else {
+    // psr/container v1.0
+    class Container implements ContainerInterface
     {
-        return isset($this->service[$id]);
+        private $service;
+
+        public function __construct(array $service)
+        {
+            $this->service = $service;
+        }
+
+        public function get($id)
+        {
+            return $this->service[$id] ?? null;
+        }
+
+        public function has($id)
+        {
+            return isset($this->service[$id]);
+        }
     }
 }
