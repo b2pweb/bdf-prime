@@ -23,6 +23,7 @@ build:
           - sudo make install
           - export PATH="/usr/local/lib:$PATH"
           - cd ..
+          - composer install
 
       tests:
         override:
