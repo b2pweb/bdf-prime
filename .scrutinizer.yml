@@ -14,6 +14,15 @@ build:
       services:
         mysql: 5.7
 
+      dependencies:
+        override:
+          - wget https://sqlite.org/2022/sqlite-autoconf-3380500.tar.gz --no-check-certificate
+          - tar -xvf sqlite-autoconf-3380500.tar.gz && cd sqlite-autoconf-3380500
+          - ./configure
+          - make
+          - sudo make install
+          - export PATH="/usr/local/lib:$PATH"
+
       tests:
         override:
           - command: XDEBUG_MODE=coverage composer run tests-with-coverage
