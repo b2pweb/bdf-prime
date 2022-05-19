@@ -22,6 +22,7 @@ build:
           - make
           - sudo make install
           - export PATH="/usr/local/lib:$PATH"
+          - cd ..
 
       tests:
         override:
