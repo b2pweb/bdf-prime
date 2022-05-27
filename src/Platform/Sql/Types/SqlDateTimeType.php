@@ -22,8 +22,7 @@ class SqlDateTimeType extends AbstractSqlDateTimeType
         $name = self::DATETIME,
         string $className = \DateTime::class,
         \DateTimeZone $timezone = null
-    )
-    {
+    ) {
         parent::__construct($platform, $name);
 
         $this->format = $platform->grammar()->getDateTimeFormatString();

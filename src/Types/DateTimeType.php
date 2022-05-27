@@ -20,8 +20,7 @@ class DateTimeType extends AbstractDateTimeType
         string $format = \DateTime::ATOM,
         string $className = \DateTime::class,
         \DateTimeZone $timezone = null
-    )
-    {
+    ) {
         parent::__construct($type);
 
         $this->format = $format;
