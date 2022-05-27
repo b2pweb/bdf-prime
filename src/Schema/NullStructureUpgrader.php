@@ -12,9 +12,8 @@ class NullStructureUpgrader implements StructureUpgraderInterface
      */
     public function migrate(bool $listDrop = true): void
     {
-        
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -22,7 +21,7 @@ class NullStructureUpgrader implements StructureUpgraderInterface
     {
         return [];
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -30,7 +29,7 @@ class NullStructureUpgrader implements StructureUpgraderInterface
     {
         return true;
     }
-    
+
     /**
      * {@inheritdoc}
      */

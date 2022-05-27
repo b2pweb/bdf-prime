@@ -28,9 +28,9 @@ use LogicException;
 
 /**
  * Mapper
- * 
+ *
  * Contient les méta données de la table.
- * 
+ *
  * @todo Convertir la donnée avec le type approprié sur les methodes setId, hydrateOne
  *
  * @template E as object
@@ -45,34 +45,34 @@ abstract class Mapper
      * If null global cache will be set.
      * Set it to false to deactivate cache on this repository
      * Set the cache instance in configure method
-     * 
+     *
      * @var false|CacheInterface
      */
     protected $resultCache;
-    
+
     /**
      * @var Metadata
      */
     private $metadata;
-    
+
     /**
      * Id generator
-     * 
+     *
      * Could be defined as string (generator class name). It would be instantiated
      * by mapper on generator() method
-     * 
+     *
      * @var \Bdf\Prime\IdGenerators\GeneratorInterface|null
      */
     protected $generator;
-    
+
     /**
      * @var class-string
      */
     private $repositoryClass = EntityRepository::class;
-    
+
     /**
      * The real name of entity class. Could be an none existing class
-     * 
+     *
      * @var class-string<E>
      */
     private $entityClass;
@@ -86,15 +86,15 @@ abstract class Mapper
 
     /**
      * Set repository read only.
-     * 
+     *
      * @var bool
      */
     private $readOnly = false;
-    
+
     /**
      * Use schema resolver
      * Disable if schema has not to be manage by this app
-     * 
+     *
      * @var bool
      */
     private $useSchemaManager = true;
@@ -151,12 +151,12 @@ abstract class Mapper
         $this->resultCache = $resultCache;
 
         $this->configure();
-        
+
         $this->metadata->build($this);
 
         $this->setHydrator($hydrator ?: new MapperHydrator());
     }
-    
+
     /**
      * Custom configuration
      */
@@ -167,7 +167,7 @@ abstract class Mapper
 
     /**
      * Get entity class
-     * 
+     *
      * @return class-string<E>
      * @final
      */
@@ -175,10 +175,10 @@ abstract class Mapper
     {
         return $this->entityClass;
     }
-    
+
     /**
      * Get metadata
-     * 
+     *
      * @return Metadata
      * @final
      */
@@ -186,10 +186,10 @@ abstract class Mapper
     {
         return $this->metadata;
     }
-    
+
     /**
      * Set property accessor class name
-     * 
+     *
      * @param class-string<PropertyAccessorInterface> $className
      * @final
      */
@@ -197,10 +197,10 @@ abstract class Mapper
     {
         $this->propertyAccessorClass = $className;
     }
-    
+
     /**
      * Get property accessor class name
-     * 
+     *
      * @return class-string<PropertyAccessorInterface>
      * @final
      */
@@ -233,7 +233,7 @@ abstract class Mapper
 
     /**
      * Set the repository read only
-     * 
+     *
      * @param bool $flag
      * @final
      */
@@ -241,10 +241,10 @@ abstract class Mapper
     {
         $this->readOnly = $flag;
     }
-    
+
     /**
      * Get repository read only state
-     * 
+     *
      * @return bool
      * @final
      */
@@ -252,7 +252,7 @@ abstract class Mapper
     {
         return $this->readOnly;
     }
-    
+
     /**
      * Disable schema manager on repository
      * @final
@@ -261,10 +261,10 @@ abstract class Mapper
     {
         $this->useSchemaManager = false;
     }
-    
+
     /**
      * Does repository have a schema manager
-     * 
+     *
      * @return bool
      * @final
      */
@@ -297,7 +297,7 @@ abstract class Mapper
 
     /**
      * Set generator ID
-     * 
+     *
      * @param string|GeneratorInterface $generator
      * @final
      */
@@ -306,13 +306,13 @@ abstract class Mapper
         if (!is_string($generator) && !$generator instanceof GeneratorInterface) {
             throw new LogicException('Trying to set an invalid generator in "' . get_class($this) . '"');
         }
-        
+
         $this->generator = $generator;
     }
-    
+
     /**
      * Get generator ID
-     * 
+     *
      * @return GeneratorInterface
      * @final
      */
@@ -376,7 +376,7 @@ abstract class Mapper
     /**
      * Get ID value of an entity
      * Only sequenceable attribute is get (the first one)
-     * 
+     *
      * @param E $entity
      *
      * @return mixed
@@ -386,10 +386,10 @@ abstract class Mapper
     {
         return $this->extractOne($entity, $this->metadata->primary['attributes'][0]);
     }
-    
+
     /**
      * Get attribute value of an entity
-     * 
+     *
      * @param E $entity
      * @param string $attribute
      *
@@ -400,10 +400,10 @@ abstract class Mapper
     {
         return $this->hydrator->extractOne($entity, $attribute);
     }
-    
+
     /**
      * Hydrate on property value of an entity
-     * 
+     *
      * @param E $entity
      * @param string $attribute
      * @param mixed  $value
@@ -415,10 +415,10 @@ abstract class Mapper
     {
         $this->hydrator->hydrateOne($entity, $attribute, $value);
     }
-    
+
     /**
      * Get primary key criteria
-     * 
+     *
      * @param E $entity
      *
      * @return array
@@ -444,7 +444,7 @@ abstract class Mapper
 
     /**
      * User api to instantiate related entity
-     * 
+     *
      * @param array $data
      *
      * @return E
@@ -467,7 +467,7 @@ abstract class Mapper
 
     /**
      * Transform entity to db one dimension array
-     * 
+     *
      * @param E $entity Entity object
      * @param array|null $attributes  Attribute should be flipped as ['key' => true]
      *
@@ -478,17 +478,17 @@ abstract class Mapper
     {
         return $this->hydrator->flatExtract($entity, $attributes);
     }
-    
+
     /**
      * Get valid array for entity
-     * 
+     *
      * Inject one dimension array (db field) into entity
      * Map attribute and cast value
-     * 
+     *
      * $optimisation est un tableau donné par le query builder dans le but
      * d'optimiser le chargement des relations et des tableaux associatifs. Il contient les entités regroupés par
      * la valeur du champs demandé
-     * 
+     *
      * @param array             $data  Db data
      * @param PlatformInterface $platform
      *
@@ -502,10 +502,10 @@ abstract class Mapper
 
         return $entity;
     }
-    
+
     /**
      * Get the repository
-     * 
+     *
      * @return RepositoryInterface<E>
      * @final
      */
@@ -532,9 +532,9 @@ abstract class Mapper
 
     /**
      * Get defined relation
-     * 
+     *
      * Build object relation defined by user
-     * 
+     *
      * @param string $relationName
      *
      * @return array  Metadata for relation definition
@@ -544,27 +544,27 @@ abstract class Mapper
     public function relation(string $relationName): array
     {
         $relations = $this->relations();
-        
+
         if (!isset($relations[$relationName])) {
             throw new RelationNotFoundException('Relation "' . $relationName . '" is not set in ' . $this->metadata->entityName);
         }
-        
+
         return $relations[$relationName];
     }
-    
+
     //
     //------------ API configuration du mapping
     //
-    
+
     /**
      * Definition du schema
-     * 
+     *
      * Definition
      *  - connection         : The connection name declare in connection manager (mandatory).
      *  - database           : The database name.
      *  - table              : The table name (mandatory).
      *  - tableOptions       : The table options (ex: engine => myisam).
-     * 
+     *
      * <code>
      *  return [
      *     'connection'   => (string),
@@ -573,14 +573,14 @@ abstract class Mapper
      *     'tableOptions' => (array),
      *  ];
      * </code>
-     * 
+     *
      * @return array
      */
     abstract public function schema(): array;
-    
+
     /**
      * Gets repository fields builder
-     * 
+     *
      * @return iterable<string, FieldDefinition>
      * @final
      *
@@ -597,19 +597,19 @@ abstract class Mapper
 
         return $builder;
     }
-    
+
     /**
      * Build fields from this mapper.
-     * 
+     *
      * To overwrite.
-     * 
+     *
      * @param FieldBuilder $builder
      */
     public function buildFields(FieldBuilder $builder): void
     {
         throw new LogicException('Fields must be defined in mapper '.__CLASS__);
     }
-    
+
     /**
      * Sequence definition.
      *
@@ -629,7 +629,7 @@ abstract class Mapper
      *     'tableOptions' => (array),
      *  ];
      * </code>
-     * 
+     *
      * @return array{
      *     connection?: string|null,
      *     table?: string|null,
@@ -646,11 +646,11 @@ abstract class Mapper
             'tableOptions' => [],
         ];
     }
-    
+
     /**
      * Gets custom filters
      * To overwrite
-     * 
+     *
      * <code>
      *  return [
      *      'customFilterName' => function(<Bdf\Prime\Query\QueryInterface> $query, <mixed> $value) {
@@ -658,23 +658,23 @@ abstract class Mapper
      *      },
      *  ];
      * </code>
-     * 
+     *
      * @return array<string, callable>
      */
     public function filters(): array
     {
         return [];
     }
-    
+
     /**
      * Array of index
-     * 
+     *
      * <code>
      *  return [
      *      ['attribute1', 'attribute2']
      *  ];
      * </code>
-     * 
+     *
      * @return array
      * @final
      *
@@ -707,20 +707,19 @@ abstract class Mapper
      */
     public function buildIndexes(IndexBuilder $builder): void
     {
-
     }
-    
+
     /**
      * Repository extension
      * returns additional methods in repository
-     * 
+     *
      * <code>
      * return [
      *     'customMethod' => function($query, $test) {
-     *         
+     *
      *     },
      * ];
-     * 
+     *
      * $repository->customMethod('test');
      * </code>
      *
@@ -752,10 +751,10 @@ abstract class Mapper
     {
         return [];
     }
-    
+
     /**
      * Register event on notifier
-     * 
+     *
      * @param RepositoryEventsSubscriberInterface<E> $notifier
      * @final
      */
@@ -838,7 +837,7 @@ abstract class Mapper
 
     /**
      * Get all constraints
-     * 
+     *
      * @return array
      */
     final public function constraints(): array
@@ -848,7 +847,7 @@ abstract class Mapper
         foreach ($this->behaviors() as $behavior) {
             $constraints += $behavior->constraints();
         }
-        
+
         return $constraints;
     }
 
@@ -856,13 +855,13 @@ abstract class Mapper
      * Register custom event on notifier
      *
      * To overwrite.
-     * 
+     *
      * <code>
      * return [
      *     'attribute' => 'value'
      * ]
      * </code>
-     * 
+     *
      * @return array
      */
     public function customConstraints(): array

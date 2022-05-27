@@ -6,7 +6,7 @@ use Bdf\Prime\Relations\RelationInterface;
 
 /**
  * ObjectPropertyInfo
- * 
+ *
  * @package Bdf\Prime\Mapper\Info
  */
 class ObjectPropertyInfo implements InfoInterface
@@ -17,25 +17,25 @@ class ObjectPropertyInfo implements InfoInterface
      * @var string
      */
     protected $name;
-    
+
     /**
      * The metadata from the metadata object
      *
      * @var array
      */
     protected $metadata;
-    
+
     /**
      * The metadata from the metadata object
      *
      * @var array
      */
     protected $relation;
-    
-    
+
+
     /**
      * Constructor
-     * 
+     *
      * @param array $metadata  The property metadata or the relation metadata
      */
     public function __construct(string $name, array $metadata = [])
@@ -43,7 +43,7 @@ class ObjectPropertyInfo implements InfoInterface
         $this->name = $name;
         $this->metadata = $metadata;
     }
-    
+
     /**
      * Set the relation info of this field
      *
@@ -55,7 +55,7 @@ class ObjectPropertyInfo implements InfoInterface
     {
         $this->relation = $metadata;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -63,7 +63,7 @@ class ObjectPropertyInfo implements InfoInterface
     {
         return $this->name;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -71,17 +71,17 @@ class ObjectPropertyInfo implements InfoInterface
     {
         return true;
     }
-    
+
     /**
      * Check whether the property is a relation
-     * 
+     *
      * @return bool
      */
     public function isRelation(): bool
     {
         return $this->relation !== null;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -124,7 +124,7 @@ class ObjectPropertyInfo implements InfoInterface
 
     /**
      * Get the class name of the property if it is a class
-     * 
+     *
      * @return null|class-string
      */
     public function className(): ?string
@@ -132,11 +132,11 @@ class ObjectPropertyInfo implements InfoInterface
         if (isset($this->relation['entity'])) {
             return $this->relation['entity'];
         }
-        
+
         if (isset($this->metadata['class'])) {
             return $this->metadata['class'];
         }
-        
+
         return null;
     }
 
@@ -166,9 +166,9 @@ class ObjectPropertyInfo implements InfoInterface
 
     /**
      * Is the relation a one_*
-     * 
+     *
      * @param string $relationType
-     * 
+     *
      * @return bool
      */
     protected function isSingleRelation(string $relationType): bool

@@ -17,8 +17,12 @@ class SqlDateTimeType extends AbstractSqlDateTimeType
      * @param string $className
      * @param \DateTimeZone|null $timezone
      */
-    public function __construct(PlatformInterface $platform, $name = self::DATETIME,
-                                string $className = \DateTime::class, \DateTimeZone $timezone = null)
+    public function __construct(
+        PlatformInterface $platform,
+        $name = self::DATETIME,
+        string $className = \DateTime::class,
+        \DateTimeZone $timezone = null
+    )
     {
         parent::__construct($platform, $name);
 

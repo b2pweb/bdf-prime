@@ -9,5 +9,4 @@ use RuntimeException;
  */
 class DBALException extends RuntimeException implements PrimeException
 {
-    
 }

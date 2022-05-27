@@ -7,9 +7,9 @@ use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 
 /**
  * Attribute
- * 
+ *
  * The expression is a mapper attribute
- * 
+ *
  * @package Bdf\Prime\Query\Expression
  *
  * @implements ExpressionInterface<CompilableClause&\Bdf\Prime\Query\Contract\Compilable, QuoteCompilerInterface>
@@ -20,7 +20,7 @@ class Attribute implements ExpressionInterface
      * @var string
      */
     protected $attribute;
-    
+
     /**
      * @var string
      */
@@ -37,7 +37,7 @@ class Attribute implements ExpressionInterface
         $this->attribute = $attribute;
         $this->pattern = $pattern;
     }
-    
+
     /**
      * {@inheritdoc}
      *

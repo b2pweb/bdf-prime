@@ -9,18 +9,18 @@ use Bdf\Prime\Query\Contract\Orderable;
  * EntityFilter gère les critères de recherche d'entités
  *
  * @package Bdf\Prime\Entity
- * 
+ *
  * @todo on attribute can have only one criteria
  */
 class Criteria implements ArrayAccess
 {
     /**
      * Critères injectés vers le dépot d'entity
-     * 
+     *
      * @var array
      */
     protected $criteria = [];
-    
+
     /**
      * Valeurs d'entrées utilisateur
      * Attention inputs ne peut contenir qu'une commande par field
@@ -30,21 +30,21 @@ class Criteria implements ArrayAccess
      * génèrera un inputs
      *   ['weight' => 'weight <']
      * </pre>
-     * 
+     *
      * @var array
      */
     protected $inputs = [];
-    
+
     /**
      * Commandes spéciales du query builder (ex: ':limit')
-     * 
+     *
      * @var array
      */
     protected $specials = [];
-    
+
     /**
      * Constructor
-     * 
+     *
      * @param array $filters
      * @param array $aliases
      */
@@ -55,7 +55,7 @@ class Criteria implements ArrayAccess
 
     /**
      * Import criteria
-     * 
+     *
      * @param array $filters
      *
      * @return self
@@ -65,13 +65,13 @@ class Criteria implements ArrayAccess
         foreach ($filters as $filter => $value) {
             $this->add($filter, $value);
         }
-        
+
         return $this;
     }
 
     /**
      * Add a criterion
-     * 
+     *
      * @param string $filter
      * @param mixed  $value
      * @param bool   $replace
@@ -84,44 +84,44 @@ class Criteria implements ArrayAccess
             $this->specials[$filter] = $value;
         } else {
             list($attribute) = explode(' ', trim($filter));
-            
+
             if ($replace && isset($this->inputs[$attribute])) {
                 $this->remove($attribute);
             }
-            
+
             $this->criteria[$filter]  = $value;
             $this->inputs[$attribute][] = $filter;
         }
-        
+
         return $this;
     }
 
     /**
      * Remove criterion
-     * 
+     *
      * @param string $filter   criterion to remove. Could be a alias
      * @return self
      */
     public function remove($filter)
     {
         list($attribute) = explode(' ', trim($filter));
-        
+
         if (isset($this->inputs[$attribute])) {
             foreach ($this->inputs[$attribute] as $key) {
                 unset($this->criteria[$key]);
             }
         }
-        
+
         unset($this->criteria[$filter]);
         unset($this->inputs[$attribute]);
         unset($this->specials[$filter]);
-        
+
         return $this;
     }
 
     /**
      * Does criterion exist
-     * 
+     *
      * @param string $filter    criterion exists. Could be a alias
      * @return bool
      */
@@ -132,7 +132,7 @@ class Criteria implements ArrayAccess
 
     /**
      * Get a criterion value
-     * 
+     *
      * @param string $filter    criterion to get. Could be a alias
      * @param mixed  $default
      *
@@ -143,7 +143,7 @@ class Criteria implements ArrayAccess
         if (isset($this->criteria[$filter])) {
             return $this->criteria[$filter];
         }
-        
+
         if (isset($this->inputs[$filter])) {
             return $this->criteria[$this->inputs[$filter][0]];
         }
@@ -153,7 +153,7 @@ class Criteria implements ArrayAccess
 
     /**
      * Get special criterion
-     * 
+     *
      * @param string $filter   Could be a alias
      * @param mixed  $default
      *
@@ -168,19 +168,19 @@ class Criteria implements ArrayAccess
 
     /**
      * Get all criteria including specials
-     * 
+     *
      * @return array
      */
     public function all()
     {
         return $this->criteria + $this->specials;
     }
-    
+
     /**
      * Get criteria only
      *
      * @todo trigger "Using deprecated language feature PHP4 constructor"
-     * 
+     *
      * @return array
      */
     public function criteria()
@@ -190,7 +190,7 @@ class Criteria implements ArrayAccess
 
     /**
      * Get all special criteria
-     * 
+     *
      * @return array
      */
     public function specials()
@@ -213,7 +213,7 @@ class Criteria implements ArrayAccess
 
     /**
      * Get attribute order type
-     * 
+     *
      * @param string $attribute
      * @return string|null  Returns attribute order type. Null if not found
      */
@@ -226,7 +226,7 @@ class Criteria implements ArrayAccess
 
     /**
      * Set/Get page number
-     * 
+     *
      * @param int $page
      * @return int|null
      */
@@ -237,13 +237,13 @@ class Criteria implements ArrayAccess
                 ? $this->specials[':limitPage'][0]
                 : 0;
         }
-        
+
         $this->specials[':limitPage'][0] = $page;
     }
 
     /**
      * Set/Get the max number of rows in a page
-     * 
+     *
      * @param int $maxRows
      * @return int|null
      */
@@ -254,13 +254,13 @@ class Criteria implements ArrayAccess
                 ? $this->specials[':limitPage'][1]
                 : 0;
         }
-        
+
         $this->specials[':limitPage'][1] = $maxRows;
     }
 
     /**
      * Set/Get SQL max results
-     * 
+     *
      * @param int $maxResults
      * @return int|null
      */
@@ -271,13 +271,13 @@ class Criteria implements ArrayAccess
                 ? $this->specials[':limit']
                 : 0;
         }
-        
+
         $this->specials[':limit'] = $maxResults;
     }
 
     /**
      * Set/Get SQL offset
-     * 
+     *
      * @param int $firstResult
      * @return int|null
      */
@@ -288,10 +288,10 @@ class Criteria implements ArrayAccess
                 ? $this->specials[':offset']
                 : 0;
         }
-        
+
         $this->specials[':offset'] = $firstResult;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -299,7 +299,7 @@ class Criteria implements ArrayAccess
     {
         $this->add($offset, $value);
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -308,7 +308,7 @@ class Criteria implements ArrayAccess
     {
         return $this->get($offset);
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -316,7 +316,7 @@ class Criteria implements ArrayAccess
     {
         return $this->exists($offset);
     }
-    
+
     /**
      * {@inheritdoc}
      */

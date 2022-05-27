@@ -24,13 +24,14 @@ class RedoCommand extends AbstractCommand
         $this
             ->setDescription('Redo a specific migration')
             ->addArgument('version', InputArgument::REQUIRED, 'The version number for the migration')
-            ->setHelp(<<<EOT
+            ->setHelp(
+                <<<EOT
 The <info>redo</info> command redo a specific migration
 
 <info>redo 20111018185412</info>
 
 EOT
-        );
+            );
     }
 
     /**

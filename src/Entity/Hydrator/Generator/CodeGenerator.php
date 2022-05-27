@@ -69,7 +69,9 @@ class CodeGenerator
      */
     public function simpleConstructor($properties)
     {
-        $parameters = implode(', ', array_map(function ($p) { return '$'.$p; }, $properties));
+        $parameters = implode(', ', array_map(function ($p) {
+            return '$'.$p;
+        }, $properties));
         $content = '';
 
         foreach ($properties as $property) {
@@ -144,7 +146,6 @@ if ({$varName} instanceof {$className}) {
 {$this->indent($code, 1)}
 }
 PHP;
-
         }
 
         return implode(' else', $out);

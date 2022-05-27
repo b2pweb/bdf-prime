@@ -58,10 +58,10 @@ class Graphviz extends AbstractVisitor
     {
         $this->output .= $this->createNode(
             $table->getName(),
-            array(
+            [
                 'label' => $this->createTableLabel($table),
                 'shape' => 'plaintext',
-            )
+            ]
         );
     }
 

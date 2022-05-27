@@ -32,7 +32,7 @@ class ByInheritance extends AbstractRelation
 
     /**
      * Set inheritance relation
-     * 
+     *
      * @param string $attributeAim
      * @param RepositoryInterface<L> $local
      * @param string $localKey
@@ -44,7 +44,7 @@ class ByInheritance extends AbstractRelation
         $this->localKey = $localKey;
 
         $mapper = $local->mapper();
-        
+
         if (!$mapper instanceof SingleTableInheritanceMapper) {
             throw new LogicException('The mapper could not manage single table inheritance relation');
         }
@@ -208,7 +208,7 @@ class ByInheritance extends AbstractRelation
             ->relation($this->attributeAim);
 
         // TODO doit on redescendre les options sur la relation ?
-        
+
         return $relation;
     }
 
@@ -221,7 +221,6 @@ class ByInheritance extends AbstractRelation
      */
     protected function relations($keys, $with, $constraints, $without): void
     {
-
     }
 
     /**
@@ -233,7 +232,6 @@ class ByInheritance extends AbstractRelation
      */
     protected function match($collection, $relations): void
     {
-
     }
 
     /**

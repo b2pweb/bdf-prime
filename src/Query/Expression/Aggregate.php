@@ -71,7 +71,7 @@ abstract class Aggregate implements ExpressionInterface
      */
     public static function min(string $attribute): self
     {
-        return new class($attribute) extends Aggregate {
+        return new class ($attribute) extends Aggregate {
             protected function expression(AbstractPlatform $platform, string $attribute): string
             {
                 return $platform->getMinExpression($attribute);
@@ -88,7 +88,7 @@ abstract class Aggregate implements ExpressionInterface
      */
     public static function max(string $attribute): self
     {
-        return new class($attribute) extends Aggregate {
+        return new class ($attribute) extends Aggregate {
             protected function expression(AbstractPlatform $platform, string $attribute): string
             {
                 return $platform->getMaxExpression($attribute);
@@ -105,7 +105,7 @@ abstract class Aggregate implements ExpressionInterface
      */
     public static function avg(string $attribute): self
     {
-        return new class($attribute) extends Aggregate {
+        return new class ($attribute) extends Aggregate {
             protected function expression(AbstractPlatform $platform, string $attribute): string
             {
                 return $platform->getAvgExpression($attribute);
@@ -122,7 +122,7 @@ abstract class Aggregate implements ExpressionInterface
      */
     public static function count(string $attribute): self
     {
-        return new class($attribute) extends Aggregate {
+        return new class ($attribute) extends Aggregate {
             protected function expression(AbstractPlatform $platform, string $attribute): string
             {
                 return $platform->getCountExpression($attribute);
@@ -139,7 +139,7 @@ abstract class Aggregate implements ExpressionInterface
      */
     public static function sum(string $attribute): self
     {
-        return new class($attribute) extends Aggregate {
+        return new class ($attribute) extends Aggregate {
             protected function expression(AbstractPlatform $platform, string $attribute): string
             {
                 return $platform->getSumExpression($attribute);

@@ -7,9 +7,9 @@ use Bdf\Prime\Query\Compiler\CompilerInterface;
 
 /**
  * SQL Expression
- * 
+ *
  * inject sql expression into query builder
- * 
+ *
  * @package Bdf\Prime\Query\Expression
  */
 class Raw implements ExpressionInterface
@@ -21,7 +21,7 @@ class Raw implements ExpressionInterface
 
     /**
      * Instanciate a new raw sql
-     * 
+     *
      * @param mixed $value
      */
     public function __construct($value)
@@ -31,14 +31,14 @@ class Raw implements ExpressionInterface
 
     /**
      * Get raw string
-     * 
+     *
      * @return string
      */
     public function __toString()
     {
         return (string)$this->value;
     }
-    
+
     /**
      * {@inheritdoc}
      */

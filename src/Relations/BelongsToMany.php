@@ -73,7 +73,7 @@ class BelongsToMany extends Relation
      * @var array
      */
     protected $allConstraints = [];
-    
+
     /**
      * {@inheritdoc}
      */
@@ -401,7 +401,7 @@ class BelongsToMany extends Relation
         if ($this->saveStrategy === self::SAVE_STRATEGY_REPLACE) {
             $this->throughQuery($this->getLocalKeyValue($owner))->delete();
         }
-        
+
         // Attach new relations
         return $this->attach($owner, $this->getRelation($owner));
     }

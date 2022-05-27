@@ -11,9 +11,9 @@ use InvalidArgumentException;
 
 /**
  * OneOrMany
- * 
+ *
  * @package Bdf\Prime\Relations
- * 
+ *
  * @todo possibilité de désactiver les constraints globales
  *
  * @template L as object
@@ -99,7 +99,7 @@ abstract class OneOrMany extends Relation
             }
         }
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -107,7 +107,7 @@ abstract class OneOrMany extends Relation
     {
         return $this->query($this->getLocalKeyValue($owner));
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -126,7 +126,7 @@ abstract class OneOrMany extends Relation
 
         return $owner;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -139,14 +139,14 @@ abstract class OneOrMany extends Relation
         if ($this->isPolymorphic()) {
             $this->discriminatorValue = null;
         }
-        
+
         // TODO Dont update key if it is embedded in the relation object
         $this->setForeignKeyValue($owner, null);
         $this->setRelation($owner, null);
 
         return $owner;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -189,9 +189,9 @@ abstract class OneOrMany extends Relation
         if (empty($entities)) {
             return 0;
         }
-        
+
         $id = $this->getLocalKeyValue($owner);
-        
+
         //Detach all relations
         if ($this->saveStrategy === self::SAVE_STRATEGY_REPLACE) {
             $this->query($id)->delete();
@@ -200,7 +200,7 @@ abstract class OneOrMany extends Relation
         if (!is_array($entities)) {
             $entities = [$entities];
         }
-        
+
         // Save new relations
         $nb = 0;
 
@@ -223,11 +223,11 @@ abstract class OneOrMany extends Relation
         if (empty($entities)) {
             return 0;
         }
-        
+
         if (!is_array($entities)) {
             $entities = [$entities];
         }
-        
+
         $nb = 0;
 
         foreach ($entities as $entity) {

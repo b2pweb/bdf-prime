@@ -51,8 +51,12 @@ trait CachableTrait
     {
         if ($this->cacheKey === null) {
             $this->cacheKey = new CacheKey(
-                function () { return $this->cacheNamespace(); },
-                $key ?? function () { return $this->cacheKey(); },
+                function () {
+                    return $this->cacheNamespace();
+                },
+                $key ?? function () {
+                    return $this->cacheKey();
+                },
                 $lifetime
             );
 

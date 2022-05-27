@@ -48,7 +48,7 @@ class Instantiator implements InstantiatorInterface
     public function instantiate($className, $hint = null)
     {
         if ($hint === self::USE_CONSTRUCTOR_HINT) {
-            return new $className;
+            return new $className();
         }
 
         /** @var T $object */

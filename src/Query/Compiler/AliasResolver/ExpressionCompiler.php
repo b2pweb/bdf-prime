@@ -117,12 +117,12 @@ use Bdf\Prime\Exception\QueryBuildingException;
  */
 class ExpressionCompiler
 {
-    const DYN_SEPARATOR    = '.';
-    const ATTR_IDENTIFIER  = '>';
-    const STA_IDENTIFIER   = '"';
-    const ALIAS_IDENTIFIER = '$';
+    public const DYN_SEPARATOR    = '.';
+    public const ATTR_IDENTIFIER  = '>';
+    public const STA_IDENTIFIER   = '"';
+    public const ALIAS_IDENTIFIER = '$';
 
-    const RESERVED = [
+    public const RESERVED = [
         self::DYN_SEPARATOR    => true,
         self::ATTR_IDENTIFIER  => true,
         self::STA_IDENTIFIER   => true,
@@ -132,7 +132,7 @@ class ExpressionCompiler
     /**
      * @var static
      */
-    static private $instance;
+    private static $instance;
 
     /**
      * Compile the expression to expression tokens

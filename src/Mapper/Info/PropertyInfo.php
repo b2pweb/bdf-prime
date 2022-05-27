@@ -19,14 +19,14 @@ class PropertyInfo implements InfoInterface
      * @var string
      */
     protected $name;
-    
+
     /**
      * The metadata from the metadata object
      *
      * @var array
      */
     protected $metadata;
-    
+
     /**
      * The metadata from the metadata object
      *
@@ -55,7 +55,7 @@ class PropertyInfo implements InfoInterface
         $this->metadata = $metadata;
         $this->typesRegistry = $typesRegistry;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -63,10 +63,10 @@ class PropertyInfo implements InfoInterface
     {
         return $this->name;
     }
-    
+
     /**
      * Get the property type
-     * 
+     *
      * @return string
      */
     public function type(): string
@@ -85,11 +85,11 @@ class PropertyInfo implements InfoInterface
             ? $this->metadata['field']
             : null;
     }
-    
+
     /**
      * Get the php type of the property
      * Class should have '\' char to be resolved with namespace.
-     * 
+     *
      * @return string
      */
     public function phpType(): string
@@ -106,10 +106,10 @@ class PropertyInfo implements InfoInterface
 
         return $this->typesRegistry->get($type)->phpType();
     }
-    
+
     /**
      * Check whether the property is a primary key
-     * 
+     *
      * @return bool
      */
     public function isPrimary(): bool
@@ -166,7 +166,7 @@ class PropertyInfo implements InfoInterface
 
     /**
      * Check whether the property is a date time object
-     * 
+     *
      * @return bool
      */
     public function isDateTime(): bool
@@ -204,30 +204,30 @@ class PropertyInfo implements InfoInterface
     {
         return $this->phpType() === PhpTypeInterface::TARRAY;
     }
-    
+
     /**
      * Check whether the property has a default value
-     * 
+     *
      * @return bool
      */
     public function hasDefault(): bool
     {
         return $this->getDefault() !== null;
     }
-    
+
     /**
      * Get the default value
-     * 
+     *
      * @return mixed
      */
     public function getDefault()
     {
         return $this->metadata['default'];
     }
-    
+
     /**
      * Get the default value
-     * 
+     *
      * @param mixed $value
      * @param bool  $toPhp
      * @param array $fieldOptions

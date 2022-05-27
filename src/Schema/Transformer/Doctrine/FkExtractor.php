@@ -45,6 +45,5 @@ final class FkExtractor implements ConstraintVisitorInterface
      */
     public function onCheck(CheckInterface $check)
     {
-
     }
 }

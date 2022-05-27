@@ -30,7 +30,7 @@ interface StructureUpgraderInterface
 
     /**
      * Truncate table
-     * 
+     *
      * @param bool $cascade
      *
      * @return bool true on success
@@ -40,7 +40,7 @@ interface StructureUpgraderInterface
 
     /**
      * Drop table and its sequence if exists
-     * 
+     *
      * @return bool true on success
      * @throws PrimeException When drop fail
      */

@@ -1,4 +1,5 @@
 <?php
+
 namespace Bdf\Prime\Query;
 
 use Bdf\Prime\Query\Expression\ExpressionInterface;

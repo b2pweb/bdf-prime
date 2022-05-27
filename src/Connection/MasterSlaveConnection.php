@@ -28,9 +28,9 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
 {
     /**
      * The connection specifically for read operations
-     * 
+     *
      * This connection is used only for the method SimpleConnection#executeQuery
-     * 
+     *
      * @var SimpleConnection
      */
     private $readConnection;
@@ -44,9 +44,9 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
 
     /**
      * Initializes a new instance of the Connection class.
-     * 
+     *
      * Here's a read connection configuration
-     * 
+     *
      * @example
      *
      * $conn = DriverManager::getConnection([
@@ -81,7 +81,7 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
 
     /**
      * Get the read connection
-     * 
+     *
      * @return SimpleConnection
      */
     public function getReadConnection()

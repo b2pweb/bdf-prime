@@ -7,9 +7,9 @@ use Bdf\Prime\Query\Compiler\CompilerInterface;
 
 /**
  * Now
- * 
+ *
  * create the 'now'NOW()" function expression
- * 
+ *
  * @package Bdf\Prime\Query\Expression
  *
  *

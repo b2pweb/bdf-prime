@@ -9,7 +9,7 @@ interface InitializableInterface
 {
     /**
      * Call before constructor
-     * 
+     *
      * Useful if your entity needs some constructor initialization that orm does not call
      */
     public function initialize(): void;

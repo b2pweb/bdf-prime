@@ -8,9 +8,9 @@ use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 
 /**
  * Attribute
- * 
+ *
  * The expression is a mapper attribute
- * 
+ *
  * @package Bdf\Prime\Query\Expression
  *
  * @implements ExpressionInterface<CompilableClause&\Bdf\Prime\Query\Contract\Compilable, QuoteCompilerInterface>
@@ -21,15 +21,15 @@ class Field implements ExpressionInterface
      * @var string
      */
     protected $search;
-    
+
     /**
      * @var array
      */
     protected $values;
-    
+
     /**
      * Constructor
-     * 
+     *
      * @param string $search
      * @param array  $values
      */
@@ -38,20 +38,20 @@ class Field implements ExpressionInterface
         $this->search = $search;
         $this->values = $values;
     }
-    
+
     /**
      * {@inheritdoc}
      *
      * @param QuoteCompilerInterface $compiler
-     * 
+     *
      * @todo gestion de la platform
      */
     public function build(CompilableClause $query, object $compiler)
     {
 //        if ($compiler->platform()->name() === 'mysql') {
-            return 'FIELD('.$compiler->quoteIdentifier($query, $query->preprocessor()->field($this->search)).','.implode(',', $this->values).')';
+        return 'FIELD('.$compiler->quoteIdentifier($query, $query->preprocessor()->field($this->search)).','.implode(',', $this->values).')';
 //        }
-//        
+//
 //        return '';
     }
 }

@@ -30,7 +30,7 @@ interface BehaviorInterface
 
     /**
      * Get behavior constraints
-     * 
+     *
      * @return array
      */
     public function constraints(): array;

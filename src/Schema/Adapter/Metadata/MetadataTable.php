@@ -52,7 +52,7 @@ final class MetadataTable implements TableInterface
      */
     public function columns(): array
     {
-        return array_map(fn($meta) => $this->column($meta['field']), $this->metadata->fields);
+        return array_map(fn ($meta) => $this->column($meta['field']), $this->metadata->fields);
     }
 
     /**

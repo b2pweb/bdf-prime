@@ -9,16 +9,16 @@ interface CacheInterface
 {
     /**
      * Read key from namespace
-     * 
+     *
      * @param CacheKey $key
-     * 
+     *
      * @return mixed|null
      */
     public function get(CacheKey $key);
 
     /**
      * Write data on namespace
-     * 
+     *
      * @param CacheKey $key
      * @param mixed $data
      *
@@ -28,7 +28,7 @@ interface CacheInterface
 
     /**
      * Delete key from namespace
-     * 
+     *
      * @param CacheKey $key
      *
      * @return void
@@ -37,7 +37,7 @@ interface CacheInterface
 
     /**
      * Flush namespace only
-     * 
+     *
      * @param string $namespace
      *
      * @return void

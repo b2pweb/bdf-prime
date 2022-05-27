@@ -70,7 +70,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
 
     /**
      * Specify the autoincrement key for the table.
-     * 
+     *
      * @return $this  This builder instance
      */
     public function autoincrement()
@@ -80,7 +80,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
 
     /**
      * Specify the sequence key(s) for the table.
-     * 
+     *
      * @return $this  This builder instance
      */
     public function sequence()
@@ -90,18 +90,18 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
 
     /**
      * Specify the primary key(s) for the table.
-     * 
+     *
      * @param Metadata::PK_* $type Type of sequence
-     * 
+     *
      * @return $this
      */
     public function primary($type = Metadata::PK_AUTO)
     {
         $this->fields[$this->current]['primary'] = $type;
-        
+
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -334,7 +334,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     public function add(string $name, string $type = TypeInterface::STRING, $default = null)
     {
         $this->current = $name;
-        
+
         $this->fields[$this->current] = [
             'type'      => $type,
             'default'   => $default,
@@ -354,7 +354,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      */
     public function embedded(string $name, string $classname, Closure $resolver)
     {
-        $builder = new static;
+        $builder = new static();
         $resolver($builder);
 
         $this->fields[$name] = [
@@ -664,7 +664,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     }
 
     //---- interator interface
-    
+
     /**
      * {@inheritdoc}
      */
@@ -674,7 +674,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     }
 
     //---- array access interface
-    
+
     /**
      * {@inheritdoc}
      */

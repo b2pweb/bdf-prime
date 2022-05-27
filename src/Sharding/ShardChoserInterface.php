@@ -11,7 +11,7 @@ interface ShardChoserInterface
 {
     /**
      * Picks a shard for the given distribution value.
-     * 
+     *
      * @param V $distributionValue The distribution value
      * @param ShardingConnection $connection The sharding connection
      *

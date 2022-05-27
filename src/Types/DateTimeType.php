@@ -15,8 +15,12 @@ class DateTimeType extends AbstractDateTimeType
      * @param string $className
      * @param \DateTimeZone|null $timezone
      */
-    public function __construct(string $type = self::DATETIME, string $format = \DateTime::ATOM,
-                                string $className = \DateTime::class, \DateTimeZone $timezone = null)
+    public function __construct(
+        string $type = self::DATETIME,
+        string $format = \DateTime::ATOM,
+        string $className = \DateTime::class,
+        \DateTimeZone $timezone = null
+    )
     {
         parent::__construct($type);
 

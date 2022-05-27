@@ -8,9 +8,9 @@ namespace Bdf\Prime\Query\Contract;
 interface Joinable
 {
     // join type
-    const INNER_JOIN = 'INNER';
-    const LEFT_JOIN = 'LEFT';
-    const RIGHT_JOIN = 'RIGHT';
+    public const INNER_JOIN = 'INNER';
+    public const LEFT_JOIN = 'LEFT';
+    public const RIGHT_JOIN = 'RIGHT';
 
     /**
      * Creates and adds a join to the query.

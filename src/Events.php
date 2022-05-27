@@ -7,17 +7,17 @@ namespace Bdf\Prime;
  */
 class Events
 {
-    const POST_LOAD = 'afterLoad';
-    
-    const PRE_SAVE = 'beforeSave';
-    const POST_SAVE = 'afterSave';
+    public const POST_LOAD = 'afterLoad';
 
-    const PRE_INSERT = 'beforeInsert';
-    const POST_INSERT = 'afterInsert';
-    
-    const PRE_UPDATE = 'beforeUpdate';
-    const POST_UPDATE = 'afterUpdate';
-    
-    const PRE_DELETE = 'beforeDelete';
-    const POST_DELETE = 'afterDelete';
+    public const PRE_SAVE = 'beforeSave';
+    public const POST_SAVE = 'afterSave';
+
+    public const PRE_INSERT = 'beforeInsert';
+    public const POST_INSERT = 'afterInsert';
+
+    public const PRE_UPDATE = 'beforeUpdate';
+    public const POST_UPDATE = 'afterUpdate';
+
+    public const PRE_DELETE = 'beforeDelete';
+    public const POST_DELETE = 'afterDelete';
 }

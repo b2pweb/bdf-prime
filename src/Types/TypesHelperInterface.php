@@ -4,7 +4,6 @@ namespace Bdf\Prime\Types;
 
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
 
-
 /**
  * Interface for build typed fields
  *

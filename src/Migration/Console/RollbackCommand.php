@@ -27,14 +27,15 @@ class RollbackCommand extends AbstractCommand
             ->setDescription('Rollback last, or to a specific migration')
             ->addOption('--target', '-t', InputArgument::OPTIONAL, 'The version number to rollback to')
             ->addOption('stage', 's', InputOption::VALUE_REQUIRED, 'The migration stage', MigrationInterface::STAGE_DEFAULT)
-            ->setHelp(<<<EOT
+            ->setHelp(
+                <<<EOT
 The <info>rollback</info> command reverts the last migration, or optionally up to a specific version
 
 <info>rollback</info>
 <info>rollback -t 20111018185412</info>
 
 EOT
-        );
+            );
     }
 
     /**

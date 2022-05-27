@@ -10,5 +10,4 @@ use RuntimeException;
  */
 class RelationNotFoundException extends RuntimeException implements PrimeException
 {
-
 }

@@ -7,7 +7,7 @@ namespace Bdf\Prime\Connection\Event;
  */
 interface ConnectionClosedListenerInterface
 {
-    const EVENT_NAME = 'onConnectionClosed';
+    public const EVENT_NAME = 'onConnectionClosed';
 
     /**
      * The connection is closed

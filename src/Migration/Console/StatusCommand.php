@@ -25,13 +25,14 @@ class StatusCommand extends AbstractCommand
         $this
             ->setDescription('Show the up/down status of all migrations')
             ->addOption('stage', 's', InputOption::VALUE_OPTIONAL, 'The migration stage. If not set, all stages will be dumped')
-            ->setHelp(<<<EOT
+            ->setHelp(
+                <<<EOT
 The <info>status</info> command prints a list of all migrations, along with their current status 
 
 <info>status</info>
 
 EOT
-        );
+            );
     }
 
     /**

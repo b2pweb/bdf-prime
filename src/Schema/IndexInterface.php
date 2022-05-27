@@ -7,9 +7,9 @@ namespace Bdf\Prime\Schema;
  */
 interface IndexInterface
 {
-    const TYPE_SIMPLE  = 0;
-    const TYPE_UNIQUE  = 1;
-    const TYPE_PRIMARY = 3; // 3 = 2|1
+    public const TYPE_SIMPLE  = 0;
+    public const TYPE_UNIQUE  = 1;
+    public const TYPE_PRIMARY = 3; // 3 = 2|1
 
     /**
      * Get the index name

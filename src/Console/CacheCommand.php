@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Cache command
- * 
+ *
  * permet de manipuler le cache de result query et de metadata
  */
 class CacheCommand extends Command
@@ -44,7 +44,7 @@ class CacheCommand extends Command
             ->addOption('clear', 'c', InputOption::VALUE_NONE, 'Clear all cache')
         ;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -62,7 +62,7 @@ class CacheCommand extends Command
             }
 
             $output->writeln("<comment>loading $name</comment>");
-            
+
             if ($input->getOption('clear')) {
                 $output->writeln("Clearing $name...");
                 $cache->clear();

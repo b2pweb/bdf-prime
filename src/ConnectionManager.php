@@ -10,7 +10,7 @@ use LogicException;
 
 /**
  * ConnectionManager
- * 
+ *
  * doctrine dbal connection registry
  */
 class ConnectionManager implements ConnectionRegistryInterface
@@ -31,7 +31,7 @@ class ConnectionManager implements ConnectionRegistryInterface
 
     /**
      * Default connection to use
-     * 
+     *
      * @var string|null
      */
     private $defaultConnection;
@@ -84,7 +84,7 @@ class ConnectionManager implements ConnectionRegistryInterface
         if (!isset($this->connections[$name])) {
             return;
         }
-        
+
         $this->connections[$name]->close();
         unset($this->connections[$name]);
     }
@@ -176,7 +176,7 @@ class ConnectionManager implements ConnectionRegistryInterface
      * Works only if connection "name" is a SubConnectionManagerInterface.
      *
      * @param string $connectionName
-     * 
+     *
      * @return bool  The connection has been loaded
      */
     private function loadSubConnection(string $connectionName): bool

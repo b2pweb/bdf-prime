@@ -19,7 +19,7 @@ class EmptyPaginator extends Paginator
     {
         $this->collection = new ArrayCollection();
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -27,7 +27,7 @@ class EmptyPaginator extends Paginator
     {
         return 0;
     }
-    
+
     /**
      * {@inheritdoc}
      */

@@ -98,16 +98,16 @@ class DefaultQueryFactory implements QueryFactoryInterface
      */
     public function compiler(string $query): object
     {
-         if (!isset($this->compilers[$query])) {
-             return $this->defaultCompiler;
-         }
+        if (!isset($this->compilers[$query])) {
+            return $this->defaultCompiler;
+        }
 
-         $compiler = $this->compilers[$query];
+        $compiler = $this->compilers[$query];
 
-         if (is_string($compiler)) {
-             return $this->compilers[$query] = new $compiler($this->connection);
-         }
+        if (is_string($compiler)) {
+            return $this->compilers[$query] = new $compiler($this->connection);
+        }
 
-         return $compiler;
+        return $compiler;
     }
 }

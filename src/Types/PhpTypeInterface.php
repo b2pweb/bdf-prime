@@ -9,13 +9,13 @@ namespace Bdf\Prime\Types;
  */
 interface PhpTypeInterface
 {
-    const OBJECT = '\stdClass';
-    const DATETIME = '\DateTime';
-    const DATETIME_IMMUTABLE = '\DateTimeImmutable';
-    const TARRAY = 'array';
+    public const OBJECT = '\stdClass';
+    public const DATETIME = '\DateTime';
+    public const DATETIME_IMMUTABLE = '\DateTimeImmutable';
+    public const TARRAY = 'array';
 
-    const BOOLEAN = 'boolean';
-    const INTEGER = 'integer';
-    const DOUBLE = 'double';
-    const STRING = 'string';
+    public const BOOLEAN = 'boolean';
+    public const INTEGER = 'integer';
+    public const DOUBLE = 'double';
+    public const STRING = 'string';
 }

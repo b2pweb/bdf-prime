@@ -34,7 +34,7 @@ use IteratorAggregate;
  */
 class RelationBuilder implements ArrayAccess, IteratorAggregate
 {
-    const MODE_EAGER = "EAGER";
+    public const MODE_EAGER = "EAGER";
 
     /**
      * Array of relations definition
@@ -65,16 +65,16 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      * Specify the property to mark relation
      *
      * @param string $property      The property owner of the relation
-     * 
+     *
      * @return $this
      */
     public function on($property)
     {
         $this->current = $property;
-        
+
         return $this;
     }
-    
+
     /**
      * Add a "belongs to" relation
      *
@@ -83,7 +83,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      * // or
      * $builder->on('customer')->belongsTo('Customer::id', 'customer.id');
      * </code>
-     * 
+     *
      * @param string $entity Class of the foreign entity
      * @param string $key Owner's property name for the foreign key
      *
@@ -98,7 +98,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
             'distantKey' => $primaryKey,
         ]);
     }
-    
+
     /**
      * Add a "has one" relation
      *
@@ -107,7 +107,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      * // or
      * $builder->on('contact')->hasOne('Contact::distantId', 'localId');
      * </code>
-     * 
+     *
      * @param string $entity        Class of the foreign entity
      * @param string $key           Owner's property name for the foreign key
      *
@@ -122,7 +122,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
             'distantKey' => $foreignKey,
         ]);
     }
-    
+
     /**
      * Add a "has many" relation
      *
@@ -131,7 +131,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      * // or
      * $builder->on('documents')->hasMany('Document::distantId', 'localId');
      * </code>
-     * 
+     *
      * @param string $entity Class of the foreign entity
      * @param string $key Owner's property name for the foreign key
      *
@@ -146,7 +146,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
             'distantKey'  => $foreignKey,
         ]);
     }
-    
+
     /**
      * Add a "belongs to many" relation
      *
@@ -157,7 +157,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      * // or
      * $builder->on('packs')->belongsToMany('Pack::id', 'localId');
      * </code>
-     * 
+     *
      * @param string $entity Class of the foreign entity
      * @param string $key Owner's property name for the foreign key
      *
@@ -217,7 +217,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
 
         return $this->map($discriminator, $map);
     }
-    
+
     /**
      * Add a "morph one" relation
      *
@@ -266,7 +266,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      * Add a "by inheritance" relation
      *
      * @param string $key  Owner's property name for the foreign key
-     * 
+     *
      * @return $this
      */
     public function inherit($key)
@@ -350,7 +350,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
 
         return $this;
     }
-    
+
     /**
      * Add a relation
      *
@@ -363,13 +363,13 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     protected function add($type, $key, array $options = [])
     {
         $this->relations[$this->current] = ['type' => $type, 'localKey' => $key] + $options;
-        
+
         return $this;
     }
 
     /**
      * Add a polymorph map.
-     * 
+     *
      * Only for belongs to relation
      *
      * @param string $discriminator     Polymorphism discriminator
@@ -381,13 +381,13 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     {
         $this->relations[$this->current]['discriminator'] = $discriminator;
         $this->relations[$this->current]['map'] = $map;
-        
+
         return $this;
     }
-    
+
     /**
      * Add a morph value.
-     * 
+     *
      * Only for Has* relation
      *
      * <code>
@@ -406,7 +406,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
 
         return $this;
     }
-    
+
     /**
      * Add constraints on relation
      *
@@ -414,7 +414,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      * // only where customer.enabled = true
      * $builder->on('customer')->constraints(['enabled' => true]);
      * </code>
-     * 
+     *
      * @param array|\Closure $constraints   The globale constraints for this relation
      *
      * @return $this
@@ -422,19 +422,19 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     public function constraints($constraints)
     {
         $this->relations[$this->current]['constraints'] = $constraints;
-        
+
         return $this;
     }
-    
+
     /**
      * Tag the relation as detached
-     * 
+     *
      * Is the property embedded in the owner class
-     * 
+     *
      * <code>
      * $builder->on('customer')->detached();
      * </code>
-     * 
+     *
      * @param bool $flag
      *
      * @return $this
@@ -442,7 +442,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     public function detached($flag = true)
     {
         $this->relations[$this->current]['detached'] = $flag;
-        
+
         return $this;
     }
 
@@ -491,7 +491,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     }
 
     //---- iterator interface
-    
+
     /**
      * {@inheritdoc}
      */
@@ -499,9 +499,9 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     {
         return new \ArrayIterator($this->relations);
     }
-    
+
     //---- array access interface
-    
+
     /**
      * {@inheritdoc}
      */

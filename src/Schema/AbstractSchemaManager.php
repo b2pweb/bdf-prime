@@ -97,7 +97,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
             new TableBuilder($tableName),
             $this->platform->types()
         );
-        
+
         $callback($table);
 
         return $this->add($table->build());

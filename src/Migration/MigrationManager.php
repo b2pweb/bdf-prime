@@ -15,8 +15,8 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 class MigrationManager
 {
-    const UP = 'up';
-    const DOWN = 'down';
+    public const UP = 'up';
+    public const DOWN = 'down';
 
     /**
      * The upgraded migration repository
@@ -112,7 +112,7 @@ class MigrationManager
             return $migrations;
         }
 
-        return array_filter($migrations, function(MigrationInterface $migration) use($stage) {
+        return array_filter($migrations, function (MigrationInterface $migration) use ($stage) {
             return $migration->stage() === $stage;
         });
     }

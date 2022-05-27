@@ -93,7 +93,7 @@ final class DoctrineTable implements TableInterface
     {
         return new IndexSet(
             array_map(
-                static fn($index) => new DoctrineIndex($index),
+                static fn ($index) => new DoctrineIndex($index),
                 $this->table->getIndexes()
             )
         );
@@ -106,7 +106,7 @@ final class DoctrineTable implements TableInterface
     {
         return new ConstraintSet(
             array_map(
-                static fn($fk) => new DoctrineForeignKey($fk),
+                static fn ($fk) => new DoctrineForeignKey($fk),
                 $this->table->getForeignKeys()
             )
         );
