@@ -26,7 +26,7 @@ abstract class PrimeSerializable extends Locatorizable
      *
      * @param array $normalized
      *
-     * @return static
+     * @return mixed
      */
     public static function fromArray(array $normalized)
     {
@@ -50,7 +50,7 @@ abstract class PrimeSerializable extends Locatorizable
      *
      * @param string $json
      *
-     * @return static
+     * @return mixed
      */
     public static function fromJson($json)
     {
