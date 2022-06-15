@@ -52,6 +52,54 @@ class AutoIncrementGeneratorTest extends TestCase
 
         $this->assertTrue(empty($data['id']));
         $this->assertMatchesRegularExpression('/[\d]+/', $entity->id);
+        $this->assertIsString($entity->id);
+    }
+
+    /**
+     *
+     */
+    public function test_generation_id_with_int_field_should_be_converted()
+    {
+        $this->pack()->declareEntity(AutoIncrementUserWithInt::class);
+
+        $service = Prime::service();
+        $entity = new AutoIncrementUserWithInt();
+        $data = ['name' => 'test'];
+
+        $generator = new AutoIncrementGenerator($service->repository($entity)->mapper());
+        $generator->setCurrentConnection($service->connection('test'));
+        $generator->generate($data, $service);
+
+        $service->repository($entity)->builder()->insert($data);
+
+        $generator->postProcess($entity);
+
+        $this->assertTrue(empty($data['id']));
+        $this->assertIsInt($entity->id);
+    }
+
+    /**
+     *
+     */
+    public function test_generation_id_with_int_ignore_generator_field_should_not_be_converted()
+    {
+        $this->pack()->declareEntity(AutoIncrementUserWithIntIgnoreGenerator::class);
+
+        $service = Prime::service();
+        $entity = new AutoIncrementUserWithIntIgnoreGenerator();
+        $data = ['name' => 'test'];
+
+        $generator = new AutoIncrementGenerator($service->repository($entity)->mapper());
+        $generator->setCurrentConnection($service->connection('test'));
+        $generator->generate($data, $service);
+
+        $service->repository($entity)->builder()->insert($data);
+
+        $generator->postProcess($entity);
+
+        $this->assertTrue(empty($data['id']));
+        $this->assertMatchesRegularExpression('/[\d]+/', $entity->id);
+        $this->assertIsString($entity->id);
     }
 
     /**
@@ -105,6 +153,67 @@ class AutoIncrementUserMapper extends Mapper
     {
         $builder
             ->bigint('id')->autoincrement()
+            ->string('name')
+        ;
+    }
+}
+
+class AutoIncrementUserWithInt
+{
+    public $id;
+    public $name;
+}
+
+class AutoIncrementUserWithIntMapper extends Mapper
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function schema(): array
+    {
+        return [
+            'connection' => 'test',
+            'table'      => 'auto_user_int',
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildFields($builder): void
+    {
+        $builder
+            ->integer('id')->autoincrement()
+            ->string('name')
+        ;
+    }
+}
+class AutoIncrementUserWithIntIgnoreGenerator
+{
+    public $id;
+    public $name;
+}
+
+class AutoIncrementUserWithIntIgnoreGeneratorMapper extends Mapper
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function schema(): array
+    {
+        return [
+            'connection' => 'test',
+            'table'      => 'auto_user_int_ignore',
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildFields($builder): void
+    {
+        $builder
+            ->integer('id')->autoincrement()->phpOptions('ignore_generator', true)
             ->string('name')
         ;
     }

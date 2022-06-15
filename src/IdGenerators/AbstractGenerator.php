@@ -119,9 +119,19 @@ abstract class AbstractGenerator implements GeneratorInterface
      */
     public function postProcess($entity): void
     {
-        if ($this->hasBeenErased) {
-            $this->mapper->hydrateOne($entity, $this->getPropertyToHydrate(), $this->lastGeneratedId());
+        if (!$this->hasBeenErased) {
+            return;
         }
+
+        $propertyName = $this->getPropertyToHydrate();
+        $propertyMetadata = $this->mapper->metadata()->attributes[$propertyName];
+        $value = $this->lastGeneratedId();
+
+        if (empty($propertyMetadata['phpOptions']['ignore_generator'])) {
+            $value = $this->connection->fromDatabase($value, $propertyMetadata['type'], $propertyMetadata['phpOptions'] ?? []);
+        }
+
+        $this->mapper->hydrateOne($entity, $propertyName, $value);
     }
 
     /**
