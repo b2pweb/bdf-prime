@@ -83,6 +83,5 @@ class DefaultPreprocessor implements PreprocessorInterface
      */
     public function clear(): void
     {
-
     }
 }

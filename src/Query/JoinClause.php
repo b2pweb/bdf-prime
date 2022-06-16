@@ -6,7 +6,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 /**
  * JoinClause
- * 
+ *
  * @package Bdf\Prime\Query
  */
 class JoinClause extends Clause
@@ -26,7 +26,7 @@ class JoinClause extends Clause
      * @param  \Closure|string  $key
      * @param  string|null      $operator
      * @param  string|null      $foreign
-     * 
+     *
      * @return $this
      */
     public function on($key, $operator = null, $foreign = null)
@@ -46,7 +46,7 @@ class JoinClause extends Clause
      * @param  \Closure|string  $key
      * @param  string|null      $operator
      * @param  string|null      $foreign
-     * 
+     *
      * @return $this
      */
     public function orOn($key, $operator = null, $foreign = null)
@@ -137,20 +137,20 @@ class JoinClause extends Clause
 
     /**
      * Add on nested
-     * 
+     *
      * @param \Closure $callback
      * @param string   $type
-     * 
+     *
      * @return $this This Query instance.
      */
     public function nested(\Closure $callback, $type = CompositeExpression::TYPE_AND)
     {
         return $this->buildNested('on', $callback, $type);
     }
-    
+
     /**
      * Get the on statement
-     * 
+     *
      * @return array
      */
     public function clauses()

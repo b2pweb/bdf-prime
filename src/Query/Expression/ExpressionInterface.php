@@ -7,9 +7,9 @@ use Bdf\Prime\Query\CompilableClause;
 
 /**
  * SQL Expression
- * 
+ *
  * inject sql expression into query builder
- * 
+ *
  * @package Bdf\Prime\Query\Expression
  *
  * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\Contract\Compilable

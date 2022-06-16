@@ -9,7 +9,7 @@ use Doctrine\Instantiator\InstantiatorInterface as BaseInstantiatorInterface;
  */
 interface InstantiatorInterface extends BaseInstantiatorInterface
 {
-    const USE_CONSTRUCTOR_HINT = 1;
+    public const USE_CONSTRUCTOR_HINT = 1;
 
     /**
      * {@inheritdoc}

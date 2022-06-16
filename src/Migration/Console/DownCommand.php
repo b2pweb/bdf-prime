@@ -24,13 +24,14 @@ class DownCommand extends AbstractCommand
         $this
             ->setDescription('Revert a specific migration')
             ->addArgument('version', InputArgument::REQUIRED, 'The version number for the migration')
-            ->setHelp(<<<EOT
+            ->setHelp(
+                <<<EOT
 The <info>down</info> command reverts a specific migration
 
 <info>down 20111018185412</info>
 
 EOT
-        );
+            );
     }
 
     /**

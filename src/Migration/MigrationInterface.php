@@ -7,8 +7,8 @@ namespace Bdf\Prime\Migration;
  */
 interface MigrationInterface
 {
-    const STAGE_DEFAULT = 'default';
-    const STAGE_PREPARE = 'prepare';
+    public const STAGE_DEFAULT = 'default';
+    public const STAGE_PREPARE = 'prepare';
 
     /**
      * Get migration name

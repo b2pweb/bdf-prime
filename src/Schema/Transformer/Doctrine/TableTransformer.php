@@ -54,11 +54,11 @@ final class TableTransformer
         return new Table(
             $this->table->name(),
             array_map(
-                fn(ColumnInterface $column) => (new ColumnTransformer($column, $this->platform))->toDoctrine(),
+                fn (ColumnInterface $column) => (new ColumnTransformer($column, $this->platform))->toDoctrine(),
                 $this->table->columns()
             ),
             array_map(
-                fn(IndexInterface $index) => (new IndexTransformer($index))->toDoctrine(),
+                fn (IndexInterface $index) => (new IndexTransformer($index))->toDoctrine(),
                 $this->table->indexes()->all()
             ),
             [],

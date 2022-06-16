@@ -7,7 +7,7 @@ namespace Bdf\Prime\Relations\Info;
  */
 final class NullRelationInfo implements RelationInfoInterface
 {
-    static private $instance;
+    private static $instance;
 
     /**
      * {@inheritdoc}
@@ -36,8 +36,8 @@ final class NullRelationInfo implements RelationInfoInterface
      */
     public static function instance(): self
     {
-        if (self::$instance === null)  {
-            return self::$instance = new self;
+        if (self::$instance === null) {
+            return self::$instance = new self();
         }
 
         return self::$instance;

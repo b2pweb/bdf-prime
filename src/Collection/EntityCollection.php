@@ -188,7 +188,7 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
     {
         $relations = Relation::sanitizeRelations((array)$relations);
 
-        return $this->repository->transaction(function(RepositoryInterface $repository) use($relations) {
+        return $this->repository->transaction(function (RepositoryInterface $repository) use ($relations) {
             $nb = 0;
 
             foreach ($this as $entity) {
@@ -217,7 +217,7 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
     {
         $relations = Relation::sanitizeRelations((array)$relations);
 
-        return $this->repository->transaction(function(RepositoryInterface $repository) use($relations) {
+        return $this->repository->transaction(function (RepositoryInterface $repository) use ($relations) {
             $nb = 0;
 
             foreach ($this as $entity) {

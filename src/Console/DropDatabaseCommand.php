@@ -6,7 +6,7 @@ use Bdf\Prime\Connection\ConnectionInterface;
 use Symfony\Component\Console\Input\InputOption;
 
 /**
- * 
+ *
  */
 class DropDatabaseCommand extends DatabaseCommand
 {

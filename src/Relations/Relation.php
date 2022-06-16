@@ -27,8 +27,8 @@ abstract class Relation extends AbstractRelation
     use ForeignKeyRelation;
 
     // save strategies
-    const SAVE_STRATEGY_REPLACE = 1;
-    const SAVE_STRATEGY_ADD = 2;
+    public const SAVE_STRATEGY_REPLACE = 1;
+    public const SAVE_STRATEGY_ADD = 2;
 
     /**
      * The save cascade strategy. See constance SAVE_STRATEGY_*

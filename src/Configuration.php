@@ -20,7 +20,7 @@ class Configuration extends BaseConfiguration
 
     /**
      * Set configuration
-     * 
+     *
      * @param array $options
      */
     public function __construct(array $options = [])

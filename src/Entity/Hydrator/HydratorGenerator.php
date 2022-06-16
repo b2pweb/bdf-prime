@@ -296,7 +296,6 @@ PHP;
 
 {$this->code->switchIntanceOf($varName, $hydrators)}
 PHP;
-
     }
 
     /**
@@ -351,7 +350,6 @@ if (empty(\$attributes)) {
 {$this->code->indent($this->generateExtractSelected(), 1)}
 }
 PHP;
-
     }
 
     /**
@@ -406,7 +404,6 @@ try {
     // Ignore not initialized properties
 }
 PHP;
-
             }
 
             $extracts .= <<<PHP
@@ -773,7 +770,6 @@ PHP;
             <<<PHP
 throw new \Bdf\Prime\Entity\Hydrator\Exception\FieldNotDeclaredException('{$this->className}', \$attribute);
 PHP
-
         );
     }
 
@@ -807,7 +803,6 @@ try {
     throw new \Bdf\Prime\Entity\Hydrator\Exception\InvalidTypeException(\$e, '{$attribute->type()}');
 }
 PHP;
-
     }
 
     /**

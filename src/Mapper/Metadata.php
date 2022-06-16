@@ -9,7 +9,7 @@ use stdClass;
 
 /**
  * Metadata
- * 
+ *
  * @todo gerer le nom de la base de données si non fourni
  * @todo exception si aucune primary ou unique n'a été définit ?
  * @todo doit on injecter si private ??
@@ -60,10 +60,10 @@ use stdClass;
 class Metadata
 {
     /* constantes définissant le type de primary key */
-    const PK_AUTOINCREMENT = 'autoincrement';
-    const PK_AUTO = true;
-    const PK_SEQUENCE = 'sequence';
-    
+    public const PK_AUTOINCREMENT = 'autoincrement';
+    public const PK_AUTO = true;
+    public const PK_SEQUENCE = 'sequence';
+
     /**
      * The expected entity classname
      *
@@ -99,22 +99,22 @@ class Metadata
      * @var string
      */
     public $connection;
-    
+
     /**
      * @var string|null
      */
     public $database;
-    
+
     /**
      * @var string
      */
     public $table;
-    
+
     /**
      * @var boolean
      */
     public $useQuoteIdentifier;
-    
+
     /**
      * @var array<string, string>
      */
@@ -178,7 +178,7 @@ class Metadata
      * @var array<string, EmbeddedMetadata>
      */
     public $embeddeds = [];
-    
+
     /**
      * @var array{
      *     type: Metadata::PK_*,
@@ -194,14 +194,14 @@ class Metadata
 
     /**
      * The repository global constraints
-     * 
+     *
      * @var array
      */
     public $constraints = [];
-    
+
     /**
      * Flag indiquant que le meta a déjà été construit
-     * 
+     *
      * @var bool
      */
     protected $built = false;
@@ -212,10 +212,10 @@ class Metadata
      * @var array
      */
     public $eagerRelations = [];
-    
+
     /**
      * Get entity class name
-     * 
+     *
      * @return class-string
      */
     public function getEntityClass(): string
@@ -225,74 +225,74 @@ class Metadata
 
     /**
      * Is metadata built
-     * 
+     *
      * @return bool
      */
     public function isBuilt(): bool
     {
         return $this->built;
     }
-    
+
     /**
      * Get connection identifier from locator
-     * 
+     *
      * @return string|null
      */
     public function connection(): ?string
     {
         return $this->connection;
     }
-    
+
     /**
      * Get database name
-     * 
+     *
      * @return string|null
      */
     public function database(): ?string
     {
         return $this->database;
     }
-    
+
     /**
      * Get table name
-     * 
+     *
      * @return string
      */
     public function table(): string
     {
         return $this->table;
     }
-    
+
     /**
      * Get table options
-     * 
+     *
      * @return array
      */
     public function tableOptions(): array
     {
         return $this->tableOptions;
     }
-    
+
     /**
      * Get indexes
-     * 
+     *
      * @return array<string, IndexMetadata>
      */
     public function indexes(): array
     {
         return $this->indexes;
     }
-    
+
     /**
      * Get embedded meta
-     * 
+     *
      * @return array<string, EmbeddedMetadata>
      */
     public function embeddeds(): array
     {
         return $this->embeddeds;
     }
-    
+
     /**
      * Get attribute embedded meta
      *
@@ -307,7 +307,7 @@ class Metadata
 
     /**
      * Get attribute or field metadata
-     * 
+     *
      * @param string $key
      * @param string $type
      *
@@ -321,10 +321,10 @@ class Metadata
 
         return null;
     }
-    
+
     /**
      * Returns primary attributes | fields | type
-     * 
+     *
      * @param 'attributes'|'fields'|'type' $type
      *
      * @return list<string>|Metadata::PK_*
@@ -336,35 +336,35 @@ class Metadata
 
     /**
      * Returns metadata for first primary key
-     * 
+     *
      * @return FieldMetadata
      */
     public function firstPrimaryMeta(): array
     {
         list($primary) = $this->primary['attributes'];
-        
+
         return $this->attributes[$primary];
     }
-    
+
     /**
      * Returns all metadata for primary key
-     * 
+     *
      * @return array<string, FieldMetadata>
      */
     public function primaryMeta(): array
     {
         $meta = [];
-        
+
         foreach ($this->primary['attributes'] as $attribute) {
             $meta[$attribute] = $this->attributes[$attribute];
         }
-        
+
         return $meta;
     }
-    
+
     /**
      * Returns sequence info
-     * 
+     *
      * @param 'connection'|'table'|'column'|'options'|null $key
      *
      * @return SequenceMetadata|string|array|null
@@ -378,7 +378,7 @@ class Metadata
 
     /**
      * Check if key is primary
-     * 
+     *
      * @param string $key
      * @param 'attributes'|'fields' $type
      *
@@ -388,20 +388,20 @@ class Metadata
     {
         return in_array($key, $this->primary[$type]);
     }
-    
+
     /**
      * Is primary key an auto increment
-     * 
+     *
      * @return bool
      */
     public function isAutoIncrementPrimaryKey(): bool
     {
         return $this->primary['type'] === self::PK_AUTOINCREMENT;
     }
-    
+
     /**
      * Is a sequence generated primary key
-     * 
+     *
      * @return bool
      *
      * @psalm-assert string $this->sequence['table']
@@ -424,7 +424,7 @@ class Metadata
 
     /**
      * The primary key has multiple fields
-     * 
+     *
      * @return bool
      */
     public function isCompositePrimaryKey(): bool
@@ -434,7 +434,7 @@ class Metadata
 
     /**
      * Get fields metadata
-     * 
+     *
      * @return array<string, FieldMetadata>
      */
     public function fields(): array
@@ -446,10 +446,10 @@ class Metadata
     {
         return $this->eagerRelations;
     }
-    
+
     /**
      * Does field exist
-     * 
+     *
      * @param string $field
      *
      * @return bool
@@ -458,10 +458,10 @@ class Metadata
     {
         return isset($this->fields[$field]);
     }
-    
+
     /**
      * Get field type
-     * 
+     *
      * @param string $field
      *
      * @return string
@@ -470,7 +470,7 @@ class Metadata
     {
         return $this->fields[$field]['type'];
     }
-    
+
     /**
      * Get attributes
      *
@@ -480,10 +480,10 @@ class Metadata
     {
         return $this->attributes;
     }
-    
+
     /**
      * Does attribute exist
-     * 
+     *
      * @param string $attribute
      *
      * @return bool
@@ -492,10 +492,10 @@ class Metadata
     {
         return isset($this->attributes[$attribute]);
     }
-    
+
     /**
      * Get attribute type
-     * 
+     *
      * @param string $attribute
      *
      * @return string
@@ -504,10 +504,10 @@ class Metadata
     {
         return $this->attributes[$attribute]['type'];
     }
-    
+
     /**
      * Get field from attribute alias if exists
-     * 
+     *
      * @param string $attribute
      *
      * @return string
@@ -516,10 +516,10 @@ class Metadata
     {
         return $this->attributes[$attribute]['field'];
     }
-    
+
     /**
      * Get attribute from field alias if exists
-     * 
+     *
      * @param string $field
      *
      * @return string
@@ -528,7 +528,7 @@ class Metadata
     {
         return $this->fields[$field]['attribute'];
     }
-    
+
     /**
      * @param Mapper $mapper
      * @psalm-param Mapper<E> $mapper
@@ -616,16 +616,16 @@ class Metadata
             'table'        => null,
             'tableOptions' => [],
         ];
-        
+
         //TODO Comment recuperer la database si non fournie
         //$service->connection($this->connection)->getDatabase();
-        
+
         $this->connection   = $schema['connection'];
         $this->database     = $schema['database'];
         $this->table        = $schema['table'];
         $this->tableOptions = $schema['tableOptions'];
     }
-    
+
     /**
      * Builds fields metadata
      *
@@ -637,7 +637,7 @@ class Metadata
         foreach ($fields as $attribute => $meta) {
             if (isset($meta['embedded'])) {
                 $this->buildFields(
-                    $meta['embedded'], 
+                    $meta['embedded'],
                     empty($meta['polymorph'])
                         ? $this->buildEmbedded($attribute, $meta['class'], $embeddedMeta)
                         : $this->buildPolymorph($attribute, $meta, $embeddedMeta)
@@ -647,10 +647,10 @@ class Metadata
             }
         }
     }
-    
+
     /**
      * Builds indexes metadata
-     * 
+     *
      * @param array $indexes
      */
     private function buildIndexes(array $indexes): void
@@ -747,10 +747,10 @@ class Metadata
             }
         }
     }
-    
+
     /**
      * Build Embedded meta
-     * 
+     *
      * @param string $attribute
      * @param class-string $class
      * @param array|null $embeddedMeta
@@ -838,7 +838,7 @@ class Metadata
 
     /**
      * Build embedded relations missing in embedded
-     * 
+     *
      * @param iterable<string, RelationDefinition> $relations
      */
     private function buildRelations(iterable $relations): void
@@ -877,10 +877,10 @@ class Metadata
         // Preformatage des eager relations
         $this->eagerRelations = Relation::sanitizeRelations($this->eagerRelations);
     }
-    
+
     /**
      * Build field meta
-     * 
+     *
      * @param string $attribute
      * @param FieldDefinition $meta
      * @param EmbeddedMetadata|null $embeddedMeta
@@ -912,7 +912,7 @@ class Metadata
             'attribute'         => $attributePath,
             'embedded'          => $path,
         ] + $meta;
-        
+
         /*
          * Construction des meta des primary keys.
          * Si un champs est en auto-increment, celui-ci doit etre placé en début de tableau.
@@ -921,7 +921,7 @@ class Metadata
             if ($this->primary['type'] !== self::PK_AUTO && $meta['primary'] !== self::PK_AUTO) {
                 throw new \LogicException('Trying to set a primary key');
             }
-            
+
             if ($meta['primary'] === self::PK_AUTO) {
                 $this->primary['attributes'][] = $attributePath;
                 $this->primary['fields'][]     = $field;
@@ -932,10 +932,10 @@ class Metadata
             }
         }
     }
-    
+
     /**
      * Build sequence info if primary is a sequence
-     * 
+     *
      * @param array{connection?:string,table?:string,column?:string,tableOptions?:array} $sequence
      */
     private function buildSequence($sequence): void
@@ -943,7 +943,7 @@ class Metadata
         if (!$this->isSequencePrimaryKey()) {
             return;
         }
-        
+
         $this->sequence = [
             'connection' => $sequence['connection'] ?? $this->connection,
             'table'      => $sequence['table'] ?? $this->table . '_seq',

@@ -62,10 +62,10 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      * @var SimpleConnection[]
      */
     private $connections = [];
-    
+
     /**
      * The shard choser
-     * 
+     *
      * @var ShardChoserInterface
      */
     private $shardChoser;
@@ -86,9 +86,9 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
 
     /**
      * Initializes a new instance of the Connection class.
-     * 
+     *
      * Here's a shard connections configuration
-     * 
+     *
      * @example
      *
      * $conn = DriverManager::getConnection([

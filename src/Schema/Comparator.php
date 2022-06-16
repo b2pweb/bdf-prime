@@ -16,11 +16,11 @@ class Comparator extends BaseComparator
 {
     /**
      * Allow diff to list drop column
-     * 
+     *
      * @var bool
      */
     protected $listDropColumn = true;
-    
+
     /**
      * Set flag that allowed diff to list drop columns
      *
@@ -32,18 +32,18 @@ class Comparator extends BaseComparator
     {
         $this->listDropColumn = (bool)$flag;
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function diffTable(BaseTable $fromTable, BaseTable $toTable)
     {
         $diff = parent::diffTable($fromTable, $toTable);
-        
+
         if ($diff && !$this->listDropColumn) {
             $diff->removedColumns = [];
         }
-        
+
         return $diff;
     }
 }

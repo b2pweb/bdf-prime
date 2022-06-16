@@ -25,14 +25,15 @@ class CheckCommand extends AbstractCommand
         $this
             ->setDescription('Check all migrations have been run, exit with non-zero if not')
             ->addOption('stage', 's', InputOption::VALUE_OPTIONAL, 'The migration stage. If not set, all stages will be dumped')
-            ->setHelp(<<<EOT
+            ->setHelp(
+                <<<EOT
 The <info>check</info> checks that all migrations have been run and exits with a 
 non-zero exit code if not, useful for build or deployment scripts.
 
 <info>check</info>
 
 EOT
-        );
+            );
     }
 
     /**

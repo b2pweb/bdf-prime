@@ -11,8 +11,8 @@ use ReflectionProperty;
  */
 class ClassAccessor
 {
-    const SCOPE_EXTERNAL = 'external';
-    const SCOPE_INHERIT  = 'inherit';
+    public const SCOPE_EXTERNAL = 'external';
+    public const SCOPE_INHERIT  = 'inherit';
 
     /**
      * The class name

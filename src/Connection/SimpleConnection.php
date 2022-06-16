@@ -55,7 +55,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      * @var string
      */
     protected $name;
-    
+
     /**
      * The schema manager.
      *
@@ -108,7 +108,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     public function setName(string $name)
     {
         $this->name = $name;
-        
+
         return $this;
     }
 
@@ -216,15 +216,15 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function delete($table, array $criteria, array $types = array())
+    public function delete($table, array $criteria, array $types = [])
     {
         return $this->from($table)->where($criteria)->delete();
     }
-    
+
     /**
      * {@inheritdoc}
      */
-    public function update($table, array $data, array $criteria, array $types = array())
+    public function update($table, array $data, array $criteria, array $types = [])
     {
         return $this->from($table)->where($criteria)->update($data, $types);
     }
@@ -232,7 +232,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function insert($table, array $data, array $types = array())
+    public function insert($table, array $data, array $types = [])
     {
         return $this->from($table)->insert($data);
     }
@@ -252,7 +252,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     {
         $this->prepareLogger();
 
-        return $this->runOrReconnect(fn() => parent::executeQuery($sql, $params, $types, $qcp));
+        return $this->runOrReconnect(fn () => parent::executeQuery($sql, $params, $types, $qcp));
     }
 
     /**
@@ -262,7 +262,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     {
         $this->prepareLogger();
 
-        return $this->runOrReconnect(fn() => parent::executeStatement($sql, $params, $types));
+        return $this->runOrReconnect(fn () => parent::executeStatement($sql, $params, $types));
     }
 
     /**
@@ -272,7 +272,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      */
     public function prepare(string $sql): Statement
     {
-        return $this->runOrReconnect(fn() => parent::prepare($sql));
+        return $this->runOrReconnect(fn () => parent::prepare($sql));
     }
 
     /**
@@ -374,17 +374,17 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     public function commit(): bool
     {
         $this->prepareLogger();
-        
+
         return parent::commit() ?? true;
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function rollBack(): bool
     {
         $this->prepareLogger();
-        
+
         return parent::rollBack() ?? true;
     }
 

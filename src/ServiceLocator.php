@@ -22,17 +22,17 @@ class ServiceLocator
      * @var ConnectionManager
      */
     private $connectionManager;
-    
+
     /**
      * @var class-string-map<T, RepositoryInterface<T>>
      */
     private $repositories = [];
-    
+
     /**
      * @var MapperFactory
      */
     private $mapperFactory;
-    
+
     /**
      * @var SerializerInterface
      */
@@ -87,26 +87,26 @@ class ServiceLocator
 
     /**
      * Returns connection manager
-     * 
+     *
      * @return MapperFactory
      */
     public function mappers()
     {
         return $this->mapperFactory;
     }
-    
+
     /**
      * Get a db connection
-     * 
+     *
      * @param string $name
-     * 
+     *
      * @return ConnectionInterface
      */
     public function connection($name = null)
     {
         return $this->connectionManager->getConnection($name);
     }
-    
+
     /**
      * Register a repository
      *
@@ -123,7 +123,7 @@ class ServiceLocator
         /** @psalm-suppress InvalidPropertyAssignmentValue */
         $this->repositories[$entityClass] = $repository;
     }
-    
+
     /**
      * Unregister a repository
      *
@@ -139,12 +139,12 @@ class ServiceLocator
 
         unset($this->repositories[$entityClass]);
     }
-    
+
     /**
      * Get mapper for specified entity
      *
      * @param class-string<T>|T $entityClass Name of Entity object to load mapper for
-     * 
+     *
      * @return RepositoryInterface<T>|null
      * @template T as object
      *
@@ -155,7 +155,7 @@ class ServiceLocator
         if (is_object($entityClass)) {
             $entityClass = get_class($entityClass);
         }
-        
+
         if (!isset($this->repositories[$entityClass])) {
             $mapper = $this->mapperFactory->build($this, $entityClass);
 
@@ -165,13 +165,13 @@ class ServiceLocator
 
             $this->repositories[$entityClass] = $mapper->repository();
         }
-        
+
         return $this->repositories[$entityClass];
     }
-    
+
     /**
      * Get repository names
-     * 
+     *
      * @return array
      */
     public function repositoryNames()

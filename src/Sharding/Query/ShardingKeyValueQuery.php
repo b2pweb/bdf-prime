@@ -334,10 +334,9 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     {
         if (isset($this->queries[$shardId])) {
             $query = $this->queries[$shardId];
-            /** @var KeyValueQueryInterface $query */
         } else {
-            $this->queries[$shardId] = $query = $this->connection->getShardConnection($shardId)->make(KeyValueQueryInterface::class, $this->preprocessor());
             /** @var KeyValueQueryInterface $query */
+            $this->queries[$shardId] = $query = $this->connection->getShardConnection($shardId)->make(KeyValueQueryInterface::class, $this->preprocessor());
             $query->setExtension($this->extension);
         }
 

@@ -90,7 +90,7 @@ class UpgraderCommand extends Command
 
                 $io->line(is_string($query) ? $query : json_encode($query));
             }
-            
+
             if ($executeQuery) {
                 $io->line('launching query ', ' ');
 

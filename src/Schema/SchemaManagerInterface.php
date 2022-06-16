@@ -1,4 +1,5 @@
 <?php
+
 namespace Bdf\Prime\Schema;
 
 use Bdf\Prime\Schema\Manager\DatabaseManagerInterface;

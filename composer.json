@@ -47,21 +47,23 @@
   "require-dev": {
     "b2pweb/bdf-phpunit": "~1.0",
     "cache/array-adapter": "~1.0",
+    "friendsofphp/php-cs-fixer": "^3.0",
     "phpunit/phpunit": "~9.0",
     "symfony/console": "~4.3|~5.0|~6.0",
     "symfony/http-foundation": "~4.3|~5.0|~6.0",
     "symfony/http-kernel": "~4.3|~5.0|~6.0",
+    "symfony/phpunit-bridge": "~4.3|~5.0|~6.0",
     "symfony/validator": "~4.3|~5.0|~6.0",
     "vimeo/psalm": "~4.21"
   },
   "scripts": {
     "tests": "phpunit",
     "tests-with-coverage": "phpunit --coverage-clover coverage.xml",
-    "psalm": "psalm --shepherd --no-cache --output-format=github"
+    "psalm": "psalm --shepherd --no-cache --output-format=github",
+    "php-cs-fixer": "php-cs-fixer fix --config=.php-cs-fixer.dist.php -v --diff --allow-risky=yes --ansi --dry-run"
   },
   "suggest": {
     "b2p/bdf-console": "required to use prime commands (~1.5)",
-    "b2p/bdf-web": "required to use service provider (~1.5)",
-    "phpunit/phpunit": "required to use repository assertion"
+    "b2p/bdf-web": "required to use service provider (~1.5)"
   }
 }

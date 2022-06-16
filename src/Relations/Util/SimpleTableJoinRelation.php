@@ -46,7 +46,9 @@ trait SimpleTableJoinRelation
 
         $query->joinEntity(
             $this->distant->entityName(),
-            function (JoinClause $clause) use($alias, $query) { $this->buildJoinClause($clause, $query, $alias); },
+            function (JoinClause $clause) use ($alias, $query) {
+                $this->buildJoinClause($clause, $query, $alias);
+            },
             null,
             $alias
         );

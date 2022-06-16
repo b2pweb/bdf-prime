@@ -24,13 +24,14 @@ class UpCommand extends AbstractCommand
         $this
             ->setDescription('Run a specific migration')
             ->addArgument('version', InputArgument::REQUIRED, 'The version number for the migration')
-            ->setHelp(<<<EOT
+            ->setHelp(
+                <<<EOT
 The <info>up</info> command runs a specific migration
 
 <info>up 20111018185121</info>
 
 EOT
-        );
+            );
     }
 
     /**

@@ -7,10 +7,10 @@ namespace Bdf\Prime\Query\Compiler\AliasResolver;
  */
 class ExpressionToken
 {
-    const TYPE_DYN   = 0;
-    const TYPE_STA   = 1;
-    const TYPE_ATTR  = 2;
-    const TYPE_ALIAS = 3;
+    public const TYPE_DYN   = 0;
+    public const TYPE_STA   = 1;
+    public const TYPE_ATTR  = 2;
+    public const TYPE_ALIAS = 3;
 
     public $type;
     public $value;

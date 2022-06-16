@@ -19,7 +19,7 @@ class MapperFactory
      * @var ResolverInterface
      */
     private $nameResolver;
-    
+
     /**
      * @var Psr16CacheInterface
      */
@@ -55,7 +55,7 @@ class MapperFactory
     {
         return $this->createMapper($serviceLocator, $this->nameResolver->resolve($entityClass), $entityClass);
     }
-    
+
     /**
      * Get mapper object
      *
@@ -75,7 +75,7 @@ class MapperFactory
         if ($entityClass === null) {
             $entityClass = $this->nameResolver->reverse($mapperClass);
         }
-        
+
         $metadata = null;
         if ($this->metadataCache !== null) {
             $cacheKey = $this->getCacheKey($mapperClass);
@@ -98,13 +98,13 @@ class MapperFactory
         if ($mapper instanceof MapperFactoryAwareInterface) {
             $mapper->setMapperFactory($this);
         }
-        
+
         return $mapper;
     }
-    
+
     /**
      * Check if class is a mapper
-     * 
+     *
      * @param string $className
      *
      * @return bool
@@ -114,10 +114,10 @@ class MapperFactory
     {
         return is_subclass_of($className, Mapper::class);
     }
-    
+
     /**
      * Check if class has a mapper
-     * 
+     *
      * @param string $className
      *
      * @return bool

@@ -91,6 +91,6 @@ class PaginatorFactory
             return self::$instance;
         }
 
-        return self::$instance = new self;
+        return self::$instance = new self();
     }
 }

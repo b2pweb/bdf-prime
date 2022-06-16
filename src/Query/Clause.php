@@ -17,7 +17,7 @@ class Clause implements ClauseInterface
      * @var array<string,callable(static,mixed):void>
      */
     protected $customFilters = [];
-    
+
     /**
      * The clause statements
      *
@@ -27,7 +27,7 @@ class Clause implements ClauseInterface
 
     /**
      * Available operators
-     * 
+     *
      * @var array<string, true>
      */
     protected $operators = [
@@ -59,27 +59,27 @@ class Clause implements ClauseInterface
         '='             => true,
         ':eq'           => true,
     ];
-    
+
     /**
      * {@inheritdoc}
      */
     public function setCustomFilters(array $filters)
     {
         $this->customFilters = $filters;
-        
+
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function addCustomFilter(string $name, callable $callback)
     {
         $this->customFilters[$name] = $callback;
-        
+
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -87,7 +87,7 @@ class Clause implements ClauseInterface
     {
         return $this->customFilters;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -95,7 +95,7 @@ class Clause implements ClauseInterface
     {
         return $this->statements[$statement] ?? [];
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -113,7 +113,7 @@ class Clause implements ClauseInterface
             //nested expression
             $glue = ($operator ?: CompositeExpression::TYPE_AND);
             $parts = [];
-            
+
             foreach ($expression as $key => $value) {
                 if (isset($this->customFilters[$key])) {
                     // Custom filter
@@ -135,7 +135,7 @@ class Clause implements ClauseInterface
                     ];
                 }
             }
-            
+
             if ($parts) {
                 $this->statements[$statement][] = [
                     'nested'  => $parts,
@@ -162,10 +162,10 @@ class Clause implements ClauseInterface
                 ];
             }
         }
-        
+
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -188,19 +188,19 @@ class Clause implements ClauseInterface
         $this->statements = [];
 
         $callback($this);
-        
+
         if (!empty($this->statements[$statement])) {
             $statements[$statement][] = [
                 'nested' => $this->statements[$statement],
                 'glue'   => $type,
             ];
         }
-        
+
         $this->statements = $statements;
-        
+
         return $this;
     }
-    
+
     /**
      * @todo Revoir cette gestion des commandes
      * {@inheritdoc}
@@ -208,7 +208,7 @@ class Clause implements ClauseInterface
     public function addCommand(string $command, $value)
     {
         // TO overload
-        
+
         return $this;
     }
 }

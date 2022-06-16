@@ -171,7 +171,7 @@ final class Timestampable extends Behavior
 
         /** @psalm-suppress UndefinedInterfaceMethod */
         $className = $repository->mapper()->info()->property($name)->phpType();
-        return new $className;
+        return new $className();
     }
 
     /**

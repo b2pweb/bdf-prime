@@ -133,7 +133,7 @@ class SoftDeleteable implements BehaviorInterface
 
         /** @psalm-suppress UndefinedInterfaceMethod */
         $className = $repository->mapper()->info()->property($name)->phpType();
-        return new $className;
+        return new $className();
     }
 
     /**

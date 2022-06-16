@@ -15,13 +15,13 @@ use IteratorAggregate;
 
 /**
  * Abstract paginator
- * 
+ *
  * Provide method for pagination
- * 
+ *
  * @author  Seb
  * @package Bdf\Prime\Query\Pagination
- * 
- * 
+ *
+ *
  * @todo retourner une nouvelle instance du paginator sur les methodes de collection ?
  *
  * @template R as array|object
@@ -29,40 +29,40 @@ use IteratorAggregate;
  */
 abstract class AbstractPaginator extends PrimeSerializable implements PaginatorInterface, IteratorAggregate
 {
-    const DEFAULT_PAGE  = 1;
-    const DEFAULT_LIMIT = 20;
+    public const DEFAULT_PAGE  = 1;
+    public const DEFAULT_LIMIT = 20;
 
     /**
      * Current query
-     * 
+     *
      * @var ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable
      */
     protected $query;
 
     /**
      * Current collection
-     * 
+     *
      * @var R[]|CollectionInterface<R>
      */
     protected $collection = [];
-    
+
     /**
      * Total size of the collection
-     * 
-     * @var int 
+     *
+     * @var int
      */
     protected $size;
-    
+
     /**
      * Current page
-     * 
+     *
      * @var int
      */
     protected $page;
-    
+
     /**
      * Number of entities loaded in the collection
-     * 
+     *
      * @var int
      */
     protected $maxRows;
@@ -80,7 +80,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
 
     /**
      * Get the query
-     * 
+     *
      * @return ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable
      * @final
      */
@@ -88,7 +88,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
     {
         return $this->query;
     }
-    
+
     /**
      * Load entities
      *
@@ -100,21 +100,21 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if ($this->maxRows > -1) {
             $this->query->limitPage($this->page, $this->maxRows);
         }
-        
+
         $this->collection = $this->query->all();
     }
-    
+
     /**
      * {@inheritdoc}
      */
     public function order($attribute = null)
     {
         $orders = $this->query->getOrders();
-        
+
         if ($attribute === null) {
             return $orders;
         }
-        
+
         return isset($orders[$attribute]) ? $orders[$attribute] : null;
     }
 
@@ -149,7 +149,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
     {
         return (int) $this->query->getLimit();
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -158,17 +158,17 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if ($this->size === null) {
             $this->buildSize();
         }
-        
+
         return $this->size;
     }
-    
+
     /**
      * Find size of the collection
      */
     protected function buildSize(): void
     {
         $currentSize = $this->count();
-            
+
         if (!$this->query->isLimitQuery()) {
             $this->size = $currentSize;
         } elseif ($currentSize + $this->query->getOffset() < $this->query->getLimit()) {
@@ -177,7 +177,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
             $this->size = $this->query->paginationCount();
         }
     }
-    
+
     /**
      * SPL - Countable
      *
@@ -187,9 +187,9 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
     {
         return count($this->collection);
     }
-    
+
     //--------- collection interface
-    
+
     /**
      * {@inheritdoc}
      */
@@ -198,12 +198,12 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);
         }
-        
+
         $this->collection->pushAll($items);
-        
+
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -212,12 +212,12 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);
         }
-        
+
         $this->collection->push($item);
-        
+
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -226,12 +226,12 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);
         }
-        
+
         $this->collection->put($key, $item);
-        
+
         return $this;
     }
-    
+
     /**
      * SPL - ArrayAccess
      *
@@ -241,7 +241,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
     {
         $this->collection[$key] = $value;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -250,10 +250,10 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             return $this->collection;
         }
-        
+
         return $this->collection->all();
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -262,10 +262,10 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);
         }
-        
+
         return $this->collection->get($key, $default);
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -274,7 +274,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
     {
         return $this->collection[$key];
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -283,10 +283,10 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);
         }
-        
+
         return $this->collection->has($key);
     }
-    
+
     /**
      * SPL - ArrayAccess
      *
@@ -296,7 +296,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
     {
         return isset($this->collection[$key]);
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -305,12 +305,12 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);
         }
-        
+
         $this->collection->remove($key);
-        
+
         return $this;
     }
-    
+
     /**
      * SPL - ArrayAccess
      *
@@ -320,7 +320,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
     {
         unset($this->collection[$key]);
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -329,12 +329,12 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);
         }
-        
+
         $this->collection->clear();
-        
+
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -343,10 +343,10 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);
         }
-        
+
         return $this->collection->keys();
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -355,10 +355,10 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);
         }
-        
+
         return $this->collection->isEmpty();
     }
-    
+
     /**
      * {@inheritdoc}
      *
@@ -375,10 +375,10 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
 
         /** @var static<M> $this */
         $this->collection = $this->collection->map($callback);
-        
+
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -387,12 +387,12 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);
         }
-        
+
         $this->collection = $this->collection->filter($callback);
-        
+
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -401,12 +401,12 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);
         }
-        
+
         $this->collection = $this->collection->groupBy($groupBy, $mode);
-        
+
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      *
@@ -417,10 +417,10 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);
         }
-        
+
         return $this->collection->contains($element);
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -429,10 +429,10 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);
         }
-        
+
         return $this->collection->indexOf($value, $strict);
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -441,12 +441,12 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);
         }
-        
+
         $this->collection = $this->collection->merge($items);
-        
+
         return $this;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -455,9 +455,9 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);
         }
-        
+
         $this->collection = $this->collection->sort($callback);
-        
+
         return $this;
     }
 }

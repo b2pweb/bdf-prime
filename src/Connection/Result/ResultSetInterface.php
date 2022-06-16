@@ -29,7 +29,7 @@ interface ResultSetInterface extends Iterator, Countable
      *
      * @deprecated Use asAssociative() instead
      */
-    const FETCH_ASSOC = 'assoc';
+    public const FETCH_ASSOC = 'assoc';
 
     /**
      * Fetch the rows as a numeric array
@@ -37,7 +37,7 @@ interface ResultSetInterface extends Iterator, Countable
      *
      * @deprecated Use asList() instead
      */
-    const FETCH_NUM = 'num';
+    public const FETCH_NUM = 'num';
 
     /**
      * Fetch only one columns on each rows
@@ -45,7 +45,7 @@ interface ResultSetInterface extends Iterator, Countable
      *
      * @deprecated Use asColumn() instead
      */
-    const FETCH_COLUMN = 'column';
+    public const FETCH_COLUMN = 'column';
 
     /**
      * Fetch rows into a simple object (stdClass)
@@ -53,7 +53,7 @@ interface ResultSetInterface extends Iterator, Countable
      *
      * @deprecated Use asObject() instead
      */
-    const FETCH_OBJECT = 'object';
+    public const FETCH_OBJECT = 'object';
 
     /**
      * Fetch rows into a new class
@@ -61,7 +61,7 @@ interface ResultSetInterface extends Iterator, Countable
      *
      * @deprecated Use asClass() instead
      */
-    const FETCH_CLASS = 'class';
+    public const FETCH_CLASS = 'class';
 
 
     /**

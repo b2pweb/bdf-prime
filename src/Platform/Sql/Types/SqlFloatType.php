@@ -26,7 +26,7 @@ class SqlFloatType extends AbstractPlatformType
      */
     public function fromDatabase($value, array $fieldOptions = [])
     {
-        return $value === null ? null : (double) $value;
+        return $value === null ? null : (float) $value;
     }
 
     /**

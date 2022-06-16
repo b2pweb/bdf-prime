@@ -22,25 +22,25 @@ class SchemaManager extends AbstractSchemaManager
 {
     /**
      * Queries to execute
-     * 
+     *
      * @var array
      */
     private $queries = [];
 
-    
+
     /**
      * Get the doctrine schema manager
-     * 
+     *
      * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
      */
     public function getDoctrineManager()
     {
         return $this->connection->getSchemaManager();
     }
-    
+
     /**
      * Get the queries to execute
-     * 
+     *
      * @return array
      */
     public function toSql()
@@ -62,7 +62,7 @@ class SchemaManager extends AbstractSchemaManager
     public function clear()
     {
         $this->queries = [];
-        
+
         return $this;
     }
 
@@ -73,13 +73,13 @@ class SchemaManager extends AbstractSchemaManager
     {
         $lastResult = false;
         $queries = $this->queries;
-        
+
         $this->clear();
-        
+
         foreach ($queries as $query) {
             $lastResult = $this->connection->executeStatement($query);
         }
-        
+
         return (bool) $lastResult;
     }
 

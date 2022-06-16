@@ -57,7 +57,7 @@ class EntityGenerator
     /**
      * Map prime types to php 7.4 property type
      */
-    const PROPERTY_TYPE_MAP = [
+    public const PROPERTY_TYPE_MAP = [
         PhpTypeInterface::BOOLEAN => 'bool',
         PhpTypeInterface::DOUBLE => 'float',
         PhpTypeInterface::INTEGER => 'int',
@@ -66,12 +66,12 @@ class EntityGenerator
     /**
      * Specifies class fields should be protected.
      */
-    const FIELD_VISIBLE_PROTECTED = 'protected';
+    public const FIELD_VISIBLE_PROTECTED = 'protected';
 
     /**
      * Specifies class fields should be private.
      */
-    const FIELD_VISIBLE_PRIVATE = 'private';
+    public const FIELD_VISIBLE_PRIVATE = 'private';
 
     /**
      * The prime service locator
@@ -312,7 +312,7 @@ public function __construct(array $data = [])
      * @param string $file    Entity file name
      *
      * @return string|false If no generation
-     * 
+     *
      * @api
      */
     public function generate($mapper, $file = null)
@@ -326,10 +326,10 @@ public function __construct(array $data = [])
         } elseif ($this->updateEntityIfExists && $file) {
             return $this->generateUpdatedEntityClass($mapper, $file);
         }
-        
+
         return false;
     }
-    
+
     /**
      * Generates a PHP5 Doctrine 2 entity class from the given Mapper instance.
      *
@@ -340,26 +340,26 @@ public function __construct(array $data = [])
     public function generateEntityClass(Mapper $mapper)
     {
         $this->mapperInfo = $mapper->info();
-        
+
         $this->staticReflection[$this->mapperInfo->className()] = ['properties' => [], 'methods' => []];
-        
-        $placeHolders = array(
+
+        $placeHolders = [
             '<namespace>',
             '<useStatement>',
             '<entityAnnotation>',
             '<entityClassName>',
             '<entityTraits>',
             '<entityBody>'
-        );
+        ];
 
-        $replacements = array(
+        $replacements = [
             $this->generateEntityNamespace(),
             $this->generateEntityUse(),
             $this->generateEntityDocBlock(),
             $this->generateEntityClassName(),
             $this->generateEntityTraits(),
             $this->generateEntityBody()
-        );
+        ];
 
         $code = str_replace($placeHolders, $replacements, static::$classTemplate);
 
@@ -377,11 +377,11 @@ public function __construct(array $data = [])
     public function generateUpdatedEntityClass(Mapper $mapper, $file)
     {
         $this->mapperInfo = $mapper->info();
-        
+
         $currentCode = file_get_contents($file);
 
         $this->parseTokensInEntityFile($currentCode);
-        
+
         $body = $this->generateEntityBody();
         $body = str_replace('<spaces>', $this->spaces, $body);
         $last = strrpos($currentCode, '}');
@@ -403,7 +403,7 @@ public function __construct(array $data = [])
 
     /**
      * Generate use part
-     * 
+     *
      * @return string
      */
     protected function generateEntityUse()
@@ -419,13 +419,13 @@ public function __construct(array $data = [])
                 $use[$interface] = 'use ' . $interface . ';';
             }
         }
-        
+
         foreach ($this->traits as $trait) {
             if ($this->hasNamespace($trait)) {
                 $use[$trait] = 'use ' . $trait . ';';
             }
         }
-        
+
         foreach ($this->mapperInfo->objects() as $info) {
             $className = $info->className();
             if (!$info->belongsToRoot()) {
@@ -445,16 +445,16 @@ public function __construct(array $data = [])
                 }
             }
         }
-        
+
         if (!$use) {
             return '';
         }
-        
+
         sort($use);
-        
+
         return implode("\n", $use) . "\n\n";
     }
-    
+
     /**
      * @return string
      */
@@ -473,13 +473,13 @@ public function __construct(array $data = [])
         if (!$this->traits) {
             return '';
         }
-        
+
         $traits = '';
-        
+
         foreach ($this->traits as $trait) {
             $traits .= $this->spaces . 'use ' . $this->getRelativeClassName($trait) . ';' . "\n";
         }
-        
+
         return $traits . "\n";
     }
 
@@ -494,7 +494,7 @@ public function __construct(array $data = [])
         $embeddedProperties = $this->generateEntityEmbeddedProperties();
         $stubMethods = $this->generateEntityStubMethods ? $this->generateEntityStubMethods() : null;
 
-        $code = array();
+        $code = [];
 
         if ($fieldMappingProperties) {
             $code[] = $fieldMappingProperties;
@@ -550,9 +550,9 @@ public function __construct(array $data = [])
                 $collections[$property->name()] = '$this->'.$property->name().' = new '.$property->phpType().'('.$constructorArgs.');';
             }
         }
-        
+
         $methods = [];
-        
+
         if (!$this->hasMethod('__construct')) {
             if ($isImportable) {
                 $buffer = '';
@@ -568,7 +568,7 @@ public function __construct(array $data = [])
                 $methods[] = $this->prefixCodeWithSpaces(str_replace("<collections>", implode("\n".$this->spaces, $collections), static::$constructorMethodTemplate));
             }
         }
-        
+
         if (!$this->hasMethod('initialize') && $initializable) {
             $methods[] = $this->generateMethod('{@inheritdoc}', 'initialize', implode("\n".$this->spaces, $collections), 'void');
         }
@@ -583,21 +583,21 @@ public function __construct(array $data = [])
      */
     protected function generateEntityDocBlock()
     {
-        $lines = array();
+        $lines = [];
         $lines[] = '/**';
         $lines[] = ' * ' . $this->getClassName($this->mapperInfo->className());
         $lines[] = ' */';
-        
+
         return implode("\n", $lines);
     }
-    
+
     /**
      * @return string
      */
     protected function generateEntityStubMethods()
     {
         $methods = [];
-        
+
         foreach ($this->mapperInfo->properties() as $property) {
             if ($code = $this->generateEntityStubMethod('set', $property)) {
                 $methods[] = $code;
@@ -647,7 +647,7 @@ public function __construct(array $data = [])
             if ($this->hasProperty($property->name())) {
                 continue;
             }
-            
+
             $default = '';
 
             if ($property->hasDefault() && !$property->isDateTime()) {
@@ -676,13 +676,13 @@ public function __construct(array $data = [])
      */
     protected function generateEntityEmbeddedProperties()
     {
-        $lines = array();
+        $lines = [];
 
         foreach ($this->mapperInfo->objects() as $property) {
             if (!$property->belongsToRoot() || $this->hasProperty($property->name())) {
                 continue;
             }
-            
+
             if (!$property->isRelation()) {
                 $lines[] = $this->generateEmbeddedPropertyDocBlock($property);
                 $lines[] = $this->spaces . $this->fieldVisibility . $this->getPropertyTypeHintForObject($property) . ' $'.$property->name().";\n";
@@ -732,7 +732,7 @@ public function __construct(array $data = [])
             $methodName = $type . $this->inflector->classify($fieldName);
             $variableName = $this->inflector->camelize($fieldName);
         }
-        
+
         if ($type === 'add') {
             $methodName = $this->inflector->singularize($methodName);
             $variableName = $this->inflector->singularize($variableName);
@@ -771,15 +771,15 @@ public function __construct(array $data = [])
             }
         }
 
-        $replacements = array(
+        $replacements = [
           '<description>'       => ucfirst($type).' '.$variableName,
           '<methodTypeHint>'    => $methodTypeHint,
           '<variableType>'      => $variableType,
           '<variableName>'      => $variableName,
           '<methodName>'        => $methodName,
           '<fieldName>'         => $fieldName,
-          '<variableDefault>'   => ($defaultValue !== null ) ? (' = '.$defaultValue) : ''
-        );
+          '<variableDefault>'   => ($defaultValue !== null) ? (' = '.$defaultValue) : ''
+        ];
 
         $method = str_replace(
             array_keys($replacements),
@@ -827,15 +827,15 @@ public function __construct(array $data = [])
         if ($this->hasMethod($methodName)) {
             return '';
         }
-        
+
         $this->staticReflection[$this->mapperInfo->className()]['methods'][] = $methodName;
 
-        $replacements = array(
+        $replacements = [
             '<description>' => $description,
             '<methodName>'  => $methodName,
             '<content>'     => $content,
             '<return>'      => $return ? ": $return" : '',
-        );
+        ];
 
         $method = str_replace(
             array_keys($replacements),
@@ -853,7 +853,7 @@ public function __construct(array $data = [])
      */
     protected function generateFieldMappingPropertyDocBlock($property)
     {
-        $lines = array();
+        $lines = [];
         $lines[] = $this->spaces . '/**';
         $lines[] = $this->spaces . ' * @var '.$property->phpType();
         $lines[] = $this->spaces . ' */';
@@ -883,15 +883,15 @@ public function __construct(array $data = [])
         } else {
             $className = '{type}';
         }
-        
-        $lines = array();
+
+        $lines = [];
         $lines[] = $this->spaces . '/**';
         $lines[] = $this->spaces . ' * @var '.$className;
         $lines[] = $this->spaces . ' */';
 
         return implode("\n", $lines);
     }
-    
+
     //
     //---------- tools methods
     //
@@ -914,14 +914,14 @@ public function __construct(array $data = [])
 
         for ($i = 0; $i < count($tokens); $i++) {
             $token = $tokens[$i];
-            if (in_array($token[0], array(T_WHITESPACE, T_COMMENT, T_DOC_COMMENT))) {
+            if (in_array($token[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT])) {
                 continue;
             }
 
             if ($inNamespace) {
                 if ($token[0] == T_NS_SEPARATOR || $token[0] == T_STRING) {
                     $lastSeenNamespace .= $token[1];
-                } elseif (is_string($token) && in_array($token, array(';', '{'))) {
+                } elseif (is_string($token) && in_array($token, [';', '{'])) {
                     $inNamespace = false;
                 }
             }
@@ -929,8 +929,8 @@ public function __construct(array $data = [])
             if ($inClass) {
                 $inClass = false;
                 $lastSeenClass = $lastSeenNamespace . ($lastSeenNamespace ? '\\' : '') . $token[1];
-                $this->staticReflection[$lastSeenClass]['properties'] = array();
-                $this->staticReflection[$lastSeenClass]['methods'] = array();
+                $this->staticReflection[$lastSeenClass]['properties'] = [];
+                $this->staticReflection[$lastSeenClass]['methods'] = [];
             }
 
             if ($token[0] == T_NAMESPACE) {
@@ -944,7 +944,7 @@ public function __construct(array $data = [])
                 } elseif ($tokens[$i+2] == "&" && $tokens[$i+3][0] == T_STRING) {
                     $this->staticReflection[$lastSeenClass]['methods'][] = strtolower($tokens[$i+3][1]);
                 }
-            } elseif (in_array($token[0], array(T_VAR, T_PUBLIC, T_PRIVATE, T_PROTECTED)) && $tokens[$i+2][0] != T_FUNCTION) {
+            } elseif (in_array($token[0], [T_VAR, T_PUBLIC, T_PRIVATE, T_PROTECTED]) && $tokens[$i+2][0] != T_FUNCTION) {
                 $this->staticReflection[$lastSeenClass]['properties'][] = substr($tokens[$i+2][1], 1);
             }
         }
@@ -1009,24 +1009,24 @@ public function __construct(array $data = [])
 
     /**
      * Get class name relative to use
-     * 
+     *
      * @param string $className
      * @return string
      */
     protected function getRelativeClassName($className)
     {
         $className = ltrim($className, '\\');
-        
+
         if ($this->hasNamespace($className)) {
             return $this->getClassName($className);
         } else {
             return '\\' . $className;
         }
     }
-    
+
     /**
      * Get the class short name
-     * 
+     *
      * @param string $className
      *
      * @return string
@@ -1046,10 +1046,10 @@ public function __construct(array $data = [])
     {
         $parts = explode('\\', $className);
         array_pop($parts);
-        
+
         return implode('\\', $parts);
     }
-    
+
     /**
      * @param string $className
      *
@@ -1076,16 +1076,16 @@ public function __construct(array $data = [])
     protected function getInterfacesToImplement()
     {
         $interfaces = [];
-        
+
         foreach ($this->interfaces as $interface) {
             $refl = new \ReflectionClass($interface);
 
             $interfaces[] = $this->getRelativeClassName($refl->getName());
         }
-        
+
         return implode(', ', $interfaces);
     }
-    
+
     /**
      * @param Mapper $mapper
      *
@@ -1096,10 +1096,10 @@ public function __construct(array $data = [])
         if ($this->isNew) {
             return [];
         }
-        
+
         $reflClass = new \ReflectionClass($this->mapperInfo->className());
 
-        $traits = array();
+        $traits = [];
 
         while ($reflClass !== false) {
             $traits = array_merge($traits, $reflClass->getTraits());
@@ -1109,7 +1109,7 @@ public function __construct(array $data = [])
 
         return $traits;
     }
-    
+
     /**
      * @param string $code
      * @param int    $num
@@ -1121,17 +1121,17 @@ public function __construct(array $data = [])
         $lines = explode("\n", $code);
 
         foreach ($lines as $key => $value) {
-            if ( ! empty($value)) {
+            if (! empty($value)) {
                 $lines[$key] = str_repeat($this->spaces, $num) . $lines[$key];
             }
         }
 
         return implode("\n", $lines);
     }
-    
+
     /**
      * Get string representation of a value
-     * 
+     *
      * @param mixed $value
      *
      * @return string
@@ -1142,18 +1142,18 @@ public function __construct(array $data = [])
             if (empty($value)) {
                 return '[]';
             }
-            
+
             return var_export($value, true);
         }
-        
+
         if (null === $value) {
             return 'null';
         }
-        
+
         if (is_string($value)) {
             return "'" . $value . "'";
         }
-        
+
         if (is_bool($value)) {
             return $value ? 'true' : 'false';
         }

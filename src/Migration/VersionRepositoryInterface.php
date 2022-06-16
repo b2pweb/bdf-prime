@@ -2,7 +2,6 @@
 
 namespace Bdf\Prime\Migration;
 
-
 use Bdf\Prime\Exception\PrimeException;
 
 interface VersionRepositoryInterface

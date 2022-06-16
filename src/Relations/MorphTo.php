@@ -149,7 +149,7 @@ class MorphTo extends BelongsTo
     }
 
     /**
-     * Change the current discriminator value 
+     * Change the current discriminator value
      * and update the distant repository of this relation
      *
      * @param mixed $type

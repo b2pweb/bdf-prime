@@ -16,12 +16,12 @@ class CallbackResolver implements ResolverInterface
      * @var Closure(class-string):class-string<Mapper>
      */
     protected $resolver;
-    
+
     /**
      * @var Closure(class-string<Mapper>):class-string
      */
     protected $reverser;
-    
+
     /**
      * @param Closure(class-string):class-string<Mapper> $resolver
      * @param Closure(class-string<Mapper>):class-string $reverser
@@ -31,7 +31,7 @@ class CallbackResolver implements ResolverInterface
         $this->resolver = $resolver;
         $this->reverser = $reverser;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -39,7 +39,7 @@ class CallbackResolver implements ResolverInterface
     {
         return ($this->resolver)($entityClass);
     }
-    
+
     /**
      * {@inheritdoc}
      */

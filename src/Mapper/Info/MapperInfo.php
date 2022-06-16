@@ -37,7 +37,7 @@ class MapperInfo
      * @var Metadata
      */
     protected $metadata;
-    
+
     /**
      * The properties info
      * Contains only info about the root properties
@@ -60,7 +60,7 @@ class MapperInfo
      * @var null|PropertyInfo[]
      */
     private $embedded;
-    
+
     /**
      * The properties info
      * Contains only info about the object properties
@@ -68,10 +68,10 @@ class MapperInfo
      * @var null|ObjectPropertyInfo[]
      */
     private $objects;
-    
+
     /**
      * Constructor
-     * 
+     *
      * @param Mapper $mapper
      * @param TypesRegistryInterface $typesRegistry
      */
@@ -81,50 +81,50 @@ class MapperInfo
         $this->metadata = $mapper->metadata();
         $this->typesRegistry = $typesRegistry;
     }
-    
+
     /**
      * Get the mapper
-     * 
+     *
      * @return Mapper
      */
     public function mapper()
     {
         return $this->mapper;
     }
-    
+
     /**
      * Get the metadata
-     * 
+     *
      * @return Metadata
      */
     public function metadata()
     {
         return $this->metadata;
     }
-    
+
     /**
      * Get the connection name
-     * 
+     *
      * @return string|null
      */
     public function connection()
     {
         return $this->metadata->connection;
     }
-    
+
     /**
      * Get the entity class name
-     * 
+     *
      * @return string
      */
     public function className()
     {
         return $this->metadata->entityName;
     }
-    
+
     /**
      * Get the entity properties
-     * 
+     *
      * @return PropertyInfo[]
      */
     public function properties()
@@ -132,13 +132,13 @@ class MapperInfo
         if ($this->properties === null) {
             $this->buildProperties();
         }
-        
+
         return $this->properties;
     }
-    
+
     /**
      * Get the primary properties
-     * 
+     *
      * @return PropertyInfo[]
      */
     public function primaries()
@@ -146,7 +146,7 @@ class MapperInfo
         if ($this->primaries === null) {
             $this->buildProperties();
         }
-        
+
         return $this->primaries;
     }
 
@@ -211,7 +211,7 @@ class MapperInfo
 
     /**
      * Get the entity properties that are objects
-     * 
+     *
      * @return ObjectPropertyInfo[]
      */
     public function objects()
@@ -219,7 +219,7 @@ class MapperInfo
         if ($this->objects === null) {
             $this->buildObjectProperties();
         }
-        
+
         return $this->objects;
     }
 
@@ -232,7 +232,7 @@ class MapperInfo
     {
         $this->objects = [];
         $relations = $this->mapper->relations();
-        
+
         foreach ($this->metadata->embeddeds as $property => $metadata) {
             $this->buildObjectProperty($property, $relations);
         }
@@ -275,22 +275,22 @@ class MapperInfo
 
         return $relations;
     }
-    
+
     /**
      * Get a properties
-     * 
+     *
      * @return InfoInterface[]
      */
     public function all()
     {
         return $this->properties() + $this->objects();
     }
-    
+
     /**
      * Get a property info
-     * 
+     *
      * @param string $name
-     * 
+     *
      * @return null|InfoInterface
      */
     public function property($name)

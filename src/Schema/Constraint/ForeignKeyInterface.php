@@ -12,17 +12,17 @@ use Bdf\Prime\Schema\ConstraintInterface;
 interface ForeignKeyInterface extends ConstraintInterface
 {
     /** Applied ONLY if there is no NULL values */
-    const MATCH_SIMPLE  = 'SIMPLE';
+    public const MATCH_SIMPLE  = 'SIMPLE';
     /** Applied on all NOT NULL values */
-    const MATCH_PARTIAL = 'PARTIAL';
+    public const MATCH_PARTIAL = 'PARTIAL';
     /** Always applied unless all values are NULL */
-    const MATCH_FULL    = 'FULL';
+    public const MATCH_FULL    = 'FULL';
 
-    const MODE_NO_ACTION   = 'NO ACTION';
-    const MODE_CASCADE     = 'CASCADE';
-    const MODE_SET_NULL    = 'SET NULL';
-    const MODE_SET_DEFAULT = 'SET DEFAULT';
-    const MODE_RESTRICT    = 'RESTRICT';
+    public const MODE_NO_ACTION   = 'NO ACTION';
+    public const MODE_CASCADE     = 'CASCADE';
+    public const MODE_SET_NULL    = 'SET NULL';
+    public const MODE_SET_DEFAULT = 'SET DEFAULT';
+    public const MODE_RESTRICT    = 'RESTRICT';
 
 
     /**
