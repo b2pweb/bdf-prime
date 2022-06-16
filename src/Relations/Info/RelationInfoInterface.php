@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Bdf\Prime\Relations\Info;
 
 /**

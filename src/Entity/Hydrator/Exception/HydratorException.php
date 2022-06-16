@@ -9,5 +9,4 @@ use Bdf\Prime\Exception\PrimeException;
  */
 interface HydratorException extends PrimeException
 {
-
 }

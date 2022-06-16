@@ -13,9 +13,9 @@ use Doctrine\DBAL\Schema\AbstractAsset;
  */
 final class NamedIndex implements IndexInterface
 {
-    const FOR_PRIMARY = 'PRIMARY';
-    const FOR_UNIQUE  = 'UNIQ';
-    const FOR_SIMPLE  = 'IDX';
+    public const FOR_PRIMARY = 'PRIMARY';
+    public const FOR_UNIQUE  = 'UNIQ';
+    public const FOR_SIMPLE  = 'IDX';
 
     /**
      * @var IndexInterface

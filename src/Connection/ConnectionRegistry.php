@@ -42,7 +42,7 @@ class ConnectionRegistry implements ConnectionRegistryInterface
      *
      * @var array
      */
-    static private $driverSchemeAliases = [
+    private static $driverSchemeAliases = [
         'db2'        => 'ibm_db2',
         'mssql'      => 'pdo_sqlsrv',
         'mysql'      => 'pdo_mysql',
@@ -67,7 +67,7 @@ class ConnectionRegistry implements ConnectionRegistryInterface
         $this->connectionFactory = $connectionFactory ?? new ConnectionFactory();
         $this->configResolver = $configResolver ?? new ConfigurationResolver();
     }
-    
+
     /**
      * {@inheritDoc}
      */

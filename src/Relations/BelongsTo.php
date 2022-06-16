@@ -4,7 +4,7 @@ namespace Bdf\Prime\Relations;
 
 /**
  * BelongsTo
- * 
+ *
  * @package Bdf\Prime\Relations
  *
  * @template L as object

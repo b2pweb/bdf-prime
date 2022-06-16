@@ -9,5 +9,4 @@ use Throwable;
  */
 interface PrimeException extends Throwable
 {
-
 }

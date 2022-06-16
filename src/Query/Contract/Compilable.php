@@ -12,10 +12,10 @@ use Bdf\Prime\Exception\PrimeException;
  */
 interface Compilable
 {
-    const TYPE_SELECT = 'select';
-    const TYPE_UPDATE = 'update';
-    const TYPE_DELETE = 'delete';
-    const TYPE_INSERT = 'insert';
+    public const TYPE_SELECT = 'select';
+    public const TYPE_UPDATE = 'update';
+    public const TYPE_DELETE = 'delete';
+    public const TYPE_INSERT = 'insert';
 
     /**
      * Compile the query to connection specific object

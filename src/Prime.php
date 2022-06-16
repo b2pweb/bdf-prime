@@ -17,7 +17,7 @@ use RuntimeException;
 
 /**
  * Prime
- * 
+ *
  * Usefull facade to manipulate repositories
  * Allow user to create, drop, truncate repositories
  * Allow user to find, insert entities
@@ -66,10 +66,10 @@ class Prime
     //
     //--------- repository
     //
-    
+
     /**
      * Get a repository
-     * 
+     *
      * @param class-string<T>|RepositoryInterface<T>|T $repository
      *
      * @return RepositoryInterface<T>|null
@@ -85,7 +85,7 @@ class Prime
 
         return static::service()->repository($repository);
     }
-    
+
     /**
      * Create repositories
      *
@@ -147,12 +147,12 @@ class Prime
         if (!is_array($repositories)) {
             $repositories = [$repositories];
         }
-        
+
         foreach ($repositories as $repository) {
             static::repository($repository)->schema($force)->$method();
         }
     }
-    
+
     //
     //--------- entities
     //
@@ -242,7 +242,7 @@ class Prime
     {
         static::callRepositoryMethod('delete', $repositoryName, $entities);
     }
-    
+
     /**
      * Call repository method for entities
      *
@@ -260,28 +260,28 @@ class Prime
             $entities = $repositoryName;
             $repositoryName = null;
         }
-        
+
         if (!is_array($entities) || !isset($entities[0])) {
             $entities = [$entities];
         }
-        
+
         foreach ($entities as $entity) {
             $repository = static::repository($repositoryName ?: $entity);
-            
+
             if (is_array($entity)) {
                 $entity = $repository->entity($entity);
             }
-            
+
             $repository->$method($entity);
         }
     }
 
     /**
      * Assert that entity exists
-     * 
+     *
      * @param object $entity
      * @param bool   $compare  Will compare entity with the expected one
-     * 
+     *
      * @return bool
      *
      * @throws PrimeException
@@ -289,34 +289,34 @@ class Prime
     public static function exists($entity, $compare = true)
     {
         $repository = static::repository($entity);
-        
+
         $expected = $repository->refresh($entity);
-        
+
         if ($expected === null) {
             return false;
         }
-        
+
         if (!$compare) {
             return true;
         }
-        
-        return $entity == $expected 
+
+        return $entity == $expected
                 ? true
                 : serialize($entity) === serialize($expected);
     }
 
     /**
      * Find entity
-     * 
+     *
      * <code>
      *  Prime::find(new EntityClass());
      *  Prime::find('EntityClass', ['id' => '...']);
      *  Prime::find($repository, ['id' => '...']);
      * </code>
-     * 
+     *
      * @param class-string<T>|RepositoryInterface<T>|T $repositoryName Repo name or Entity instance
      * @param array|object|null $criteria Array of criteria. Optional if repository name is an object
-     * 
+     *
      * @return T[]|\Bdf\Prime\Collection\CollectionInterface<T>
      *
      * @throws PrimeException
@@ -327,27 +327,27 @@ class Prime
     {
         /** @psalm-suppress InvalidArgument */
         $repository = static::repository($repositoryName);
-        
+
         // if $repositoryName is an entity
         if (is_object($repositoryName) && !$repositoryName instanceof RepositoryInterface) {
             $criteria = $repository->mapper()->prepareToRepository($repositoryName);
         }
-        
+
         return $repository->queries()->builder()->where($criteria)->all();
     }
 
     /**
      * Find one entity
-     * 
+     *
      * <code>
      *  Prime::one(new EntityClass());
      *  Prime::one('EntityClass', ['id' => '...']);
      *  Prime::one($repository, ['id' => '...']);
      * </code>
-     * 
+     *
      * @param class-string<T>|RepositoryInterface<T>|T $repositoryName Repo name or Entity instance
      * @param array|object|null $criteria Array of criteria. Optional if repository name is an object
-     * 
+     *
      * @return T|null
      *
      * @throws PrimeException
@@ -358,7 +358,7 @@ class Prime
     {
         /** @psalm-suppress InvalidArgument */
         $repository = static::repository($repositoryName);
-        
+
         // if $repositoryName is an entity
         if (is_object($repositoryName) && !$repositoryName instanceof RepositoryInterface) {
             $criteria = $repository->mapper()->prepareToRepository($repositoryName);
@@ -369,10 +369,10 @@ class Prime
 
     /**
      * Refresh entity from repository
-     * 
+     *
      * @param T $entity
      * @param array $additionalCriteria  Criteria to add to primary key
-     * 
+     *
      * @return T|null New refresh entity
      *
      * @throws PrimeException
@@ -382,19 +382,19 @@ class Prime
     public static function refresh($entity, $additionalCriteria = [])
     {
         $repository = static::repository($entity);
-        
+
         return $repository->refresh($entity, $additionalCriteria);
     }
-    
+
     //
     //--------- service
     //
-    
+
     /**
      * Get active connection from profile name
-     * 
+     *
      * @param string $name
-     * 
+     *
      * @return ConnectionInterface
      */
     public static function connection($name = null)
@@ -404,7 +404,7 @@ class Prime
 
     /**
      * Get service locator
-     * 
+     *
      * @return ServiceLocator
      */
     public static function service()
@@ -425,10 +425,10 @@ class Prime
     {
         if (static::$config instanceof ContainerInterface) {
             static::$serviceLocator = static::$config->get('prime');
-            
+
             return;
         }
-        
+
         if (!is_array(static::$config)) {
             throw new RuntimeException('Prime is not configured');
         }

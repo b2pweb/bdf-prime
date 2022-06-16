@@ -22,7 +22,8 @@ class InvalidTypeException extends InvalidArgumentException implements HydratorE
     {
         parent::__construct(
             'Try to hydrate with an invalid type : '.$previous->getMessage().($mapperType ? ' (declared type on mapper : '.$mapperType.')' : ''),
-            0, $previous
+            0,
+            $previous
         );
     }
 }

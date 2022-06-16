@@ -19,11 +19,11 @@ use LogicException;
 
 /**
  * Query Walker
- * 
+ *
  * Permet de parcourir des collections contenant de gros volume d'entités.
  * Le parcourt se fait par paquet d'entités définis par la limit de la query
  * Une fois la limite atteinte, la classe lance la requête suivante
- * 
+ *
  * Attention, le walker ne gère pas les objects collection
  *
  * @template R as array|object
@@ -33,12 +33,12 @@ use LogicException;
  */
 class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
 {
-    const DEFAULT_PAGE  = 1;
-    const DEFAULT_LIMIT = 150;
-    
+    public const DEFAULT_PAGE  = 1;
+    public const DEFAULT_LIMIT = 150;
+
     /**
      * First page
-     * 
+     *
      * @var int
      */
     protected $startPage;
@@ -82,7 +82,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
 
     /**
      * Create a query walker
-     * 
+     *
      * @param ReadCommandInterface<ConnectionInterface, R> $query
      * @param int            $maxRows
      * @param int            $page
@@ -265,7 +265,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     {
         return current($this->collection);
     }
-    
+
     /**
      * SPL - Iterator
      *
@@ -281,7 +281,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
 
         return key($this->collection);
     }
-    
+
     /**
      * SPL - Iterator
      *
@@ -297,7 +297,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
             $this->loadCollection();
         }
     }
-    
+
     /**
      * SPL - Iterator
      *
@@ -307,7 +307,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     {
         return false !== current($this->collection);
     }
-    
+
     /**
      * SPL - Iterator
      *

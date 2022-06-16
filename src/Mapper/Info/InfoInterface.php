@@ -9,14 +9,14 @@ interface InfoInterface
 {
     /**
      * Get the property name
-     * 
+     *
      * @return string
      */
     public function name(): string;
-    
+
     /**
      * Check whether the property is an object
-     * 
+     *
      * @return bool
      */
     public function isObject(): bool;

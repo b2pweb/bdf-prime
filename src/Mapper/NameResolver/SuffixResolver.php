@@ -11,7 +11,7 @@ class SuffixResolver implements ResolverInterface
      * @var string
      */
     protected $suffix;
-    
+
     /**
      * @param string $suffix
      */
@@ -19,7 +19,7 @@ class SuffixResolver implements ResolverInterface
     {
         $this->suffix = $suffix;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -27,7 +27,7 @@ class SuffixResolver implements ResolverInterface
     {
         return $entityClass . $this->suffix;
     }
-    
+
     /**
      * {@inheritdoc}
      */

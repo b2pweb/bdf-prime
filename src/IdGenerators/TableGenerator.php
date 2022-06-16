@@ -9,7 +9,7 @@ use Bdf\Prime\ServiceLocator;
 
 /**
  * Sequence table
- * 
+ *
  * generate sequence from table.
  *
  * @extends AbstractGenerator<\Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection>
@@ -33,10 +33,10 @@ class TableGenerator extends AbstractGenerator
 
         return $data[$property] = $this->incrementSequence($connection, $metadata);
     }
-    
+
     /**
      * Increment and return the new sequence id
-     * 
+     *
      * @param \Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection $connection
      * @param Metadata   $metadata
      *
@@ -52,7 +52,7 @@ class TableGenerator extends AbstractGenerator
                 $connection->executeUpdate('UPDATE '.$metadata->sequence['table']
                     .' SET '. $metadata->sequence['column'].' = LAST_INSERT_ID('.$metadata->sequence['column'].'+1)');
                 return (string) $connection->lastInsertId();
-            
+
             case 'sqlite':
                 $connection->executeUpdate('UPDATE '.$metadata->sequence['table']
                     .' SET '.$metadata->sequence['column'].' = '.$metadata->sequence['column'].'+1');

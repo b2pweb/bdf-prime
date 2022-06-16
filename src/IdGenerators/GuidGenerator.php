@@ -7,7 +7,7 @@ use Ramsey\Uuid\Uuid;
 
 /**
  * GUID generator
- * 
+ *
  * generate guid from UUID expression
  *
  * @extends AbstractGenerator<\Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection>

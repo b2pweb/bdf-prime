@@ -16,7 +16,7 @@ use Bdf\Prime\Repository\RepositoryInterface;
  */
 class Versionable extends Behavior
 {
-    const COLUMN_NAME = 'version';
+    public const COLUMN_NAME = 'version';
 
     /**
      * The version repository className

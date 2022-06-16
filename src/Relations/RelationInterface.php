@@ -18,13 +18,13 @@ use Bdf\Prime\Repository\RepositoryInterface;
  */
 interface RelationInterface
 {
-    const BELONGS_TO        = 'belongsTo';
-    const HAS_ONE           = 'hasOne';
-    const HAS_MANY          = 'hasMany';
-    const BELONGS_TO_MANY   = 'belongsToMany';
-    const BY_INHERITANCE    = 'byInheritance';
-    const MORPH_TO          = 'morphTo';
-    const CUSTOM            = 'custom';
+    public const BELONGS_TO        = 'belongsTo';
+    public const HAS_ONE           = 'hasOne';
+    public const HAS_MANY          = 'hasMany';
+    public const BELONGS_TO_MANY   = 'belongsToMany';
+    public const BY_INHERITANCE    = 'byInheritance';
+    public const MORPH_TO          = 'morphTo';
+    public const CUSTOM            = 'custom';
 //    const MORPH_TO_MANY     = 'morphToMany';
 
     /**
@@ -54,9 +54,9 @@ interface RelationInterface
 
     /**
      * Set the relation options
-     * 
+     *
      * @param array $options
-     * 
+     *
      * @return $this
      */
     public function setOptions(array $options);
@@ -168,7 +168,7 @@ interface RelationInterface
      * @param R $entity The related entity data
      *
      * @return L Returns the owner entity instance
-     * 
+     *
      * @throws \InvalidArgumentException If the owner is not a foreign key barrier
      */
     public function associate($owner, $entity);
@@ -181,11 +181,11 @@ interface RelationInterface
      *       the related entity id must be generated before, and the owner must be updated manually
      *
      * Only foreign key barrier can dissociate an entity
-     * 
+     *
      * @param L $owner  The relation owner
      *
      * @return L Returns the owner entity instance
-     * 
+     *
      * @throws \InvalidArgumentException If the owner is not a foreign key barrier
      */
     public function dissociate($owner);

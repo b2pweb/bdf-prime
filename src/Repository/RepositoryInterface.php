@@ -18,16 +18,16 @@ use Bdf\Prime\Schema\StructureUpgraderInterface;
 
 /**
  * RepositoryInterface
- * 
+ *
  * @template E as object
  */
 interface RepositoryInterface
 {
     /**
      * Get a repository
-     * 
+     *
      * @param class-string<T>|T $entity
-     * 
+     *
      * @return RepositoryInterface<T>
      * @template T as object
      */
@@ -35,21 +35,21 @@ interface RepositoryInterface
 
     /**
      * Get mapper
-     * 
+     *
      * @return Mapper<E>
      */
     public function mapper(): Mapper;
-    
+
     /**
      * Get the metadata
-     * 
+     *
      * @return Metadata
      */
     public function metadata(): Metadata;
 
     /**
      * Get DBAL connection
-     * 
+     *
      * @return ConnectionInterface
      */
     public function connection(): ConnectionInterface;
@@ -63,13 +63,13 @@ interface RepositoryInterface
 
     /**
      * Instanciate entity criteria
-     * 
+     *
      * @param array $criteria
-     * 
+     *
      * @return Criteria
      */
     public function criteria(array $criteria = []): Criteria;
-    
+
     /**
      * Instantiate entity
      *

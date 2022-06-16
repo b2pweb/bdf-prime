@@ -10,31 +10,31 @@ namespace Bdf\Prime\Types;
  */
 interface TypeInterface
 {
-    const TARRAY = 'array';
-    const ARRAY_OBJECT = 'array_object';
-    const JSON = 'json';
-    const OBJECT = 'object';
+    public const TARRAY = 'array';
+    public const ARRAY_OBJECT = 'array_object';
+    public const JSON = 'json';
+    public const OBJECT = 'object';
 
-    const BOOLEAN = 'boolean';
-    const TINYINT = 'tinyint';
-    const SMALLINT = 'smallint';
-    const INTEGER = 'integer';
-    const BIGINT = 'bigint';
-    const DOUBLE = 'double';
-    const FLOAT = 'float';
-    const DECIMAL = 'decimal';
+    public const BOOLEAN = 'boolean';
+    public const TINYINT = 'tinyint';
+    public const SMALLINT = 'smallint';
+    public const INTEGER = 'integer';
+    public const BIGINT = 'bigint';
+    public const DOUBLE = 'double';
+    public const FLOAT = 'float';
+    public const DECIMAL = 'decimal';
 
-    const STRING = 'string';
-    const TEXT = 'text';
-    const BLOB = 'blob';
-    const BINARY = 'binary';
-    const GUID = 'guid';
+    public const STRING = 'string';
+    public const TEXT = 'text';
+    public const BLOB = 'blob';
+    public const BINARY = 'binary';
+    public const GUID = 'guid';
 
-    const DATETIME = 'datetime';
-    const DATETIMETZ = 'datetimetz';
-    const DATE = 'date';
-    const TIME = 'time';
-    const TIMESTAMP = 'timestamp';
+    public const DATETIME = 'datetime';
+    public const DATETIMETZ = 'datetimetz';
+    public const DATE = 'date';
+    public const TIME = 'time';
+    public const TIMESTAMP = 'timestamp';
 
     /**
      * Transform database value to PHP value

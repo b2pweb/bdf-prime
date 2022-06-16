@@ -180,7 +180,7 @@ class MapperVisitor extends AbstractVisitor
         if ($default !== null) {
             switch ($type) {
                 case TypeInterface::BOOLEAN:
-                    $default = (boolean)$default;
+                    $default = (bool)$default;
                     break;
 
                 case TypeInterface::TINYINT:
@@ -194,7 +194,7 @@ class MapperVisitor extends AbstractVisitor
                     break;
 
                 case TypeInterface::DOUBLE:
-                    $default = (double)$default;
+                    $default = (float)$default;
                     break;
             }
 

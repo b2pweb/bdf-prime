@@ -5,7 +5,7 @@ namespace Bdf\Prime\Console;
 use Bdf\Prime\Connection\ConnectionInterface;
 
 /**
- * 
+ *
  */
 class CreateDatabaseCommand extends DatabaseCommand
 {

@@ -7,7 +7,7 @@ namespace Bdf\Prime\Schema\Util;
  */
 final class Name
 {
-    const DEFAULT_LENGTH = 63;
+    public const DEFAULT_LENGTH = 63;
 
     /**
      * Generate an identifier, using Doctrine algo

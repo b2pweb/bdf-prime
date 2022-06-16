@@ -16,18 +16,18 @@ use Doctrine\DBAL\Exception\TableNotFoundException;
 
 /**
  * Handle structure migration of repository tables
- * 
+ *
  * @todo gestion du renommage de champs dans le cas où d'autres attributs ont été changés
  */
 class RepositoryUpgrader implements StructureUpgraderInterface
 {
     /**
-     * @var ServiceLocator 
+     * @var ServiceLocator
      */
     protected $service;
-    
+
     /**
-     * @var Metadata 
+     * @var Metadata
      */
     protected $metadata;
 
@@ -48,7 +48,7 @@ class RepositoryUpgrader implements StructureUpgraderInterface
         $this->metadata = $metadata;
         $this->schema   = $schema;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -64,7 +64,7 @@ class RepositoryUpgrader implements StructureUpgraderInterface
             $this->insertSequenceId();
         }
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -143,7 +143,7 @@ class RepositoryUpgrader implements StructureUpgraderInterface
 
         return $table->build();
     }
-    
+
     /**
      * Insert sequence id into sequence table
      *
@@ -163,12 +163,12 @@ class RepositoryUpgrader implements StructureUpgraderInterface
 
         /** @psalm-suppress UndefinedInterfaceMethod */
         $nb = $connection->from($table)->count();
-        
+
         if ($nb == 0) {
             $connection->insert($table, [$this->metadata->sequence['column'] => 0]);
         }
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -190,7 +190,7 @@ class RepositoryUpgrader implements StructureUpgraderInterface
             if (($schemaSequence = $this->schemaSequence()) !== null) {
                 $schemaSequence->drop($this->metadata->sequence['table']);
             }
-            
+
             return true;
         } catch (DBALException $e) {
             if ($e->getPrevious() instanceof TableNotFoundException) {
@@ -203,7 +203,7 @@ class RepositoryUpgrader implements StructureUpgraderInterface
 
     /**
      * Get the schema builder
-     * 
+     *
      * @return SchemaManagerInterface
      * @throws PrimeException
      */
@@ -237,7 +237,7 @@ class RepositoryUpgrader implements StructureUpgraderInterface
 
     /**
      * Get the connection
-     * 
+     *
      * @param string $profile
      *
      * @return ConnectionInterface

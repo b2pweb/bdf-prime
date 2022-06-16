@@ -7,7 +7,7 @@ use Bdf\Prime\Relations\Relation;
 
 /**
  * SingleTableInheritanceMapper
- * 
+ *
  * @package Bdf\Prime\Mapper
  */
 abstract class SingleTableInheritanceMapper extends Mapper implements MapperFactoryAwareInterface
@@ -50,7 +50,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
     public function relation(string $relationName): array
     {
         $relation = parent::relation($relationName);
-        
+
         if ($this->isDiscriminatedMapper() && $relation['type'] == Relation::BY_INHERITANCE) {
             throw new \RuntimeException('Relation type not allowed from relation "' . $relationName . '" in ' . $this->getEntityClass());
         }

@@ -27,16 +27,16 @@ interface ConnectionInterface
 {
     /**
      * Set the connection name
-     * 
+     *
      * @param string $name
-     * 
+     *
      * @return $this
      */
     public function setName(string $name);
 
     /**
      * Get the connection name
-     * 
+     *
      * @return string
      */
     public function getName(): string;

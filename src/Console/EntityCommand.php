@@ -21,7 +21,7 @@ use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * EntityCommand
- * 
+ *
  * @package Bdf\Prime\Console
  *
  * @psalm-suppress ReservedWord
@@ -57,7 +57,8 @@ class EntityCommand extends Command
             ->addArgument('mapper', InputArgument::REQUIRED, 'Mapper file or directory to parse')
             ->addOption('backup', 'b', InputOption::VALUE_NONE, 'Backup file if exists')
             ->setDescription('Generate entity class by mapper')
-            ->setHelp(<<<EOF
+            ->setHelp(
+                <<<EOF
 The <info>%command.name%</info> generate entity from mapper
 use mapper argument to parse a directory or a mapper file
   <info>php %command.full_name% app/models</info>
@@ -80,7 +81,7 @@ EOF
         $io = new BdfStyle($input, $output);
 
         $path = realpath($io->argument('mapper'));
-        
+
         $cache = $this->locator->mappers()->getMetadataCache();
         $this->locator->mappers()->setMetadataCache(null);
 
@@ -101,7 +102,7 @@ EOF
         $this->locator->mappers()->setMetadataCache($cache);
         return 0;
     }
-    
+
     /**
      * @param string $path
      *
@@ -114,11 +115,11 @@ EOF
         } else {
             $classFile = new PhpClassFile($path);
             $classFile->extractClassInfo();
-            
+
             return [$classFile];
         }
     }
-    
+
     /**
      * @param BdfStyle $io
      * @param EntityGenerator $generator
@@ -133,7 +134,7 @@ EOF
         $fileName  = str_replace('Mapper', '', $classInfo->getRealPath());
         $className = $mapper->getEntityClass();
         $doCreate = false;
-        
+
         if (file_exists($fileName)) {
             $userChoice = (string) $io->choice("'$fileName' exists. what do you want ?", [
                 '1'     => 'Regenerate: will replace the existing entity',
@@ -155,7 +156,7 @@ EOF
         if ($typedPropertiesAvailable) {
             $generator->useTypedProperties();
         }
-        
+
         $choices = [
             '0'     => 'Skip',
             '1'     => 'Auto+create',
@@ -177,6 +178,7 @@ EOF
             switch ((string) $io->choice("'$className' found", $choices, 'auto')) {
                 case 'Auto+create':
                     $doCreate = true;
+                    // no break
                 case 'Auto':
                     $generator->setClassToExtend(Model::class);
                     $generator->addInterface(InitializableInterface::class);
@@ -184,7 +186,8 @@ EOF
                     if (!$doCreate) {
                         break;
                     }
-                
+
+                    // no break
                 case 'Create':
                     $filesystem = new Filesystem();
 
@@ -192,21 +195,21 @@ EOF
                         $filesystem->copy($fileName, $fileName.'.bak');
                         $io->comment('backup file "' . $fileName.'.bak' . '"');
                     }
-                    
+
                     $filesystem->dumpFile($fileName, $generator->generate($mapper, $fileName));
 
                     $io->info('File "' . $fileName . '" was created');
                     return;
-                    
+
                 case 'Show':
                     $io->line('File: ' . $fileName);
                     $io->line($generator->generate($mapper, $fileName));
                     break;
-                    
+
                 case 'Extends class':
                     $generator->setClassToExtend((string) $io->ask('Enter full name class'));
                     break;
-                    
+
                 case 'Implements interface':
                     $knownInterfaces = [
                         '1'     => EntityInterface::class,
@@ -214,9 +217,9 @@ EOF
                         '3'     => ImportableInterface::class,
                         '4'     => 'other',
                     ];
-                    
+
                     $userChoice = (string) $io->choice('Choose interface', $knownInterfaces);
-                    
+
                     if ($userChoice === 'other') {
                         $generator->addInterface((string) $io->ask('Enter full name class:'));
                     } else {
@@ -229,16 +232,16 @@ EOF
                         '1'     => ArrayInjector::class,
                         '2'     => 'other',
                     ];
-                    
+
                     $userChoice = (string) $io->choice('Choose extension', $knownTraits);
-                    
+
                     if ($userChoice === 'other') {
                         $generator->addTrait((string) $io->ask('Enter full name class:'));
                     } else {
                         $generator->addTrait($userChoice);
                     }
                     break;
-                
+
                 case 'Enable/disable get method shortcut':
                     $generator->useGetShortcutMethod($generator->getUseGetShortcutMethod() === false);
                     break;

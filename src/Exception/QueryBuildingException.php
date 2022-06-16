@@ -9,5 +9,4 @@ use LogicException;
  */
 class QueryBuildingException extends LogicException implements PrimeException
 {
-
 }

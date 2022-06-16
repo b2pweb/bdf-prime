@@ -26,10 +26,12 @@ abstract class PrimeSerializable extends Locatorizable
      *
      * @param array $normalized
      *
-     * @return static
+     * @return mixed
+     * @psalm-return static
      */
     public static function fromArray(array $normalized)
     {
+        /** @var static */
         return self::serializer()->fromArray($normalized, static::class);
     }
 
@@ -50,10 +52,12 @@ abstract class PrimeSerializable extends Locatorizable
      *
      * @param string $json
      *
-     * @return static
+     * @return mixed
+     * @psalm-return static
      */
     public static function fromJson($json)
     {
+        /** @var static */
         return self::serializer()->fromJson($json, static::class);
     }
 

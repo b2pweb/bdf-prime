@@ -25,7 +25,8 @@ class UninitializedPropertyException extends RuntimeException implements Hydrato
     {
         parent::__construct(
             'Trying to read the property '.$className.'::'.$propertyName.' which is not yet initialized. Maybe you have forgot to call the setter or define a default value on the property declaration ?',
-            0, $previous
+            0,
+            $previous
         );
     }
 }

@@ -27,14 +27,15 @@ class MigrateCommand extends AbstractCommand
             ->setDescription('Run all migrations')
             ->addOption('--target', '-t', InputArgument::OPTIONAL, 'The version number to migrate to')
             ->addOption('stage', 's', InputOption::VALUE_REQUIRED, 'The migration stage', MigrationInterface::STAGE_DEFAULT)
-            ->setHelp(<<<EOT
+            ->setHelp(
+                <<<EOT
 The <info>migrate</info> command runs all available migrations, optionally up to a specific version
 
 <info>migrate</info>
 <info>migrate -t 20111018185412</info>
 
 EOT
-        );
+            );
     }
 
     /**

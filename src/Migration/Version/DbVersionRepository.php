@@ -60,7 +60,7 @@ class DbVersionRepository implements VersionRepositoryInterface
 
     /**
      * Get the connection
-     * 
+     *
      * @return ConnectionInterface&\Doctrine\DBAL\Connection
      */
     public function getConnection(): ConnectionInterface
@@ -163,7 +163,7 @@ class DbVersionRepository implements VersionRepositoryInterface
     }
 
     /**
-     * Is the schema ready? 
+     * Is the schema ready?
      *
      * @return boolean
      * @throws PrimeException
@@ -191,12 +191,12 @@ class DbVersionRepository implements VersionRepositoryInterface
             throw new \LogicException('The connection "' . $this->connection->getName() . '" do not supports table configuration');
         }
 
-        $schemaManager->table($this->tableName, function($table) {
+        $schemaManager->table($this->tableName, function ($table) {
             $table->string('version');
         });
 
         $this->hasSchema = true;
-        
+
         return $this;
     }
 }

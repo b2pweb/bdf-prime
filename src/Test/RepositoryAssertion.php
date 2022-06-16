@@ -15,7 +15,7 @@ trait RepositoryAssertion
      * @var TestPack
      */
     protected $testPack;
-    
+
     /**
      * Get the test pack manager
      *
@@ -26,13 +26,13 @@ trait RepositoryAssertion
         if ($this->testPack === null) {
             $this->testPack = TestPack::pack();
         }
-        
+
         return $this->testPack;
     }
-    
+
     /**
      * Assert that two array of entities are the same
-     * 
+     *
      * @param array $expectedEntities
      * @param array $actualEntities
      * @param string $message
@@ -51,11 +51,11 @@ trait RepositoryAssertion
             $this->assertSameEntity($expectedEntity, $actualEntities[$index], $message);
         }
     }
-    
+
     /**
      * Assert that two entities are the same
      * Compare only fields defined in associated mapper
-     * 
+     *
      * @param object        $expected
      * @param object        $entity
      * @param string        $message
@@ -66,17 +66,17 @@ trait RepositoryAssertion
     {
         $this->assertEntity($expected, $entity, 0, $message);
     }
-    
-     /**
-     * Assert that two array of entities are equal
-     * 
-     * @param array $expectedEntities
-     * @param array $actualEntities
-     * @param int   $dateTimeDelta
-     * @param string $message
-      *
-      * @throws \Exception
-     */
+
+    /**
+    * Assert that two array of entities are equal
+    *
+    * @param array $expectedEntities
+    * @param array $actualEntities
+    * @param int   $dateTimeDelta
+    * @param string $message
+     *
+     * @throws \Exception
+    */
     public function assertEntities($expectedEntities, $actualEntities, $dateTimeDelta = 5, $message = '')
     {
         if (is_string($dateTimeDelta)) {
@@ -96,7 +96,7 @@ trait RepositoryAssertion
             $this->assertEntity($expectedEntity, $actualEntities[$index], $dateTimeDelta, $message);
         }
     }
-    
+
     /**
      * Assert that two entities are equal
      * Compare only fields defined in associated mapper

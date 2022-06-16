@@ -34,6 +34,4 @@ class ObjectType extends AbstractSerializeType
 
         return parent::toDatabase($value);
     }
-
-
 }

@@ -19,13 +19,14 @@ class InitCommand extends AbstractCommand
     {
         $this
             ->setDescription('Initialise this directory for use with migration')
-            ->setHelp(<<<EOT
+            ->setHelp(
+                <<<EOT
 The <info>init</info> command creates a migrations directory
 
 <info>init</info>
 
 EOT
-        );
+            );
     }
 
     /**

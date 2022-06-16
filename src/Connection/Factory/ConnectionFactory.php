@@ -27,7 +27,7 @@ class ConnectionFactory implements ConnectionFactoryInterface
      * @psalm-suppress UndefinedClass
      * @psalm-suppress InvalidPropertyAssignmentValue
      */
-    static private $driversMap = [
+    private static $driversMap = [
         'mongodb' => [MongoDriver::class, MongoConnection::class],
     ];
 

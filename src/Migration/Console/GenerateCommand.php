@@ -26,13 +26,14 @@ class GenerateCommand extends AbstractCommand
             ->setDescription('Generate a new migration')
             ->addArgument('name', InputArgument::REQUIRED, 'The name for the migration')
             ->addOption('stage', 's', InputOption::VALUE_REQUIRED, 'The migration stage', MigrationInterface::STAGE_DEFAULT)
-            ->setHelp(<<<EOT
+            ->setHelp(
+                <<<EOT
 The <info>generate</info> command creates a new migration with the name and path specified 
 
 <info>generate MyMigrationComponent ./migrations</info>
 
 EOT
-        );
+            );
     }
 
     /**

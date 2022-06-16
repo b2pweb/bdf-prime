@@ -60,7 +60,7 @@ class TestPack
     public static function pack()
     {
         if (static::$pack === null) {
-            static::$pack = new static;
+            static::$pack = new static();
         }
 
         return static::$pack;
@@ -357,7 +357,6 @@ class TestPack
                 $connection->setNestTransactionsWithSavepoints(true);
                 $connection->beginTransaction();
             } catch (\Exception $e) {
-
             }
         }
     }
@@ -375,7 +374,6 @@ class TestPack
                     $connection->rollBack();
                 }
             } catch (\Exception $e) {
-
             }
         }
     }

@@ -23,7 +23,7 @@ class ArrayHydrator implements HydratorInterface
     /**
      * Array prefix for protected properties
      */
-    const PROTECTED_PREFIX = "\0*\0";
+    public const PROTECTED_PREFIX = "\0*\0";
 
     /**
      * @var array<class-string, callable(object, array)>

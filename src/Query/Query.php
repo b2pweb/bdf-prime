@@ -24,9 +24,9 @@ use Stringable;
 
 /**
  * Sql Query
- * 
+ *
  * @package Bdf\Prime\Query
- * 
+ *
  * @todo comment reset un statement (ex ecraser les orders). Prendre en compte le reset du compiler
  *
  * @template C as \Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection
@@ -128,7 +128,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
                 'types' => $types,
             ];
         }
-        
+
         return $this->executeUpdate(self::TYPE_UPDATE);
     }
 
@@ -143,7 +143,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
                 'data' => $data,
             ];
         }
-        
+
         return $this->executeUpdate(self::TYPE_INSERT);
     }
 
@@ -153,7 +153,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     public function ignore(bool $flag = true)
     {
         $this->statements['ignore'] = $flag;
-        
+
         return $this;
     }
 
@@ -385,9 +385,9 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     public function distinct(bool $flag = true)
     {
         $this->compilerState->invalidate('columns');
-        
+
         $this->statements['distinct'] = $flag;
-        
+
         return $this;
     }
 
@@ -455,23 +455,23 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     public function group(string ...$columns)
     {
         $this->compilerState->invalidate('groups');
-        
+
         $this->statements['groups'] = $columns;
-        
+
         return $this;
     }
 
     /**
      * {@inheritdoc}
-     * 
+     *
      * @no-named-arguments
      */
     public function addGroup(string ...$columns)
     {
         $this->compilerState->invalidate('groups');
-        
+
         $this->statements['groups'] = [...$this->statements['groups'], ...$columns];
-        
+
         return $this;
     }
 
@@ -562,7 +562,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
                     $this->limit($value);
                 }
                 break;
-            
+
             case ':limitPage':
                 if (is_array($value)) {
                     $this->limitPage($value[0], $value[1]);
@@ -570,28 +570,28 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
                     $this->limitPage($value);
                 }
                 break;
-            
+
             case ':offset':
                 $this->offset($value);
                 break;
-            
+
             case ':order':
                 $this->order($value);
                 break;
-            
+
             case ':distinct':
                 $this->distinct($value);
                 break;
-                
+
             case ':group':
                 $this->group($value);
                 break;
-            
+
             case ':having':
                 $this->having($value);
                 break;
         }
-        
+
         return $this;
     }
 
@@ -623,7 +623,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
             } else {
                 $keys[] = '/[?]/';
             }
-            
+
             if (is_array($value)) {
                 $values[$key] = implode(',', $this->connection->quote($value));
             } elseif (is_null($value)) {
@@ -636,10 +636,10 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
                 $values[$key] = $value;
             }
         }
-        
+
         return preg_replace($keys, $values, $sql, 1);
     }
-    
+
     /**
      * Gets a string representation of this Query which corresponds to
      * the final SQL query being constructed.

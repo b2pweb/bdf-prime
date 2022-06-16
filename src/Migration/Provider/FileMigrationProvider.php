@@ -188,7 +188,9 @@ class FileMigrationProvider implements MigrationProviderInterface
         }
 
         // Check if migration name already exists
-        $definedMigration = array_search($className, array_map(function(MigrationInterface $migration) { return $migration->name(); }, $this->migrations));
+        $definedMigration = array_search($className, array_map(function (MigrationInterface $migration) {
+            return $migration->name();
+        }, $this->migrations));
 
         if (false !== $definedMigration) {
             throw new InvalidArgumentException(sprintf(

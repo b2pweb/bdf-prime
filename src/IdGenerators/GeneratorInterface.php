@@ -15,7 +15,7 @@ interface GeneratorInterface
 {
     /**
      * Set the current connection
-     * 
+     *
      * @param C $connection
      *
      * @return void
@@ -38,7 +38,7 @@ interface GeneratorInterface
 
     /**
      * Modify entity after insertion
-     * 
+     *
      * @param object $entity
      *
      * @return void

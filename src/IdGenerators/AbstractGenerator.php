@@ -23,7 +23,7 @@ abstract class AbstractGenerator implements GeneratorInterface
      * @var Mapper
      */
     private $mapper;
-    
+
     /**
      * The active connection
      *
@@ -46,7 +46,7 @@ abstract class AbstractGenerator implements GeneratorInterface
      * @var bool
      */
     protected $hasBeenErased = true;
-    
+
     /**
      * @param Mapper $mapper
      */
@@ -55,27 +55,27 @@ abstract class AbstractGenerator implements GeneratorInterface
         // TODO: reference cyclique
         $this->mapper = $mapper;
     }
-    
+
     /**
      * Get the mapper
-     * 
+     *
      * @return Mapper
      */
     public function mapper()
     {
         return $this->mapper;
     }
-    
+
     /**
      * Get connection
-     * 
+     *
      * @return C
      */
     public function connection()
     {
         return $this->connection;
     }
-    
+
     /**
      * {@inheritdoc}
      */
@@ -83,7 +83,7 @@ abstract class AbstractGenerator implements GeneratorInterface
     {
         $this->connection = $connection;
     }
-    
+
     /**
      * {@inheritdoc}
      */
