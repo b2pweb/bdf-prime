@@ -194,7 +194,7 @@ class BelongsToMany extends Relation
      */
     public function link($owner): ReadCommandInterface
     {
-        /** @var QueryInterface&EntityJoinable $query */
+        /** @var QueryInterface<\Bdf\Prime\Connection\ConnectionInterface, R>&EntityJoinable $query */
         $query = $this->distant->queries()->builder();
 
         return $query

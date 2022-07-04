@@ -331,6 +331,10 @@ class RepositoryQueryFactory
      * @param string|null $alias The FROM table alias
      *
      * @return CommandInterface
+     *
+     * @template Q
+     * @psalm-param Q $query
+     * @psalm-return Q
      */
     private function configure(CommandInterface $query, ?string $alias = null)
     {

@@ -88,7 +88,7 @@ class MapperFactory
             $hydrator = new MapperHydrator();
         }
 
-        /** @var Mapper $mapper */
+        /** @var Mapper<E> $mapper */
         $mapper = new $mapperClass($serviceLocator, $entityClass, $metadata, $hydrator, $this->resultCache);
 
         if ($this->metadataCache !== null && $metadata === null) {
