@@ -1,0 +1,13 @@
+{
+    "runner.bootstrap": "bench/autoload.php",
+    "runner.path": "bench",
+    "runner.file_pattern": "**Bench.php",
+    "runner.time_unit": "milliseconds",
+    "report.generators": {
+        "bdf": {
+            "extends": "aggregate",
+            "break": ["subject", "groups"],
+            "cols": ["subject", "mem_peak", "best", "mean", "worst"]
+        }
+    }
+}

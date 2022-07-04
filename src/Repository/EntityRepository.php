@@ -86,7 +86,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Cache of relation instance
      *
-     * @var RelationInterface[]
+     * @var array<string, RelationInterface<E, object>>
      */
     protected $relations = [];
 
