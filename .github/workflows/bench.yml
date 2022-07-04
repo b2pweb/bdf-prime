@@ -1,0 +1,26 @@
+name: PHP Bench
+
+on:
+  push:
+    branches: [ '[1-9].[0-9]+' ]
+  pull_request:
+    branches: [ '[1-9].[0-9]+' ]
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    name: PHP Bench
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: "8.0"
+        extensions: json
+
+    - name: Install dependencies
+      run: composer install --prefer-dist --no-progress
+
+    - name: Benchmark
+      run: vendor/bin/phpbench run
