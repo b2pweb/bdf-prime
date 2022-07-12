@@ -6,8 +6,8 @@ use Bdf\Prime\Entity\Hydrator\Exception\InvalidTypeException;
 use Bdf\Prime\Entity\ImportableInterface;
 use Closure;
 use stdClass;
-
 use TypeError;
+
 use function get_class;
 use function is_array;
 use function method_exists;

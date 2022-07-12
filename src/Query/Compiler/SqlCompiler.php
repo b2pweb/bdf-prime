@@ -691,7 +691,6 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
                 }
                 return $this->quoteIdentifier($query, $column).' >= '.$this->compileExpressionValue($query, $value, $converted);
 
-            // REGEX matching
             case '~=':
             case '=~':
             case ':regex':
@@ -700,14 +699,12 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
                 }
                 return $this->quoteIdentifier($query, $column).' REGEXP '.$this->compileExpressionValue($query, (string)$value, $converted);
 
-            // LIKE
             case ':like':
                 if (is_array($value)) {
                     return $this->compileIntoExpression($query, $value, $column, 'LIKE', $converted);
                 }
                 return $this->quoteIdentifier($query, $column).' LIKE '.$this->compileExpressionValue($query, $value, $converted);
 
-            // NOT LIKE
             case ':notlike':
             case '!like':
                 if (is_array($value)) {
@@ -715,7 +712,6 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
                 }
                 return $this->quoteIdentifier($query, $column).' NOT LIKE '.$this->compileExpressionValue($query, $value, $converted);
 
-            // In
             case 'in':
             case ':in':
                 if (empty($value)) {
@@ -723,7 +719,6 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
                 }
                 return $this->compileInExpression($query, $value, $column, 'IN', $converted);
 
-            // Not in
             case 'notin':
             case '!in':
             case ':notin':
@@ -732,7 +727,6 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
                 }
                 return $this->compileInExpression($query, $value, $column, 'NOT IN', $converted);
 
-            // Between
             case 'between':
             case ':between':
                 if (is_array($value)) {
@@ -740,12 +734,10 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
                 }
                 return $this->platform()->grammar()->getBetweenExpression($this->quoteIdentifier($query, $column), '0', $this->compileExpressionValue($query, $value, $converted));
 
-            // Not between
             case '!between':
             case ':notbetween':
                 return $this->platform()->grammar()->getNotExpression($this->compileExpression($query, $column, ':between', $value, $converted));
 
-            // Not equal
             case '<>':
             case '!=':
             case ':ne':
@@ -758,7 +750,6 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
                 }
                 return $this->quoteIdentifier($query, $column).' != '.$this->compileExpressionValue($query, $value, $converted);
 
-            // Equals
             case '=':
             case ':eq':
                 if (is_null($value)) {
@@ -769,7 +760,6 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
                 }
                 return $this->quoteIdentifier($query, $column).' = '.$this->compileExpressionValue($query, $value, $converted);
 
-            // Unsupported operator
             default:
                 throw new UnexpectedValueException("Unsupported operator '" . $operator . "' in WHERE clause");
         }

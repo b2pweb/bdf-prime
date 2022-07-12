@@ -10,6 +10,7 @@ use Bdf\Prime\ServiceLocator;
 use Bdf\Util\Console\BdfStyle;
 use Bdf\Util\File\ClassFileLocator;
 use Bdf\Util\File\PhpClassFile;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,6 +21,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * HydratorGenerationCommand
  */
+#[AsCommand('prime:hydrator', 'Generate optimized hydrator classes for entities')]
 class HydratorGenerationCommand extends Command
 {
     protected static $defaultName = 'prime:hydrator';
