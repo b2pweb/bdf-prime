@@ -221,8 +221,6 @@ abstract class Relation extends AbstractRelation
                 );
                 break;
 
-            //---- polymorphism
-
             case RelationInterface::BY_INHERITANCE:
                 $relation = new ByInheritance(
                     $relationName,
