@@ -6,6 +6,7 @@ use Bdf\Prime\Schema\SchemaManagerInterface;
 use Bdf\Prime\Schema\Visitor\MapperVisitor;
 use Bdf\Prime\ServiceLocator;
 use Bdf\Util\Console\BdfStyle;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -14,6 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * MapperCommand
  */
+#[AsCommand('prime:mapper', 'Generate mapper prototype class')]
 class MapperCommand extends Command
 {
     protected static $defaultName = 'prime:mapper';

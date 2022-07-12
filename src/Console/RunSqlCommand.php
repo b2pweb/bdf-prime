@@ -5,10 +5,12 @@ namespace Bdf\Prime\Console;
 use Bdf\Prime\ConnectionManager;
 use Bdf\Prime\Console\ConnectionProvider\DoctrineConnectionProviderAdapter;
 use Doctrine\DBAL\Tools\Console\Command\RunSqlCommand as DoctrineRunSqlCommand;
+use Symfony\Component\Console\Attribute\AsCommand;
 
 /**
  * Run SQL on a doctrine connection. This will display a dbal result.
  */
+#[AsCommand('prime:run:sql', 'Executes arbitrary SQL directly from the command line.')]
 class RunSqlCommand extends DoctrineRunSqlCommand
 {
     protected static $defaultName = 'prime:run:sql';
