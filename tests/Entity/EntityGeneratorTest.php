@@ -12,6 +12,7 @@ use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Project;
 use Bdf\Prime\Task;
+use Bdf\Prime\TestEntity;
 use Bdf\Prime\User;
 use PHPUnit\Framework\TestCase;
 
@@ -432,6 +433,102 @@ PHP
         $this->assertStringContainsString("\$this->deletedAt = new \DateTime();", $classContent);
     }
 
+    public function test_useConstructorPropertyPromotion()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->useConstructorPropertyPromotion();
+        $generator->useTypedProperties();
+
+        $classContent = $generator->generate(TestEntity::repository()->mapper());
+        $this->assertStringContainsString(<<<'PHP'
+    public function __construct(
+        /**
+         * @var integer
+         */
+        protected ?int $id = null,
+
+        /**
+         * @var string
+         */
+        protected ?string $name = null,
+
+        /**
+         * @var \DateTime
+         */
+        protected ?\DateTime $dateInsert = null,
+
+        /**
+         * @var TestEmbeddedEntity
+         */
+        protected ?TestEmbeddedEntity $foreign = null,
+    ) {
+        $this->foreign ??= new TestEmbeddedEntity();
+    }
+PHP
+        , $classContent);
+    }
+
+    /**
+     *
+     */
+    public function test_default_date_instantiation_constructorPropertyPromotion()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->useConstructorPropertyPromotion();
+        $generator->useTypedProperties();
+
+        $classContent = $generator->generate(Task::repository()->mapper());
+        $this->assertStringContainsString(<<<'PHP'
+    public function __construct(
+        /**
+         * @var integer
+         */
+        protected ?int $id = null,
+
+        /**
+         * @var string
+         */
+        protected ?string $name = null,
+
+        /**
+         * @var string
+         */
+        protected ?string $type = null,
+
+        /**
+         * @var string
+         */
+        protected ?string $targetId = '0',
+
+        /**
+         * @var string
+         */
+        protected ?string $overridenProperty = null,
+
+        /**
+         * @var \DateTimeImmutable
+         */
+        protected ?\DateTimeImmutable $createdAt = null,
+
+        /**
+         * @var \DateTimeImmutable
+         */
+        protected ?\DateTimeImmutable $updatedAt = null,
+
+        /**
+         * @var \DateTime
+         */
+        protected ?\DateTime $deletedAt = null,
+    ) {
+        $this->createdAt ??= new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $this->updatedAt ??= new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $this->deletedAt ??= new \DateTime();
+    }
+
+PHP
+            , $classContent);
+    }
+
     /**
      *
      */
@@ -495,8 +592,11 @@ PHP
 
         $this->assertValidPHP($generator->generate($entity::repository()->mapper()));
 
-        if (PHP_VERSION_ID >= 70400) {
-            $generator->useTypedProperties();
+        $generator->useTypedProperties();
+        $this->assertValidPHP($generator->generate($entity::repository()->mapper()));
+
+        if (PHP_MAJOR_VERSION >= 8) {
+            $generator->useConstructorPropertyPromotion();
             $this->assertValidPHP($generator->generate($entity::repository()->mapper()));
         }
     }
