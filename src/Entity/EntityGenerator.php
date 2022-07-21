@@ -221,7 +221,7 @@ class EntityGenerator
  *
  * @return <variableType>
  */
-public function <methodName>()
+public function <methodName>(): <methodTypeHint>
 {
 <spaces>return $this-><fieldName>;
 }
@@ -238,7 +238,7 @@ public function <methodName>()
  *
  * @return $this
  */
-public function <methodName>(<methodTypeHint>$<variableName><variableDefault>)
+public function <methodName>(<methodTypeHint> $<variableName><variableDefault>): self
 {
 <spaces>$this-><fieldName> = $<variableName>;
 
@@ -257,7 +257,7 @@ public function <methodName>(<methodTypeHint>$<variableName><variableDefault>)
  *
  * @return $this
  */
-public function <methodName>(<methodTypeHint>$<variableName>)
+public function <methodName>(<methodTypeHint> $<variableName>): self
 {
 <spaces>$this-><fieldName>[] = $<variableName>;
 
@@ -803,7 +803,7 @@ public function __construct(array $data = [])
     {
         $fieldName = $propertyInfo->name();
 
-        // The hint flag help algorythm to determine the hint info for object parameter.
+        // The hint flag help algorithm to determine the hint info for object parameter.
         // It should be 'array' for collection but the add method need the object hint.
         // setItems(array $items)
         // addItem(Item $item)
@@ -831,11 +831,12 @@ public function __construct(array $data = [])
         if ($propertyInfo->isObject()) {
             /** @var ObjectPropertyInfo $propertyInfo */
             $variableType = $this->getRelativeClassName($propertyInfo->className());
-            $methodTypeHint =  $variableType.' ';
+            // Only makes nullable for single relation
+            $methodTypeHint = $this->getPropertyTypeHint($propertyInfo->className(), !$hintOne && !$propertyInfo->isEmbedded());
         } else {
             /** @var PropertyInfo $propertyInfo */
             $variableType = $propertyInfo->phpType();
-            $methodTypeHint = '';
+            $methodTypeHint = $this->getPropertyTypeHint($variableType, $propertyInfo->isNullable());
         }
 
         if ($propertyInfo->isArray() && $hintOne === false) {
@@ -844,10 +845,10 @@ public function __construct(array $data = [])
                 $repository = $this->prime->repository($propertyInfo->className());
                 $wrapperClass = $this->getRelativeClassName($repository->collectionFactory()->wrapperClass($propertyInfo->wrapper()));
 
-                $methodTypeHint = $wrapperClass.' ';
+                $methodTypeHint = $wrapperClass;
                 $variableType .= '[]|'.$wrapperClass;
             } else {
-                $methodTypeHint = 'array ';
+                $methodTypeHint = 'array';
 
                 if ($variableType !== 'array') {
                     $variableType .= '[]';
