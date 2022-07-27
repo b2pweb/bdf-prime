@@ -153,10 +153,10 @@ EOF
             }
         }
 
-        $typedPropertiesAvailable = PHP_VERSION_ID >= 70400;
+        $generator->useTypedProperties();
 
-        if ($typedPropertiesAvailable) {
-            $generator->useTypedProperties();
+        if (PHP_MAJOR_VERSION >= 8) {
+            $generator->useConstructorPropertyPromotion();
         }
 
         $choices = [
@@ -170,11 +170,9 @@ EOF
             '7'     => 'Extensions',
             '8'     => 'Enable/disable get method shortcut',
             '9'     => 'Change field visibility',
+            10      => 'Enable/disable typed properties (PHP >= 7.4 only)',
+            11      => 'Enable/disable promoted properties on constructor (PHP >= 8.0 only)',
         ];
-
-        if ($typedPropertiesAvailable) {
-            $choices[10] = 'Enable/disable typed properties (PHP >= 7.4 only)';
-        }
 
         while (true) {
             switch ((string) $io->choice("'$className' found", $choices, 'auto')) {
@@ -258,6 +256,10 @@ EOF
 
                 case 'Enable/disable typed properties (PHP >= 7.4 only)':
                     $generator->useTypedProperties($generator->getUseTypedProperties() === false);
+                    break;
+
+                case 'Enable/disable promoted properties on constructor (PHP >= 8.0 only)':
+                    $generator->useConstructorPropertyPromotion($generator->getUseConstructorPropertyPromotion() === false);
                     break;
 
                 default:

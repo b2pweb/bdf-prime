@@ -190,6 +190,16 @@ class EntityGenerator
     private $useTypedProperties = false;
 
     /**
+     * Enable generation of PHP 8 constructor with promoted properties
+     * If used, the constructor will not call import for filling the entity
+     *
+     * Note: only compatible with PHP >= 8.0
+     *
+     * @var bool
+     */
+    private $useConstructorPropertyPromotion = false;
+
+    /**
      * @var string
      */
     private static $classTemplate =
@@ -211,7 +221,7 @@ class EntityGenerator
  *
  * @return <variableType>
  */
-public function <methodName>()
+public function <methodName>(): <methodTypeHint>
 {
 <spaces>return $this-><fieldName>;
 }
@@ -228,7 +238,7 @@ public function <methodName>()
  *
  * @return $this
  */
-public function <methodName>(<methodTypeHint>$<variableName><variableDefault>)
+public function <methodName>(<methodTypeHint> $<variableName><variableDefault>): self
 {
 <spaces>$this-><fieldName> = $<variableName>;
 
@@ -247,7 +257,7 @@ public function <methodName>(<methodTypeHint>$<variableName><variableDefault>)
  *
  * @return $this
  */
-public function <methodName>(<methodTypeHint>$<variableName>)
+public function <methodName>(<methodTypeHint> $<variableName>): self
 {
 <spaces>$this-><fieldName>[] = $<variableName>;
 
@@ -293,6 +303,17 @@ public function __construct()
 public function __construct(array $data = [])
 {
 <spaces><initialize>$this->import($data);
+}
+';
+
+    /**
+     * @var string
+     */
+    private static $constructorWithPromotedPropertiesMethodTemplate =
+'public function __construct(
+<properties>
+) {
+<spaces><body>
 }
 ';
 
@@ -484,27 +505,31 @@ public function __construct(array $data = [])
     }
 
     /**
-     * @param Mapper $mapper
-     *
      * @return string
      */
     protected function generateEntityBody()
     {
-        $fieldMappingProperties = $this->generateEntityFieldMappingProperties();
-        $embeddedProperties = $this->generateEntityEmbeddedProperties();
+        $fieldMappingProperties = $this->generateEntityFieldMappingProperties($this->useConstructorPropertyPromotion);
+        $embeddedProperties = $this->generateEntityEmbeddedProperties($this->useConstructorPropertyPromotion);
         $stubMethods = $this->generateEntityStubMethods ? $this->generateEntityStubMethods() : null;
 
         $code = [];
 
-        if ($fieldMappingProperties) {
-            $code[] = $fieldMappingProperties;
+        if (!$this->useConstructorPropertyPromotion) {
+            if ($fieldMappingProperties) {
+                $code[] = $fieldMappingProperties;
+            }
+
+            if ($embeddedProperties) {
+                $code[] = $embeddedProperties;
+            }
         }
 
-        if ($embeddedProperties) {
-            $code[] = $embeddedProperties;
-        }
-
-        $code[] = $this->generateEntityConstructor();
+        $code[] = $this->generateEntityConstructor(
+            $this->useConstructorPropertyPromotion,
+            $fieldMappingProperties,
+            $embeddedProperties
+        );
 
         if ($stubMethods) {
             $code[] = $stubMethods;
@@ -514,15 +539,23 @@ public function __construct(array $data = [])
     }
 
     /**
+     * @param bool $propertyPromotion Generate constructor with property promotion
+     * @param string $fieldMappingProperties Entity properties
+     * @param string $embeddedProperties Relations and embedded properties
+     *
      * @return string
      */
-    protected function generateEntityConstructor()
+    protected function generateEntityConstructor(bool $propertyPromotion, string $fieldMappingProperties, string $embeddedProperties)
     {
         $initializable = in_array(InitializableInterface::class, $this->interfaces);
         $isImportable  = in_array(ImportableInterface::class, $this->interfaces)
                     || is_subclass_of($this->classToExtend, ImportableInterface::class);
 
         $collections = [];
+
+        // Assignment operator : use null coalesce assignment with property promotion
+        // because assignation is performed before initializing default value
+        $assign = $propertyPromotion ? '??=' : '=';
 
         foreach ($this->mapperInfo->objects() as $property) {
             if (!$property->belongsToRoot()) {
@@ -531,12 +564,12 @@ public function __construct(array $data = [])
 
             if ($property->isRelation()) {
                 if (!$property->isArray()) {
-                    $collections[$property->name()] = '$this->'.$property->name().' = new '.$this->getRelativeClassName($property->className()).'();';
+                    $collections[$property->name()] = '$this->'.$property->name().' '.$assign.' new '.$this->getRelativeClassName($property->className()).'();';
                 } elseif ($property->wrapper() === 'collection') { // @todo handle other wrapper types
-                    $collections[$property->name()] = '$this->'.$property->name().' = '.$this->getRelativeClassName($property->className()).'::collection();';
+                    $collections[$property->name()] = '$this->'.$property->name().' '.$assign.' '.$this->getRelativeClassName($property->className()).'::collection();';
                 }
             } else {
-                $collections[$property->name()] = '$this->'.$property->name().' = new '.$this->getRelativeClassName($property->className()).'();';
+                $collections[$property->name()] = '$this->'.$property->name().' '.$assign.' new '.$this->getRelativeClassName($property->className()).'();';
             }
         }
         foreach ($this->mapperInfo->properties() as $property) {
@@ -547,25 +580,17 @@ public function __construct(array $data = [])
                     $constructorArgs = "'now', new \DateTimeZone('$timezone')";
                 }
 
-                $collections[$property->name()] = '$this->'.$property->name().' = new '.$property->phpType().'('.$constructorArgs.');';
+                $collections[$property->name()] = '$this->'.$property->name().' '.$assign.' new '.$property->phpType().'('.$constructorArgs.');';
             }
         }
 
         $methods = [];
 
         if (!$this->hasMethod('__construct')) {
-            if ($isImportable) {
-                $buffer = '';
-
-                if ($initializable) {
-                    $buffer = '$this->initialize();'."\n".$this->spaces;
-                } elseif ($collections) {
-                    $buffer = implode("\n".$this->spaces, $collections)."\n".$this->spaces;
-                }
-
-                $methods[] = $this->prefixCodeWithSpaces(str_replace("<initialize>", $buffer, static::$importableConstructorMethodTemplate));
-            } elseif ($collections && !$initializable) {
-                $methods[] = $this->prefixCodeWithSpaces(str_replace("<collections>", implode("\n".$this->spaces, $collections), static::$constructorMethodTemplate));
+            if ($propertyPromotion) {
+                $methods[] = $this->generateConstructorWithPromotedProperties($initializable, $collections, $fieldMappingProperties, $embeddedProperties);
+            } elseif ($constructor = $this->generateClassicConstructor($isImportable, $initializable, $collections)) {
+                $methods[] = $constructor;
             }
         }
 
@@ -574,6 +599,64 @@ public function __construct(array $data = [])
         }
 
         return implode("\n", $methods);
+    }
+
+    /**
+     * Generate PHP 8 constructor
+     *
+     * @param bool $initializable Does the entity class implements InitializableInterface ?
+     * @param string[] $collections Initialisation method instructions
+     * @param string $fieldMappingProperties Entity properties
+     * @param string $embeddedProperties Relations and embedded properties
+     *
+     * @return string
+     */
+    private function generateConstructorWithPromotedProperties(bool $initializable, array $collections, string $fieldMappingProperties, string $embeddedProperties): string
+    {
+        if ($initializable) {
+            $buffer = '$this->initialize();'."\n".$this->spaces;
+        } elseif ($collections) {
+            $buffer = implode("\n".$this->spaces, $collections)."\n".$this->spaces;
+        } else {
+            $buffer = '';
+        }
+
+        $properties = rtrim($fieldMappingProperties."\n".$embeddedProperties);
+        $properties = str_replace(';', ',', $properties);
+
+        return $this->prefixCodeWithSpaces(str_replace(
+            ['<body>', '<properties>'],
+            [rtrim($buffer), $properties],
+            static::$constructorWithPromotedPropertiesMethodTemplate
+        ));
+    }
+
+    /**
+     * Generate classic constructor
+     *
+     * @param bool $isImportable Does the entity class implements InitializableInterface ?
+     * @param bool $initializable Does the entity class implements ImportableInterface ?
+     * @param string[] $collections Initialisation method instructions
+     *
+     * @return string|null
+     */
+    private function generateClassicConstructor(bool $isImportable, bool $initializable, array $collections): ?string
+    {
+        if ($isImportable) {
+            $buffer = '';
+
+            if ($initializable) {
+                $buffer = '$this->initialize();'."\n".$this->spaces;
+            } elseif ($collections) {
+                $buffer = implode("\n".$this->spaces, $collections)."\n".$this->spaces;
+            }
+
+            return $this->prefixCodeWithSpaces(str_replace("<initialize>", $buffer, static::$importableConstructorMethodTemplate));
+        } elseif ($collections && !$initializable) {
+            return $this->prefixCodeWithSpaces(str_replace("<collections>", implode("\n".$this->spaces, $collections), static::$constructorMethodTemplate));
+        }
+
+        return null;
     }
 
     /**
@@ -639,7 +722,7 @@ public function __construct(array $data = [])
     /**
      * @return string
      */
-    protected function generateEntityFieldMappingProperties()
+    protected function generateEntityFieldMappingProperties(bool $forceNullable = false)
     {
         $lines = [];
 
@@ -660,21 +743,22 @@ public function __construct(array $data = [])
 
             // A nullable property should be defined as null by default
             // A property is considered as nullable if it's explicitly defined on mapper or if the field is auto-generated
-            if ($this->useTypedProperties && !$default && $property->isNullable()) {
+            if (!$default && ($forceNullable || ($this->useTypedProperties && $property->isNullable()))) {
                 $default = ' = null';
             }
 
             $lines[] = $this->generateFieldMappingPropertyDocBlock($property);
-            $lines[] = $this->spaces.$this->fieldVisibility.$this->getPropertyTypeHintForSimpleProperty($property).' $'.$property->name().$default.";\n";
+            $lines[] = $this->spaces.$this->fieldVisibility.$this->getPropertyTypeHintForSimpleProperty($property, $forceNullable).' $'.$property->name().$default.";\n";
         }
 
         return implode("\n", $lines);
     }
 
     /**
+     * @param bool $forceNullable Force typehint to be nullable. Useful property promotion
      * @return string
      */
-    protected function generateEntityEmbeddedProperties()
+    protected function generateEntityEmbeddedProperties(bool $forceNullable = false)
     {
         $lines = [];
 
@@ -685,7 +769,7 @@ public function __construct(array $data = [])
 
             if (!$property->isRelation()) {
                 $lines[] = $this->generateEmbeddedPropertyDocBlock($property);
-                $lines[] = $this->spaces . $this->fieldVisibility . $this->getPropertyTypeHintForObject($property) . ' $'.$property->name().";\n";
+                $lines[] = $this->spaces . $this->fieldVisibility . $this->getPropertyTypeHintForObject($property, $forceNullable) . ' $'.$property->name().";\n";
             } else {
                 $name = $property->name();
                 $default = '';
@@ -696,12 +780,12 @@ public function __construct(array $data = [])
                 }
 
                 // If property is typed, always define a default value
-                if ($this->useTypedProperties && !$default) {
+                if (($forceNullable || $this->useTypedProperties) && !$default) {
                     $default = ' = null';
                 }
 
                 $lines[] = $this->generateEmbeddedPropertyDocBlock($property);
-                $lines[] = $this->spaces . $this->fieldVisibility . $this->getPropertyTypeHintForObject($property) . ' $' . $name . $default .";\n";
+                $lines[] = $this->spaces . $this->fieldVisibility . $this->getPropertyTypeHintForObject($property, $forceNullable) . ' $' . $name . $default .";\n";
             }
         }
 
@@ -719,7 +803,7 @@ public function __construct(array $data = [])
     {
         $fieldName = $propertyInfo->name();
 
-        // The hint flag help algorythm to determine the hint info for object parameter.
+        // The hint flag help algorithm to determine the hint info for object parameter.
         // It should be 'array' for collection but the add method need the object hint.
         // setItems(array $items)
         // addItem(Item $item)
@@ -747,11 +831,12 @@ public function __construct(array $data = [])
         if ($propertyInfo->isObject()) {
             /** @var ObjectPropertyInfo $propertyInfo */
             $variableType = $this->getRelativeClassName($propertyInfo->className());
-            $methodTypeHint =  $variableType.' ';
+            // Only makes nullable for single relation
+            $methodTypeHint = $this->getPropertyTypeHint($propertyInfo->className(), !$hintOne && !$propertyInfo->isEmbedded());
         } else {
             /** @var PropertyInfo $propertyInfo */
             $variableType = $propertyInfo->phpType();
-            $methodTypeHint = '';
+            $methodTypeHint = $this->getPropertyTypeHint($variableType, $propertyInfo->isNullable());
         }
 
         if ($propertyInfo->isArray() && $hintOne === false) {
@@ -760,10 +845,10 @@ public function __construct(array $data = [])
                 $repository = $this->prime->repository($propertyInfo->className());
                 $wrapperClass = $this->getRelativeClassName($repository->collectionFactory()->wrapperClass($propertyInfo->wrapper()));
 
-                $methodTypeHint = $wrapperClass.' ';
+                $methodTypeHint = $wrapperClass;
                 $variableType .= '[]|'.$wrapperClass;
             } else {
-                $methodTypeHint = 'array ';
+                $methodTypeHint = 'array';
 
                 if ($variableType !== 'array') {
                     $variableType .= '[]';
@@ -1194,16 +1279,17 @@ public function __construct(array $data = [])
      * The returned type hint will be prefixed by a single space
      *
      * @param PropertyInfo $property
+     * @param bool $forceNullable Force typehint to be nullable. Useful property promotion
      *
      * @return string
      */
-    protected function getPropertyTypeHintForSimpleProperty(PropertyInfo $property): string
+    protected function getPropertyTypeHintForSimpleProperty(PropertyInfo $property, bool $forceNullable = false): string
     {
         if (!$this->useTypedProperties) {
             return '';
         }
 
-        return ' ' . $this->getPropertyTypeHint($property->phpType(), $property->isNullable());
+        return ' ' . $this->getPropertyTypeHint($property->phpType(), $forceNullable || $property->isNullable());
     }
 
     /**
@@ -1217,10 +1303,11 @@ public function __construct(array $data = [])
      * - This method will also resolve collection relations and the wrapper class if provided
      *
      * @param ObjectPropertyInfo $property
+     * @param bool $forceNullable Force typehint to be nullable. Useful property promotion
      *
      * @return string
      */
-    protected function getPropertyTypeHintForObject(ObjectPropertyInfo $property): string
+    protected function getPropertyTypeHintForObject(ObjectPropertyInfo $property, bool $forceNullable = false): string
     {
         if (!$this->useTypedProperties) {
             return '';
@@ -1237,7 +1324,7 @@ public function __construct(array $data = [])
             }
         }
 
-        return ' ' . $this->getPropertyTypeHint($type, $property->isRelation());
+        return ' ' . $this->getPropertyTypeHint($type, $forceNullable || $property->isRelation());
     }
 
     //---------------------- mutators
@@ -1477,5 +1564,23 @@ public function __construct(array $data = [])
     public function useTypedProperties(bool $useTypedProperties = true): void
     {
         $this->useTypedProperties = $useTypedProperties;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getUseConstructorPropertyPromotion(): bool
+    {
+        return $this->useConstructorPropertyPromotion;
+    }
+
+    /**
+     * Enable usage of PHP 8 promoted properties on constructor instead of array import
+     *
+     * @param bool $useConstructorPropertyPromotion
+     */
+    public function useConstructorPropertyPromotion(bool $useConstructorPropertyPromotion = true): void
+    {
+        $this->useConstructorPropertyPromotion = $useConstructorPropertyPromotion;
     }
 }

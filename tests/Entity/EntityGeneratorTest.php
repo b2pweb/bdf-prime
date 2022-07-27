@@ -12,6 +12,7 @@ use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Project;
 use Bdf\Prime\Task;
+use Bdf\Prime\TestEntity;
 use Bdf\Prime\User;
 use PHPUnit\Framework\TestCase;
 
@@ -90,11 +91,11 @@ class EntityGeneratorTest extends TestCase
         $generator = new EntityGenerator(Prime::service());
         $classContent = $generator->generate(User::repository()->mapper());
 
-        $this->assertStringContainsString('function setId($id)', $classContent);
-        $this->assertStringContainsString('function id()', $classContent);
-        $this->assertStringContainsString('function setName($name)', $classContent);
-        $this->assertStringContainsString('function name()', $classContent);
-        $this->assertStringContainsString('function setRoles(array $roles)', $classContent);
+        $this->assertStringContainsString('function setId(string $id): self', $classContent);
+        $this->assertStringContainsString('function id(): string', $classContent);
+        $this->assertStringContainsString('function setName(string $name): self', $classContent);
+        $this->assertStringContainsString('function name(): string', $classContent);
+        $this->assertStringContainsString('function setRoles(array $roles): self', $classContent);
     }
 
     /**
@@ -106,7 +107,7 @@ class EntityGeneratorTest extends TestCase
         $generator->useGetShortcutMethod(false);
         $classContent = $generator->generate(User::repository()->mapper());
         
-        $this->assertStringContainsString('function getId()', $classContent);
+        $this->assertStringContainsString('function getId(): string', $classContent);
     }
 
     /**
@@ -130,7 +131,7 @@ class EntityGeneratorTest extends TestCase
 
         $classContent = $generator->generate(User::repository()->mapper());
 
-        $this->assertStringNotContainsString('function setId($id)', $classContent);
+        $this->assertStringNotContainsString('function setId(?int $id): self', $classContent);
     }
 
     /**
@@ -252,7 +253,7 @@ class EntityGeneratorTest extends TestCase
      *
      * @return \$this
      */
-    public function setRoles(array \$roles)
+    public function setRoles(array \$roles): self
     {
         \$this->roles = \$roles;
 
@@ -267,7 +268,7 @@ EOF;
      *
      * @return array
      */
-    public function roles()
+    public function roles(): array
     {
         return \$this->roles;
     }
@@ -287,8 +288,8 @@ EOF;
         $this->assertStringContainsString('use Bdf\Prime\Customer;', $classContent);
         $this->assertStringContainsString('protected $customer;', $classContent);
         $this->assertStringContainsString('$this->customer = new Customer();', $classContent);
-        $this->assertStringContainsString('function setCustomer(Customer $customer)', $classContent);
-        $this->assertStringContainsString('function customer()', $classContent);
+        $this->assertStringContainsString('function setCustomer(Customer $customer): self', $classContent);
+        $this->assertStringContainsString('function customer(): Customer', $classContent);
 
         $generator->useTypedProperties();
         $classContent = $generator->generate(User::repository()->mapper());
@@ -305,9 +306,9 @@ EOF;
 
         $this->assertStringContainsString('use Bdf\Prime\Document;', $classContent);
         $this->assertStringContainsString('protected $documents = [];', $classContent);
-        $this->assertStringContainsString('function addDocument(Document $document)', $classContent);
-        $this->assertStringContainsString('function setDocuments(array $documents)', $classContent);
-        $this->assertStringContainsString('function documents()', $classContent);
+        $this->assertStringContainsString('function addDocument(Document $document): self', $classContent);
+        $this->assertStringContainsString('function setDocuments(array $documents): self', $classContent);
+        $this->assertStringContainsString('function documents(): array', $classContent);
 
         $generator->useTypedProperties();
         $classContent = $generator->generate(Customer::repository()->mapper());
@@ -324,9 +325,9 @@ EOF;
 
         $this->assertStringContainsString('use Bdf\Prime\Pack;', $classContent);
         $this->assertStringContainsString('protected $packs = [];', $classContent);
-        $this->assertStringContainsString('function addPack(Pack $pack)', $classContent);
-        $this->assertStringContainsString('function setPacks(array $packs)', $classContent);
-        $this->assertStringContainsString('function packs()', $classContent);
+        $this->assertStringContainsString('function addPack(Pack $pack): self', $classContent);
+        $this->assertStringContainsString('function setPacks(array $packs): self', $classContent);
+        $this->assertStringContainsString('function packs(): array', $classContent);
 
         $generator->useTypedProperties();
         $classContent = $generator->generate(Customer::repository()->mapper());
@@ -342,8 +343,8 @@ EOF;
         $classContent = $generator->generate(Document::repository()->mapper());
 
         $this->assertStringContainsString('protected $uploader;', $classContent);
-        $this->assertStringContainsString('function setUploader(Admin $uploader)', $classContent);
-        $this->assertStringContainsString('function uploader()', $classContent);
+        $this->assertStringContainsString('function setUploader(Admin $uploader): self', $classContent);
+        $this->assertStringContainsString('function uploader(): Admin', $classContent);
 
         // Normal ?
         $generator->useTypedProperties();
@@ -379,7 +380,7 @@ PHP
      *
      * @return $this
      */
-    public function setFiles(EntityCollection $files)
+    public function setFiles(EntityCollection $files): self
     {
         $this->files = $files;
 
@@ -391,7 +392,7 @@ PHP
      *
      * @return TestFile[]|EntityCollection
      */
-    public function files()
+    public function files(): EntityCollection
     {
         return $this->files;
     }
@@ -430,6 +431,102 @@ PHP
         $this->assertStringContainsString("\$this->updatedAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));", $classContent);
         $this->assertStringContainsString("\$this->createdAt = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));", $classContent);
         $this->assertStringContainsString("\$this->deletedAt = new \DateTime();", $classContent);
+    }
+
+    public function test_useConstructorPropertyPromotion()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->useConstructorPropertyPromotion();
+        $generator->useTypedProperties();
+
+        $classContent = $generator->generate(TestEntity::repository()->mapper());
+        $this->assertStringContainsString(<<<'PHP'
+    public function __construct(
+        /**
+         * @var integer
+         */
+        protected ?int $id = null,
+
+        /**
+         * @var string
+         */
+        protected ?string $name = null,
+
+        /**
+         * @var \DateTime
+         */
+        protected ?\DateTime $dateInsert = null,
+
+        /**
+         * @var TestEmbeddedEntity
+         */
+        protected ?TestEmbeddedEntity $foreign = null,
+    ) {
+        $this->foreign ??= new TestEmbeddedEntity();
+    }
+PHP
+        , $classContent);
+    }
+
+    /**
+     *
+     */
+    public function test_default_date_instantiation_constructorPropertyPromotion()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->useConstructorPropertyPromotion();
+        $generator->useTypedProperties();
+
+        $classContent = $generator->generate(Task::repository()->mapper());
+        $this->assertStringContainsString(<<<'PHP'
+    public function __construct(
+        /**
+         * @var integer
+         */
+        protected ?int $id = null,
+
+        /**
+         * @var string
+         */
+        protected ?string $name = null,
+
+        /**
+         * @var string
+         */
+        protected ?string $type = null,
+
+        /**
+         * @var string
+         */
+        protected ?string $targetId = '0',
+
+        /**
+         * @var string
+         */
+        protected ?string $overridenProperty = null,
+
+        /**
+         * @var \DateTimeImmutable
+         */
+        protected ?\DateTimeImmutable $createdAt = null,
+
+        /**
+         * @var \DateTimeImmutable
+         */
+        protected ?\DateTimeImmutable $updatedAt = null,
+
+        /**
+         * @var \DateTime
+         */
+        protected ?\DateTime $deletedAt = null,
+    ) {
+        $this->createdAt ??= new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $this->updatedAt ??= new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $this->deletedAt ??= new \DateTime();
+    }
+
+PHP
+            , $classContent);
     }
 
     /**
@@ -495,8 +592,11 @@ PHP
 
         $this->assertValidPHP($generator->generate($entity::repository()->mapper()));
 
-        if (PHP_VERSION_ID >= 70400) {
-            $generator->useTypedProperties();
+        $generator->useTypedProperties();
+        $this->assertValidPHP($generator->generate($entity::repository()->mapper()));
+
+        if (PHP_MAJOR_VERSION >= 8) {
+            $generator->useConstructorPropertyPromotion();
             $this->assertValidPHP($generator->generate($entity::repository()->mapper()));
         }
     }
