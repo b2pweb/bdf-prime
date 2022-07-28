@@ -294,19 +294,11 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     }
 
     /**
-     * Clear extra data from entities store into repository
+     * @deprecated This method is empty and will be removed in 3.0
      */
     public function __destruct()
     {
-        // Active record not enabled : repository will not contains any information about entity
-        if (!self::isActiveRecordEnabled()) {
-            return;
-        }
-
-        // The entity may be a child of the real db entity, so no repository is related
-        if ($repository = static::repository()) {
-            $repository->free($this);
-        }
+        // No-op
     }
 
     //---- events

@@ -998,12 +998,11 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * @param E $entity
      *
      * @return void
+     * @deprecated This is a no-op method. Will be removed in 3.0.
      */
     public function free($entity)
     {
-        foreach ($this->relations as $relation) {
-            $relation->clearInfo($entity);
-        }
+        // No-op
     }
 
     /**

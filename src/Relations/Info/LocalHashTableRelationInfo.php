@@ -3,24 +3,29 @@
 namespace Bdf\Prime\Relations\Info;
 
 /**
- * Store loading information into an array, using spl_object_hash for identify entities
+ * Store loading information into an array, using WeakMap for identify entities
  */
 final class LocalHashTableRelationInfo implements RelationInfoInterface
 {
     /**
      * Store loaded state of entities relations
-     * Use the entity object id as key, and boolean as value
+     * Use the entity object as key, and boolean as value
      *
-     * @var array<int, boolean>
+     * @var \WeakMap<object, bool>
      */
-    private $loaded = [];
+    private $loaded;
+
+    public function __construct()
+    {
+        $this->loaded = new \WeakMap();
+    }
 
     /**
      * {@inheritdoc}
      */
     public function isLoaded($entity): bool
     {
-        return !empty($this->loaded[spl_object_id($entity)]);
+        return !empty($this->loaded[$entity]);
     }
 
     /**
@@ -28,7 +33,7 @@ final class LocalHashTableRelationInfo implements RelationInfoInterface
      */
     public function clear($entity): void
     {
-        unset($this->loaded[spl_object_id($entity)]);
+        unset($this->loaded[$entity]);
     }
 
     /**
@@ -36,7 +41,6 @@ final class LocalHashTableRelationInfo implements RelationInfoInterface
      */
     public function markAsLoaded($entity): void
     {
-        // @todo que faire avec les stdClass ?
-        $this->loaded[spl_object_id($entity)] = true;
+        $this->loaded[$entity] = true;
     }
 }

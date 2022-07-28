@@ -277,7 +277,7 @@ interface RelationInterface
      *
      * @param L $entity
      *
-     * @internal
+     * @internal Will be removed in 3.0
      */
     public function clearInfo($entity): void;
 }

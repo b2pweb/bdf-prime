@@ -28,4 +28,23 @@ class LocalHashTableRelationInfoTest extends TestCase
         $info->clear($entity);
         $this->assertFalse($info->isLoaded($entity));
     }
+
+    /**
+     *
+     */
+    public function test_isLoaded_without_clear()
+    {
+        $info = new LocalHashTableRelationInfo();
+
+        $entity = new \stdClass();
+
+        $this->assertFalse($info->isLoaded($entity));
+
+        $info->markAsLoaded($entity);
+        $this->assertTrue($info->isLoaded($entity));
+
+        $this->assertFalse($info->isLoaded(new \stdClass()));
+        $info->markAsLoaded(new \stdClass());
+        $this->assertFalse($info->isLoaded(new \stdClass()));
+    }
 }
