@@ -18,6 +18,7 @@ interface RelationInfoInterface
     /**
      * @param E $entity
      * @return void
+     * @deprecated Will be removed in 3.0
      */
     public function clear($entity): void;
 
