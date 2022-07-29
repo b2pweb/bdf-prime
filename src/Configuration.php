@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Platform\PlatformTypeInterface;
 use Bdf\Prime\Types\TypesRegistry;
 use Bdf\Prime\Types\TypesRegistryInterface;
 use Doctrine\DBAL\Configuration as BaseConfiguration;
@@ -19,6 +20,11 @@ class Configuration extends BaseConfiguration
     private ?TypesRegistryInterface $types;
 
     /**
+     * @var array<class-string<PlatformTypeInterface>|PlatformTypeInterface>
+     */
+    private array $platformTypes = [];
+
+    /**
      * Set configuration
      *
      * @param array $options
@@ -34,6 +40,24 @@ class Configuration extends BaseConfiguration
 
         foreach ($options as $name => $value) {
             $this->$name = $value;
+        }
+    }
+
+    /**
+     * Register a custom platform type
+     *
+     * Note: use this with caution, override platform behavior is unlikely a good idea
+     *
+     * @param class-string<PlatformTypeInterface>|PlatformTypeInterface $platformType Type instance or class name
+     * @param string|null $alias Type alias
+     * @return void
+     */
+    public function addPlatformType($platformType, ?string $alias = null): void
+    {
+        if ($alias !== null) {
+            $this->platformTypes[$alias] = $platformType;
+        } else {
+            $this->platformTypes[] = $platformType;
         }
     }
 
@@ -60,5 +84,15 @@ class Configuration extends BaseConfiguration
         }
 
         return $this->types;
+    }
+
+    /**
+     * Get custom platform types
+     *
+     * @return array<class-string<PlatformTypeInterface>|PlatformTypeInterface>
+     */
+    public function getPlatformTypes(): array
+    {
+        return $this->platformTypes;
     }
 }
