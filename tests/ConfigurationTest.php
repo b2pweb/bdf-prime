@@ -3,6 +3,7 @@
 namespace Bdf\Prime;
 
 use Bdf\Prime\Logger\PsrDecorator;
+use Bdf\Prime\Platform\PlatformTypeInterface;
 use Bdf\Prime\Types\TypesRegistry;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
@@ -48,5 +49,20 @@ class ConfigurationTest extends TestCase
         $configuration->setTypes($types);
 
         $this->assertSame($types, $configuration->getTypes());
+    }
+
+    /**
+     *
+     */
+    public function test_platform_types()
+    {
+        $t1 = $this->createMock(PlatformTypeInterface::class);
+        $t2 = $this->createMock(PlatformTypeInterface::class);
+
+        $configuration = new Configuration();
+        $configuration->addPlatformType($t1);
+        $configuration->addPlatformType($t2, 'foo');
+
+        $this->assertSame([$t1, 'foo' => $t2], $configuration->getPlatformTypes());
     }
 }

@@ -466,6 +466,12 @@ class Prime
             }
         }
 
+        if ($types = static::$config['platformTypes'] ?? null) {
+            foreach ($types as $alias => $type) {
+                $configuration->addPlatformType($type, is_string($alias) ? $alias : null);
+            }
+        }
+
         if ($serializer = static::$config['serializer'] ?? null) {
             static::$serviceLocator->setSerializer($serializer);
         }
