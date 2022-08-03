@@ -267,11 +267,7 @@ class EntityGenerator
         $generator->addComment($this->getClassName($this->mapperInfo->className()));
 
         if ($this->classToExtend) {
-            if (method_exists($generator, 'setExtends')) {
-                $generator->setExtends($this->classToExtend);
-            } else {
-                $generator->addExtend($this->classToExtend);
-            }
+            $generator->setExtends($this->classToExtend);
         }
 
         foreach ($this->interfaces as $interface) {
@@ -536,7 +532,7 @@ class EntityGenerator
 
             $generator->setNullable($nullable = $forceNullable || $this->useTypedProperties);
 
-            switch(true) {
+            switch (true) {
                 case $property->isArray() && $property->wrapper() === null:
                     // Simple array relation
                     $generator->setDefaultValue([]);
