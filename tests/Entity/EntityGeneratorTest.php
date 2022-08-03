@@ -4,6 +4,7 @@ namespace Bdf\Prime\Entity;
 
 use Bdf\Prime\Admin;
 use Bdf\Prime\Collection\EntityCollection;
+use Bdf\Prime\Company;
 use Bdf\Prime\Customer;
 use Bdf\Prime\Document;
 use Bdf\Prime\Faction;
@@ -190,7 +191,6 @@ class EntityGeneratorTest extends TestCase
 
         $classContent = $generator->generate(User::repository()->mapper());
 
-        $this->assertStringContainsString('use Bdf\Prime\Customer;', $classContent);
         $this->assertStringContainsString('extends Customer', $classContent);
     }
 
@@ -205,7 +205,6 @@ class EntityGeneratorTest extends TestCase
 
         $classContent = $generator->generate(User::repository()->mapper());
 
-        $this->assertStringContainsString('use Bdf\Prime\Customer;', $classContent);
         $this->assertStringContainsString('use Bdf\Prime\Entity\EntityInterface;', $classContent);
         $this->assertStringContainsString('extends Customer implements EntityInterface', $classContent);
     }
@@ -285,7 +284,6 @@ EOF;
         $generator = new EntityGenerator(Prime::service());
         $classContent = $generator->generate(User::repository()->mapper());
 
-        $this->assertStringContainsString('use Bdf\Prime\Customer;', $classContent);
         $this->assertStringContainsString('protected $customer;', $classContent);
         $this->assertStringContainsString('$this->customer = new Customer();', $classContent);
         $this->assertStringContainsString('function setCustomer(Customer $customer): self', $classContent);
@@ -304,7 +302,6 @@ EOF;
         $generator = new EntityGenerator(Prime::service());
         $classContent = $generator->generate(Customer::repository()->mapper());
 
-        $this->assertStringContainsString('use Bdf\Prime\Document;', $classContent);
         $this->assertStringContainsString('protected $documents = [];', $classContent);
         $this->assertStringContainsString('function addDocument(Document $document): self', $classContent);
         $this->assertStringContainsString('function setDocuments(array $documents): self', $classContent);
@@ -323,7 +320,6 @@ EOF;
         $generator = new EntityGenerator(Prime::service());
         $classContent = $generator->generate(Customer::repository()->mapper());
 
-        $this->assertStringContainsString('use Bdf\Prime\Pack;', $classContent);
         $this->assertStringContainsString('protected $packs = [];', $classContent);
         $this->assertStringContainsString('function addPack(Pack $pack): self', $classContent);
         $this->assertStringContainsString('function setPacks(array $packs): self', $classContent);
@@ -446,17 +442,14 @@ PHP
          * @var integer
          */
         protected ?int $id = null,
-
         /**
          * @var string
          */
         protected ?string $name = null,
-
         /**
          * @var \DateTime
          */
         protected ?\DateTime $dateInsert = null,
-
         /**
          * @var TestEmbeddedEntity
          */
@@ -484,37 +477,30 @@ PHP
          * @var integer
          */
         protected ?int $id = null,
-
         /**
          * @var string
          */
         protected ?string $name = null,
-
         /**
          * @var string
          */
         protected ?string $type = null,
-
         /**
          * @var string
          */
         protected ?string $targetId = '0',
-
         /**
          * @var string
          */
         protected ?string $overridenProperty = null,
-
         /**
          * @var \DateTimeImmutable
          */
         protected ?\DateTimeImmutable $createdAt = null,
-
         /**
          * @var \DateTimeImmutable
          */
         protected ?\DateTimeImmutable $updatedAt = null,
-
         /**
          * @var \DateTime
          */
@@ -599,6 +585,196 @@ PHP
             $generator->useConstructorPropertyPromotion();
             $this->assertValidPHP($generator->generate($entity::repository()->mapper()));
         }
+    }
+
+    public function test_indentation()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $entity = $generator->generateEntityClass(Company::repository()->mapper());
+
+        $this->assertEquals(<<<'PHP'
+<?php
+
+namespace Bdf\Prime;
+
+/**
+ * Company
+ */
+class Company
+{
+    /**
+     * @var integer
+     */
+    protected $id;
+
+    /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * Set id
+     *
+     * @param integer $id
+     *
+     * @return $this
+     */
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function id(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        return $this->name;
+    }
+}
+
+PHP
+        , $entity);
+
+
+        $generator->setNumSpaces(2);
+        $entity = $generator->generateEntityClass(Company::repository()->mapper());
+
+        $this->assertEquals(<<<'PHP'
+<?php
+
+namespace Bdf\Prime;
+
+/**
+ * Company
+ */
+class Company
+{
+  /**
+   * @var integer
+   */
+  protected $id;
+
+  /**
+   * @var string
+   */
+  protected $name;
+
+  /**
+   * Set id
+   *
+   * @param integer $id
+   *
+   * @return $this
+   */
+  public function setId(int $id): self
+  {
+    $this->id = $id;
+
+    return $this;
+  }
+
+  /**
+   * Get id
+   *
+   * @return integer
+   */
+  public function id(): int
+  {
+    return $this->id;
+  }
+
+  /**
+   * Set name
+   *
+   * @param string $name
+   *
+   * @return $this
+   */
+  public function setName(string $name): self
+  {
+    $this->name = $name;
+
+    return $this;
+  }
+
+  /**
+   * Get name
+   *
+   * @return string
+   */
+  public function name(): string
+  {
+    return $this->name;
+  }
+}
+
+PHP
+            , $entity);
+    }
+
+    public function test_generate_update_already_up_to_date()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->setUpdateEntityIfExists(true);
+
+        $entity = $generator->generate(Company::repository()->mapper(), __DIR__.'/_files/company_up_to_date.php');
+        $this->assertStringEqualsFile(__DIR__.'/_files/company_up_to_date.php', $entity);
+    }
+
+    public function test_generate_update_with_missing_property()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->setUpdateEntityIfExists(true);
+
+        $entity = $generator->generate(Company::repository()->mapper(), __DIR__ . '/_files/company_with_missing_property.php');
+        $this->assertStringEqualsFile(__DIR__.'/_files/company_up_to_date.php', $entity);
+    }
+
+    public function test_generate_update_with_missing_accessors()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->setUpdateEntityIfExists(true);
+
+        $entity = $generator->generate(Company::repository()->mapper(), __DIR__ . '/_files/company_with_missing_accessors.php');
+        $this->assertStringEqualsFile(__DIR__.'/_files/company_up_to_date.php', $entity);
+    }
+
+    public function test_generate_update_with_custom_methods()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->setUpdateEntityIfExists(true);
+
+        $entity = $generator->generate(Company::repository()->mapper(), __DIR__ . '/_files/company_with_custom_method_and_missing_properties.php');
+        $this->assertStringEqualsFile(__DIR__.'/_files/company_up_to_date_with_custom_method.php', $entity);
     }
 
     public function provideEntities(): array

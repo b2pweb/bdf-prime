@@ -1,41 +1,29 @@
 <?php
-/*
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * This software consists of voluntary contributions made by many individuals
- * and is licensed under the MIT license. For more information, see
- * <http://www.doctrine-project.org>.
- */
 
 namespace Bdf\Prime\Entity;
 
 use Bdf\Prime\Mapper\Info\InfoInterface;
+use Bdf\Prime\Mapper\Info\MapperInfo;
 use Bdf\Prime\Mapper\Info\ObjectPropertyInfo;
 use Bdf\Prime\Mapper\Info\PropertyInfo;
 use Bdf\Prime\Mapper\Mapper;
-use Bdf\Prime\Mapper\Info\MapperInfo;
 use Bdf\Prime\ServiceLocator;
 use Bdf\Prime\Types\PhpTypeInterface;
-use Bdf\Prime\Types\TypeInterface;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\Inflector as InflectorObject;
 use Doctrine\Inflector\InflectorFactory;
+use Nette\PhpGenerator\ClassType;
+use Nette\PhpGenerator\Method;
+use Nette\PhpGenerator\PhpFile;
+use Nette\PhpGenerator\PhpNamespace;
+use Nette\PhpGenerator\Printer;
+use Nette\PhpGenerator\PsrPrinter;
 
 /**
- * Generic class used to generate PHP5 entity classes from Mapper.
+ * Generic class used to generate PHP 7 and 8 entity classes from Mapper.
  *
  *     [php]
- *     $mapper = $service->mappers()->build('Entity);
+ *     $mapper = $service->mappers()->build('Entity');
  *
  *     $generator = new EntityGenerator();
  *     $generator->setGenerateStubMethods(true);
@@ -43,13 +31,7 @@ use Doctrine\Inflector\InflectorFactory;
  *     $generator->setUpdateEntityIfExists(true);
  *     $generator->generate($mapper, '/path/to/generate/entities');
  *
- *
- * @link    www.doctrine-project.org
- * @since   2.0
- * @author  Benjamin Eberlei <kontakt@beberlei.de>
- * @author  Guilherme Blanco <guilhermeblanco@hotmail.com>
- * @author  Jonathan Wage <jonwage@gmail.com>
- * @author  Roman Borschel <roman@code-factory.org>
+ * @todo version 3.6 et 4.0 pour nette generator
  */
 class EntityGenerator
 {
@@ -66,120 +48,113 @@ class EntityGenerator
     /**
      * Specifies class fields should be protected.
      */
-    public const FIELD_VISIBLE_PROTECTED = 'protected';
+    public const FIELD_VISIBLE_PROTECTED = ClassType::VISIBILITY_PROTECTED;
 
     /**
      * Specifies class fields should be private.
      */
-    public const FIELD_VISIBLE_PRIVATE = 'private';
+    public const FIELD_VISIBLE_PRIVATE = ClassType::VISIBILITY_PRIVATE;
 
     /**
      * The prime service locator
      *
      * @var ServiceLocator
      */
-    private $prime;
+    private ServiceLocator $prime;
 
     /**
      * The inflector instance
      *
      * @var InflectorObject
      */
-    private $inflector;
+    private InflectorObject $inflector;
 
     /**
      * The mapper info
      *
      * @var MapperInfo
      */
-    private $mapperInfo;
+    private MapperInfo $mapperInfo;
 
     /**
      * The extension to use for written php files.
      *
      * @var string
      */
-    private $extension = '.php';
+    private string $extension = '.php';
 
     /**
      * Whether or not the current Mapper instance is new or old.
      *
      * @var boolean
      */
-    private $isNew = true;
+    private bool $isNew = true;
 
     /**
-     * @var array
+     * @var array<class-string, array{properties: list<string>, methods: list<string>}>
      */
-    private $staticReflection = [];
+    private array $staticReflection = [];
 
     /**
      * Number of spaces to use for indention in generated code.
      */
-    private $numSpaces = 4;
-
-    /**
-     * The actual spaces to use for indention.
-     *
-     * @var string
-     */
-    private $spaces = '    ';
+    private int $numSpaces = 4;
 
     /**
      * The class all generated entities should extend.
      *
-     * @var string
+     * @var class-string|null
      */
-    private $classToExtend;
+    private ?string $classToExtend = null;
 
     /**
      * The interfaces all generated entities should implement.
      *
-     * @var array
+     * @var array<class-string, class-string>
      */
-    private $interfaces = [];
+    private array $interfaces = [];
 
     /**
      * The traits
      *
-     * @var array
+     * @var array<string, string>
      */
-    private $traits = [];
+    private array $traits = [];
 
     /**
      * Whether or not to generate sub methods.
      *
      * @var boolean
      */
-    private $generateEntityStubMethods = true;
+    private bool $generateEntityStubMethods = true;
 
     /**
      * Whether or not to update the entity class if it exists already.
      *
      * @var boolean
      */
-    private $updateEntityIfExists = false;
+    private bool $updateEntityIfExists = false;
 
     /**
      * Whether or not to re-generate entity class if it exists already.
      *
      * @var boolean
      */
-    private $regenerateEntityIfExists = false;
+    private bool $regenerateEntityIfExists = false;
 
     /**
      * The name of get methods will not contains the 'get' prefix
      *
      * @var boolean
      */
-    private $useGetShortcutMethod = true;
+    private bool $useGetShortcutMethod = true;
 
     /**
      * Visibility of the field
      *
-     * @var string
+     * @var self::FIELD_*
      */
-    private $fieldVisibility = self::FIELD_VISIBLE_PROTECTED;
+    private string $fieldVisibility = self::FIELD_VISIBLE_PROTECTED;
 
     /**
      * Use type on generated properties
@@ -187,7 +162,7 @@ class EntityGenerator
      *
      * @var bool
      */
-    private $useTypedProperties = false;
+    private bool $useTypedProperties = false;
 
     /**
      * Enable generation of PHP 8 constructor with promoted properties
@@ -197,125 +172,7 @@ class EntityGenerator
      *
      * @var bool
      */
-    private $useConstructorPropertyPromotion = false;
-
-    /**
-     * @var string
-     */
-    private static $classTemplate =
-'<?php
-
-<namespace><useStatement><entityAnnotation>
-<entityClassName>
-{
-<entityTraits><entityBody>
-}
-';
-
-    /**
-     * @var string
-     */
-    private static $getMethodTemplate =
-'/**
- * <description>
- *
- * @return <variableType>
- */
-public function <methodName>(): <methodTypeHint>
-{
-<spaces>return $this-><fieldName>;
-}
-';
-
-    /**
-     * @var string
-     */
-    private static $setMethodTemplate =
-'/**
- * <description>
- *
- * @param <variableType> $<variableName>
- *
- * @return $this
- */
-public function <methodName>(<methodTypeHint> $<variableName><variableDefault>): self
-{
-<spaces>$this-><fieldName> = $<variableName>;
-
-<spaces>return $this;
-}
-';
-
-    /**
-     * @var string
-     */
-    private static $addMethodTemplate =
-'/**
- * <description>
- *
- * @param <variableType> $<variableName>
- *
- * @return $this
- */
-public function <methodName>(<methodTypeHint> $<variableName>): self
-{
-<spaces>$this-><fieldName>[] = $<variableName>;
-
-<spaces>return $this;
-}
-';
-
-    /**
-     * @var string
-     */
-    private static $methodTemplate =
-'/**
- * <description>
- */
-public function <methodName>()<return>
-{
-<spaces><content>
-}
-';
-
-    /**
-     * @var string
-     */
-    private static $constructorMethodTemplate =
-'/**
- * Constructor
- */
-public function __construct()
-{
-<spaces><collections>
-}
-';
-
-    /**
-     * @var string
-     */
-    private static $importableConstructorMethodTemplate =
-'/**
- * Constructor
- *
- * @param array $data
- */
-public function __construct(array $data = [])
-{
-<spaces><initialize>$this->import($data);
-}
-';
-
-    /**
-     * @var string
-     */
-    private static $constructorWithPromotedPropertiesMethodTemplate =
-'public function __construct(
-<properties>
-) {
-<spaces><body>
-}
-';
+    private bool $useConstructorPropertyPromotion = false;
 
     /**
      * Set prime service locator
@@ -330,13 +187,13 @@ public function __construct(array $data = [])
      * Generates and writes entity classes
      *
      * @param Mapper $mapper
-     * @param string $file    Entity file name
+     * @param string|null $file Entity file name
      *
      * @return string|false If no generation
      *
      * @api
      */
-    public function generate($mapper, $file = null)
+    public function generate(Mapper $mapper, ?string $file = null)
     {
         $this->isNew = !$file || !file_exists($file) || $this->regenerateEntityIfExists;
 
@@ -344,7 +201,7 @@ public function __construct(array $data = [])
         if ($this->isNew || !$file) {
             return $this->generateEntityClass($mapper);
         // If entity exists and we're allowed to update the entity class
-        } elseif ($this->updateEntityIfExists && $file) {
+        } elseif ($this->updateEntityIfExists) {
             return $this->generateUpdatedEntityClass($mapper, $file);
         }
 
@@ -358,92 +215,90 @@ public function __construct(array $data = [])
      *
      * @return string
      */
-    public function generateEntityClass(Mapper $mapper)
+    public function generateEntityClass(Mapper $mapper): string
     {
         $this->mapperInfo = $mapper->info();
 
+        $file = new PhpFile();
+
+        $namespace = $file->addNamespace($this->hasNamespace($this->mapperInfo->className()) ? $this->getNamespace($this->mapperInfo->className()) : '');
+        $generator = $namespace->addClass($this->getClassName($this->mapperInfo->className()));
+
         $this->staticReflection[$this->mapperInfo->className()] = ['properties' => [], 'methods' => []];
 
-        $placeHolders = [
-            '<namespace>',
-            '<useStatement>',
-            '<entityAnnotation>',
-            '<entityClassName>',
-            '<entityTraits>',
-            '<entityBody>'
-        ];
+        $this->generateEntityClassDeclaration($generator);
+        $this->generateEntityUse($namespace);
+        $this->generateEntityBody($generator, $namespace);
 
-        $replacements = [
-            $this->generateEntityNamespace(),
-            $this->generateEntityUse(),
-            $this->generateEntityDocBlock(),
-            $this->generateEntityClassName(),
-            $this->generateEntityTraits(),
-            $this->generateEntityBody()
-        ];
-
-        $code = str_replace($placeHolders, $replacements, static::$classTemplate);
-
-        return str_replace('<spaces>', $this->spaces, $code);
+        return (new ConfigurableEntityPrinter($this))
+            ->printFile($file);
     }
 
     /**
      * Generates the updated code for the given Mapper and entity at path.
      *
      * @param Mapper $mapper
-     * @param string $file
+     * @param string $filename
      *
      * @return string
      */
-    public function generateUpdatedEntityClass(Mapper $mapper, $file)
+    public function generateUpdatedEntityClass(Mapper $mapper, string $filename): string
     {
         $this->mapperInfo = $mapper->info();
 
-        $currentCode = file_get_contents($file);
+        $currentCode = file_get_contents($filename);
+        $file = PhpFile::fromCode($currentCode);
+        $generator = $file->getClasses()[$this->mapperInfo->className()];
+        $namespace = $file->getNamespaces()[$this->getNamespace($this->mapperInfo->className())];
 
         $this->parseTokensInEntityFile($currentCode);
 
-        $body = $this->generateEntityBody();
-        $body = str_replace('<spaces>', $this->spaces, $body);
-        $last = strrpos($currentCode, '}');
+        $this->generateEntityBody($generator, $namespace);
 
-        return substr($currentCode, 0, $last) . $body . (strlen($body) > 0 ? "\n" : '') . "}\n";
+        return (new ConfigurableEntityPrinter($this))
+            ->printFile($file);
     }
 
     /**
-     * @return string
+     * Generate class inheritance and traits
      */
-    protected function generateEntityNamespace(): string
+    protected function generateEntityClassDeclaration(ClassType $generator): void
     {
-        if ($this->hasNamespace($this->mapperInfo->className())) {
-            return 'namespace ' . $this->getNamespace($this->mapperInfo->className()) .';' . "\n\n";
+        $generator->addComment($this->getClassName($this->mapperInfo->className()));
+
+        if ($this->classToExtend) {
+            if (method_exists($generator, 'setExtends')) {
+                $generator->setExtends($this->classToExtend);
+            } else {
+                $generator->addExtend($this->classToExtend);
+            }
         }
 
-        return '';
+        foreach ($this->interfaces as $interface) {
+            $generator->addImplement($interface);
+        }
+
+        $generator->setTraits($this->traits);
     }
 
     /**
      * Generate use part
-     *
-     * @return string
      */
-    protected function generateEntityUse()
+    protected function generateEntityUse(PhpNamespace $namespace): void
     {
-        $use = [];
-
         if (($parentClass = $this->getClassToExtend()) && $this->hasNamespace($parentClass)) {
-            $use[$parentClass] = 'use ' . $parentClass . ';';
+            $namespace->addUse($parentClass);
         }
 
         foreach ($this->interfaces as $interface) {
             if ($this->hasNamespace($interface)) {
-                $use[$interface] = 'use ' . $interface . ';';
+                $namespace->addUse($interface);
             }
         }
 
         foreach ($this->traits as $trait) {
             if ($this->hasNamespace($trait)) {
-                $use[$trait] = 'use ' . $trait . ';';
+                $namespace->addUse($trait);
             }
         }
 
@@ -453,8 +308,8 @@ public function __construct(array $data = [])
                 continue;
             }
 
-            if ($this->hasNamespace($className)) {
-                $use[$className] = 'use '.$className.';';
+            if ($this->hasNamespace($className) && $this->getNamespace($className) !== $namespace->getName()) {
+                $namespace->addUse($className);
             }
 
             if ($info->wrapper() !== null) {
@@ -462,173 +317,85 @@ public function __construct(array $data = [])
                 $wrapperClass = $repository->collectionFactory()->wrapperClass($info->wrapper());
 
                 if ($this->hasNamespace($wrapperClass)) {
-                    $use[$wrapperClass] = 'use '.$wrapperClass.';';
+                    $namespace->addUse($wrapperClass);
                 }
             }
         }
-
-        if (!$use) {
-            return '';
-        }
-
-        sort($use);
-
-        return implode("\n", $use) . "\n\n";
     }
 
-    /**
-     * @return string
-     */
-    protected function generateEntityClassName()
+    protected function generateEntityBody(ClassType $generator, PhpNamespace $namespace): void
     {
-        return 'class ' . $this->getClassName($this->mapperInfo->className()) .
-            ($this->classToExtend ? ' extends ' . $this->getClassToExtendName() : null) .
-            ($this->interfaces ? ' implements ' . $this->getInterfacesToImplement() : null);
-    }
-
-    /**
-     * @return string
-     */
-    protected function generateEntityTraits()
-    {
-        if (!$this->traits) {
-            return '';
-        }
-
-        $traits = '';
-
-        foreach ($this->traits as $trait) {
-            $traits .= $this->spaces . 'use ' . $this->getRelativeClassName($trait) . ';' . "\n";
-        }
-
-        return $traits . "\n";
-    }
-
-    /**
-     * @return string
-     */
-    protected function generateEntityBody()
-    {
-        $fieldMappingProperties = $this->generateEntityFieldMappingProperties($this->useConstructorPropertyPromotion);
-        $embeddedProperties = $this->generateEntityEmbeddedProperties($this->useConstructorPropertyPromotion);
-        $stubMethods = $this->generateEntityStubMethods ? $this->generateEntityStubMethods() : null;
-
-        $code = [];
+        $properties = [
+            ...$this->generateEntityFieldMappingProperties($this->useConstructorPropertyPromotion),
+            ...$this->generateEntityEmbeddedProperties($namespace, $this->useConstructorPropertyPromotion)
+        ];
 
         if (!$this->useConstructorPropertyPromotion) {
-            if ($fieldMappingProperties) {
-                $code[] = $fieldMappingProperties;
-            }
-
-            if ($embeddedProperties) {
-                $code[] = $embeddedProperties;
+            foreach ($properties as $property) {
+                $property->addProperty($generator, $namespace);
             }
         }
 
-        $code[] = $this->generateEntityConstructor(
-            $this->useConstructorPropertyPromotion,
-            $fieldMappingProperties,
-            $embeddedProperties
-        );
-
-        if ($stubMethods) {
-            $code[] = $stubMethods;
+        if ($this->generateEntityStubMethods) {
+            $this->generateEntityStubMethods($generator, $namespace);
         }
 
-        return implode("\n", $code);
+        $this->generateEntityConstructor($generator, $namespace, $this->useConstructorPropertyPromotion, $properties);
     }
 
     /**
      * @param bool $propertyPromotion Generate constructor with property promotion
-     * @param string $fieldMappingProperties Entity properties
-     * @param string $embeddedProperties Relations and embedded properties
-     *
-     * @return string
+     * @param list<PropertyGenerator> $properties
      */
-    protected function generateEntityConstructor(bool $propertyPromotion, string $fieldMappingProperties, string $embeddedProperties)
+    protected function generateEntityConstructor(ClassType $generator, PhpNamespace $namespace, bool $propertyPromotion, array $properties): void
     {
         $initializable = in_array(InitializableInterface::class, $this->interfaces);
         $isImportable  = in_array(ImportableInterface::class, $this->interfaces)
                     || is_subclass_of($this->classToExtend, ImportableInterface::class);
 
-        $collections = [];
-
-        // Assignment operator : use null coalesce assignment with property promotion
-        // because assignation is performed before initializing default value
-        $assign = $propertyPromotion ? '??=' : '=';
-
-        foreach ($this->mapperInfo->objects() as $property) {
-            if (!$property->belongsToRoot()) {
-                continue;
-            }
-
-            if ($property->isRelation()) {
-                if (!$property->isArray()) {
-                    $collections[$property->name()] = '$this->'.$property->name().' '.$assign.' new '.$this->getRelativeClassName($property->className()).'();';
-                } elseif ($property->wrapper() === 'collection') { // @todo handle other wrapper types
-                    $collections[$property->name()] = '$this->'.$property->name().' '.$assign.' '.$this->getRelativeClassName($property->className()).'::collection();';
-                }
-            } else {
-                $collections[$property->name()] = '$this->'.$property->name().' '.$assign.' new '.$this->getRelativeClassName($property->className()).'();';
-            }
-        }
-        foreach ($this->mapperInfo->properties() as $property) {
-            if ($property->isDateTime() && $property->hasDefault()) {
-                $constructorArgs = '';
-                // Add the default timezone from the property type.
-                if ($timezone = $property->getTimezone()) {
-                    $constructorArgs = "'now', new \DateTimeZone('$timezone')";
-                }
-
-                $collections[$property->name()] = '$this->'.$property->name().' '.$assign.' new '.$property->phpType().'('.$constructorArgs.');';
-            }
-        }
-
-        $methods = [];
-
         if (!$this->hasMethod('__construct')) {
             if ($propertyPromotion) {
-                $methods[] = $this->generateConstructorWithPromotedProperties($initializable, $collections, $fieldMappingProperties, $embeddedProperties);
-            } elseif ($constructor = $this->generateClassicConstructor($isImportable, $initializable, $collections)) {
-                $methods[] = $constructor;
+                $this->generateConstructorWithPromotedProperties($generator, $namespace, $initializable, $properties);
+            } else {
+                $this->generateClassicConstructor($generator, $namespace, $isImportable, $initializable, $properties);
             }
         }
 
         if (!$this->hasMethod('initialize') && $initializable) {
-            $methods[] = $this->generateMethod('{@inheritdoc}', 'initialize', implode("\n".$this->spaces, $collections), 'void');
-        }
+            $init = Method::from([InitializableInterface::class, 'initialize'])
+                ->addComment('{@inheritdoc}');
 
-        return implode("\n", $methods);
+            foreach ($properties as $property) {
+                $property->addInitializeLine($init);
+            }
+
+            $generator->addMember($init);
+        }
     }
 
     /**
      * Generate PHP 8 constructor
      *
      * @param bool $initializable Does the entity class implements InitializableInterface ?
-     * @param string[] $collections Initialisation method instructions
-     * @param string $fieldMappingProperties Entity properties
-     * @param string $embeddedProperties Relations and embedded properties
-     *
-     * @return string
+     * @param list<PropertyGenerator> $properties Properties to declare an initialize
      */
-    private function generateConstructorWithPromotedProperties(bool $initializable, array $collections, string $fieldMappingProperties, string $embeddedProperties): string
+    private function generateConstructorWithPromotedProperties(ClassType $generator, PhpNamespace $namespace, bool $initializable, array $properties): void
     {
-        if ($initializable) {
-            $buffer = '$this->initialize();'."\n".$this->spaces;
-        } elseif ($collections) {
-            $buffer = implode("\n".$this->spaces, $collections)."\n".$this->spaces;
-        } else {
-            $buffer = '';
+        $constructor = $generator->addMethod('__construct');
+
+        foreach ($properties as $property) {
+            $property->addPromotedProperty($constructor, $namespace);
         }
 
-        $properties = rtrim($fieldMappingProperties."\n".$embeddedProperties);
-        $properties = str_replace(';', ',', $properties);
-
-        return $this->prefixCodeWithSpaces(str_replace(
-            ['<body>', '<properties>'],
-            [rtrim($buffer), $properties],
-            static::$constructorWithPromotedPropertiesMethodTemplate
-        ));
+        if ($initializable) {
+            $constructor->addBody('$this->initialize();');
+        } else {
+            foreach ($properties as $property) {
+                // Assignment operator : use null coalesce assignment with property promotion
+                // because assignation is performed before initializing default value
+                $property->addInitializeLine($constructor, '??=');
+            }
+        }
     }
 
     /**
@@ -636,59 +403,45 @@ public function __construct(array $data = [])
      *
      * @param bool $isImportable Does the entity class implements InitializableInterface ?
      * @param bool $initializable Does the entity class implements ImportableInterface ?
-     * @param string[] $collections Initialisation method instructions
-     *
-     * @return string|null
+     * @param list<PropertyGenerator> $properties Properties to initialize
      */
-    private function generateClassicConstructor(bool $isImportable, bool $initializable, array $collections): ?string
+    private function generateClassicConstructor(ClassType $generator, PhpNamespace $namespace, bool $isImportable, bool $initializable, array $properties): void
     {
         if ($isImportable) {
-            $buffer = '';
+            $constructor = $generator->addMethod('__construct');
+
+            $constructor
+                ->addParameter('data', [])
+                ->setType('array')
+            ;
 
             if ($initializable) {
-                $buffer = '$this->initialize();'."\n".$this->spaces;
-            } elseif ($collections) {
-                $buffer = implode("\n".$this->spaces, $collections)."\n".$this->spaces;
+                $constructor->addBody('$this->initialize();');
+            } else {
+                foreach ($properties as $property) {
+                    $property->addInitializeLine($constructor);
+                }
             }
 
-            return $this->prefixCodeWithSpaces(str_replace("<initialize>", $buffer, static::$importableConstructorMethodTemplate));
-        } elseif ($collections && !$initializable) {
-            return $this->prefixCodeWithSpaces(str_replace("<collections>", implode("\n".$this->spaces, $collections), static::$constructorMethodTemplate));
+            $constructor->addBody('$this->import($data);');
+        } elseif (!$initializable) {
+            $constructor = null;
+
+            foreach ($properties as $property) {
+                if ($property->hasInitialisation()) {
+                    // Add a constructor only if it's necessary
+                    $constructor = $constructor ?? $generator->addMethod('__construct');
+                    $property->addInitializeLine($constructor);
+                }
+            }
         }
-
-        return null;
     }
 
-    /**
-     * @param Mapper $mapper
-     *
-     * @return string
-     */
-    protected function generateEntityDocBlock()
+    protected function generateEntityStubMethods(ClassType $generator, PhpNamespace $namespace): void
     {
-        $lines = [];
-        $lines[] = '/**';
-        $lines[] = ' * ' . $this->getClassName($this->mapperInfo->className());
-        $lines[] = ' */';
-
-        return implode("\n", $lines);
-    }
-
-    /**
-     * @return string
-     */
-    protected function generateEntityStubMethods()
-    {
-        $methods = [];
-
         foreach ($this->mapperInfo->properties() as $property) {
-            if ($code = $this->generateEntityStubMethod('set', $property)) {
-                $methods[] = $code;
-            }
-
-            if ($code = $this->generateEntityStubMethod('get', $property)) {
-                $methods[] = $code;
-            }
+            $this->generateSetter($generator, $namespace, $property);
+            $this->generateGetter($generator, $namespace, $property);
         }
 
         foreach ($this->mapperInfo->objects() as $property) {
@@ -696,157 +449,197 @@ public function __construct(array $data = [])
                 continue;
             }
 
-            if (!$property->isArray() || $property->wrapper() !== null) {
-                if ($code = $this->generateEntityStubMethod('set', $property)) {
-                    $methods[] = $code;
-                }
-                if ($code = $this->generateEntityStubMethod('get', $property)) {
-                    $methods[] = $code;
-                }
-            } else {
-                if ($code = $this->generateEntityStubMethod('add', $property)) {
-                    $methods[] = $code;
-                }
-                if ($code = $this->generateEntityStubMethod('set', $property)) {
-                    $methods[] = $code;
-                }
-                if ($code = $this->generateEntityStubMethod('get', $property)) {
-                    $methods[] = $code;
-                }
+            if ($property->isArray() && $property->wrapper() === null) {
+                $this->generateAdder($generator, $namespace, $property);
             }
+
+            $this->generateSetter($generator, $namespace, $property);
+            $this->generateGetter($generator, $namespace, $property);
         }
-
-        return implode("\n", $methods);
-    }
-
-    /**
-     * @return string
-     */
-    protected function generateEntityFieldMappingProperties(bool $forceNullable = false)
-    {
-        $lines = [];
-
-        foreach ($this->mapperInfo->properties() as  $property) {
-            if ($this->hasProperty($property->name())) {
-                continue;
-            }
-
-            $default = '';
-
-            if ($property->hasDefault() && !$property->isDateTime()) {
-                $default = ' = '.$this->stringfyValue(
-                    $property->convert($property->getDefault())
-                );
-            } elseif ($property->isArray()) {
-                $default = ' = []';
-            }
-
-            // A nullable property should be defined as null by default
-            // A property is considered as nullable if it's explicitly defined on mapper or if the field is auto-generated
-            if (!$default && ($forceNullable || ($this->useTypedProperties && $property->isNullable()))) {
-                $default = ' = null';
-            }
-
-            $lines[] = $this->generateFieldMappingPropertyDocBlock($property);
-            $lines[] = $this->spaces.$this->fieldVisibility.$this->getPropertyTypeHintForSimpleProperty($property, $forceNullable).' $'.$property->name().$default.";\n";
-        }
-
-        return implode("\n", $lines);
     }
 
     /**
      * @param bool $forceNullable Force typehint to be nullable. Useful property promotion
-     * @return string
+     * @return list<PropertyGenerator>
      */
-    protected function generateEntityEmbeddedProperties(bool $forceNullable = false)
+    protected function generateEntityFieldMappingProperties(bool $forceNullable = false): array
     {
-        $lines = [];
+        $properties = [];
+
+        foreach ($this->mapperInfo->properties() as $property) {
+            if ($this->hasProperty($property->name())) {
+                continue;
+            }
+
+            $properties[] = $generator = new PropertyGenerator($property->name());
+
+            $generator->setNullable($forceNullable || $property->isNullable());
+            $generator->setVisibility($this->fieldVisibility);
+            $generator->setVarTag($property->phpType());
+
+            if ($this->useTypedProperties) {
+                $generator->setTypeHint($property->phpType());
+            }
+
+            if ($property->hasDefault() && !$property->isDateTime()) {
+                $generator->setDefaultValue($property->convert($property->getDefault()));
+            } elseif ($property->isArray()) {
+                $generator->setDefaultValue([]);
+            } elseif (($forceNullable || ($this->useTypedProperties && $property->isNullable()))) {
+                // A nullable property should be defined as null by default
+                // A property is considered as nullable if it's explicitly defined on mapper or if the field is auto-generated
+                $generator->setDefaultValue(null);
+            }
+
+            if ($property->hasDefault() && $property->isDateTime()) {
+                $constructorArgs = '';
+                // Add the default timezone from the property type.
+                if ($timezone = $property->getTimezone()) {
+                    $constructorArgs = "'now', new \DateTimeZone('$timezone')";
+                }
+
+                $generator->setInitialize('new '.$property->phpType().'('.$constructorArgs.')');
+            }
+        }
+
+        return $properties;
+    }
+
+    /**
+     * @param bool $forceNullable Force typehint to be nullable. Useful property promotion
+     * @return list<PropertyGenerator>
+     */
+    protected function generateEntityEmbeddedProperties(PhpNamespace $namespace, bool $forceNullable = false): array
+    {
+        $properties = [];
 
         foreach ($this->mapperInfo->objects() as $property) {
             if (!$property->belongsToRoot() || $this->hasProperty($property->name())) {
                 continue;
             }
 
+            $properties[] = $generator = new PropertyGenerator($property->name());
+            $generator->setVisibility($this->fieldVisibility);
+
+            // Embedded property : should not be null
             if (!$property->isRelation()) {
-                $lines[] = $this->generateEmbeddedPropertyDocBlock($property);
-                $lines[] = $this->spaces . $this->fieldVisibility . $this->getPropertyTypeHintForObject($property, $forceNullable) . ' $'.$property->name().";\n";
-            } else {
-                $name = $property->name();
-                $default = '';
+                $generator->setNullable($forceNullable);
+                $generator->setVarTag($property->className());
+                $generator->setInitialize('new '.$namespace->simplifyName($property->className()).'()');
 
-                // Do not initialize the property if it's a wrapper
-                if ($property->isArray() && $property->wrapper() === null) {
-                    $default = ' = []';
+                if ($this->useTypedProperties) {
+                    $generator->setTypeHint($property->className());
                 }
 
-                // If property is typed, always define a default value
-                if (($forceNullable || $this->useTypedProperties) && !$default) {
-                    $default = ' = null';
-                }
+                continue;
+            }
 
-                $lines[] = $this->generateEmbeddedPropertyDocBlock($property);
-                $lines[] = $this->spaces . $this->fieldVisibility . $this->getPropertyTypeHintForObject($property, $forceNullable) . ' $' . $name . $default .";\n";
+            $generator->setNullable($nullable = $forceNullable || $this->useTypedProperties);
+
+            switch(true) {
+                case $property->isArray() && $property->wrapper() === null:
+                    // Simple array relation
+                    $generator->setDefaultValue([]);
+                    $generator->setVarTag($property->className() . '[]');
+
+                    if ($this->useTypedProperties) {
+                        $generator->setTypeHint('array');
+                    }
+                    break;
+
+                case $property->isArray() && $property->wrapper() !== null:
+                    // Array relation with wrapper
+                    $repository = $this->prime->repository($property->className());
+                    $generator->setVarTag($repository->collectionFactory()->wrapperClass($property->wrapper()) . '|' . $property->className() . '[]');
+
+                    // The value is an object : so the default value must be null
+                    if ($nullable) {
+                        $generator->setDefaultValue(null);
+                    }
+
+                    if ($this->useTypedProperties) {
+                        $generator->setTypeHint($repository->collectionFactory()->wrapperClass($property->wrapper()));
+                    }
+
+                    // @todo handle other wrapper types
+                    if ($property->wrapper() === 'collection') {
+                        $generator->setInitialize($namespace->simplifyName($property->className()).'::collection()');
+                    }
+
+                    break;
+
+                default:
+                    // Simple relation
+                    $generator->setVarTag($property->className());
+                    $generator->setInitialize('new '.$namespace->simplifyName($property->className()).'()');
+
+                    // The value is an object : so the default value must be null
+                    if ($nullable) {
+                        $generator->setDefaultValue(null);
+                    }
+
+                    if ($this->useTypedProperties) {
+                        $generator->setTypeHint($property->className());
+                    }
             }
         }
 
-        return implode("\n", $lines);
+        return $properties;
     }
 
     /**
-     * @param string            $type
-     * @param InfoInterface     $propertyInfo
-     * @param string|null       $defaultValue
+     * Get accessor metadata for a given property
      *
-     * @return string
+     * @param PhpNamespace $namespace
+     * @param InfoInterface $propertyInfo
+     * @param string|null $prefix Accessor prefix. Can be null to use the field name as method name.
+     * @param bool $one In case of array property, get metadata for single item instead of the whole array.
+     *
+     * @return array{method: string, variable: string, field: string, typeHint: string, docType: string, nullable: bool}|null Accessor metadata, or null if the method already exists.
      */
-    protected function generateEntityStubMethod($type, InfoInterface $propertyInfo, $defaultValue = null)
+    protected function accessorMetadata(PhpNamespace $namespace, InfoInterface $propertyInfo, ?string $prefix, bool $one = false): ?array
     {
         $fieldName = $propertyInfo->name();
 
-        // The hint flag help algorithm to determine the hint info for object parameter.
-        // It should be 'array' for collection but the add method need the object hint.
-        // setItems(array $items)
-        // addItem(Item $item)
-        $hintOne = false;
-
-        if ($type === 'get' && $this->useGetShortcutMethod === true) {
+        if (!$prefix) {
             $variableName = $this->inflector->camelize($fieldName);
             $methodName = $variableName;
         } else {
-            $methodName = $type . $this->inflector->classify($fieldName);
+            $methodName = $prefix . $this->inflector->classify($fieldName);
             $variableName = $this->inflector->camelize($fieldName);
         }
 
-        if ($type === 'add') {
+        if ($one) {
             $methodName = $this->inflector->singularize($methodName);
             $variableName = $this->inflector->singularize($variableName);
-            $hintOne = true;
         }
 
         if ($this->hasMethod($methodName)) {
-            return '';
+            return null;
         }
+
         $this->staticReflection[$this->mapperInfo->className()]['methods'][] = strtolower($methodName);
 
         if ($propertyInfo->isObject()) {
             /** @var ObjectPropertyInfo $propertyInfo */
-            $variableType = $this->getRelativeClassName($propertyInfo->className());
+            $variableType = $namespace->simplifyName($propertyInfo->className());
             // Only makes nullable for single relation
-            $methodTypeHint = $this->getPropertyTypeHint($propertyInfo->className(), !$hintOne && !$propertyInfo->isEmbedded());
+            $methodTypeHint = $propertyInfo->className();
+            $nullable = (!$one && !$propertyInfo->isEmbedded());
         } else {
             /** @var PropertyInfo $propertyInfo */
             $variableType = $propertyInfo->phpType();
-            $methodTypeHint = $this->getPropertyTypeHint($variableType, $propertyInfo->isNullable());
+            $methodTypeHint = self::PROPERTY_TYPE_MAP[$variableType] ?? $variableType;
+            $nullable = $propertyInfo->isNullable();
         }
 
-        if ($propertyInfo->isArray() && $hintOne === false) {
+        if ($propertyInfo->isArray() && $one === false) {
             if ($propertyInfo->isObject() && $propertyInfo->wrapper() !== null) {
                 /** @var ObjectPropertyInfo $propertyInfo */
                 $repository = $this->prime->repository($propertyInfo->className());
-                $wrapperClass = $this->getRelativeClassName($repository->collectionFactory()->wrapperClass($propertyInfo->wrapper()));
 
-                $methodTypeHint = $wrapperClass;
-                $variableType .= '[]|'.$wrapperClass;
+                $methodTypeHint = $repository->collectionFactory()->wrapperClass($propertyInfo->wrapper());
+                $variableType .= '[]|'.$namespace->simplifyName($methodTypeHint);
             } else {
                 $methodTypeHint = 'array';
 
@@ -856,125 +649,81 @@ public function __construct(array $data = [])
             }
         }
 
-        $replacements = [
-          '<description>'       => ucfirst($type).' '.$variableName,
-          '<methodTypeHint>'    => $methodTypeHint,
-          '<variableType>'      => $variableType,
-          '<variableName>'      => $variableName,
-          '<methodName>'        => $methodName,
-          '<fieldName>'         => $fieldName,
-          '<variableDefault>'   => ($defaultValue !== null) ? (' = '.$defaultValue) : ''
+        return [
+            'field' => $fieldName,
+            'variable' => $variableName,
+            'method' => $methodName,
+            'typeHint' => $methodTypeHint,
+            'docType' => $variableType,
+            'nullable' => $nullable,
         ];
-
-        $method = str_replace(
-            array_keys($replacements),
-            array_values($replacements),
-            $this->getMethodTemplate($type)
-        );
-
-        return $this->prefixCodeWithSpaces($method);
     }
 
-    /**
-     * Get the template of the method
-     *
-     * @param string $prefix
-     *
-     * @return string
-     *
-     * @throws \LogicException
-     */
-    private function getMethodTemplate($prefix)
+    protected function generateGetter(ClassType $generator, PhpNamespace $namespace, InfoInterface $propertyInfo): void
     {
-        switch ($prefix) {
-            case 'get':
-                return static::$getMethodTemplate;
+        $metadata = $this->accessorMetadata($namespace, $propertyInfo, $this->useGetShortcutMethod ? null : 'get');
 
-            case 'add':
-                return static::$addMethodTemplate;
-
-            case 'set':
-                return static::$setMethodTemplate;
+        if (!$metadata) {
+            return;
         }
 
-        throw new \LogicException('No template found for method "'.$prefix.'"');
+        $method = $generator->addMethod($metadata['method']);
+        $method->addComment('Get ' . $metadata['variable']);
+        $method->addComment('');
+        $method->setReturnType($metadata['typeHint']);
+        $method->setReturnNullable($metadata['nullable']);
+        $method->setBody('return $this->?;', [$metadata['field']]);
+        $method->addComment('@return ' . $metadata['docType']);
     }
 
-    /**
-     * @param string $description
-     * @param string $methodName
-     * @param string $content
-     *
-     * @return string
-     */
-    protected function generateMethod(string $description, string $methodName, string $content, ?string $return = null)
+    protected function generateSetter(ClassType $generator, PhpNamespace $namespace, InfoInterface $propertyInfo): void
     {
-        if ($this->hasMethod($methodName)) {
-            return '';
+        $metadata = $this->accessorMetadata($namespace, $propertyInfo, 'set');
+
+        if (!$metadata) {
+            return;
         }
 
-        $this->staticReflection[$this->mapperInfo->className()]['methods'][] = $methodName;
-
-        $replacements = [
-            '<description>' => $description,
-            '<methodName>'  => $methodName,
-            '<content>'     => $content,
-            '<return>'      => $return ? ": $return" : '',
-        ];
-
-        $method = str_replace(
-            array_keys($replacements),
-            array_values($replacements),
-            static::$methodTemplate
-        );
-
-        return $this->prefixCodeWithSpaces($method);
+        $method = $generator->addMethod($metadata['method']);
+        $method->addComment('Set ' . $metadata['variable']);
+        $method->addComment('');
+        $method->addComment('@param ' . $metadata['docType'] . ' $' . $metadata['variable']);
+        $method->addComment('');
+        $method->addComment('@return $this');
+        $method->setReturnType('self');
+        $method
+            ->addParameter($metadata['variable'])
+            ->setType($metadata['typeHint'])
+            ->setNullable($metadata['nullable'])
+        ;
+        $method->addBody('$this->? = $?;', [$metadata['field'], $metadata['variable']]);
+        $method->addBody('');
+        $method->addBody('return $this;');
     }
 
-    /**
-     * @param PropertyInfo $property
-     *
-     * @return string
-     */
-    protected function generateFieldMappingPropertyDocBlock($property)
+    protected function generateAdder(ClassType $generator, PhpNamespace $namespace, InfoInterface $propertyInfo): void
     {
-        $lines = [];
-        $lines[] = $this->spaces . '/**';
-        $lines[] = $this->spaces . ' * @var '.$property->phpType();
-        $lines[] = $this->spaces . ' */';
+        $metadata = $this->accessorMetadata($namespace, $propertyInfo, 'add', true);
 
-        return implode("\n", $lines);
-    }
-
-    /**
-     * @param ObjectPropertyInfo $property
-     *
-     * @return string
-     */
-    protected function generateEmbeddedPropertyDocBlock($property)
-    {
-        $className = $property->className();
-        if ($className) {
-            $className = $this->getRelativeClassName($className);
-
-            if ($property->isArray()) {
-                if ($property->wrapper() !== null) {
-                    $repository = $this->prime->repository($property->className());
-                    $className = $this->getRelativeClassName($repository->collectionFactory()->wrapperClass($property->wrapper())).'|'.$className.'[]';
-                } else {
-                    $className .= '[]';
-                }
-            }
-        } else {
-            $className = '{type}';
+        if (!$metadata) {
+            return;
         }
 
-        $lines = [];
-        $lines[] = $this->spaces . '/**';
-        $lines[] = $this->spaces . ' * @var '.$className;
-        $lines[] = $this->spaces . ' */';
-
-        return implode("\n", $lines);
+        $method = $generator->addMethod($metadata['method']);
+        $method->addComment('Add ' . $metadata['variable']);
+        $method->addComment('');
+        $method->addComment('@param ' . $metadata['docType'] . ' $' . $metadata['variable']);
+        $method->addComment('');
+        $method->addComment('@return $this');
+        $method->setReturnType('self');
+        $method
+            ->addParameter($metadata['variable'])
+            ->setType($metadata['typeHint'])
+            ->setNullable($metadata['nullable'])
+        ;
+        $method->addBody('$this->?[] = $?;', [$metadata['field'], $metadata['variable']]);
+        $method->addBody('');
+        $method->addBody('return $this;');
     }
 
     //
@@ -988,11 +737,12 @@ public function __construct(array $data = [])
      *
      * @return void
      */
-    protected function parseTokensInEntityFile($src)
+    protected function parseTokensInEntityFile(string $src): void
     {
         $tokens = token_get_all($src);
         $lastSeenNamespace = "";
-        $lastSeenClass = false;
+        /* @var class-string $lastSeenClass */
+        $lastSeenClass = null;
 
         $inNamespace = false;
         $inClass = false;
@@ -1004,7 +754,7 @@ public function __construct(array $data = [])
             }
 
             if ($inNamespace) {
-                if ($token[0] == T_NS_SEPARATOR || $token[0] == T_STRING) {
+                if ($token[0] == T_NS_SEPARATOR || $token[0] == T_STRING || (defined('T_NAME_QUALIFIED') && $token[0] == T_NAME_QUALIFIED)) {
                     $lastSeenNamespace .= $token[1];
                 } elseif (is_string($token) && in_array($token, [';', '{'])) {
                     $inNamespace = false;
@@ -1040,11 +790,11 @@ public function __construct(array $data = [])
      *
      * @return bool
      */
-    protected function hasProperty($property)
+    protected function hasProperty(string $property): bool
     {
-        if ($this->classToExtend || (!$this->isNew && class_exists($this->mapperInfo->className()))) {
+        if ($this->classToExtend) {
             // don't generate property if its already on the base class.
-            $reflClass = new \ReflectionClass($this->getClassToExtend() ?: $this->mapperInfo->className());
+            $reflClass = new \ReflectionClass($this->getClassToExtend());
             if ($reflClass->hasProperty($property)) {
                 return true;
             }
@@ -1068,7 +818,7 @@ public function __construct(array $data = [])
      *
      * @return bool
      */
-    protected function hasMethod($method)
+    protected function hasMethod(string $method): bool
     {
         if ($this->classToExtend || (!$this->isNew && class_exists($this->mapperInfo->className()))) {
             // don't generate method if its already on the base class.
@@ -1093,30 +843,13 @@ public function __construct(array $data = [])
     }
 
     /**
-     * Get class name relative to use
-     *
-     * @param string $className
-     * @return string
-     */
-    protected function getRelativeClassName($className)
-    {
-        $className = ltrim($className, '\\');
-
-        if ($this->hasNamespace($className)) {
-            return $this->getClassName($className);
-        } else {
-            return '\\' . $className;
-        }
-    }
-
-    /**
      * Get the class short name
      *
      * @param string $className
      *
      * @return string
      */
-    protected function getClassName($className)
+    protected function getClassName(string $className): string
     {
         $parts = explode('\\', $className);
         return array_pop($parts);
@@ -1127,7 +860,7 @@ public function __construct(array $data = [])
      *
      * @return string
      */
-    protected function getNamespace($className)
+    protected function getNamespace(string $className): string
     {
         $parts = explode('\\', $className);
         array_pop($parts);
@@ -1140,43 +873,15 @@ public function __construct(array $data = [])
      *
      * @return bool
      */
-    protected function hasNamespace($className)
+    protected function hasNamespace(string $className): bool
     {
         return strrpos($className, '\\') != 0;
     }
 
     /**
-     * @return string
+     * @return array<trait-string, \ReflectionClass>
      */
-    protected function getClassToExtendName()
-    {
-        $refl = new \ReflectionClass($this->getClassToExtend());
-
-        return $this->getRelativeClassName($refl->getName());
-    }
-
-    /**
-     * @return string
-     */
-    protected function getInterfacesToImplement()
-    {
-        $interfaces = [];
-
-        foreach ($this->interfaces as $interface) {
-            $refl = new \ReflectionClass($interface);
-
-            $interfaces[] = $this->getRelativeClassName($refl->getName());
-        }
-
-        return implode(', ', $interfaces);
-    }
-
-    /**
-     * @param Mapper $mapper
-     *
-     * @return \ReflectionClass[]
-     */
-    protected function getTraitsReflections()
+    protected function getTraitsReflections(): array
     {
         if ($this->isNew) {
             return [];
@@ -1195,138 +900,6 @@ public function __construct(array $data = [])
         return $traits;
     }
 
-    /**
-     * @param string $code
-     * @param int    $num
-     *
-     * @return string
-     */
-    protected function prefixCodeWithSpaces($code, $num = 1)
-    {
-        $lines = explode("\n", $code);
-
-        foreach ($lines as $key => $value) {
-            if (! empty($value)) {
-                $lines[$key] = str_repeat($this->spaces, $num) . $lines[$key];
-            }
-        }
-
-        return implode("\n", $lines);
-    }
-
-    /**
-     * Get string representation of a value
-     *
-     * @param mixed $value
-     *
-     * @return string
-     */
-    protected function stringfyValue($value)
-    {
-        if (is_array($value)) {
-            if (empty($value)) {
-                return '[]';
-            }
-
-            return var_export($value, true);
-        }
-
-        if (null === $value) {
-            return 'null';
-        }
-
-        if (is_string($value)) {
-            return "'" . $value . "'";
-        }
-
-        if (is_bool($value)) {
-            return $value ? 'true' : 'false';
-        }
-
-        return $value;
-    }
-
-    /**
-     * Get the php 7.4 property type hint
-     *
-     * This method will map invalid type hint to value one (ex: double -> float)
-     * It will also resolve the relative class name if the type is a class
-     *
-     * @param string $type The property type declared by field phpType()
-     * @param bool $nullable Does the property should be nullable
-     *
-     * @return string
-     *
-     * @see TypeInterface::phpType()
-     *
-     * @todo use directly the property info object ?
-     */
-    protected function getPropertyTypeHint(string $type, bool $nullable): string
-    {
-        if (class_exists($type)) {
-            $type = $this->getRelativeClassName($type);
-        } else {
-            $type = self::PROPERTY_TYPE_MAP[$type] ?? $type;
-        }
-
-        return ($nullable ? '?' : '') . $type;
-    }
-
-    /**
-     * Get the php 7.4 property type hint for a simple property
-     *
-     * If typed properties are disabled, this method will return an empty string
-     * The returned type hint will be prefixed by a single space
-     *
-     * @param PropertyInfo $property
-     * @param bool $forceNullable Force typehint to be nullable. Useful property promotion
-     *
-     * @return string
-     */
-    protected function getPropertyTypeHintForSimpleProperty(PropertyInfo $property, bool $forceNullable = false): string
-    {
-        if (!$this->useTypedProperties) {
-            return '';
-        }
-
-        return ' ' . $this->getPropertyTypeHint($property->phpType(), $forceNullable || $property->isNullable());
-    }
-
-    /**
-     * Get the php 7.4 property type hint for a object property (i.e. relation or embedded)
-     *
-     * If typed properties are disabled, this method will return an empty string
-     * The returned type hint will be prefixed by a single space
-     *
-     * - Embedded properties will not be marked as nullable
-     * - Relations will always be nullable
-     * - This method will also resolve collection relations and the wrapper class if provided
-     *
-     * @param ObjectPropertyInfo $property
-     * @param bool $forceNullable Force typehint to be nullable. Useful property promotion
-     *
-     * @return string
-     */
-    protected function getPropertyTypeHintForObject(ObjectPropertyInfo $property, bool $forceNullable = false): string
-    {
-        if (!$this->useTypedProperties) {
-            return '';
-        }
-
-        $type = $property->className();
-
-        if ($property->isArray()) {
-            if ($property->wrapper() === null) {
-                $type = 'array';
-            } else {
-                $repository = $this->prime->repository($type);
-                $type = $repository->collectionFactory()->wrapperClass($property->wrapper());
-            }
-        }
-
-        return ' ' . $this->getPropertyTypeHint($type, $forceNullable || $property->isRelation());
-    }
-
     //---------------------- mutators
 
     /**
@@ -1336,7 +909,6 @@ public function __construct(array $data = [])
      */
     public function setNumSpaces(int $numSpaces): void
     {
-        $this->spaces = str_repeat(' ', $numSpaces);
         $this->numSpaces = $numSpaces;
     }
 
@@ -1529,15 +1101,15 @@ public function __construct(array $data = [])
     /**
      * Sets whether or not the get mehtod will be suffixed by 'get'.
      *
-     * @param bool $bool
+     * @param bool $flag
      *
      * @return void
      *
      * @api
      */
-    public function useGetShortcutMethod($bool = true)
+    public function useGetShortcutMethod(bool $flag = true)
     {
-        $this->useGetShortcutMethod = $bool;
+        $this->useGetShortcutMethod = $flag;
     }
 
     /**
@@ -1582,5 +1154,175 @@ public function __construct(array $data = [])
     public function useConstructorPropertyPromotion(bool $useConstructorPropertyPromotion = true): void
     {
         $this->useConstructorPropertyPromotion = $useConstructorPropertyPromotion;
+    }
+}
+
+/**
+ * @internal
+ */
+class PropertyGenerator
+{
+    private string $name;
+    private ?string $typeHint = null;
+    private bool $nullable = false;
+    private ?string $varTag = null;
+    private string $visibility = EntityGenerator::FIELD_VISIBLE_PROTECTED;
+    private $defaultValue;
+    private bool $hasDefaultValue = false;
+    private ?string $initialize = null;
+
+    /**
+     * @param string $name
+     */
+    public function __construct(string $name)
+    {
+        $this->name = $name;
+    }
+
+    public function setTypeHint(string $typeHint): void
+    {
+        $this->typeHint = $typeHint;
+    }
+
+    public function setNullable(bool $nullable): void
+    {
+        $this->nullable = $nullable;
+    }
+
+    public function setVarTag(string $varTag): void
+    {
+        $this->varTag = $varTag;
+    }
+
+    public function setVisibility(string $visibility): void
+    {
+        $this->visibility = $visibility;
+    }
+
+    public function setDefaultValue($value): void
+    {
+        $this->defaultValue = $value;
+        $this->hasDefaultValue = true;
+    }
+
+    public function setInitialize(string $initialize): void
+    {
+        $this->initialize = $initialize;
+    }
+
+    public function hasInitialisation(): bool
+    {
+        return $this->initialize !== null;
+    }
+
+    public function addProperty(ClassType $generator, ?PhpNamespace $namespace): void
+    {
+        $property = $generator->addProperty($this->name);
+
+        $property
+            ->setNullable($this->nullable)
+            ->setVisibility($this->visibility)
+        ;
+
+        if ($this->typeHint) {
+            $typehint = EntityGenerator::PROPERTY_TYPE_MAP[$this->typeHint] ?? $this->typeHint;
+            $property->setType($typehint);
+        }
+
+        if ($this->hasDefaultValue) {
+            $property->setValue($this->defaultValue);
+        }
+
+        if ($this->varTag) {
+            $type = $this->varTag;
+
+            if (!isset(EntityGenerator::PROPERTY_TYPE_MAP[$this->varTag]) && $namespace) {
+                $type = $this->simplifyType($type, $namespace);
+            }
+
+            $property->addComment("\n@var $type");
+        }
+    }
+
+    public function addPromotedProperty(Method $constructor, ?PhpNamespace $namespace): void
+    {
+        $parameter = $constructor->addPromotedParameter($this->name);
+
+        $parameter
+            ->setNullable($this->nullable)
+            ->setVisibility($this->visibility)
+        ;
+
+        if ($this->typeHint) {
+            $typehint = EntityGenerator::PROPERTY_TYPE_MAP[$this->typeHint] ?? $this->typeHint;
+            $parameter->setType($typehint);
+        }
+
+        if ($this->hasDefaultValue) {
+            $parameter->setDefaultValue($this->defaultValue);
+        }
+
+        if ($this->varTag) {
+            $type = $this->varTag;
+
+            if (!isset(EntityGenerator::PROPERTY_TYPE_MAP[$this->varTag]) && $namespace) {
+                $type = $this->simplifyType($type, $namespace);
+            }
+
+            $parameter->addComment("\n@var $type");
+        }
+    }
+
+    public function addInitializeLine(Method $initializeMethod, string $assignationOperator = '='): void
+    {
+        if ($this->initialize) {
+            $initializeMethod->addBody('$this->'.$this->name.' '.$assignationOperator.' '.$this->initialize.';');
+        }
+    }
+
+    private function simplifyType(string $type, PhpNamespace $namespace): string
+    {
+        $types = explode('|', $type);
+
+        foreach ($types as &$part) {
+            $atomicType = $part;
+            $isArray = false;
+
+            if (str_ends_with($atomicType, '[]')) {
+                $atomicType = substr($atomicType, 0, -2);
+                $isArray = true;
+            }
+
+            if (isset(EntityGenerator::PROPERTY_TYPE_MAP[$atomicType])) {
+                continue;
+            }
+
+            $part = $namespace->simplifyName($atomicType) . ($isArray ? '[]' : '');
+        }
+
+        return implode('|', $types);
+    }
+}
+
+/**
+ * @internal
+ */
+class ConfigurableEntityPrinter extends Printer
+{
+    public function __construct(EntityGenerator $generator)
+    {
+        parent::__construct();
+
+        $this->linesBetweenMethods = 1;
+        $this->linesBetweenProperties = 1;
+        $this->indentation = str_repeat(' ', $generator->getNumSpaces());
+    }
+
+    public function printClass($class, ?PhpNamespace $namespace = null): string
+    {
+        $code = parent::printClass($class, $namespace);
+
+        // Reformat property docblock : nette will generate property doc on single line
+        return preg_replace('#^( *)/\*\*(.*)\s+\*/$#m', "$1/**\n$1 *$2\n$1 */", $code);
     }
 }
