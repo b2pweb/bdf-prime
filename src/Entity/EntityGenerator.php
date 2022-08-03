@@ -1004,7 +1004,7 @@ public function __construct(array $data = [])
             }
 
             if ($inNamespace) {
-                if ($token[0] == T_NS_SEPARATOR || $token[0] == T_STRING) {
+                if ($token[0] == T_NS_SEPARATOR || $token[0] == T_STRING || (defined('T_NAME_QUALIFIED') && $token[0] == T_NAME_QUALIFIED)) {
                     $lastSeenNamespace .= $token[1];
                 } elseif (is_string($token) && in_array($token, [';', '{'])) {
                     $inNamespace = false;

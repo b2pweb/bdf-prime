@@ -4,6 +4,7 @@ namespace Bdf\Prime\Entity;
 
 use Bdf\Prime\Admin;
 use Bdf\Prime\Collection\EntityCollection;
+use Bdf\Prime\Company;
 use Bdf\Prime\Customer;
 use Bdf\Prime\Document;
 use Bdf\Prime\Faction;
@@ -599,6 +600,202 @@ PHP
             $generator->useConstructorPropertyPromotion();
             $this->assertValidPHP($generator->generate($entity::repository()->mapper()));
         }
+    }
+
+    public function test_generate_update_already_up_to_date()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->setUpdateEntityIfExists(true);
+        $generator->setClassToExtend(Model::class);
+
+        $entity = $generator->generate(Company::repository()->mapper(), __DIR__.'/_files/company_up_to_date.php');
+        $this->assertStringEqualsFile(__DIR__.'/_files/company_up_to_date.php', $entity);
+    }
+
+    public function test_generate_update_with_missing_property()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->setUpdateEntityIfExists(true);
+        $generator->setClassToExtend(Model::class);
+
+        $entity = $generator->generate(Company::repository()->mapper(), __DIR__ . '/_files/company_with_missing_property.php');
+        $this->assertEquals(<<<'PHP'
+<?php
+
+namespace Bdf\Prime;
+
+use Bdf\Prime\Entity\Model;
+
+/**
+ * Company
+ */
+class Company extends Model
+{
+    /**
+     * @var integer
+     */
+    protected $id;
+
+    /**
+     * Constructor
+     *
+     * @param array $data
+     */
+    public function __construct(array $data = [])
+    {
+        $this->import($data);
+    }
+
+    /**
+     * Set id
+     *
+     * @param integer $id
+     *
+     * @return $this
+     */
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function id(): int
+    {
+        return $this->id;
+    }
+    /**
+     * @var string
+     */
+    protected $name;
+
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+}
+
+PHP
+            , $entity);
+    }
+
+    public function test_generate_update_with_missing_accessors()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->setUpdateEntityIfExists(true);
+        $generator->setClassToExtend(Model::class);
+
+        $entity = $generator->generate(Company::repository()->mapper(), __DIR__ . '/_files/company_with_missing_accessors.php');
+        $this->assertEquals(<<<'PHP'
+<?php
+
+namespace Bdf\Prime;
+
+use Bdf\Prime\Entity\Model;
+
+/**
+ * Company
+ */
+class Company extends Model
+{
+    /**
+     * @var integer
+     */
+    protected $id;
+
+    /**
+     * @var string
+     */
+    protected $name;
+
+    /**
+     * Constructor
+     *
+     * @param array $data
+     */
+    public function __construct(array $data = [])
+    {
+        $this->import($data);
+    }
+
+    /**
+     * Set id
+     *
+     * @param integer $id
+     *
+     * @return $this
+     */
+    public function setId(int $id): self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function id(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set name
+     *
+     * @param string $name
+     *
+     * @return $this
+     */
+    public function setName(string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * Get name
+     *
+     * @return string
+     */
+    public function name(): string
+    {
+        return $this->name;
+    }
+
+}
+
+PHP
+        , $entity);
     }
 
     public function provideEntities(): array
