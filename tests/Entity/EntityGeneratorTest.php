@@ -777,6 +777,28 @@ PHP
         $this->assertStringEqualsFile(__DIR__.'/_files/company_up_to_date_with_custom_method.php', $entity);
     }
 
+    public function test_generate_update_already_up_to_date_with_promoted_properties()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->setUpdateEntityIfExists(true);
+        $generator->useTypedProperties();
+        $generator->useConstructorPropertyPromotion();
+
+        $entity = $generator->generate(Company::repository()->mapper(), __DIR__.'/_files/company_up_to_date_with_promoted_properties.php');
+        $this->assertStringEqualsFile(__DIR__.'/_files/company_up_to_date_with_promoted_properties.php', $entity);
+    }
+
+    public function test_generate_update_with_missing_property_with_promoted_properties()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->setUpdateEntityIfExists(true);
+        $generator->useTypedProperties();
+        $generator->useConstructorPropertyPromotion();
+
+        $entity = $generator->generate(Company::repository()->mapper(), __DIR__ . '/_files/company_up_to_date_with_promoted_properties_missing_property.php');
+        $this->assertStringEqualsFile(__DIR__.'/_files/company_up_to_date_with_promoted_properties.php', $entity);
+    }
+
     public function provideEntities(): array
     {
         return [

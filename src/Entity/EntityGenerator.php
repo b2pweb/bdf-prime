@@ -13,11 +13,14 @@ use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\Inflector as InflectorObject;
 use Doctrine\Inflector\InflectorFactory;
 use Nette\PhpGenerator\ClassType;
+use Nette\PhpGenerator\Constant;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Printer;
-use Nette\PhpGenerator\PsrPrinter;
+use Nette\PhpGenerator\PromotedParameter;
+use Nette\PhpGenerator\Property;
+use Nette\PhpGenerator\TraitUse;
 
 /**
  * Generic class used to generate PHP 7 and 8 entity classes from Mapper.
@@ -30,8 +33,6 @@ use Nette\PhpGenerator\PsrPrinter;
  *     $generator->setRegenerateEntityIfExists(false);
  *     $generator->setUpdateEntityIfExists(true);
  *     $generator->generate($mapper, '/path/to/generate/entities');
- *
- * @todo version 3.6 et 4.0 pour nette generator
  */
 class EntityGenerator
 {
@@ -48,12 +49,12 @@ class EntityGenerator
     /**
      * Specifies class fields should be protected.
      */
-    public const FIELD_VISIBLE_PROTECTED = ClassType::VISIBILITY_PROTECTED;
+    public const FIELD_VISIBLE_PROTECTED = ClassType::VisibilityProtected;
 
     /**
      * Specifies class fields should be private.
      */
-    public const FIELD_VISIBLE_PRIVATE = ClassType::VISIBILITY_PRIVATE;
+    public const FIELD_VISIBLE_PRIVATE = ClassType::VisibilityPrivate;
 
     /**
      * The prime service locator
@@ -89,11 +90,6 @@ class EntityGenerator
      * @var boolean
      */
     private bool $isNew = true;
-
-    /**
-     * @var array<class-string, array{properties: list<string>, methods: list<string>}>
-     */
-    private array $staticReflection = [];
 
     /**
      * Number of spaces to use for indention in generated code.
@@ -218,17 +214,20 @@ class EntityGenerator
     public function generateEntityClass(Mapper $mapper): string
     {
         $this->mapperInfo = $mapper->info();
+        $className = $this->mapperInfo->className();
 
         $file = new PhpFile();
 
-        $namespace = $file->addNamespace($this->hasNamespace($this->mapperInfo->className()) ? $this->getNamespace($this->mapperInfo->className()) : '');
-        $generator = $namespace->addClass($this->getClassName($this->mapperInfo->className()));
+        $nsSeparatorPos = strrpos($className, '\\');
 
-        $this->staticReflection[$this->mapperInfo->className()] = ['properties' => [], 'methods' => []];
+        $namespace = $file->addNamespace($nsSeparatorPos !== false ? substr($className, 0, $nsSeparatorPos) : '');
+        $class = $namespace->addClass(substr($className, $nsSeparatorPos + 1));
 
-        $this->generateEntityClassDeclaration($generator);
-        $this->generateEntityUse($namespace);
-        $this->generateEntityBody($generator, $namespace);
+        $generator = new EntityClassGenerator($class, $namespace);
+
+        $this->generateEntityClassDeclaration($class);
+        $this->generateEntityUse($generator);
+        $this->generateEntityBody($generator);
 
         return (new ConfigurableEntityPrinter($this))
             ->printFile($file);
@@ -248,12 +247,25 @@ class EntityGenerator
 
         $currentCode = file_get_contents($filename);
         $file = PhpFile::fromCode($currentCode);
-        $generator = $file->getClasses()[$this->mapperInfo->className()];
-        $namespace = $file->getNamespaces()[$this->getNamespace($this->mapperInfo->className())];
 
-        $this->parseTokensInEntityFile($currentCode);
+        $namespace = null;
+        $class = null;
 
-        $this->generateEntityBody($generator, $namespace);
+        foreach ($file->getNamespaces() as $foundNs) {
+            foreach ($foundNs->getClasses() as $foundClass) {
+                if ($this->mapperInfo->className() === $foundNs->getName() . '\\' . $foundClass->getName()) {
+                    $namespace = $foundNs;
+                    $class = $foundClass;
+                    break;
+                }
+            }
+        }
+
+        if (!$namespace || !$class) {
+            throw new \InvalidArgumentException('The file do not contains class definition of ' . $this->mapperInfo->className());
+        }
+
+        $this->generateEntityBody(new EntityClassGenerator($class, $namespace));
 
         return (new ConfigurableEntityPrinter($this))
             ->printFile($file);
@@ -262,40 +274,36 @@ class EntityGenerator
     /**
      * Generate class inheritance and traits
      */
-    protected function generateEntityClassDeclaration(ClassType $generator): void
+    protected function generateEntityClassDeclaration(ClassType $class): void
     {
-        $generator->addComment($this->getClassName($this->mapperInfo->className()));
+        $class->addComment($class->getName());
 
         if ($this->classToExtend) {
-            $generator->setExtends($this->classToExtend);
+            $class->setExtends($this->classToExtend);
         }
 
         foreach ($this->interfaces as $interface) {
-            $generator->addImplement($interface);
+            $class->addImplement($interface);
         }
 
-        $generator->setTraits($this->traits);
+        $class->setTraits($this->traits);
     }
 
     /**
      * Generate use part
      */
-    protected function generateEntityUse(PhpNamespace $namespace): void
+    protected function generateEntityUse(EntityClassGenerator $generator): void
     {
-        if (($parentClass = $this->getClassToExtend()) && $this->hasNamespace($parentClass)) {
-            $namespace->addUse($parentClass);
+        if (($parentClass = $this->getClassToExtend())) {
+            $generator->addUse($parentClass);
         }
 
         foreach ($this->interfaces as $interface) {
-            if ($this->hasNamespace($interface)) {
-                $namespace->addUse($interface);
-            }
+            $generator->addUse($interface);
         }
 
         foreach ($this->traits as $trait) {
-            if ($this->hasNamespace($trait)) {
-                $namespace->addUse($trait);
-            }
+            $generator->addUse($trait);
         }
 
         foreach ($this->mapperInfo->objects() as $info) {
@@ -304,60 +312,54 @@ class EntityGenerator
                 continue;
             }
 
-            if ($this->hasNamespace($className) && $this->getNamespace($className) !== $namespace->getName()) {
-                $namespace->addUse($className);
-            }
+            $generator->addUse($className);
 
             if ($info->wrapper() !== null) {
                 $repository = $this->prime->repository($className);
                 $wrapperClass = $repository->collectionFactory()->wrapperClass($info->wrapper());
 
-                if ($this->hasNamespace($wrapperClass)) {
-                    $namespace->addUse($wrapperClass);
-                }
+                $generator->addUse($wrapperClass);
             }
         }
     }
 
-    protected function generateEntityBody(ClassType $generator, PhpNamespace $namespace): void
+    protected function generateEntityBody(EntityClassGenerator $generator): void
     {
         $properties = [
-            ...$this->generateEntityFieldMappingProperties($this->useConstructorPropertyPromotion),
-            ...$this->generateEntityEmbeddedProperties($namespace, $this->useConstructorPropertyPromotion)
+            ...$this->generateEntityFieldMappingProperties($generator, $this->useConstructorPropertyPromotion),
+            ...$this->generateEntityEmbeddedProperties($generator, $this->useConstructorPropertyPromotion)
         ];
 
         if (!$this->useConstructorPropertyPromotion) {
             foreach ($properties as $property) {
-                $property->addProperty($generator, $namespace);
+                $property->addProperty($generator);
             }
         }
 
         if ($this->generateEntityStubMethods) {
-            $this->generateEntityStubMethods($generator, $namespace);
+            $this->generateEntityStubMethods($generator);
         }
 
-        $this->generateEntityConstructor($generator, $namespace, $this->useConstructorPropertyPromotion, $properties);
+        $this->generateEntityConstructor($generator, $this->useConstructorPropertyPromotion, $properties);
     }
 
     /**
      * @param bool $propertyPromotion Generate constructor with property promotion
      * @param list<PropertyGenerator> $properties
      */
-    protected function generateEntityConstructor(ClassType $generator, PhpNamespace $namespace, bool $propertyPromotion, array $properties): void
+    protected function generateEntityConstructor(EntityClassGenerator $generator, bool $propertyPromotion, array $properties): void
     {
         $initializable = in_array(InitializableInterface::class, $this->interfaces);
         $isImportable  = in_array(ImportableInterface::class, $this->interfaces)
                     || is_subclass_of($this->classToExtend, ImportableInterface::class);
 
-        if (!$this->hasMethod('__construct')) {
-            if ($propertyPromotion) {
-                $this->generateConstructorWithPromotedProperties($generator, $namespace, $initializable, $properties);
-            } else {
-                $this->generateClassicConstructor($generator, $namespace, $isImportable, $initializable, $properties);
-            }
+        if ($propertyPromotion) {
+            $this->generateConstructorWithPromotedProperties($generator, $initializable, $properties);
+        } else {
+            $this->generateClassicConstructor($generator, $isImportable, $initializable, $properties);
         }
 
-        if (!$this->hasMethod('initialize') && $initializable) {
+        if (!$generator->hasMethod('initialize') && $initializable) {
             $init = Method::from([InitializableInterface::class, 'initialize'])
                 ->addComment('{@inheritdoc}');
 
@@ -375,12 +377,18 @@ class EntityGenerator
      * @param bool $initializable Does the entity class implements InitializableInterface ?
      * @param list<PropertyGenerator> $properties Properties to declare an initialize
      */
-    private function generateConstructorWithPromotedProperties(ClassType $generator, PhpNamespace $namespace, bool $initializable, array $properties): void
+    private function generateConstructorWithPromotedProperties(EntityClassGenerator $generator, bool $initializable, array $properties): void
     {
-        $constructor = $generator->addMethod('__construct');
+        $isUpdate = $generator->hasMethod('__construct');
+        $constructor = $isUpdate ? $generator->getMethod('__construct') : $generator->addMethod('__construct');
 
         foreach ($properties as $property) {
-            $property->addPromotedProperty($constructor, $namespace);
+            $property->addPromotedProperty($constructor, $generator);
+        }
+
+        // Only declare new properties
+        if ($isUpdate) {
+            return;
         }
 
         if ($initializable) {
@@ -401,8 +409,13 @@ class EntityGenerator
      * @param bool $initializable Does the entity class implements ImportableInterface ?
      * @param list<PropertyGenerator> $properties Properties to initialize
      */
-    private function generateClassicConstructor(ClassType $generator, PhpNamespace $namespace, bool $isImportable, bool $initializable, array $properties): void
+    private function generateClassicConstructor(EntityClassGenerator $generator, bool $isImportable, bool $initializable, array $properties): void
     {
+        // Do not support constructor update
+        if ($generator->hasMethod('__construct')) {
+            return;
+        }
+
         if ($isImportable) {
             $constructor = $generator->addMethod('__construct');
 
@@ -433,11 +446,11 @@ class EntityGenerator
         }
     }
 
-    protected function generateEntityStubMethods(ClassType $generator, PhpNamespace $namespace): void
+    protected function generateEntityStubMethods(EntityClassGenerator $generator): void
     {
         foreach ($this->mapperInfo->properties() as $property) {
-            $this->generateSetter($generator, $namespace, $property);
-            $this->generateGetter($generator, $namespace, $property);
+            $this->generateSetter($generator, $property);
+            $this->generateGetter($generator, $property);
         }
 
         foreach ($this->mapperInfo->objects() as $property) {
@@ -446,11 +459,11 @@ class EntityGenerator
             }
 
             if ($property->isArray() && $property->wrapper() === null) {
-                $this->generateAdder($generator, $namespace, $property);
+                $this->generateAdder($generator, $property);
             }
 
-            $this->generateSetter($generator, $namespace, $property);
-            $this->generateGetter($generator, $namespace, $property);
+            $this->generateSetter($generator, $property);
+            $this->generateGetter($generator, $property);
         }
     }
 
@@ -458,12 +471,12 @@ class EntityGenerator
      * @param bool $forceNullable Force typehint to be nullable. Useful property promotion
      * @return list<PropertyGenerator>
      */
-    protected function generateEntityFieldMappingProperties(bool $forceNullable = false): array
+    protected function generateEntityFieldMappingProperties(EntityClassGenerator $class, bool $forceNullable = false): array
     {
         $properties = [];
 
         foreach ($this->mapperInfo->properties() as $property) {
-            if ($this->hasProperty($property->name())) {
+            if ($class->hasProperty($property->name())) {
                 continue;
             }
 
@@ -505,12 +518,12 @@ class EntityGenerator
      * @param bool $forceNullable Force typehint to be nullable. Useful property promotion
      * @return list<PropertyGenerator>
      */
-    protected function generateEntityEmbeddedProperties(PhpNamespace $namespace, bool $forceNullable = false): array
+    protected function generateEntityEmbeddedProperties(EntityClassGenerator $class, bool $forceNullable = false): array
     {
         $properties = [];
 
         foreach ($this->mapperInfo->objects() as $property) {
-            if (!$property->belongsToRoot() || $this->hasProperty($property->name())) {
+            if (!$property->belongsToRoot() || $class->hasProperty($property->name())) {
                 continue;
             }
 
@@ -521,7 +534,7 @@ class EntityGenerator
             if (!$property->isRelation()) {
                 $generator->setNullable($forceNullable);
                 $generator->setVarTag($property->className());
-                $generator->setInitialize('new '.$namespace->simplifyName($property->className()).'()');
+                $generator->setInitialize('new '.$class->simplifyType($property->className()).'()');
 
                 if ($this->useTypedProperties) {
                     $generator->setTypeHint($property->className());
@@ -559,7 +572,7 @@ class EntityGenerator
 
                     // @todo handle other wrapper types
                     if ($property->wrapper() === 'collection') {
-                        $generator->setInitialize($namespace->simplifyName($property->className()).'::collection()');
+                        $generator->setInitialize($class->simplifyType($property->className()).'::collection()');
                     }
 
                     break;
@@ -567,7 +580,7 @@ class EntityGenerator
                 default:
                     // Simple relation
                     $generator->setVarTag($property->className());
-                    $generator->setInitialize('new '.$namespace->simplifyName($property->className()).'()');
+                    $generator->setInitialize('new '.$class->simplifyType($property->className()).'()');
 
                     // The value is an object : so the default value must be null
                     if ($nullable) {
@@ -586,14 +599,14 @@ class EntityGenerator
     /**
      * Get accessor metadata for a given property
      *
-     * @param PhpNamespace $namespace
+     * @param EntityClassGenerator $generator
      * @param InfoInterface $propertyInfo
      * @param string|null $prefix Accessor prefix. Can be null to use the field name as method name.
      * @param bool $one In case of array property, get metadata for single item instead of the whole array.
      *
      * @return array{method: string, variable: string, field: string, typeHint: string, docType: string, nullable: bool}|null Accessor metadata, or null if the method already exists.
      */
-    protected function accessorMetadata(PhpNamespace $namespace, InfoInterface $propertyInfo, ?string $prefix, bool $one = false): ?array
+    protected function accessorMetadata(EntityClassGenerator $generator, InfoInterface $propertyInfo, ?string $prefix, bool $one = false): ?array
     {
         $fieldName = $propertyInfo->name();
 
@@ -610,15 +623,13 @@ class EntityGenerator
             $variableName = $this->inflector->singularize($variableName);
         }
 
-        if ($this->hasMethod($methodName)) {
+        if ($generator->hasMethod($methodName)) {
             return null;
         }
 
-        $this->staticReflection[$this->mapperInfo->className()]['methods'][] = strtolower($methodName);
-
         if ($propertyInfo->isObject()) {
             /** @var ObjectPropertyInfo $propertyInfo */
-            $variableType = $namespace->simplifyName($propertyInfo->className());
+            $variableType = $generator->simplifyType($propertyInfo->className());
             // Only makes nullable for single relation
             $methodTypeHint = $propertyInfo->className();
             $nullable = (!$one && !$propertyInfo->isEmbedded());
@@ -635,7 +646,7 @@ class EntityGenerator
                 $repository = $this->prime->repository($propertyInfo->className());
 
                 $methodTypeHint = $repository->collectionFactory()->wrapperClass($propertyInfo->wrapper());
-                $variableType .= '[]|'.$namespace->simplifyName($methodTypeHint);
+                $variableType .= '[]|'.$generator->simplifyType($methodTypeHint);
             } else {
                 $methodTypeHint = 'array';
 
@@ -655,9 +666,9 @@ class EntityGenerator
         ];
     }
 
-    protected function generateGetter(ClassType $generator, PhpNamespace $namespace, InfoInterface $propertyInfo): void
+    protected function generateGetter(EntityClassGenerator $generator, InfoInterface $propertyInfo): void
     {
-        $metadata = $this->accessorMetadata($namespace, $propertyInfo, $this->useGetShortcutMethod ? null : 'get');
+        $metadata = $this->accessorMetadata($generator, $propertyInfo, $this->useGetShortcutMethod ? null : 'get');
 
         if (!$metadata) {
             return;
@@ -672,9 +683,9 @@ class EntityGenerator
         $method->addComment('@return ' . $metadata['docType']);
     }
 
-    protected function generateSetter(ClassType $generator, PhpNamespace $namespace, InfoInterface $propertyInfo): void
+    protected function generateSetter(EntityClassGenerator $generator, InfoInterface $propertyInfo): void
     {
-        $metadata = $this->accessorMetadata($namespace, $propertyInfo, 'set');
+        $metadata = $this->accessorMetadata($generator, $propertyInfo, 'set');
 
         if (!$metadata) {
             return;
@@ -697,9 +708,9 @@ class EntityGenerator
         $method->addBody('return $this;');
     }
 
-    protected function generateAdder(ClassType $generator, PhpNamespace $namespace, InfoInterface $propertyInfo): void
+    protected function generateAdder(EntityClassGenerator $generator, InfoInterface $propertyInfo): void
     {
-        $metadata = $this->accessorMetadata($namespace, $propertyInfo, 'add', true);
+        $metadata = $this->accessorMetadata($generator, $propertyInfo, 'add', true);
 
         if (!$metadata) {
             return;
@@ -720,180 +731,6 @@ class EntityGenerator
         $method->addBody('$this->?[] = $?;', [$metadata['field'], $metadata['variable']]);
         $method->addBody('');
         $method->addBody('return $this;');
-    }
-
-    //
-    //---------- tools methods
-    //
-
-    /**
-     * @todo this won't work if there is a namespace in brackets and a class outside of it.
-     *
-     * @param string $src
-     *
-     * @return void
-     */
-    protected function parseTokensInEntityFile(string $src): void
-    {
-        $tokens = token_get_all($src);
-        $lastSeenNamespace = "";
-        /* @var class-string $lastSeenClass */
-        $lastSeenClass = null;
-
-        $inNamespace = false;
-        $inClass = false;
-
-        for ($i = 0; $i < count($tokens); $i++) {
-            $token = $tokens[$i];
-            if (in_array($token[0], [T_WHITESPACE, T_COMMENT, T_DOC_COMMENT])) {
-                continue;
-            }
-
-            if ($inNamespace) {
-                if ($token[0] == T_NS_SEPARATOR || $token[0] == T_STRING || (defined('T_NAME_QUALIFIED') && $token[0] == T_NAME_QUALIFIED)) {
-                    $lastSeenNamespace .= $token[1];
-                } elseif (is_string($token) && in_array($token, [';', '{'])) {
-                    $inNamespace = false;
-                }
-            }
-
-            if ($inClass) {
-                $inClass = false;
-                $lastSeenClass = $lastSeenNamespace . ($lastSeenNamespace ? '\\' : '') . $token[1];
-                $this->staticReflection[$lastSeenClass]['properties'] = [];
-                $this->staticReflection[$lastSeenClass]['methods'] = [];
-            }
-
-            if ($token[0] == T_NAMESPACE) {
-                $lastSeenNamespace = "";
-                $inNamespace = true;
-            } elseif ($token[0] == T_CLASS && $tokens[$i-1][0] != T_DOUBLE_COLON) {
-                $inClass = true;
-            } elseif ($token[0] == T_FUNCTION) {
-                if ($tokens[$i+2][0] == T_STRING) {
-                    $this->staticReflection[$lastSeenClass]['methods'][] = strtolower($tokens[$i+2][1]);
-                } elseif ($tokens[$i+2] == "&" && $tokens[$i+3][0] == T_STRING) {
-                    $this->staticReflection[$lastSeenClass]['methods'][] = strtolower($tokens[$i+3][1]);
-                }
-            } elseif (in_array($token[0], [T_VAR, T_PUBLIC, T_PRIVATE, T_PROTECTED]) && $tokens[$i+2][0] != T_FUNCTION) {
-                $this->staticReflection[$lastSeenClass]['properties'][] = substr($tokens[$i+2][1], 1);
-            }
-        }
-    }
-
-    /**
-     * @param string $property
-     *
-     * @return bool
-     */
-    protected function hasProperty(string $property): bool
-    {
-        if ($this->classToExtend) {
-            // don't generate property if its already on the base class.
-            $reflClass = new \ReflectionClass($this->getClassToExtend());
-            if ($reflClass->hasProperty($property)) {
-                return true;
-            }
-        }
-
-        // check traits for existing property
-        foreach ($this->getTraitsReflections() as $trait) {
-            if ($trait->hasProperty($property)) {
-                return true;
-            }
-        }
-
-        return (
-            isset($this->staticReflection[$this->mapperInfo->className()]) &&
-            in_array($property, $this->staticReflection[$this->mapperInfo->className()]['properties'])
-        );
-    }
-
-    /**
-     * @param string $method
-     *
-     * @return bool
-     */
-    protected function hasMethod(string $method): bool
-    {
-        if ($this->classToExtend || (!$this->isNew && class_exists($this->mapperInfo->className()))) {
-            // don't generate method if its already on the base class.
-            $reflClass = new \ReflectionClass($this->getClassToExtend() ?: $this->mapperInfo->className());
-
-            if ($reflClass->hasMethod($method)) {
-                return true;
-            }
-        }
-
-        // check traits for existing method
-        foreach ($this->getTraitsReflections() as $trait) {
-            if ($trait->hasMethod($method)) {
-                return true;
-            }
-        }
-
-        return (
-            isset($this->staticReflection[$this->mapperInfo->className()]) &&
-            in_array(strtolower($method), $this->staticReflection[$this->mapperInfo->className()]['methods'])
-        );
-    }
-
-    /**
-     * Get the class short name
-     *
-     * @param string $className
-     *
-     * @return string
-     */
-    protected function getClassName(string $className): string
-    {
-        $parts = explode('\\', $className);
-        return array_pop($parts);
-    }
-
-    /**
-     * @param string $className
-     *
-     * @return string
-     */
-    protected function getNamespace(string $className): string
-    {
-        $parts = explode('\\', $className);
-        array_pop($parts);
-
-        return implode('\\', $parts);
-    }
-
-    /**
-     * @param string $className
-     *
-     * @return bool
-     */
-    protected function hasNamespace(string $className): bool
-    {
-        return strrpos($className, '\\') != 0;
-    }
-
-    /**
-     * @return array<trait-string, \ReflectionClass>
-     */
-    protected function getTraitsReflections(): array
-    {
-        if ($this->isNew) {
-            return [];
-        }
-
-        $reflClass = new \ReflectionClass($this->mapperInfo->className());
-
-        $traits = [];
-
-        while ($reflClass !== false) {
-            $traits = array_merge($traits, $reflClass->getTraits());
-
-            $reflClass = $reflClass->getParentClass();
-        }
-
-        return $traits;
     }
 
     //---------------------- mutators
@@ -1211,7 +1048,7 @@ class PropertyGenerator
         return $this->initialize !== null;
     }
 
-    public function addProperty(ClassType $generator, ?PhpNamespace $namespace): void
+    public function addProperty(EntityClassGenerator $generator): void
     {
         $property = $generator->addProperty($this->name);
 
@@ -1232,15 +1069,15 @@ class PropertyGenerator
         if ($this->varTag) {
             $type = $this->varTag;
 
-            if (!isset(EntityGenerator::PROPERTY_TYPE_MAP[$this->varTag]) && $namespace) {
-                $type = $this->simplifyType($type, $namespace);
+            if (!isset(EntityGenerator::PROPERTY_TYPE_MAP[$this->varTag])) {
+                $type = $this->simplifyType($type, $generator);
             }
 
             $property->addComment("\n@var $type");
         }
     }
 
-    public function addPromotedProperty(Method $constructor, ?PhpNamespace $namespace): void
+    public function addPromotedProperty(Method $constructor, EntityClassGenerator $generator): void
     {
         $parameter = $constructor->addPromotedParameter($this->name);
 
@@ -1261,8 +1098,8 @@ class PropertyGenerator
         if ($this->varTag) {
             $type = $this->varTag;
 
-            if (!isset(EntityGenerator::PROPERTY_TYPE_MAP[$this->varTag]) && $namespace) {
-                $type = $this->simplifyType($type, $namespace);
+            if (!isset(EntityGenerator::PROPERTY_TYPE_MAP[$this->varTag])) {
+                $type = $this->simplifyType($type, $generator);
             }
 
             $parameter->addComment("\n@var $type");
@@ -1276,7 +1113,7 @@ class PropertyGenerator
         }
     }
 
-    private function simplifyType(string $type, PhpNamespace $namespace): string
+    private function simplifyType(string $type, EntityClassGenerator $generator): string
     {
         $types = explode('|', $type);
 
@@ -1293,7 +1130,7 @@ class PropertyGenerator
                 continue;
             }
 
-            $part = $namespace->simplifyName($atomicType) . ($isArray ? '[]' : '');
+            $part = $generator->simplifyType($atomicType) . ($isArray ? '[]' : '');
         }
 
         return implode('|', $types);
@@ -1320,5 +1157,169 @@ class ConfigurableEntityPrinter extends Printer
 
         // Reformat property docblock : nette will generate property doc on single line
         return preg_replace('#^( *)/\*\*(.*)\s+\*/$#m', "$1/**\n$1 *$2\n$1 */", $code);
+    }
+}
+
+/**
+ * @internal
+ */
+class EntityClassGenerator
+{
+    private ClassType $class;
+    private PhpNamespace $namespace;
+
+    /**
+     * @param ClassType $class
+     * @param PhpNamespace $namespace
+     */
+    public function __construct(ClassType $class, PhpNamespace $namespace)
+    {
+        $this->class = $class;
+        $this->namespace = $namespace;
+    }
+
+    /**
+     * Add use statement if necessary
+     * Ignore classes without namespace or in current namespace
+     *
+     * @param string $class
+     * @return void
+     */
+    public function addUse(string $class): void
+    {
+        $nsSeparatorPos = strrpos(ltrim($class, '\\'), '\\');
+
+        // Not namespaced : do not import
+        if ($nsSeparatorPos === false) {
+            return;
+        }
+
+        $ns = substr($class, 0, $nsSeparatorPos);
+
+        // Same namespace : import is not necessary
+        if ($ns === $this->namespace->getName()) {
+            return;
+        }
+
+        $this->namespace->addUse($class);
+    }
+
+    /**
+     * Check if the given method exists on the current generated class
+     * This method will check parent class and used traits
+     *
+     * @param string $method
+     * @return bool
+     */
+    public function hasMethod(string $method): bool
+    {
+        /** @psalm-suppress InvalidArgument */
+        if ($this->class->getExtends() && method_exists($this->class->getExtends(), $method)) {
+            return true;
+        }
+
+        foreach ($this->class->getTraits() as $trait) {
+            if ($trait instanceof TraitUse) {
+                $trait = $trait->getName();
+            }
+
+            if (method_exists($trait, $method)) {
+                return true;
+            }
+        }
+
+        return $this->class->hasMethod($method);
+    }
+
+    /**
+     * Add a new method into the class
+     *
+     * @param string $name Method name
+     * @return Method
+     */
+    public function addMethod(string $name): Method
+    {
+        return $this->class->addMethod($name);
+    }
+
+    /**
+     * Check if the given property exists on the current generated class
+     * This method will check parent class and used traits
+     * It will also check promoted parameters on constructor
+     *
+     * @param string $property
+     * @return bool
+     */
+    public function hasProperty(string $property): bool
+    {
+        if ($this->class->getExtends() && property_exists($this->class->getExtends(), $property)) {
+            return true;
+        }
+
+        foreach ($this->class->getTraits() as $trait) {
+            if ($trait instanceof TraitUse) {
+                $trait = $trait->getName();
+            }
+
+            if (property_exists($trait, $property)) {
+                return true;
+            }
+        }
+
+        if ($this->class->hasProperty($property)) {
+            return true;
+        }
+
+        if (!$this->class->hasMethod('__construct')) {
+            return false;
+        }
+
+        $parameter = $this->class->getMethod('__construct')->getParameters()[$property] ?? null;
+
+        return $parameter instanceof PromotedParameter;
+    }
+
+    /**
+     * Get a method by its name
+     *
+     * @param string $name
+     * @return Method
+     */
+    public function getMethod(string $name): Method
+    {
+        return $this->class->getMethod($name);
+    }
+
+    /**
+     * Add a new property on the entity class
+     *
+     * @param string $name Property name
+     *
+     * @return Property
+     */
+    public function addProperty(string $name): Property
+    {
+        return $this->class->addProperty($name);
+    }
+
+    /**
+     * Simplify a typename if imported or in the current namespace
+     *
+     * @param string $type
+     * @return string
+     */
+    public function simplifyType(string $type): string
+    {
+        return $this->namespace->simplifyName($type);
+    }
+
+    /**
+     * @param Method|Property|Constant|TraitUse $classMember
+     *
+     * @return void
+     */
+    public function addMember($classMember): void
+    {
+        $this->class->addMember($classMember);
     }
 }
