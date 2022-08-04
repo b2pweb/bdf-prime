@@ -20,8 +20,6 @@ class Company
     /**
      * Set id
      *
-     * @param integer $id
-     *
      * @return $this
      */
     public function setId(int $id): self
@@ -33,8 +31,6 @@ class Company
 
     /**
      * Get id
-     *
-     * @return integer
      */
     public function id(): int
     {
@@ -43,8 +39,6 @@ class Company
 
     /**
      * Set name
-     *
-     * @param string $name
      *
      * @return $this
      */
@@ -57,8 +51,6 @@ class Company
 
     /**
      * Get name
-     *
-     * @return string
      */
     public function name(): string
     {

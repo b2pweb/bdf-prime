@@ -604,7 +604,7 @@ class EntityGenerator
      * @param string|null $prefix Accessor prefix. Can be null to use the field name as method name.
      * @param bool $one In case of array property, get metadata for single item instead of the whole array.
      *
-     * @return array{method: string, variable: string, field: string, typeHint: string, docType: string, nullable: bool}|null Accessor metadata, or null if the method already exists.
+     * @return array{method: string, variable: string, field: string, typeHint: string, docType: string|null, nullable: bool}|null Accessor metadata, or null if the method already exists.
      */
     protected function accessorMetadata(EntityClassGenerator $generator, InfoInterface $propertyInfo, ?string $prefix, bool $one = false): ?array
     {
@@ -627,16 +627,16 @@ class EntityGenerator
             return null;
         }
 
+        $variableType = null;
+
         if ($propertyInfo->isObject()) {
             /** @var ObjectPropertyInfo $propertyInfo */
-            $variableType = $generator->simplifyType($propertyInfo->className());
             // Only makes nullable for single relation
             $methodTypeHint = $propertyInfo->className();
             $nullable = (!$one && !$propertyInfo->isEmbedded());
         } else {
             /** @var PropertyInfo $propertyInfo */
-            $variableType = $propertyInfo->phpType();
-            $methodTypeHint = self::PROPERTY_TYPE_MAP[$variableType] ?? $variableType;
+            $methodTypeHint = self::PROPERTY_TYPE_MAP[$propertyInfo->phpType()] ?? $propertyInfo->phpType();
             $nullable = $propertyInfo->isNullable();
         }
 
@@ -646,9 +646,10 @@ class EntityGenerator
                 $repository = $this->prime->repository($propertyInfo->className());
 
                 $methodTypeHint = $repository->collectionFactory()->wrapperClass($propertyInfo->wrapper());
-                $variableType .= '[]|'.$generator->simplifyType($methodTypeHint);
+                $variableType = $generator->simplifyType($propertyInfo->className()) . '[]|'.$generator->simplifyType($methodTypeHint);
             } else {
                 $methodTypeHint = 'array';
+                $variableType = $propertyInfo->isObject() ? $propertyInfo->className() : $propertyInfo->phpType();
 
                 if ($variableType !== 'array') {
                     $variableType .= '[]';
@@ -680,7 +681,10 @@ class EntityGenerator
         $method->setReturnType($metadata['typeHint']);
         $method->setReturnNullable($metadata['nullable']);
         $method->setBody('return $this->?;', [$metadata['field']]);
-        $method->addComment('@return ' . $metadata['docType']);
+
+        if ($metadata['docType']) {
+            $method->addComment('@return ' . $metadata['docType']);
+        }
     }
 
     protected function generateSetter(EntityClassGenerator $generator, InfoInterface $propertyInfo): void
@@ -694,8 +698,12 @@ class EntityGenerator
         $method = $generator->addMethod($metadata['method']);
         $method->addComment('Set ' . $metadata['variable']);
         $method->addComment('');
-        $method->addComment('@param ' . $metadata['docType'] . ' $' . $metadata['variable']);
-        $method->addComment('');
+
+        if ($metadata['docType']) {
+            $method->addComment('@param ' . $metadata['docType'] . ' $' . $metadata['variable']);
+            $method->addComment('');
+        }
+
         $method->addComment('@return $this');
         $method->setReturnType('self');
         $method
@@ -719,8 +727,12 @@ class EntityGenerator
         $method = $generator->addMethod($metadata['method']);
         $method->addComment('Add ' . $metadata['variable']);
         $method->addComment('');
-        $method->addComment('@param ' . $metadata['docType'] . ' $' . $metadata['variable']);
-        $method->addComment('');
+
+        if ($metadata['docType']) {
+            $method->addComment('@param ' . $metadata['docType'] . ' $' . $metadata['variable']);
+            $method->addComment('');
+        }
+
         $method->addComment('@return $this');
         $method->setReturnType('self');
         $method

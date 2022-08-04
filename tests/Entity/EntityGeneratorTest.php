@@ -615,8 +615,6 @@ class Company
     /**
      * Set id
      *
-     * @param integer $id
-     *
      * @return $this
      */
     public function setId(int $id): self
@@ -628,8 +626,6 @@ class Company
 
     /**
      * Get id
-     *
-     * @return integer
      */
     public function id(): int
     {
@@ -638,8 +634,6 @@ class Company
 
     /**
      * Set name
-     *
-     * @param string $name
      *
      * @return $this
      */
@@ -652,8 +646,6 @@ class Company
 
     /**
      * Get name
-     *
-     * @return string
      */
     public function name(): string
     {
@@ -691,8 +683,6 @@ class Company
   /**
    * Set id
    *
-   * @param integer $id
-   *
    * @return $this
    */
   public function setId(int $id): self
@@ -704,8 +694,6 @@ class Company
 
   /**
    * Get id
-   *
-   * @return integer
    */
   public function id(): int
   {
@@ -714,8 +702,6 @@ class Company
 
   /**
    * Set name
-   *
-   * @param string $name
    *
    * @return $this
    */
@@ -728,8 +714,6 @@ class Company
 
   /**
    * Get name
-   *
-   * @return string
    */
   public function name(): string
   {
@@ -795,7 +779,7 @@ PHP
         $generator->useTypedProperties();
         $generator->useConstructorPropertyPromotion();
 
-        $entity = $generator->generate(Company::repository()->mapper(), __DIR__ . '/_files/company_up_to_date_with_promoted_properties_missing_property.php');
+        $entity = $generator->generate(Company::repository()->mapper(), __DIR__ . '/_files/company_with_promoted_properties_missing_property.php');
         $this->assertStringEqualsFile(__DIR__.'/_files/company_up_to_date_with_promoted_properties.php', $entity);
     }
 

@@ -24,8 +24,6 @@ class Company extends Model
     /**
      * Set id
      *
-     * @param integer $id
-     *
      * @return $this
      */
     public function setId(int $id): self
@@ -37,8 +35,6 @@ class Company extends Model
 
     /**
      * Get id
-     *
-     * @return integer
      */
     public function id(): int
     {
@@ -47,8 +43,6 @@ class Company extends Model
 
     /**
      * Set name
-     *
-     * @param string $name
      *
      * @return $this
      */
@@ -61,8 +55,6 @@ class Company extends Model
 
     /**
      * Get name
-     *
-     * @return string
      */
     public function name(): string
     {
