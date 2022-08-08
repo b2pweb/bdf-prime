@@ -140,7 +140,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      */
     public function getDatabase(): ?string
     {
-        return null;
+        return '';
     }
 
     /**
