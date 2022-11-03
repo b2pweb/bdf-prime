@@ -67,7 +67,7 @@ final class KeyWalkStrategy implements WalkStrategyInterface
         $cursor = clone $cursor;
 
         if ($cursor->entities) {
-            $cursor->cursor = $this->key->get(end($cursor->entities));
+            $cursor->cursor = $this->getLastKeyOfEntities($cursor);
         }
 
         if ($cursor->cursor !== null) {
@@ -111,5 +111,46 @@ final class KeyWalkStrategy implements WalkStrategyInterface
         $orders = $query->getOrders();
 
         return empty($orders) || (count($orders) === 1 && isset($orders[$key]));
+    }
+
+    /**
+     * Find the last key to be set as cursor value
+     *
+     * @param WalkCursor $cursor
+     * @return mixed
+     *
+     * @see WalkCursor::$cursor
+     */
+    private function getLastKeyOfEntities(WalkCursor $cursor)
+    {
+        $lastEntity = end($cursor->entities);
+
+        // Basic select query : results are an ordered list, so the last key is always the key of the last entity
+        if (array_is_list($cursor->entities)) {
+            return $this->key->get($lastEntity);
+        }
+
+        // group by query
+        // Because index can be overridden (or value are added), order is not guaranteed
+        // So we should iterate other entities to find the "max" key
+        // In case of "by combine", values of each key are ordered list, so we simply need to take the last entity's key of each index
+        $lastKey = $this->key->get(is_array($lastEntity) ? end($lastEntity) : $lastEntity);
+
+        /** @var ReadCommandInterface<ConnectionInterface, E>&Orderable&Whereable $query */
+        $query = $cursor->query;
+        $asc = $query->getOrders()[$this->key->name()] === Orderable::ORDER_ASC;
+
+        foreach ($cursor->entities as $entity) {
+            $key = $this->key->get(is_array($entity) ? end($entity) : $entity);
+            $gt = $key > $lastKey;
+
+            // order is ascendant and key is > lastKey
+            // or order is descendant and key is < lastKey
+            if ($asc === $gt) {
+                $lastKey = $key;
+            }
+        }
+
+        return $lastKey;
     }
 }
