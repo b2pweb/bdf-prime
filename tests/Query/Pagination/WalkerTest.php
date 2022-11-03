@@ -198,6 +198,73 @@ class WalkerTest extends TestCase
         iterator_to_array($walker);
     }
 
+    /**
+     *
+     */
+    public function test_key_walk_strategy_with_simple_group_by()
+    {
+        $entities = [
+            new TestEntity(['name' => 'foo1']), // overridden
+            new TestEntity(['name' => 'foo2']),
+            new TestEntity(['name' => 'foo1']),
+            new TestEntity(['name' => 'foo1']), // overridden, use as cursor
+            new TestEntity(['name' => 'foo3']),
+            new TestEntity(['name' => 'foo4']),
+            new TestEntity(['name' => 'foo5']),
+        ];
+
+        foreach ($entities as $entity) {
+            $entity->insert();
+        }
+
+        $walker = new Walker(TestEntity::builder()->by('name'), 4);
+        $walker->setStrategy(new KeyWalkStrategy(new MapperPrimaryKey(TestEntity::mapper())));
+
+        $this->assertEquals([$entities[3], $entities[1], $entities[4], $entities[5], $entities[6]], iterator_to_array($walker, false));
+
+        $walker = new Walker(TestEntity::builder()->by('name'), 4);
+        $walker->setStrategy(new KeyWalkStrategy(new MapperPrimaryKey(TestEntity::mapper())));
+
+        $this->assertEquals([
+            'foo1' => $entities[3],
+            'foo2' => $entities[1],
+            'foo3' => $entities[4],
+            'foo4' => $entities[5],
+            'foo5' => $entities[6],
+        ], iterator_to_array($walker));
+    }
+
+    /**
+     *
+     */
+    public function test_key_walk_strategy_with_group_by_combine()
+    {
+        $entities = [
+            new TestEntity(['name' => 'foo1']),
+            new TestEntity(['name' => 'foo2']),
+            new TestEntity(['name' => 'foo1']),
+            new TestEntity(['name' => 'foo1']),
+            new TestEntity(['name' => 'foo3']),
+            new TestEntity(['name' => 'foo4']),
+            new TestEntity(['name' => 'foo5']),
+        ];
+
+        foreach ($entities as $entity) {
+            $entity->insert();
+        }
+
+        $walker = new Walker(TestEntity::builder()->by('name', true), 4);
+        $walker->setStrategy(new KeyWalkStrategy(new MapperPrimaryKey(TestEntity::mapper())));
+
+        $this->assertEquals([
+            'foo1' => [$entities[0], $entities[2], $entities[3]],
+            'foo2' => [$entities[1]],
+            'foo3' => [$entities[4]],
+            'foo4' => [$entities[5]],
+            'foo5' => [$entities[6]],
+        ], iterator_to_array($walker));
+    }
+
     private function insertEntities(int $count): array
     {
         $entities = [];
