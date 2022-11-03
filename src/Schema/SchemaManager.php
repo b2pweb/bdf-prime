@@ -265,6 +265,7 @@ class SchemaManager extends AbstractSchemaManager
      */
     public function rename(string $from, string $to)
     {
+        /** @psalm-suppress InternalMethod */
         $diff = new DoctrineTableDiff($from);
         $diff->newName = $to;
 
