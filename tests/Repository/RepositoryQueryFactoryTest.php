@@ -269,6 +269,19 @@ class RepositoryQueryFactoryTest extends TestCase
     }
 
     /**
+     * Bug #FRAM-74
+     */
+    public function test_countKeyValue_side_effect()
+    {
+        $this->getTestPack()->nonPersist(new TestEntity(['id' => 2, 'name' => 'Foo']));
+
+        $this->assertEquals(1, $this->factory->countKeyValue('id', 1));
+        $this->assertEquals(1, $this->factory->countKeyValue('name', 'Foo'));
+        $this->assertEquals(1, $this->factory->countKeyValue('id', 1));
+        $this->assertEquals(2, $this->factory->countKeyValue());
+    }
+
+    /**
      *
      */
     public function test_keyValue_not_supported()
