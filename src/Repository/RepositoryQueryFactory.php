@@ -66,9 +66,9 @@ class RepositoryQueryFactory
     private $findByIdQuery;
 
     /**
-     * @var KeyValueQueryInterface<ConnectionInterface, E>
+     * @var array<array-key, KeyValueQueryInterface<ConnectionInterface, E>|null>
      */
-    private $countKeyValueQuery;
+    private $countKeyValueQueries;
 
     /**
      * Save extension instance for optimisation
@@ -249,12 +249,14 @@ class RepositoryQueryFactory
     {
         if (!$this->supportsKeyValue) {
             $query = $this->builder();
+        } elseif (is_array($attribute)) {
+            $query = $this->keyValue();
         } else {
-            if (!$this->countKeyValueQuery) {
-                $this->countKeyValueQuery = $this->keyValue();
-            }
+            $query = $this->countKeyValueQueries[$attribute ?? 0] ?? null;
 
-            $query = $this->countKeyValueQuery;
+            if (!$query) {
+                $this->countKeyValueQueries[$attribute ?? 0] = $query = $this->keyValue();
+            }
         }
 
         if ($attribute) {
