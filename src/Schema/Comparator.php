@@ -41,6 +41,7 @@ class Comparator extends BaseComparator
         $diff = parent::diffTable($fromTable, $toTable);
 
         if ($diff && !$this->listDropColumn) {
+            /** @psalm-suppress InternalProperty */
             $diff->removedColumns = [];
         }
 

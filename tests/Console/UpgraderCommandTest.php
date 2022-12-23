@@ -10,8 +10,10 @@ require_once __DIR__.'/UpgradeModels/Person.php';
 use Bdf\Prime\Console\UpgraderCommand;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Schema\Builder\TypesHelperTableBuilder;
+use Composer\InstalledVersions;
 use Console\UpgradeModels\Address;
 use Console\UpgradeModels\Person;
+use PackageVersions\Installer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -143,7 +145,23 @@ OUT
 
         $tester->execute(['path' => __DIR__.'/UpgradeModels', '--useDrop' => true]);
 
-        $this->assertOutput(<<<OUT
+        if (version_compare(InstalledVersions::getVersion('doctrine/dbal'), '3.5.0', '>=')) {
+            $this->assertOutput(<<<OUT
+Console\UpgradeModels\AddressMapper is up to date
+Console\UpgradeModels\PersonMapper needs upgrade
+CREATE TEMPORARY TABLE __temp__person AS SELECT id, firstName, lastName FROM person
+DROP TABLE person
+CREATE TABLE person (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, firstName VARCHAR(255) NOT NULL COLLATE "BINARY", lastName VARCHAR(255) NOT NULL COLLATE "BINARY", address_id INTEGER NOT NULL)
+INSERT INTO person (id, firstName, lastName) SELECT id, firstName, lastName FROM __temp__person
+DROP TABLE __temp__person
+
+Found 5 upgrade(s)
+
+OUT
+                , $tester
+            );
+        } else {
+            $this->assertOutput(<<<OUT
 Console\UpgradeModels\AddressMapper is up to date
 Console\UpgradeModels\PersonMapper needs upgrade
 CREATE TEMPORARY TABLE __temp__person AS SELECT id, firstName, lastName FROM person
@@ -155,8 +173,9 @@ DROP TABLE __temp__person
 Found 5 upgrade(s)
 
 OUT
-            , $tester
-        );
+                , $tester
+            );
+        }
     }
 
     private function assertOutput(string $expected, CommandTester $tester): void
