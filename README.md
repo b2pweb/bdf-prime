@@ -12,7 +12,7 @@ The goal of prime is to lightweight usage of data mapper and doctrine DBAL.
 
 ### Getting Started
 
-See [Wiki](./wiki) for more information
+See [Wiki](https://github.com/b2pweb/bdf-prime/wiki) for more information
 
 ```bash
 composer require b2pweb/prime
