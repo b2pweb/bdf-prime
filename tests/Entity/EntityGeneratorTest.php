@@ -461,6 +461,48 @@ PHP
         , $classContent);
     }
 
+    public function test_useConstructorPropertyPromotion_should_force_default_to_null_on_properties()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->useConstructorPropertyPromotion();
+        $generator->useTypedProperties();
+
+        $classContent = $generator->generate(Document::repository()->mapper());
+
+        $this->assertStringContainsString(<<<'PHP'
+    public function __construct(
+        /**
+         * @var string
+         */
+        protected ?string $id = null,
+        /**
+         * @var string
+         */
+        protected ?string $customerId = null,
+        /**
+         * @var string
+         */
+        protected ?string $uploaderType = null,
+        /**
+         * @var string
+         */
+        protected ?string $uploaderId = null,
+        /**
+         * @var Contact
+         */
+        protected ?Contact $contact = null,
+        /**
+         * @var Admin
+         */
+        protected ?Admin $uploader = null,
+    ) {
+        $this->contact ??= new Contact();
+        $this->uploader ??= new Admin();
+    }
+PHP
+            , $classContent);
+    }
+
     /**
      *
      */
