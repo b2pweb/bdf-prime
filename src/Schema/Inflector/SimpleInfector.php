@@ -43,6 +43,6 @@ class SimpleInfector implements InflectorInterface
      */
     public function getSequenceName(string $table): string
     {
-        return "${table}_seq";
+        return "{$table}_seq";
     }
 }

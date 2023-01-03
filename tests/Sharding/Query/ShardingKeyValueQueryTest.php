@@ -27,6 +27,15 @@ class ShardingKeyValueQueryTest extends TestCase
     private $connection;
 
     /**
+     * @var ShardingConnectionFactory
+     */
+    private $factory;
+    /**
+     * @var ConnectionRegistry
+     */
+    private $registry;
+
+    /**
      * @var ConnectionInterface
      */
     private $shard1;

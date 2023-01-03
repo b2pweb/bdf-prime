@@ -137,7 +137,7 @@ class HydratorGenerationCommand extends Command
      */
     private function generateHydrator($io, $className, Mapper $mapper): void
     {
-        $io->inline("Generate hydrator for ${className} ");
+        $io->inline("Generate hydrator for {$className} ");
 
         try {
             $generator = new HydratorGenerator($this->locator, $mapper, $className);
@@ -185,18 +185,18 @@ class HydratorGenerationCommand extends Command
             $embeddeds = $className::embeddedPrimeClasses();
 
             if (empty($embeddeds)) {
-                $hydrators[] = "'{$className::supportedPrimeClassName()}' => new ${className}(),";
+                $hydrators[] = "'{$className::supportedPrimeClassName()}' => new {$className}(),";
             } else {
                 $arguments = [];
 
                 foreach ($embeddeds as $entity) {
-                    $arguments[] = "\$registry->get('${entity}')";
+                    $arguments[] = "\$registry->get('{$entity}')";
                 }
 
                 $arguments = implode(', ', $arguments);
-                $closure = "function(\$registry) {return new ${className}(${arguments});}";
+                $closure = "function(\$registry) {return new {$className}({$arguments});}";
 
-                $factories[] = "'{$className::supportedPrimeClassName()}' => ${closure},";
+                $factories[] = "'{$className::supportedPrimeClassName()}' => {$closure},";
             }
         }
 
@@ -204,7 +204,7 @@ class HydratorGenerationCommand extends Command
 
         if ($io->option('include')) {
             foreach ($includes as $file) {
-                $content .= "require_once __DIR__.DIRECTORY_SEPARATOR.'${file}';\n";
+                $content .= "require_once __DIR__.DIRECTORY_SEPARATOR.'{$file}';\n";
             }
         } else {
             $io->block([

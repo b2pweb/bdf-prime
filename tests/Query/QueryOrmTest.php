@@ -32,6 +32,7 @@ class QueryOrmTest extends TestCase
 
     protected $repository;
     protected $query;
+    protected $table;
 
     /**
      *

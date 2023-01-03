@@ -15,7 +15,8 @@ class ExpressionTest extends TestCase
 
     protected $repository;
     protected $query;
-    
+    protected $table;
+
     protected function setUp(): void
     {
         $this->primeStart();
