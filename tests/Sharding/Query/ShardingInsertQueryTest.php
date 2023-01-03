@@ -27,6 +27,14 @@ class ShardingInsertQueryTest extends TestCase
      * @var ShardingConnection
      */
     private $connection;
+    /**
+     * @var ShardingConnectionFactory
+     */
+    private $factory;
+    /**
+     * @var ConnectionRegistry
+     */
+    private $registry;
 
     /**
      *

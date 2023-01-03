@@ -24,7 +24,16 @@ class ShardingConnectionTest extends TestCase
 
     /** @var ConnectionManager $connections */
     protected $connections;
-    
+
+    /**
+     * @var ShardingConnectionFactory
+     */
+    private $factory;
+    /**
+     * @var ConnectionRegistry
+     */
+    private $registry;
+
     /**
      * 
      */
