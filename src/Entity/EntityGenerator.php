@@ -768,8 +768,11 @@ public function __construct(array $data = [])
             }
 
             if (!$property->isRelation()) {
+                // Always add a default value with use property promotion
+                $default = $this->useConstructorPropertyPromotion ? ' = null' : '';
+
                 $lines[] = $this->generateEmbeddedPropertyDocBlock($property);
-                $lines[] = $this->spaces . $this->fieldVisibility . $this->getPropertyTypeHintForObject($property, $forceNullable) . ' $'.$property->name().";\n";
+                $lines[] = $this->spaces . $this->fieldVisibility . $this->getPropertyTypeHintForObject($property, $forceNullable) . ' $'.$property->name().$default.";\n";
             } else {
                 $name = $property->name();
                 $default = '';
