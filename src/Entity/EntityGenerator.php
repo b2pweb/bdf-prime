@@ -533,6 +533,12 @@ class EntityGenerator
             // Embedded property : should not be null
             if (!$property->isRelation()) {
                 $generator->setNullable($forceNullable);
+
+                // Always add a default value with use property promotion
+                if ($this->useConstructorPropertyPromotion) {
+                    $generator->setDefaultValue(null);
+                }
+
                 $generator->setVarTag($property->className());
                 $generator->setInitialize('new '.$class->simplifyType($property->className()).'()');
 
