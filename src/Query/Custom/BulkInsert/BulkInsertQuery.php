@@ -5,9 +5,11 @@ namespace Bdf\Prime\Query\Custom\BulkInsert;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Query\CompilableClause;
+use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\CompilerState;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
+use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 use Bdf\Prime\Query\Contract\Cachable;
 use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
@@ -60,7 +62,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
     /**
      * The SQL compiler
      *
-     * @var BulkInsertSqlCompiler
+     * @var CompilerInterface<BulkInsertQuery>&QuoteCompilerInterface
      */
     protected $compiler;
 
@@ -88,8 +90,10 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
 
     /**
      * {@inheritdoc}
+     *
+     * @return CompilerInterface<BulkInsertQuery>&QuoteCompilerInterface
      */
-    public function compiler(): BulkInsertSqlCompiler
+    public function compiler(): object
     {
         return $this->compiler;
     }

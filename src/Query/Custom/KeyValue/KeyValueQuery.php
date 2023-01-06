@@ -9,6 +9,7 @@ use Bdf\Prime\Query\AbstractReadCommand;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
+use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Contract\Limitable;
 use Bdf\Prime\Query\Contract\Paginable;
@@ -292,8 +293,10 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
 
     /**
      * {@inheritdoc}
+     *
+     * @return CompilerInterface<KeyValueQuery>&QuoteCompilerInterface
      */
-    public function compiler(): KeyValueSqlCompiler
+    public function compiler(): object
     {
         return parent::compiler();
     }
