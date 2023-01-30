@@ -83,7 +83,11 @@ final class KeyWalkStrategy implements WalkStrategyInterface
 
             if ($query instanceof CompilableClause) {
                 foreach ($query->statements['where'] as $key => $statement) {
-                    if ($statement['column'] === $column && $statement['operator'] === $operator) {
+                    if (
+                        isset($statement['column'], $statement['operator'], $statement['value'])
+                        && $statement['column'] === $column
+                        && $statement['operator'] === $operator
+                    ) {
                         $query->statements['where'][$key]['value'] = $cursor->cursor;
                         $set = true;
                         $query->state()->invalidate('where');
