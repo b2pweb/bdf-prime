@@ -81,7 +81,7 @@ final class KeyWalkStrategy implements WalkStrategyInterface
             // Quick fix for FRAM-86 : reset where clause
             $set = false;
 
-            if ($query instanceof CompilableClause) {
+            if ($query instanceof CompilableClause && !empty($query->statements['where'])) {
                 foreach ($query->statements['where'] as $key => $statement) {
                     if (
                         isset($statement['column'], $statement['operator'], $statement['value'])
