@@ -8,6 +8,7 @@ use Bdf\Prime\Entity\Hydrator\HydratorRegistry;
 use Bdf\Prime\Entity\Instantiator\InstantiatorInterface;
 use Bdf\Prime\Entity\Instantiator\RegistryInstantiator;
 use Bdf\Prime\Mapper\MapperFactory;
+use Bdf\Prime\Mapper\MapperFactoryInterface;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Serializer\SerializerInterface;
@@ -29,7 +30,7 @@ class ServiceLocator
     private $repositories = [];
 
     /**
-     * @var MapperFactory
+     * @var MapperFactoryInterface
      */
     private $mapperFactory;
 
@@ -67,7 +68,7 @@ class ServiceLocator
      * @param MapperFactory|null $mapperFactory
      * @param InstantiatorInterface|null $instantiator
      */
-    public function __construct(ConnectionManager $connectionManager = null, MapperFactory $mapperFactory = null, InstantiatorInterface $instantiator = null)
+    public function __construct(ConnectionManager $connectionManager = null, MapperFactoryInterface $mapperFactory = null, InstantiatorInterface $instantiator = null)
     {
         $this->connectionManager = $connectionManager ?: new ConnectionManager();
         $this->mapperFactory = $mapperFactory ?: new MapperFactory();
@@ -88,9 +89,9 @@ class ServiceLocator
     /**
      * Returns connection manager
      *
-     * @return MapperFactory
+     * @return MapperFactoryInterface
      */
-    public function mappers()
+    public function mappers(): MapperFactoryInterface
     {
         return $this->mapperFactory;
     }

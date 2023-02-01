@@ -25,6 +25,7 @@ use Bdf\Prime\ServiceLocator;
 use Bdf\Serializer\PropertyAccessor\PropertyAccessorInterface;
 use Bdf\Serializer\PropertyAccessor\ReflectionAccessor;
 use LogicException;
+use stdClass;
 
 /**
  * Mapper
@@ -129,7 +130,7 @@ abstract class Mapper
     protected $serviceLocator;
 
     /**
-     * @var MapperHydratorInterface<E>
+     * @var MapperHydratorInterface<E>|null
      */
     protected $hydrator;
 
@@ -138,23 +139,18 @@ abstract class Mapper
      * Mapper constructor
      *
      * @param ServiceLocator $serviceLocator
-     * @param class-string<E> $entityClass
+     * @param class-string<E>|null $entityClass
      * @param Metadata|null $metadata
      * @param MapperHydratorInterface<E>|null $hydrator
      * @param CacheInterface|null $resultCache
      */
-    public function __construct(ServiceLocator $serviceLocator, string $entityClass, ?Metadata $metadata = null, MapperHydratorInterface $hydrator = null, CacheInterface $resultCache = null)
+    public function __construct(ServiceLocator $serviceLocator, ?string $entityClass = null, ?Metadata $metadata = null, MapperHydratorInterface $hydrator = null, CacheInterface $resultCache = null)
     {
-        $this->entityClass = $entityClass;
-        $this->metadata = $metadata ?: new Metadata();
+        $this->entityClass = $entityClass ?? stdClass::class;
+        $this->metadata = $metadata;
         $this->serviceLocator = $serviceLocator;
         $this->resultCache = $resultCache;
-
-        $this->configure();
-
-        $this->metadata->build($this);
-
-        $this->setHydrator($hydrator ?: new MapperHydrator());
+        $this->hydrator = $hydrator;
     }
 
     /**
@@ -337,6 +333,9 @@ abstract class Mapper
     /**
      * @return MapperHydratorInterface<E>
      * @final
+     *
+     * @psalm-suppress InvalidNullableReturnType
+     * @psalm-suppress NullableReturnStatement
      */
     public function hydrator(): MapperHydratorInterface
     {
@@ -353,7 +352,10 @@ abstract class Mapper
     {
         $this->hydrator = $hydrator;
         $this->hydrator->setPrimeInstantiator($this->serviceLocator->instantiator());
-        $this->hydrator->setPrimeMetadata($this->metadata);
+
+        if ($this->metadata !== null) {
+            $this->hydrator->setPrimeMetadata($this->metadata);
+        }
 
         return $this;
     }
@@ -880,5 +882,52 @@ abstract class Mapper
         $this->generator = null;
         $this->hydrator = null;
         $this->metadata = null;
+    }
+
+    /**
+     * @internal
+     */
+    public function setResultCache(CacheInterface $resultCache): void
+    {
+        $this->resultCache = $resultCache;
+    }
+
+    /**
+     * @internal
+     */
+    public function setMetadata(Metadata $metadata): void
+    {
+        $this->metadata = $metadata;
+    }
+
+    /**
+     * @param class-string<E> $entityClass
+     * @internal
+     */
+    public function setEntityClass(string $entityClass): void
+    {
+        $this->entityClass = $entityClass;
+    }
+
+    /**
+     * Must be called after constructor and setters
+     *
+     * @internal
+     */
+    public function build(): void
+    {
+        $metadata = $this->metadata;
+
+        if (!$metadata) {
+            $metadata = $this->metadata = new Metadata();
+        }
+
+        $this->configure();
+
+        $metadata->build($this);
+
+        $this->hydrator ??= new MapperHydrator();
+        $this->hydrator->setPrimeMetadata($metadata);
+        $this->hydrator->setPrimeInstantiator($this->serviceLocator->instantiator());
     }
 }

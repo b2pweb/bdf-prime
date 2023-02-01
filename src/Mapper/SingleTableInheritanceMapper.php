@@ -15,7 +15,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
     /**
      * The mapper factory
      *
-     * @var MapperFactory
+     * @var MapperFactoryInterface
      */
     protected $mapperFactory;
 
@@ -39,7 +39,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      * {@inheritdoc}
      * @final
      */
-    public function setMapperFactory(MapperFactory $mapperFactory): void
+    public function setMapperFactory(MapperFactoryInterface $mapperFactory): void
     {
         $this->mapperFactory = $mapperFactory;
     }

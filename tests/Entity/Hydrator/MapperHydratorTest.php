@@ -37,7 +37,9 @@ class MapperHydratorTest extends TestCase
         $prime = new ServiceLocator();
         $this->hydrator = new MapperHydrator();
         $this->hydrator->setPrimeInstantiator($prime->instantiator());
-        $this->hydrator->setPrimeMetadata((new TestEntityMapper($prime, TestEntity::class))->metadata());
+        $mapper = new TestEntityMapper($prime, TestEntity::class);
+        $mapper->build();
+        $this->hydrator->setPrimeMetadata($mapper->metadata());
     }
 
     /**
