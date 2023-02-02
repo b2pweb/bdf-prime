@@ -4,6 +4,8 @@ namespace Bdf\Prime\Query\Pagination\WalkStrategy;
 
 use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Connection\ConnectionInterface;
+use Bdf\Prime\Query\Clause;
+use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Contract\Limitable;
 use Bdf\Prime\Query\Contract\Orderable;
 use Bdf\Prime\Query\Contract\ReadOperation;
@@ -73,9 +75,30 @@ final class KeyWalkStrategy implements WalkStrategyInterface
         if ($cursor->cursor !== null) {
             /** @var ReadCommandInterface<ConnectionInterface, E>&Orderable&Whereable $query */
             $query = $cursor->query;
-            $operator = $query->getOrders()[$this->key->name()] === Orderable::ORDER_ASC ? '>' : '<';
+            $column = $this->key->name();
+            $operator = $query->getOrders()[$column] === Orderable::ORDER_ASC ? '>' : '<';
 
-            $query->where($this->key->name(), $operator, $cursor->cursor);
+            // Quick fix for FRAM-86 : reset where clause
+            $set = false;
+
+            if ($query instanceof CompilableClause && !empty($query->statements['where'])) {
+                foreach ($query->statements['where'] as $key => $statement) {
+                    if (
+                        isset($statement['column'], $statement['operator'], $statement['value'])
+                        && $statement['column'] === $column
+                        && $statement['operator'] === $operator
+                    ) {
+                        $query->statements['where'][$key]['value'] = $cursor->cursor;
+                        $set = true;
+                        $query->state()->invalidate('where');
+                        break;
+                    }
+                }
+            }
+
+            if (!$set) {
+                $query->where($column, $operator, $cursor->cursor);
+            }
         }
 
         $cursor->entities = $cursor->query->all();
