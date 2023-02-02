@@ -436,7 +436,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
 
         $column = $query->preprocessor()->field($column);
 
-        if (strpos($column, '*') !== false) {
+        if ($column[-1] === '*') {
             return $column;
         }
 

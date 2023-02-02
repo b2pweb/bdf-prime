@@ -1600,4 +1600,14 @@ class QueryTest extends TestCase
             $query->toSql()
         );
     }
+
+    public function test_count_alias()
+    {
+        $query = $this->query()->addSelect(['count' => 'COUNT(*)']);
+
+        $this->assertEquals(
+            'SELECT COUNT(*) as count FROM test_',
+            $query->toSql()
+        );
+    }
 }
