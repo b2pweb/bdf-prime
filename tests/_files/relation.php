@@ -499,6 +499,7 @@ class Customer extends Model
     public $packs;
     public $documents;
     public $location;
+    public $locationWithConstraint;
     public $parentId;
     public $parent;
 
@@ -562,8 +563,22 @@ class CustomerMapper extends Mapper
         $builder->on('location')
             ->hasOne(Location::class);
 
+        $builder->on('locationWithConstraint')
+            ->hasOne(Location::class)
+            ->constraints([
+                'address' => '???',
+                'city !=' => '',
+            ])
+        ;
+
         $builder->on('documents')
             ->hasMany(Document::class.'::customerId');
+
+        $builder->on('documents-system')
+            ->hasMany(Document::class.'::customerId')
+            ->constraints(['uploaderType' => 'system'])
+            ->detached()
+        ;
 
         $builder->on('users')
             ->hasMany(User::class.'::customer.id')
