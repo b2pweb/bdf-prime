@@ -307,7 +307,7 @@ abstract class OneOrMany extends Relation
     /**
      * Fill the distant entity with default values and foreign key
      *
-     * @param object $entity The distant entity
+     * @param R $entity The distant entity
      * @param mixed $id The foreign key value
      *
      * @return void
