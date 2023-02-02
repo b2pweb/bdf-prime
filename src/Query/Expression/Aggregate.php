@@ -46,10 +46,13 @@ abstract class Aggregate implements ExpressionInterface
      */
     final public function build(CompilableClause $query, object $compiler)
     {
-        return $this->expression(
-            $compiler->platform()->grammar(),
-            $compiler->quoteIdentifier($query, $query->preprocessor()->field($this->attribute))
-        );
+        $attribute = $this->attribute;
+
+        if ($attribute !== '*') {
+            $attribute = $compiler->quoteIdentifier($query, $query->preprocessor()->field($attribute));
+        }
+
+        return $this->expression($compiler->platform()->grammar(), $attribute);
     }
 
     /**
@@ -120,7 +123,7 @@ abstract class Aggregate implements ExpressionInterface
      *
      * @return self
      */
-    public static function count(string $attribute): self
+    public static function count(string $attribute = '*'): self
     {
         return new class ($attribute) extends Aggregate {
             protected function expression(AbstractPlatform $platform, string $attribute): string
