@@ -4,6 +4,7 @@ namespace Bdf\Prime\Query;
 
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Customer;
+use Bdf\Prime\CustomerCriteria;
 use Bdf\Prime\Document;
 use Bdf\Prime\DoubleJoinEntityMaster;
 use Bdf\Prime\EntityWithCallableKey;
@@ -11,6 +12,7 @@ use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Expression\Attribute;
 use Bdf\Prime\Query\Expression\Like;
+use Bdf\Prime\Query\Expression\Operator;
 use Bdf\Prime\Query\Expression\RawValue;
 use Bdf\Prime\Query\Expression\Value;
 use Bdf\Prime\Repository\RepositoryInterface;
@@ -1157,5 +1159,35 @@ class QueryOrmTest extends TestCase
             'SELECT my_alias.* FROM user_ my_alias WHERE my_alias.name_ LIKE ?',
             User::fromAlias('my_alias')->where('name', ':like', 'J%')->toSql()
         );
+    }
+
+    public function test_with_criteria()
+    {
+        /** @var CustomerCriteria $criteria */
+        $criteria = Customer::criteria();
+
+        $criteria
+            ->name('foo')
+            ->parentId(null)
+        ;
+
+        $query = Customer::where($criteria);
+
+        $this->assertEquals('SELECT t0.* FROM customer_ t0 WHERE t0.name_ = \'foo\' AND t0.parent_id IS NULL', $query->toRawSql());
+    }
+
+    public function test_with_criteria_expression()
+    {
+        /** @var CustomerCriteria $criteria */
+        $criteria = Customer::criteria();
+
+        $criteria
+            ->name((new Like('foo'))->startsWith())
+            ->id(Operator::{'>'}(5))
+        ;
+
+        $query = Customer::where($criteria);
+
+        $this->assertEquals('SELECT t0.* FROM customer_ t0 WHERE t0.name_ LIKE \'foo%\' AND t0.id_ > \'5\'', $query->toRawSql());
     }
 }

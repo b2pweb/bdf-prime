@@ -3,6 +3,10 @@
 namespace Bdf\Prime\Mapper;
 
 use Bdf\Prime\Bench\HydratorGeneration;
+use Bdf\Prime\Customer;
+use Bdf\Prime\CustomerCriteria;
+use Bdf\Prime\CustomerMapper;
+use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Entity\Hydrator\HydratorGeneratedInterface;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
 use Bdf\Prime\Entity\Hydrator\MapperHydratorInterface;
@@ -496,6 +500,25 @@ class MapperTest extends TestCase
         $this->assertSame([], $optimisation['relations']['foreign.id']);
     }
 
+    public function test_with_custom_criteria()
+    {
+        $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+
+        $this->assertSame(Criteria::class, get_class($mapper->criteria()));
+        $this->assertEquals(new Criteria(['name' => 'foo']), $mapper->criteria(['name' => 'foo']));
+
+        $mapper->setCriteriaClass(MyCustomCriteria::class);
+        $this->assertSame(MyCustomCriteria::class, get_class($mapper->criteria()));
+        $this->assertEquals(new MyCustomCriteria(['name' => 'foo']), $mapper->criteria(['name' => 'foo']));
+    }
+
+    public function test_dedicated_criteria()
+    {
+        $mapper = new CustomerMapper(Prime::service(), Customer::class);
+
+        $this->assertSame(CustomerCriteria::class, get_class($mapper->criteria()));
+    }
+
     /**
      * @return HydratorGeneratedInterface[]
      */
@@ -505,5 +528,15 @@ class MapperTest extends TestCase
             ["default"],
             ["generated"]
         ];
+    }
+}
+
+class MyCustomCriteria extends Criteria
+{
+    public function foo(string $bar): self
+    {
+        $this->add('name', 'foo' . $bar);
+
+        return $this;
     }
 }

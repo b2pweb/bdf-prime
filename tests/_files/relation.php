@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Mapper\Builder\PolymorphBuilder;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
@@ -580,6 +581,27 @@ class CustomerMapper extends Mapper
             ->hasMany(User::class.'::customer.id')
             ->constraints(['faction.domain' => 'user'])
             ->detached();
+    }
+}
+
+class CustomerCriteria extends Criteria
+{
+    public function id($value): self
+    {
+        $this->add('id', $value);
+        return $this;
+    }
+
+    public function parentId($value): self
+    {
+        $this->add('parentId', $value);
+        return $this;
+    }
+
+    public function name($value): self
+    {
+        $this->add('name', $value);
+        return $this;
     }
 }
 

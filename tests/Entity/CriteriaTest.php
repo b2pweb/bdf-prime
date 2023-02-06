@@ -141,7 +141,20 @@ class CriteriaTest extends TestCase
         
         $this->assertEquals(['name' => 'test%', ':limit' => 1], $criteria->all());
     }
-    
+
+    /**
+     *
+     */
+    public function test_iterator()
+    {
+        $criteria = new Criteria();
+
+        $criteria->add('name', 'test%');
+        $criteria->add(':limit', 1);
+
+        $this->assertEquals(['name' => 'test%', ':limit' => 1], iterator_to_array($criteria));
+    }
+
     /**
      * 
      */

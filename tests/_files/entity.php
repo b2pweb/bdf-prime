@@ -83,11 +83,11 @@ class TestEntityMapper extends Mapper
     public function filters(): array
     {
         return [
-            'idLike' => function($query, $value) {
-                $query->where(['id :like' => $value . '%']);
+            'idLike' => function($query, string $id) {
+                $query->where(['id :like' => $id . '%']);
             },
-            'nameLike' => function($query, $value) {
-                $query->where(['name :like' => '%' . $value]);
+            'nameLike' => function($query, string $search) {
+                $query->where(['name :like' => '%' . $search]);
             },
             'join' => function($query, $value) {
                 $query->join('Bdf\Prime\TestEmbeddedEntity', 'id', 'foreign.id', 'f')
