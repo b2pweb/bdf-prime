@@ -6,12 +6,13 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 /**
  * Interface for where() method
+ *
+ * @method $this whereReplace(string $column, $operator = null, $value = null) Add or replace single where criterion.
  */
 interface Whereable
 {
     /**
      * Specifies one or more restrictions to the query result.
-     * Replaces any previously specified restrictions, if any.
      *
      * <code>
      *     $query
@@ -36,6 +37,31 @@ interface Whereable
      * @return $this This Query instance.
      */
     public function where($column, $operator = null, $value = null);
+
+    /**
+     * Add or replace single where criterion
+     * The criterion value will be replaced on the first occurrence matching with the column and the operator
+     *
+     * Note: Unlike the where() method, this method does not support the array syntax nor nested statements
+     *
+     * <code>
+     *     $query
+     *         ->select('u.name')
+     *         ->from('users', 'u')
+     *         ->whereReplace('u.id', '1') // Filter not existing, will be added
+     *     ;
+     *
+     *     $query->whereReplace('u.id', '2'); // Will replace the previous where
+     *     $query->whereReplace('u.id', '<', '1000'); // Operator is different, so the clause is added
+     * </code>
+     *
+     * @param string $column The column name to filter
+     * @param string|mixed|null $operator The comparison operator, or the value is you want to use "=" operator
+     * @param mixed $value
+     *
+     * @return $this This Query instance.
+     */
+    //public function whereReplace(string $column, $operator = null, $value = null); // @todo uncomment on prime 3.0
 
     /**
      * Adds one or more restrictions to the query results, forming a logical

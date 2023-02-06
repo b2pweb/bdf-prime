@@ -169,6 +169,42 @@ class Clause implements ClauseInterface
     /**
      * {@inheritdoc}
      */
+    public function replaceClause(string $statement, string $expression, $operator = null, $value = null)
+    {
+        if ($value === null && (!is_string($operator) || !isset($this->operators[$operator]))) {
+            $value = $operator;
+            $operator = '=';
+        }
+
+        $found = false;
+
+        foreach ($this->statements[$statement] ?? [] as $key => $clause) {
+            if (
+                isset($clause['column'], $clause['operator'], $clause['value'])
+                && $clause['column'] === $expression
+                && $clause['operator'] === $operator
+            ) {
+                $this->statements[$statement][$key]['value'] = $value;
+                $found = true;
+                break;
+            }
+        }
+
+        if (!$found) {
+            $this->statements[$statement][] = [
+                'column'    => $expression,
+                'operator'  => $operator,
+                'value'     => $value,
+                'glue'      => CompositeExpression::TYPE_AND,
+            ];
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function buildRaw(string $statement, $expression, string $type = CompositeExpression::TYPE_AND)
     {
         $this->statements[$statement][] = [
