@@ -180,7 +180,7 @@ class Clause implements ClauseInterface
 
         foreach ($this->statements[$statement] ?? [] as $key => $clause) {
             if (
-                isset($clause['column'], $clause['operator'], $clause['value'])
+                isset($clause['column'], $clause['operator'])
                 && $clause['column'] === $expression
                 && $clause['operator'] === $operator
             ) {
