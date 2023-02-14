@@ -155,7 +155,13 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     {
         if ($this->platform === null) {
             try {
-                $this->platform = new SqlPlatform($this->getDatabasePlatform(), $this->getConfiguration()->getTypes());
+                $config = $this->getConfiguration();
+                $this->platform = new SqlPlatform($this->getDatabasePlatform(), $config->getTypes());
+                $types = $this->platform->types();
+
+                foreach ($config->getPlatformTypes() as $alias => $type) {
+                    $types->register($type, is_string($alias) ? $alias : null);
+                }
             } catch (DoctrineDBALException $e) {
                 /** @psalm-suppress InvalidScalarArgument */
                 throw new DBALException($e->getMessage(), $e->getCode(), $e);

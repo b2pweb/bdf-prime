@@ -8,6 +8,8 @@ namespace Bdf\Prime;
 class Company
 {
     /**
+     * The company id
+     *
      * @var integer
      */
     protected $id;
@@ -30,5 +32,15 @@ class Company
     public function id(): int
     {
         return $this->id;
+    }
+
+    public function isFoo(): bool
+    {
+        return $this->id && ($this->id % 3840) === 0;
+    }
+
+    public function isBar(): bool
+    {
+        return $this->id && ($this->id % 2980) === 0;
     }
 }

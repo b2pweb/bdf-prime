@@ -5,9 +5,12 @@ namespace Bdf\Prime\Connection;
 use Bdf\Prime\Connection\Event\ConnectionClosedListenerInterface;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Connection\Result\UpdateResultSet;
+use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Exception\QueryExecutionException;
+use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Platform\Sql\Types\SqlBooleanType;
 use Bdf\Prime\Platform\Sql\Types\SqlIntegerType;
+use Bdf\Prime\Platform\Sql\Types\SqlStringType;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Compiler\SqlCompiler;
@@ -18,6 +21,8 @@ use Bdf\Prime\Query\Custom\BulkInsert\BulkInsertQuery;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueSqlCompiler;
 use Bdf\Prime\Query\Query;
+use Bdf\Prime\TestEntity;
+use Bdf\Prime\Types\TypeInterface;
 use PHPUnit\Framework\TestCase;
 
 // Declare read timeout in case the extension musqli does not support this constant.
@@ -574,5 +579,62 @@ class SimpleConnectionTest extends TestCase
         $connection = $this->prime()->connection('other_connection');
 
         $this->assertFalse($connection->isConnected());
+    }
+
+    public function test_with_custom_platform_type()
+    {
+        if (Prime::isConfigured()) {
+            $this->unsetPrime();
+        }
+
+        Prime::configure([
+//                'logger' => new PsrDecorator(new Logger()),
+//                'resultCache' => new \Bdf\Prime\Cache\ArrayCache(),
+            'connection' => [
+                'config' => [
+                    'test' => [
+                        'adapter' => 'sqlite',
+                        'memory' => true
+                    ],
+                ]
+            ],
+            'platformTypes' => [
+                TypeInterface::STRING => FakeNullableStringType::class,
+            ]
+        ]);
+
+        Model::configure(function() { return Prime::service(); });
+
+        $connection = Prime::service()->connection('test');
+
+        $this->assertNull($connection->fromDatabase('', TypeInterface::STRING));
+        $this->assertSame('', $connection->toDatabase(null));
+
+        TestEntity::repository()->schema()->migrate();
+
+        $entity = new TestEntity(['name' => null]);
+        $entity->insert();
+
+        $this->assertNull(TestEntity::refresh($entity)->name);
+        $this->assertSame('', TestEntity::where('id', $entity->id)->inRow('name'));
+
+        // Restart prime for next tests
+        $this->unsetPrime();
+        $this->configurePrime();
+    }
+}
+
+class FakeNullableStringType extends SqlStringType
+{
+    public function toDatabase($value)
+    {
+        return (string) parent::toDatabase($value);
+    }
+
+    public function fromDatabase($value, array $fieldOptions = [])
+    {
+        $value = parent::fromDatabase($value, $fieldOptions);
+
+        return $value === '' ? null : $value;
     }
 }

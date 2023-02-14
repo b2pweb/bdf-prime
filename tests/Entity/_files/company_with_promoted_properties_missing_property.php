@@ -2,15 +2,20 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Entity\Model;
+
 /**
  * Company
  */
-class Company
+class Company extends Model
 {
-    /**
-     * @var integer
-     */
-    protected $id;
+    public function __construct(
+        /**
+         * @var integer
+         */
+        protected ?int $id = null,
+    ) {
+    }
 
     /**
      * Set id
