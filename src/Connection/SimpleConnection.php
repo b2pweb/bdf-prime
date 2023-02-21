@@ -26,7 +26,6 @@ use Bdf\Prime\Query\Custom\KeyValue\KeyValueSqlCompiler;
 use Bdf\Prime\Query\Factory\DefaultQueryFactory;
 use Bdf\Prime\Query\Factory\QueryFactoryInterface;
 use Bdf\Prime\Query\Query;
-use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Schema\SchemaManager;
 use Closure;
 use Doctrine\Common\EventManager;
@@ -258,6 +257,8 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     {
         $this->prepareLogger();
 
+        $types = $types ?: Binder::types($params);
+
         return $this->runOrReconnect(fn () => parent::executeQuery($sql, $params, $types, $qcp));
     }
 
@@ -267,6 +268,8 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     public function executeStatement($sql, array $params = [], array $types = [])
     {
         $this->prepareLogger();
+
+        $types = $types ?: Binder::types($params);
 
         return $this->runOrReconnect(fn () => parent::executeStatement($sql, $params, $types));
     }
@@ -328,33 +331,33 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      */
     protected function executePrepared(Statement $statement, Compilable $query)
     {
-        $bindings = $query->getBindings();
+        $statement = Binder::bindValues($statement, $query);
         $isRead = $query->type() === Compilable::TYPE_SELECT;
 
         $this->prepareLogger();
 
         try {
             $result = $isRead
-                ? new DoctrineResultSet($statement->executeQuery($bindings))
-                : new UpdateResultSet($statement->executeStatement($bindings))
+                ? new DoctrineResultSet($statement->executeQuery())
+                : new UpdateResultSet($statement->executeStatement())
             ;
         } catch (DoctrineDBALException $exception) {
             // Prepared query on SQLite for PHP < 7.2 invalidates the query when schema change
             // This process may be removed on PHP 7.2
             if ($this->causedBySchemaChange($exception)) {
-                $statement = $query->compile(true);
+                $statement = Binder::bindValues($query->compile(true), $query);
                 $result = $isRead
-                    ? new DoctrineResultSet($statement->executeQuery($query->getBindings()))
-                    : new UpdateResultSet($statement->executeStatement($query->getBindings()))
+                    ? new DoctrineResultSet($statement->executeQuery())
+                    : new UpdateResultSet($statement->executeStatement())
                 ;
             } elseif ($this->causedByLostConnection($exception->getPrevious())) { // If the connection is lost, the query must be recompiled
                 $this->close();
                 $this->connect();
 
-                $statement = $query->compile(true);
+                $statement = Binder::bindValues($query->compile(true), $query);
                 $result = $isRead
-                    ? new DoctrineResultSet($statement->executeQuery($query->getBindings()))
-                    : new UpdateResultSet($statement->executeStatement($query->getBindings()))
+                    ? new DoctrineResultSet($statement->executeQuery())
+                    : new UpdateResultSet($statement->executeStatement())
                 ;
             } else {
                 throw $exception;
