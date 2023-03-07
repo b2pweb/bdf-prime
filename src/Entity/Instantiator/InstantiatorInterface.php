@@ -48,4 +48,3 @@ if ((new \ReflectionMethod(BaseInstantiatorInterface::class, 'instantiate'))->ha
         public function instantiate($className, $hint = null);
     }
 }
-
