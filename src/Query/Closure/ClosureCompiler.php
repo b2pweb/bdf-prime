@@ -128,6 +128,10 @@ final class ClosureCompiler
         return $filters;
     }
 
+    /**
+     * @psalm-suppress UndefinedClass - ReflectionUnionType does not exist on PHP < 8.0
+     * @psalm-suppress TypeDoesNotContainType
+     */
     private function checkParameterType(?ReflectionType $type): void
     {
         if ($type === null) {
