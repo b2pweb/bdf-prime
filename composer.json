@@ -58,7 +58,8 @@
     "symfony/phpunit-bridge": "~4.3|~5.0|~6.0",
     "symfony/validator": "~4.3|~5.0|~6.0",
     "vimeo/psalm": "~4.21",
-    "phpbench/phpbench": "^1.2"
+    "phpbench/phpbench": "^1.2",
+    "nikic/php-parser": "^4.15"
   },
   "scripts": {
     "tests": "phpunit",
@@ -68,6 +69,7 @@
   },
   "suggest": {
     "b2p/bdf-console": "required to use prime commands (~1.5)",
-    "b2p/bdf-web": "required to use service provider (~1.5)"
+    "b2p/bdf-web": "required to use service provider (~1.5)",
+    "nikic/php-parser": "required to use closure filters (~4.15)"
   }
 }

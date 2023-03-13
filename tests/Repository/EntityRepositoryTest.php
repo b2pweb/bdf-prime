@@ -7,6 +7,7 @@ use Bdf\Prime\Events;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Query\Query;
 use Bdf\Prime\Right;
 use Bdf\Prime\Test\RepositoryAssertion;
 use Bdf\Prime\TestEntity;
@@ -715,6 +716,21 @@ class EntityRepositoryTest extends TestCase
 
         $respository->builder();
         $this->assertContains('lazytest', $this->prime()->connections()->getCurrentConnectionNames());
+    }
+
+    /**
+     *
+     */
+    public function test_filter()
+    {
+        $repository = TestEntity::repository();
+
+        $query = $repository->filter(fn (TestEntity $entity) => $entity->id >= 1 && $entity->id <= 10);
+
+        $this->assertInstanceOf(Query::class, $query);
+        $this->assertEquals('SELECT t0.* FROM test_ t0 WHERE t0.id >= 1 AND t0.id <= 10', $query->toRawSql());
+
+        $this->assertEquals([$this->getTestPack()->get('entity')], iterator_to_array($query));
     }
 }
 

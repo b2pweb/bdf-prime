@@ -14,6 +14,7 @@ use Bdf\Prime\Query\Contract\ReadOperation;
  * @method $this by(string $attribute, bool $combine = false) Indexing entities by an attribute value. Use combine for multiple entities with same attribute value
  * @method $this with(string|string[] $relations) Relations to load
  * @method $this without(string|string[] $relations) Relations to discard
+ * @method $this filter(\Closure $predicate) Filter entities
  * @method R|null get($pk) Get one entity by its identifier
  * @method R getOrFail($pk) Get one entity or throws when entity is not found
  * @method R getOrNew($pk) Get one entity or return a new one if not found in repository

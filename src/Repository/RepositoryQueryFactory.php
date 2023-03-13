@@ -7,6 +7,7 @@ use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Exception\QueryBuildingException;
 use Bdf\Prime\Mapper\Metadata;
+use Bdf\Prime\Query\Closure\ClosureCompiler;
 use Bdf\Prime\Query\CommandInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\OrmPreprocessor;
 use Bdf\Prime\Query\Contract\Cachable;
@@ -17,6 +18,7 @@ use Bdf\Prime\Query\Pagination\PaginatorFactory;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\QueryRepositoryExtension;
 use Bdf\Prime\Query\ReadCommandInterface;
+use Psr\SimpleCache\CacheInterface as Psr16Cache;
 
 /**
  * Factory for repository queries
@@ -47,6 +49,11 @@ class RepositoryQueryFactory
      * @var CacheInterface
      */
     private $resultCache;
+
+    /**
+     * @var Psr16Cache|null
+     */
+    private $metadataCache;
 
     /**
      * Check if the repository can support optimised KeyValue query
@@ -91,10 +98,11 @@ class RepositoryQueryFactory
      * @param RepositoryInterface<E> $repository
      * @param CacheInterface|null $resultCache
      */
-    public function __construct(RepositoryInterface $repository, ?CacheInterface $resultCache = null)
+    public function __construct(RepositoryInterface $repository, ?CacheInterface $resultCache = null, ?Psr16Cache $metadataCache = null)
     {
         $this->repository = $repository;
         $this->resultCache = $resultCache;
+        $this->metadataCache = $metadataCache;
 
         $this->supportsKeyValue = empty($repository->constraints());
 
@@ -371,7 +379,10 @@ class RepositoryQueryFactory
     private function extension()
     {
         if (!$this->extension) {
-            $this->extension = new QueryRepositoryExtension($this->repository);
+            $this->extension = new QueryRepositoryExtension(
+                $this->repository,
+                new ClosureCompiler($this->repository, $this->metadataCache)
+            );
         }
 
         return clone $this->extension;

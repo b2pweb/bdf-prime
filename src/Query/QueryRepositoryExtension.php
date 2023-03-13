@@ -11,10 +11,12 @@ use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
+use Bdf\Prime\Query\Closure\ClosureCompiler;
 use Bdf\Prime\Query\Contract\Whereable;
 use Bdf\Prime\Relations\Relation;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryInterface;
+use Closure;
 
 /**
  * QueryRepositoryExtension
@@ -37,6 +39,11 @@ class QueryRepositoryExtension extends QueryCompatExtension
      * @var Mapper<E>
      */
     protected $mapper;
+
+    /**
+     * @var ClosureCompiler<E>|null
+     */
+    protected $closureCompiler;
 
     /**
      * Array of relations to associate on entities
@@ -66,12 +73,14 @@ class QueryRepositoryExtension extends QueryCompatExtension
      * QueryRepositoryExtension constructor.
      *
      * @param RepositoryInterface<E> $repository
+     * @param ClosureCompiler<E>|null $closureCompiler
      */
-    public function __construct(RepositoryInterface $repository)
+    public function __construct(RepositoryInterface $repository, ?ClosureCompiler $closureCompiler = null)
     {
         $this->repository = $repository;
         $this->metadata = $repository->metadata();
         $this->mapper = $repository->mapper();
+        $this->closureCompiler = $closureCompiler;
     }
 
     /**
@@ -154,6 +163,34 @@ class QueryRepositoryExtension extends QueryCompatExtension
         }
 
         return $this->repository->entity();
+    }
+
+    /**
+     * Filter entities by a predicate
+     *
+     * The predicate will be compiled to a where clause, instead of be called on each entity
+     *
+     * <code>
+     * $query->filter(fn (User $user) => $user->enabled()); // WHERE enabled = 1
+     * $query->filter(fn (User $user) => $user->enabled() && $user->age() > 18); // WHERE enabled = 1 AND age > 18
+     * </code>
+     *
+     * @param ReadCommandInterface<ConnectionInterface, E> $query
+     * @param Closure(E):bool $predicate The predicate. Must take the entity as parameter, and return a boolean.
+     *
+     * @return ReadCommandInterface<ConnectionInterface, E>
+     */
+    public function filter(ReadCommandInterface $query, Closure $predicate)
+    {
+        if (!$this->closureCompiler) {
+            throw new BadMethodCallException('Closure filter is not enabled.');
+        }
+
+        if (!$query instanceof Whereable) {
+            throw new BadMethodCallException('The query must implement ' . Whereable::class . ' to use filter with a closure.');
+        }
+
+        return $query->where($this->closureCompiler->compile($predicate));
     }
 
     /**
