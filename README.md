@@ -5,6 +5,7 @@ The goal of prime is to lightweight usage of data mapper and doctrine DBAL.
 
 [![build](https://github.com/b2pweb/bdf-prime/actions/workflows/php.yml/badge.svg)](https://github.com/b2pweb/bdf-prime/actions/workflows/php.yml)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/b2pweb/bdf-prime/badges/quality-score.png?b=2.0)](https://scrutinizer-ci.com/g/b2pweb/bdf-prime/?branch=2.0)
+[![codecov](https://codecov.io/github/b2pweb/bdf-prime/branch/2.1/graph/badge.svg?token=VOFSPEWYKX)](https://codecov.io/github/b2pweb/bdf-prime)
 [![Packagist Version](https://img.shields.io/packagist/v/b2pweb/bdf-prime.svg)](https://packagist.org/packages/b2pweb/bdf-prime)
 [![Total Downloads](https://img.shields.io/packagist/dt/b2pweb/bdf-prime.svg)](https://packagist.org/packages/b2pweb/bdf-prime)
 [![Type Coverage](https://shepherd.dev/github/b2pweb/bdf-prime/coverage.svg)](https://shepherd.dev/github/b2pweb/bdf-prime)
