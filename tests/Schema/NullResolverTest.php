@@ -18,6 +18,7 @@ class NullResolverTest extends TestCase
 
         $schema->migrate();
         $this->assertEquals([], $schema->diff());
+        $this->assertEquals(['up' => [], 'down' => []], $schema->queries());
         $this->assertTrue($schema->truncate());
         $this->assertTrue($schema->drop());
     }

@@ -4,6 +4,7 @@ namespace Bdf\Prime\Schema;
 
 use Bdf\Prime\Schema\Manager\DatabaseManagerInterface;
 use Bdf\Prime\Schema\Manager\QueryManagerInterface;
+use Bdf\Prime\Schema\Manager\RollbackQueryManagerInterface;
 use Bdf\Prime\Schema\Manager\TableManagerInterface;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Schema as DoctrineSchema;
@@ -15,7 +16,7 @@ use Doctrine\DBAL\Schema\Table as DoctrineTable;
  * @template C as \Bdf\Prime\Connection\ConnectionInterface
  * @extends DatabaseManagerInterface<C>
  */
-interface SchemaManagerInterface extends DatabaseManagerInterface, TableManagerInterface, QueryManagerInterface
+interface SchemaManagerInterface extends DatabaseManagerInterface, TableManagerInterface, QueryManagerInterface, RollbackQueryManagerInterface
 {
     /**
      * Get the doctrine schema instance

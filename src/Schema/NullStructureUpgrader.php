@@ -25,6 +25,17 @@ class NullStructureUpgrader implements StructureUpgraderInterface
     /**
      * {@inheritdoc}
      */
+    public function queries(bool $listDrop = true): array
+    {
+        return [
+            'up' => [],
+            'down' => [],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function truncate(bool $cascade = false): bool
     {
         return true;

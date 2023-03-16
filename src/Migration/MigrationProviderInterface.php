@@ -21,10 +21,12 @@ interface MigrationProviderInterface
      * @param string $version
      * @param string $name
      * @param string $stage The generation options
+     * @param array<string, list<mixed>> $upQueries The queries to execute on up, indexed by connection name
+     * @param array<string, list<mixed>> $downQueries The queries to execute on up, indexed by connection name
      *
      * @return string  Returns the file name
      */
-    public function create(string $version, string $name, string $stage = MigrationInterface::STAGE_DEFAULT): string;
+    public function create(string $version, string $name, string $stage = MigrationInterface::STAGE_DEFAULT, array $upQueries = [], array $downQueries = []): string;
 
     /**
      * Get the directory path of migration files

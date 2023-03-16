@@ -220,6 +220,10 @@ class SchemaManager extends AbstractSchemaManager
      */
     public function drop(string $tableName)
     {
+        if ($this->generateRollback) {
+            $this->pushRollback($this->schema($this->load($tableName)));
+        }
+
         try {
             return $this->push(
                 $this->platform->grammar()->getDropTableSQL($tableName)
@@ -270,6 +274,14 @@ class SchemaManager extends AbstractSchemaManager
         $diff->newName = $to;
 
         try {
+            if ($this->generateRollback) {
+                /** @psalm-suppress InternalMethod */
+                $rollbackDiff = new DoctrineTableDiff($to);
+                $rollbackDiff->newName = $from;
+
+                $this->pushRollback($this->platform->grammar()->getAlterTableSQL($rollbackDiff));
+            }
+
             return $this->push(
                 $this->platform->grammar()->getAlterTableSQL($diff)
             );

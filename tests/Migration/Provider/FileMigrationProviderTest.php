@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Migration\Provider;
 
+use Bdf\Prime\Migration\MigrationInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -185,6 +186,61 @@ PHP
 
         $content = file_get_contents($path);
         $this->assertStringNotContainsString('public function stage()', $content);
+    }
+
+    /**
+     *
+     */
+    public function test_create_with_queries()
+    {
+        $di = $this->createMock(ContainerInterface::class);
+        $provider = new FileMigrationProvider(new MigrationFactory($di), $this->workingDir);
+
+        $path = $provider->create('123', 'MyMigration', MigrationInterface::STAGE_DEFAULT,
+            [
+                'test' => [
+                    'CREATE TABLE test (id INT NOT NULL)',
+                    'ALTER TABLE other ADD COLUMN foo INT NOT NULL',
+                ],
+                'foo' => [
+                    'CREATE TABLE foo (id INT NOT NULL)',
+                ]
+            ],
+            [
+                'test' => [
+                    'DROP TABLE test',
+                    'ALTER TABLE other DROP COLUMN foo',
+                ],
+                'foo' => [
+                    'DROP TABLE foo',
+                ]
+            ]
+        );
+
+        $this->assertFileExists($path);
+        $this->assertStringEndsWith('123_MyMigration.php', $path);
+
+        $content = file_get_contents($path);
+        $this->assertStringContainsString(<<<'PHP'
+    public function up(): void
+    {
+        $this->update('CREATE TABLE test (id INT NOT NULL)', [], 'test');
+        $this->update('ALTER TABLE other ADD COLUMN foo INT NOT NULL', [], 'test');
+        $this->update('CREATE TABLE foo (id INT NOT NULL)', [], 'foo');
+    }
+PHP
+            , $content
+        );
+        $this->assertStringContainsString(<<<'PHP'
+    public function down(): void
+    {
+        $this->update('DROP TABLE test', [], 'test');
+        $this->update('ALTER TABLE other DROP COLUMN foo', [], 'test');
+        $this->update('DROP TABLE foo', [], 'foo');
+    }
+PHP
+            , $content
+        );
     }
 
     /**

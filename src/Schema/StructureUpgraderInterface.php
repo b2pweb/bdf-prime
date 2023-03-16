@@ -29,6 +29,19 @@ interface StructureUpgraderInterface
     public function diff(bool $listDrop = true): array;
 
     /**
+     * List migration queries, indexed by connection name
+     *
+     * The result is an array with two keys:
+     * - up: the queries to execute to migrate the schema
+     * - down: the queries to execute to rollback the migration
+     *
+     * @param bool $listDrop Whether to list drop queries
+     *
+     * @return array{up: array<string, list<string>>, down: array<string, list<string>>}
+     */
+    public function queries(bool $listDrop = true): array;
+
+    /**
      * Truncate table
      *
      * @param bool $cascade

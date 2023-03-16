@@ -2,6 +2,8 @@
 
 namespace Bdf\Prime\Console;
 
+use Bdf\Prime\Migration\MigrationInterface;
+use Bdf\Prime\Migration\MigrationManager;
 use Bdf\Prime\Schema\RepositoryUpgraderResolver;
 use Bdf\Prime\Schema\StructureUpgraderResolverInterface;
 use Bdf\Prime\ServiceLocator;
@@ -23,19 +25,22 @@ class UpgraderCommand extends Command
     protected static $defaultName = 'prime:upgrade';
 
     private StructureUpgraderResolverInterface $resolver;
+    private ?MigrationManager $migrationManager;
 
     /**
      * UpgraderCommand constructor.
      *
      * @param StructureUpgraderResolverInterface|ServiceLocator $resolver
+     * @param MigrationManager|null $migrationManager
      */
-    public function __construct($resolver)
+    public function __construct($resolver, ?MigrationManager $migrationManager = null)
     {
         if ($resolver instanceof ServiceLocator) {
             $resolver = new RepositoryUpgraderResolver($resolver);
         }
 
         $this->resolver = $resolver;
+        $this->migrationManager = $migrationManager;
 
         parent::__construct(static::$defaultName);
     }
@@ -50,6 +55,7 @@ class UpgraderCommand extends Command
             ->addOption('execute', null, InputOption::VALUE_NONE, 'Lance les requetes d\'upgrade')
             ->addOption('useDrop', null, InputOption::VALUE_NONE, 'Lance les requetes de alter avec des drop')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force l\'utilisation du schema manager des mappers l\'ayant désactivé')
+            ->addOption('migration', null, InputOption::VALUE_REQUIRED, 'Migration name to generate. Cannot be used with --execute option.')
             ->addArgument('path', InputArgument::REQUIRED, 'Model path')
         ;
     }
@@ -64,7 +70,25 @@ class UpgraderCommand extends Command
         $useDrop      = $io->option('useDrop');
         $executeQuery = $io->option('execute');
         $force        = $io->option('force');
+        $migration    = $io->option('migration');
         $nbWarning    = 0;
+
+        if ($migration) {
+            if ($executeQuery) {
+                $io->error('Cannot use --migration option with --execute option');
+
+                return 1;
+            }
+
+            if (!$this->migrationManager) {
+                $io->error('Migration manager is not configured');
+
+                return 1;
+            }
+        }
+
+        $upQueries = [];
+        $downQueries = [];
 
         foreach ((new ClassFileLocator(realpath($io->argument('path')))) as $classInfo) {
             $className = $classInfo->getClass();
@@ -86,6 +110,13 @@ class UpgraderCommand extends Command
             }
 
             $io->line("<comment>{$className}</comment> <info>needs upgrade</info>");
+
+            if ($migration) {
+                $migrationQueries = $schema->queries($useDrop);
+
+                $upQueries = array_merge_recursive($upQueries, $migrationQueries['up']);
+                $downQueries = array_merge_recursive($downQueries, $migrationQueries['down']);
+            }
 
             foreach ($queries as $query) {
                 $nbWarning++;
@@ -109,6 +140,14 @@ class UpgraderCommand extends Command
         }
 
         $io->info('Found ' . $nbWarning . ' upgrade(s)');
+
+        if ($migration) {
+            if ($upQueries) {
+                $this->migrationManager->createMigration($migration, MigrationInterface::STAGE_PREPARE, $upQueries, $downQueries);
+            } else {
+                $io->warning('Migration not created, no queries found');
+            }
+        }
 
         return 0;
     }

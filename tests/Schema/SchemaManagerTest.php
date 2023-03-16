@@ -112,9 +112,11 @@ class SchemaManagerTest extends TestCase
     public function test_rename_sql()
     {
         $schema = $this->schema->simulate();
+        $schema->generateRollback(true);
         $schema->rename('test_', 'test');
         
         $this->assertEquals(['ALTER TABLE test_ RENAME TO test'], $schema->toSql());
+        $this->assertEquals(['ALTER TABLE test RENAME TO test_'], $schema->rollbackQueries());
     }
     
     /**
@@ -133,9 +135,11 @@ class SchemaManagerTest extends TestCase
     public function test_drop_sql()
     {
         $schema = $this->schema->simulate();
+        $schema->generateRollback(true);
         $schema->drop('test_');
         
         $this->assertEquals(['DROP TABLE test_'], $schema->toSql());
+        $this->assertEquals(['CREATE TABLE test_ (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(255) NOT NULL COLLATE "BINARY", foreign_key INTEGER DEFAULT NULL, date_insert DATETIME DEFAULT NULL)'], $schema->rollbackQueries());
     }
     
     /**
