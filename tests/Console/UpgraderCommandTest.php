@@ -181,12 +181,14 @@ OUT
      */
     public function test_execute_migration_should_be_generated()
     {
+        Person::repository()->schema()->migrate();
+
         $this->command = new UpgraderCommand($this->prime(), $this->migrationManager);
 
         $tester = new CommandTester($this->command);
         $tester->execute(['path' => __DIR__.'/UpgradeModels', '--migration' => 'foo']);
 
-        $this->assertStringContainsString('Found 2 upgrade(s)', $tester->getDisplay(true));
+        $this->assertStringContainsString('Found 1 upgrade(s)', $tester->getDisplay(true));
         $files = glob(self::MIGRATION_PATH.'/*.php');
 
         $this->assertNotEmpty($files);
@@ -215,7 +217,6 @@ class Foo extends Migration
     public function up(): void
     {
         $this->update('CREATE TABLE address (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, street VARCHAR(255) NOT NULL, number INTEGER NOT NULL, city VARCHAR(255) NOT NULL, zipCode VARCHAR(255) NOT NULL, country VARCHAR(255) NOT NULL)', [], 'test');
-        $this->update('CREATE TABLE person (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, firstName VARCHAR(255) NOT NULL, lastName VARCHAR(255) NOT NULL, address_id INTEGER NOT NULL)', [], 'test');
     }
 
     /**
@@ -224,7 +225,6 @@ class Foo extends Migration
     public function down(): void
     {
         $this->update('DROP TABLE address', [], 'test');
-        $this->update('DROP TABLE person', [], 'test');
     }
 
     /**
@@ -238,6 +238,32 @@ class Foo extends Migration
 
 PHP, file_get_contents($files[0])
         );
+    }
+
+    /**
+     *
+     */
+    public function test_execute_migration_with_multiple_entities_should_be_generated()
+    {
+        $this->command = new UpgraderCommand($this->prime(), $this->migrationManager);
+
+        $tester = new CommandTester($this->command);
+        $tester->execute(['path' => __DIR__.'/UpgradeModels', '--migration' => 'foo']);
+
+        $this->assertStringContainsString('Found 2 upgrade(s)', $tester->getDisplay(true));
+        $files = glob(self::MIGRATION_PATH.'/*.php');
+
+        $this->assertNotEmpty($files);
+        $this->assertStringEndsWith('Foo.php', $files[0]);
+
+        $content = file_get_contents($files[0]);
+
+        // Order is not guaranteed, so we simply check that the queries are present without checking the order
+        $this->assertStringContainsString("\$this->update('CREATE TABLE address (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, street VARCHAR(255) NOT NULL, number INTEGER NOT NULL, city VARCHAR(255) NOT NULL, zipCode VARCHAR(255) NOT NULL, country VARCHAR(255) NOT NULL)', [], 'test');", $content);
+        $this->assertStringContainsString("\$this->update('CREATE TABLE person (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, firstName VARCHAR(255) NOT NULL, lastName VARCHAR(255) NOT NULL, address_id INTEGER NOT NULL)', [], 'test');", $content);
+
+        $this->assertStringContainsString("\$this->update('DROP TABLE address', [], 'test');", $content);
+        $this->assertStringContainsString("\$this->update('DROP TABLE person', [], 'test');", $content);
     }
 
     /**
