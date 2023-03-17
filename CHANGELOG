@@ -9,6 +9,8 @@ v2.1.0
     * Add `Bdf\Prime\Mapper\ContainerMapperFactory` to use the PSR-11 container as mapper factory
     * Change: method `Mapper::build()` must be called after the mapper has been instantiated to finish the initialization.
       This allows to configure the mapper outside of the constructor. Other parameters than ServiceLocator of the constructor are now deprecated and optional.
+* Change: Fill relation entity with constraints
+    * Affect methods `RelationInterface::create()`, `RelationInterface::add()`, `RelationInterface::saveAll()`
 
 v2.0.6
 ------
