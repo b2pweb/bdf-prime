@@ -10,7 +10,9 @@ namespace Bdf\Prime\Mapper;
 interface MapperFactoryAwareInterface
 {
     /**
-     * @param MapperFactory $mapperFactory
+     * @psalm-suppress MismatchingDocblockParamType
+     * Parameter type will be changed to MapperFactoryInterface in 3.0
+     * @param MapperFactoryInterface $mapperFactory
      * @return void
      * @internal
      */

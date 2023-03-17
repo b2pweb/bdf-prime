@@ -20,7 +20,8 @@
     },
     "classmap": [
       "tests/_files/PrimeTestCase.php",
-      "tests/_files/HydratorGeneration.php"
+      "tests/_files/HydratorGeneration.php",
+      "tests/_files/ArrayContainer.php"
     ]
   },
   "minimum-stability": "dev",
