@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Mapper\Builder\PolymorphBuilder;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
@@ -499,6 +500,7 @@ class Customer extends Model
     public $packs;
     public $documents;
     public $location;
+    public $locationWithConstraint;
     public $parentId;
     public $parent;
 
@@ -562,8 +564,22 @@ class CustomerMapper extends Mapper
         $builder->on('location')
             ->hasOne(Location::class);
 
+        $builder->on('locationWithConstraint')
+            ->hasOne(Location::class)
+            ->constraints([
+                'address' => '???',
+                'city !=' => '',
+            ])
+        ;
+
         $builder->on('documents')
             ->hasMany(Document::class.'::customerId');
+
+        $builder->on('documents-system')
+            ->hasMany(Document::class.'::customerId')
+            ->constraints(['uploaderType' => 'system'])
+            ->detached()
+        ;
 
         $builder->on('users')
             ->hasMany(User::class.'::customer.id')
@@ -580,6 +596,27 @@ class CustomerMapper extends Mapper
             ->hasMany(User::class.'::customer.id')
             ->constraints(['faction.domain' => 'user'])
             ->detached();
+    }
+}
+
+class CustomerCriteria extends Criteria
+{
+    public function id($value): self
+    {
+        $this->add('id', $value);
+        return $this;
+    }
+
+    public function parentId($value): self
+    {
+        $this->add('parentId', $value);
+        return $this;
+    }
+
+    public function name($value): self
+    {
+        $this->add('name', $value);
+        return $this;
     }
 }
 

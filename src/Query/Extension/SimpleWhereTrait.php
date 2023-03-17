@@ -38,6 +38,18 @@ trait SimpleWhereTrait
     /**
      * {@inheritdoc}
      *
+     * @see Whereable::whereReplace()
+     */
+    public function whereReplace(string $column, $operator = null, $value = null)
+    {
+        $this->compilerState->invalidate('where');
+        $this->replaceClause('where', $column, $operator, $value);
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * @see Whereable::orWhere()
      */
     public function orWhere($column, $operator = null, $value = null)
@@ -137,6 +149,13 @@ trait SimpleWhereTrait
      * @see Clause::buildClause()
      */
     abstract public function buildClause(string $statement, $expression, $operator = null, $value = null, string $type = CompositeExpression::TYPE_AND);
+
+    /**
+     * {@inheritdoc}
+     *
+     * @see Clause::replaceClause()
+     */
+    abstract public function replaceClause(string $statement, string $expression, $operator = null, $value = null);
 
     /**
      * {@inheritdoc}

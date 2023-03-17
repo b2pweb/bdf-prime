@@ -92,6 +92,29 @@ interface ClauseInterface
     public function buildClause(string $statement, $expression, $operator = null, $value = null, string $type = CompositeExpression::TYPE_AND);
 
     /**
+     * Replace a clause value
+     *
+     * If the clause does not exist, it will be added
+     * Only the first statement matching the expression and the operator will be replaced
+     *
+     * Note: unlike the buildClause method, this method does not support the array syntax nor nested statements
+     *
+     * <code>
+     *   $query->from('users', 'u')->where('u.id', '=', 1); // SELECT * FROM users u WHERE u.id = 1
+     *   $query->replaceClause('where', 'u.id', '=', 2); // Replace the clause : SELECT * FROM users u WHERE u.id = 2
+     *   $query->replaceClause('where', 'u.id', '<', 1000); // Operator is different, so the clause is added : SELECT * FROM users u WHERE u.id = 2 AND u.id < 1000
+     * </code>
+     *
+     * @param string $statement Statement name to modify. e.g. where, having, on...
+     * @param string $expression Column name or expression
+     * @param string|mixed|null $operator Comparison operator. If the $value parameter is omitted, this parameter is used as the value, and the operator is set to '='.
+     * @param mixed $value The value to compare to.
+     *
+     * @return $this
+     */
+    public function replaceClause(string $statement, string $expression, $operator = null, $value = null);
+
+    /**
      * Add a raw expression in statement
      *
      * <code>

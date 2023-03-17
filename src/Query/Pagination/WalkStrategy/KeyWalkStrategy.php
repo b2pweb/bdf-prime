@@ -13,6 +13,8 @@ use Bdf\Prime\Query\Contract\Whereable;
 use Bdf\Prime\Query\ReadCommandInterface;
 use InvalidArgumentException;
 
+use function method_exists;
+
 /**
  * Walk strategy using a primary key (or any unique key) as cursor
  * This strategy supports deleting entities during the walk, but the entity must contains a single primary key, and the query must be ordered by this key
@@ -78,25 +80,11 @@ final class KeyWalkStrategy implements WalkStrategyInterface
             $column = $this->key->name();
             $operator = $query->getOrders()[$column] === Orderable::ORDER_ASC ? '>' : '<';
 
-            // Quick fix for FRAM-86 : reset where clause
-            $set = false;
-
-            if ($query instanceof CompilableClause && !empty($query->statements['where'])) {
-                foreach ($query->statements['where'] as $key => $statement) {
-                    if (
-                        isset($statement['column'], $statement['operator'], $statement['value'])
-                        && $statement['column'] === $column
-                        && $statement['operator'] === $operator
-                    ) {
-                        $query->statements['where'][$key]['value'] = $cursor->cursor;
-                        $set = true;
-                        $query->state()->invalidate('where');
-                        break;
-                    }
-                }
-            }
-
-            if (!$set) {
+            // #FRAM-86 : reset where clause
+            // @todo remove method_exists check on prime 3.0
+            if (method_exists($query, 'whereReplace')) {
+                $query->whereReplace($column, $operator, $cursor->cursor);
+            } else {
                 $query->where($column, $operator, $cursor->cursor);
             }
         }

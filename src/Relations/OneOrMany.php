@@ -9,6 +9,8 @@ use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use InvalidArgumentException;
 
+use function array_intersect_key;
+
 /**
  * OneOrMany
  *
@@ -23,6 +25,13 @@ use InvalidArgumentException;
  */
 abstract class OneOrMany extends Relation
 {
+    /**
+     * Default attributes to fill when creating a new relation entity
+     *
+     * @var array<string, mixed>|null
+     */
+    private ?array $defaultValues = null;
+
     /**
      * {@inheritdoc}
      */
@@ -158,7 +167,7 @@ abstract class OneOrMany extends Relation
 
         $entity = $this->distant->entity($data);
 
-        $this->setForeignKeyValue($entity, $this->getLocalKeyValue($owner));
+        $this->fillDistantEntityConstraints($entity, $this->getLocalKeyValue($owner));
 
         return $entity;
     }
@@ -173,7 +182,7 @@ abstract class OneOrMany extends Relation
             throw new InvalidArgumentException('The local entity is not the primary key barrier.');
         }
 
-        $this->setForeignKeyValue($related, $this->getLocalKeyValue($owner));
+        $this->fillDistantEntityConstraints($related, $this->getLocalKeyValue($owner));
 
         return $this->distant->save($related);
     }
@@ -205,7 +214,7 @@ abstract class OneOrMany extends Relation
         $nb = 0;
 
         foreach ($entities as $entity) {
-            $this->setForeignKeyValue($entity, $id);
+            $this->fillDistantEntityConstraints($entity, $id);
             $nb += $this->distant->saveAll($entity, $relations);
         }
 
@@ -292,6 +301,36 @@ abstract class OneOrMany extends Relation
             if ($this->isPolymorphic()) {
                 $repository->mapper()->hydrateOne($entity, $this->discriminator, $this->discriminatorValue);
             }
+        }
+    }
+
+    /**
+     * Fill the distant entity with default values and foreign key
+     *
+     * @param R $entity The distant entity
+     * @param mixed $id The foreign key value
+     *
+     * @return void
+     */
+    private function fillDistantEntityConstraints(object $entity, $id): void
+    {
+        $this->setForeignKeyValue($entity, $id);
+
+        if (!$this->constraints || !$this->distant) {
+            return;
+        }
+
+        if (($values = $this->defaultValues) === null) {
+            $values = $this->defaultValues = array_intersect_key(
+                $this->constraints,
+                $this->distant->metadata()->attributes
+            );
+        }
+
+        $mapper = $this->distant->mapper();
+
+        foreach ($values as $key => $value) {
+            $mapper->hydrateOne($entity, $key, $value);
         }
     }
 }

@@ -4,6 +4,7 @@ namespace Bdf\Prime\Mapper;
 
 use Bdf\Prime\Behaviors\BehaviorInterface;
 use Bdf\Prime\Cache\CacheInterface;
+use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
 use Bdf\Prime\Entity\Hydrator\MapperHydratorInterface;
 use Bdf\Prime\Entity\ImportableInterface;
@@ -25,6 +26,9 @@ use Bdf\Prime\ServiceLocator;
 use Bdf\Serializer\PropertyAccessor\PropertyAccessorInterface;
 use Bdf\Serializer\PropertyAccessor\ReflectionAccessor;
 use LogicException;
+use stdClass;
+
+use function class_exists;
 
 /**
  * Mapper
@@ -85,6 +89,14 @@ abstract class Mapper
     private $propertyAccessorClass = ReflectionAccessor::class;
 
     /**
+     * Class of the criteria to use
+     * If null, the class will be resolved from the entity class with the suffix "Criteria" if exists
+     *
+     * @var class-string<Criteria>|null
+     */
+    private ?string $criteriaClass = null;
+
+    /**
      * Set repository read only.
      *
      * @var bool
@@ -129,7 +141,7 @@ abstract class Mapper
     protected $serviceLocator;
 
     /**
-     * @var MapperHydratorInterface<E>
+     * @var MapperHydratorInterface<E>|null
      */
     protected $hydrator;
 
@@ -138,23 +150,18 @@ abstract class Mapper
      * Mapper constructor
      *
      * @param ServiceLocator $serviceLocator
-     * @param class-string<E> $entityClass
+     * @param class-string<E>|null $entityClass
      * @param Metadata|null $metadata
      * @param MapperHydratorInterface<E>|null $hydrator
      * @param CacheInterface|null $resultCache
      */
-    public function __construct(ServiceLocator $serviceLocator, string $entityClass, ?Metadata $metadata = null, MapperHydratorInterface $hydrator = null, CacheInterface $resultCache = null)
+    public function __construct(ServiceLocator $serviceLocator, ?string $entityClass = null, ?Metadata $metadata = null, MapperHydratorInterface $hydrator = null, CacheInterface $resultCache = null)
     {
-        $this->entityClass = $entityClass;
-        $this->metadata = $metadata ?: new Metadata();
+        $this->entityClass = $entityClass ?? stdClass::class;
+        $this->metadata = $metadata;
         $this->serviceLocator = $serviceLocator;
         $this->resultCache = $resultCache;
-
-        $this->configure();
-
-        $this->metadata->build($this);
-
-        $this->setHydrator($hydrator ?: new MapperHydrator());
+        $this->hydrator = $hydrator;
     }
 
     /**
@@ -337,6 +344,9 @@ abstract class Mapper
     /**
      * @return MapperHydratorInterface<E>
      * @final
+     *
+     * @psalm-suppress InvalidNullableReturnType
+     * @psalm-suppress NullableReturnStatement
      */
     public function hydrator(): MapperHydratorInterface
     {
@@ -353,9 +363,23 @@ abstract class Mapper
     {
         $this->hydrator = $hydrator;
         $this->hydrator->setPrimeInstantiator($this->serviceLocator->instantiator());
-        $this->hydrator->setPrimeMetadata($this->metadata);
+
+        if ($this->metadata !== null) {
+            $this->hydrator->setPrimeMetadata($this->metadata);
+        }
 
         return $this;
+    }
+
+    /**
+     * Define the criteria class
+     * By default, it is the entity class with "Criteria" suffix if exists, else base Criteria class
+     *
+     * @param class-string<Criteria> $className
+     */
+    final public function setCriteriaClass(string $className): void
+    {
+        $this->criteriaClass = $className;
     }
 
     /**
@@ -514,6 +538,25 @@ abstract class Mapper
         $className = $this->repositoryClass;
 
         return new $className($this, $this->serviceLocator, $this->resultCache === false ? null : $this->resultCache);
+    }
+
+    /**
+     * Create a criteria object for this entity
+     *
+     * @param array<string, mixed> $filters
+     *
+     * @return Criteria
+     */
+    public function criteria(array $filters = []): Criteria
+    {
+        $class = $this->criteriaClass;
+
+        if (!$class) {
+            $class = $this->entityClass . 'Criteria';
+            $this->criteriaClass = $class = class_exists($class) ? $class : Criteria::class;
+        }
+
+        return new $class($filters);
     }
 
     /**
@@ -880,5 +923,52 @@ abstract class Mapper
         $this->generator = null;
         $this->hydrator = null;
         $this->metadata = null;
+    }
+
+    /**
+     * @internal
+     */
+    public function setResultCache(CacheInterface $resultCache): void
+    {
+        $this->resultCache = $resultCache;
+    }
+
+    /**
+     * @internal
+     */
+    public function setMetadata(Metadata $metadata): void
+    {
+        $this->metadata = $metadata;
+    }
+
+    /**
+     * @param class-string<E> $entityClass
+     * @internal
+     */
+    public function setEntityClass(string $entityClass): void
+    {
+        $this->entityClass = $entityClass;
+    }
+
+    /**
+     * Must be called after constructor and setters
+     *
+     * @internal
+     */
+    public function build(): void
+    {
+        $metadata = $this->metadata;
+
+        if (!$metadata) {
+            $metadata = $this->metadata = new Metadata();
+        }
+
+        $this->configure();
+
+        $metadata->build($this);
+
+        $this->hydrator ??= new MapperHydrator();
+        $this->hydrator->setPrimeMetadata($metadata);
+        $this->hydrator->setPrimeInstantiator($this->serviceLocator->instantiator());
     }
 }

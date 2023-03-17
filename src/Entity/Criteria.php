@@ -4,49 +4,48 @@ namespace Bdf\Prime\Entity;
 
 use ArrayAccess;
 use Bdf\Prime\Query\Contract\Orderable;
+use Exception;
+use IteratorAggregate;
+use Traversable;
 
 /**
- * EntityFilter gère les critères de recherche d'entités
- *
- * @package Bdf\Prime\Entity
- *
- * @todo on attribute can have only one criteria
+ * Builder for entity criteria
  */
-class Criteria implements ArrayAccess
+class Criteria implements ArrayAccess, IteratorAggregate
 {
     /**
      * Critères injectés vers le dépot d'entity
      *
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $criteria = [];
+    protected array $criteria = [];
 
     /**
-     * Valeurs d'entrées utilisateur
-     * Attention inputs ne peut contenir qu'une commande par field
+     * Map attribute name to filters (i.e. attribute with operator)
+     *
      * <pre>
      * ex:
      *   ['weight >' => 10, 'weight <' => 20]
-     * génèrera un inputs
-     *   ['weight' => 'weight <']
+     * Will generates inputs:
+     *   ['weight' => ['weight >', 'weight <']]
      * </pre>
      *
-     * @var array
+     * @var array<string, list<string>>
      */
-    protected $inputs = [];
+    protected array $inputs = [];
 
     /**
      * Commandes spéciales du query builder (ex: ':limit')
      *
-     * @var array
+     * @var array<string, mixed>
      */
-    protected $specials = [];
+    protected array $specials = [];
 
     /**
      * Constructor
      *
      * @param array $filters
-     * @param array $aliases
+     * @psalm-consistent-constructor
      */
     public function __construct(array $filters = [])
     {
@@ -323,5 +322,13 @@ class Criteria implements ArrayAccess
     public function offsetUnset($offset): void
     {
         $this->remove($offset);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIterator(): iterable
+    {
+        yield from $this->all();
     }
 }
