@@ -100,6 +100,22 @@ class AggregateTest extends TestCase
 
         $this->assertEquals('SELECT COUNT(t0.id_) as a FROM faction_ t0 WHERE t0.enabled_ = ?', $query->toSql());
         $this->assertEquals(3, $query->execute()->current()['a']);
+
+        $query = Faction::select(['a' => Aggregate::count('id')]);
+        $query->useQuoteIdentifier(true);
+        $this->assertEquals('SELECT COUNT("t0"."id_") as "a" FROM "faction_" "t0" WHERE "t0"."enabled_" = ?', $query->toSql());
+    }
+
+    /**
+     *
+     */
+    public function test_count_wildcard()
+    {
+        $query = Faction::select(['a' => Aggregate::count()]);
+        $query->useQuoteIdentifier(true);
+
+        $this->assertEquals('SELECT COUNT(*) as "a" FROM "faction_" "t0" WHERE "t0"."enabled_" = ?', $query->toSql());
+        $this->assertEquals(3, $query->execute()->current()['a']);
     }
 
     /**

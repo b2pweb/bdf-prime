@@ -97,3 +97,49 @@ jobs:
 #      run: |
 #        git fetch --depth=1 origin $GITHUB_BASE_REF
 #        ~/.composer/vendor/bin/infection --logger-github --git-diff-filter=AM
+
+  coverage:
+    name: Test coverage
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set Timezone
+        uses: szenius/set-timezone@v1.0
+        with:
+          timezoneLinux: "Europe/Paris"
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.1
+          extensions: json
+          ini-values: date.timezone=Europe/Paris
+
+      - uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql version: '5.7'
+          mysql root password: 'root'
+
+      - name: Reset mysql password
+        run: |
+          # To prevent "ERROR 2013 (HY000): Lost connection to MySQL server at 'reading initial communication packet', system error: 0"
+          # See: https://github.com/mirromutth/mysql-action/issues/16
+          sleep 15
+          
+          cat <<EOF | mysql -h 127.0.0.1 -u root --password=root
+            UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
+            FLUSH PRIVILEGES;
+          EOF
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: Run test coverage
+        run: ./vendor/bin/phpunit --coverage-clover=coverage.xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v2
+        with:
+          files: coverage.xml

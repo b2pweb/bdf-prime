@@ -43,7 +43,7 @@ class RegistryInstantiator implements InstantiatorInterface
     /**
      * {@inheritdoc}
      */
-    public function instantiate($className, $hint = null)
+    public function instantiate($className, $hint = null): object
     {
         if (isset($this->registry[$className])) {
             return $this->registry[$className]->instantiate($className, $hint);

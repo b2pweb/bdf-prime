@@ -265,6 +265,78 @@ class WalkerTest extends TestCase
         ], iterator_to_array($walker));
     }
 
+    /**
+     *
+     */
+    public function test_key_walk_strategy_should_replace_key_clause()
+    {
+        $entities = [
+            new TestEntity(['name' => 'foo1']),
+            new TestEntity(['name' => 'foo2']),
+            new TestEntity(['name' => 'foo1']),
+            new TestEntity(['name' => 'foo1']),
+            new TestEntity(['name' => 'foo3']),
+            new TestEntity(['name' => 'foo4']),
+            new TestEntity(['name' => 'foo5']),
+        ];
+
+        foreach ($entities as $entity) {
+            $entity->insert();
+        }
+
+        $this->queries->queries = [];
+
+        $walker = new Walker(TestEntity::builder(), 4);
+        $walker->setStrategy(new KeyWalkStrategy(new MapperPrimaryKey(TestEntity::mapper())));
+
+        $this->assertCount(7, iterator_to_array($walker));
+
+        $queries = array_values($this->queries->queries);
+        $this->assertCount(3, $queries);
+
+        $this->assertSame('SELECT t0.* FROM test_ t0 WHERE t0.id > ? ORDER BY t0.id ASC LIMIT 4', $queries[1]['sql']);
+        $this->assertSame([4], $queries[1]['params']);
+        $this->assertSame('SELECT t0.* FROM test_ t0 WHERE t0.id > ? ORDER BY t0.id ASC LIMIT 4', $queries[2]['sql']);
+        $this->assertSame([7], $queries[2]['params']);
+
+        $this->queries->queries = [];
+
+        $walker = new Walker(TestEntity::builder()->where('name', '>', 'foo1'), 2);
+        $walker->setStrategy(new KeyWalkStrategy(new MapperPrimaryKey(TestEntity::mapper())));
+
+        $this->assertCount(4, iterator_to_array($walker));
+
+        $queries = array_values($this->queries->queries);
+        $this->assertCount(3, $queries);
+
+        $this->assertSame('SELECT t0.* FROM test_ t0 WHERE t0.name > ? AND t0.id > ? ORDER BY t0.id ASC LIMIT 2', $queries[1]['sql']);
+        $this->assertSame(['foo1', 5], $queries[1]['params']);
+        $this->assertSame('SELECT t0.* FROM test_ t0 WHERE t0.name > ? AND t0.id > ? ORDER BY t0.id ASC LIMIT 2', $queries[2]['sql']);
+        $this->assertSame(['foo1', 7], $queries[2]['params']);
+
+        $this->queries->queries = [];
+
+        $walker = new Walker(TestEntity::builder()->where('id', '<', 5), 2);
+        $walker->setStrategy(new KeyWalkStrategy(new MapperPrimaryKey(TestEntity::mapper())));
+
+        $this->assertCount(4, iterator_to_array($walker));
+
+        $queries = array_values($this->queries->queries);
+        $this->assertCount(3, $queries);
+
+        $this->assertSame('SELECT t0.* FROM test_ t0 WHERE t0.id < ? ORDER BY t0.id ASC LIMIT 2', $queries[0]['sql']);
+        $this->assertSame([5], $queries[0]['params']);
+        $this->assertSame('SELECT t0.* FROM test_ t0 WHERE t0.id < ? AND t0.id > ? ORDER BY t0.id ASC LIMIT 2', $queries[1]['sql']);
+        $this->assertSame([5, 2], $queries[1]['params']);
+        $this->assertSame('SELECT t0.* FROM test_ t0 WHERE t0.id < ? AND t0.id > ? ORDER BY t0.id ASC LIMIT 2', $queries[2]['sql']);
+        $this->assertSame([5, 4], $queries[2]['params']);
+
+
+        $walker = new Walker(TestEntity::builder()->whereRaw('MOD(id, 2) = 0'), 2);
+        $walker->setStrategy(new KeyWalkStrategy(new MapperPrimaryKey(TestEntity::mapper())));
+        $this->assertCount(3, iterator_to_array($walker));
+    }
+
     private function insertEntities(int $count): array
     {
         $entities = [];
