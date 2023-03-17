@@ -237,6 +237,8 @@ class MetadataTest extends TestCase
                 ;
             }
         };
+
+        $mapper->build();
     }
 }
 
