@@ -11,15 +11,12 @@ use Doctrine\Instantiator\InstantiatorInterface as DoctrineInstantiatorInterface
  */
 class Instantiator implements InstantiatorInterface
 {
-    /**
-     * @var DoctrineInstantiatorInterface
-     */
-    protected $instantiator;
+    protected DoctrineInstantiatorInterface $instantiator;
 
     /**
      * Instantiator constructor.
      *
-     * @param DoctrineInstantiatorInterface $instantiator
+     * @param DoctrineInstantiatorInterface|null $instantiator
      */
     public function __construct(DoctrineInstantiatorInterface $instantiator = null)
     {
@@ -31,7 +28,7 @@ class Instantiator implements InstantiatorInterface
      *
      * @return DoctrineInstantiatorInterface
      */
-    public function instantiator()
+    public function instantiator(): DoctrineInstantiatorInterface
     {
         return $this->instantiator;
     }
@@ -45,7 +42,7 @@ class Instantiator implements InstantiatorInterface
      * @return T
      * @template T as object
      */
-    public function instantiate($className, $hint = null)
+    public function instantiate($className, $hint = null): object
     {
         if ($hint === self::USE_CONSTRUCTOR_HINT) {
             return new $className();
