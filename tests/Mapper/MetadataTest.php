@@ -35,7 +35,9 @@ class MetadataTest extends TestCase
      */
     public function test_embedded()
     {
-        $meta = (new TestEntityMapper(Prime::service(), TestEntity::class))->metadata();
+        $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
+        $meta = $mapper->metadata();
         $this->assertEquals(TestEmbeddedEntity::class, $meta->embedded('foreign')['class']);
         $this->assertEquals(null, $meta->embedded('unknow'));
     }
@@ -45,7 +47,9 @@ class MetadataTest extends TestCase
      */
     public function test_polymorph_embedded()
     {
-        $meta = (new PolymorphContainerMapper(Prime::service(), PolymorphContainer::class))->metadata();
+        $mapper = new PolymorphContainerMapper(Prime::service(), PolymorphContainer::class);
+        $mapper->build();
+        $meta = $mapper->metadata();
 
         $this->assertEquals(['A' => PolymorphSubA::class, 'B' => PolymorphSubB::class], $meta->embedded('embedded')['class_map']);
         $this->assertEquals('sub_type', $meta->embedded('embedded')['discriminator_field']);
@@ -59,7 +63,9 @@ class MetadataTest extends TestCase
      */
     public function test_meta()
     {
-        $meta = (new TestEntityMapper(Prime::service(), TestEntity::class))->metadata();
+        $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
+        $meta = $mapper->metadata();
         $this->assertEquals('dateInsert', $meta->meta('date_insert', 'fields')['attribute']);
         $this->assertEquals('date_insert', $meta->meta('dateInsert', 'attributes')['field']);
         $this->assertEquals(null, $meta->meta('unknow'));
@@ -70,7 +76,9 @@ class MetadataTest extends TestCase
      */
     public function test_basic_info()
     {
-        $meta = (new TestEntityMapper(Prime::service(), TestEntity::class))->metadata();
+        $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
+        $meta = $mapper->metadata();
         
         $this->assertEquals(TestEntity::class, $meta->getEntityClass());
         $this->assertEquals(InstantiatorInterface::USE_CONSTRUCTOR_HINT, $meta->instantiatorHint);
@@ -86,7 +94,9 @@ class MetadataTest extends TestCase
      */
     public function test_embeddeds()
     {
-        $meta = (new TestEntityMapper(Prime::service(), TestEntity::class))->metadata();
+        $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
+        $meta = $mapper->metadata();
         
         $embeddeds = $meta->embeddeds();
         
@@ -102,7 +112,9 @@ class MetadataTest extends TestCase
      */
     public function test_attributes()
     {
-        $meta = (new TestEntityMapper(Prime::service(), TestEntity::class))->metadata();
+        $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
+        $meta = $mapper->metadata();
         
         $attributes = $meta->attributes();
         
@@ -126,7 +138,9 @@ class MetadataTest extends TestCase
      */
     public function test_primary()
     {
-        $meta = (new TestEntityMapper(Prime::service(), TestEntity::class))->metadata();
+        $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
+        $meta = $mapper->metadata();
         
         $this->assertEquals(['id'], $meta->primary());
         $this->assertEquals(['id'], $meta->primary('fields'));
@@ -143,7 +157,9 @@ class MetadataTest extends TestCase
      */
     public function test_mode_eager()
     {
-        $meta = (new TestEntityMapper(Prime::service(), TestEntity::class))->metadata();
+        $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
+        $meta = $mapper->metadata();
 
         $this->assertEquals(['parent' => ['constraints' => [], 'relations' => []]], $meta->eagerRelations());
     }
@@ -153,7 +169,9 @@ class MetadataTest extends TestCase
      */
     public function test_indexes()
     {
-        $meta = (new TestEntityMapper(Prime::service(), TestEntity::class))->metadata();
+        $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
+        $meta = $mapper->metadata();
 
         $this->assertEquals([
             'name_search' => [
@@ -178,7 +196,9 @@ class MetadataTest extends TestCase
      */
     public function test_indexes_legacy_format()
     {
-        $meta = (new TestEmbeddedEntityMapper(Prime::service(), TestEmbeddedEntity::class))->metadata();
+        $mapper = new TestEmbeddedEntityMapper(Prime::service(), TestEmbeddedEntity::class);
+        $mapper->build();
+        $meta = $mapper->metadata();
 
         $this->assertEquals([
             [

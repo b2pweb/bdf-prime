@@ -3,6 +3,27 @@ v2.1.0
 
 * Feat: Declare or override platform types using `Bdf\Prime\Configuration::addPlatformType()`
 * Change: EntityGenerator algorithm has changed : now it do not imports class from current namespace and reformat class on update
+* Feat: Handle by() with combine option on walker with KeyWalkStrategy
+* Feat: Instantiate the mapper using PSR-11 container
+    * Add `Bdf\Prime\Mapper\MapperFactoryInterface` and used it on typehint instead of the implementation `Bdf\Prime\Mapper\MapperFactory`
+    * Add `Bdf\Prime\Mapper\ContainerMapperFactory` to use the PSR-11 container as mapper factory
+    * Change: method `Mapper::build()` must be called after the mapper has been instantiated to finish the initialization.
+      This allows to configure the mapper outside of the constructor. Other parameters than ServiceLocator of the constructor are now deprecated and optional.
+* Change: Fill relation entity with constraints
+    * Affect methods `RelationInterface::create()`, `RelationInterface::add()`, `RelationInterface::saveAll()`
+* Feat: Generate custom criteria for entity
+    * Add `Bdf\Prime\Mapper\Mapper::criteria()` to instantiate the criteria, and `Bdf\Prime\Mapper\Mapper::setCriteriaClass()` for define the custom criteria class
+    * By default, the used criteria class is the entity class with suffix `Criteria`, or `Bdf\Prime\Criteria\Criteria` if not found
+    * Add `prime:criteria` command to generate the criteria class from the entity file
+    * The generated criteria will provide a setter for each property of the entity, and filters
+* Change: `Clause::buildClause()`, and all related methods like `Wherable::where()` now handle iterable expression parameters.
+  This change allows to use the `Criteria` as parameter of the where clause without the need to call `Criteria::all()`
+* Feat: Add `Bdf\Prime\Query\Expression\Operator` to wrap the operator and the value as expression. So it can be used in on criteria setters
+
+v2.0.6
+------
+
+* Change: Compatibility with doctrine/instantiator v2.0
 
 v2.0.0
 ------

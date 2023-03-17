@@ -4,6 +4,12 @@ namespace Bdf\Prime\Query;
 
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
+use function explode;
+use function is_int;
+use function is_iterable;
+use function is_string;
+use function trim;
+
 /**
  * Clause
  *
@@ -109,7 +115,7 @@ class Clause implements ClauseInterface
      */
     public function buildClause(string $statement, $expression, $operator = null, $value = null, string $type = CompositeExpression::TYPE_AND)
     {
-        if (is_array($expression)) {
+        if (is_iterable($expression)) {
             //nested expression
             $glue = ($operator ?: CompositeExpression::TYPE_AND);
             $parts = [];
@@ -126,10 +132,10 @@ class Clause implements ClauseInterface
                     $this->addCommand($key, $value);
                 } else {
                     // Column with operator
-                    $key  = explode(' ', trim($key), 2);
+                    $key = explode(' ', trim($key), 2);
                     $parts[] = [
                         'column'    => $key[0],
-                        'operator'  => isset($key[1]) ? $key[1] : '=',
+                        'operator'  => $key[1] ?? '=',
                         'value'     => $value,
                         'glue'      => $glue,
                     ];

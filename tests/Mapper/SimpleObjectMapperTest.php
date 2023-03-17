@@ -39,6 +39,7 @@ class SimpleObjectMapperTest extends TestCase
     public function test_default()
     {
         $mapper = new SimpleEntityMapper(Prime::service(), __NAMESPACE__.'\SimpleEntity');
+        $mapper->build();
         
         $this->assertEquals(__NAMESPACE__.'\SimpleEntity', $mapper->getEntityClass());
         $this->assertEquals('stdClass', $mapper->metadata()->entityClass);
@@ -50,6 +51,7 @@ class SimpleObjectMapperTest extends TestCase
     public function test_entity()
     {
         $mapper = new SimpleEntityMapper(Prime::service(), __NAMESPACE__.'\SimpleEntity');
+        $mapper->build();
         
         $this->assertEquals(new stdClass, $mapper->entity(['id' => 1]));
     }

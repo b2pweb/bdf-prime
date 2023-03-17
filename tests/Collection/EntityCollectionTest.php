@@ -341,6 +341,7 @@ class EntityCollectionTest extends TestCase
                 'packs' => null,
                 'documents' => null,
                 'location' => null,
+                'locationWithConstraint' => null,
                 'parentId' => null,
                 'parent' => null,
             ],
@@ -350,6 +351,7 @@ class EntityCollectionTest extends TestCase
                 'packs' => null,
                 'documents' => null,
                 'location' => null,
+                'locationWithConstraint' => null,
                 'parentId' => null,
                 'parent' => null,
             ],
@@ -359,6 +361,7 @@ class EntityCollectionTest extends TestCase
                 'packs' => null,
                 'documents' => null,
                 'location' => null,
+                'locationWithConstraint' => null,
                 'parentId' => null,
                 'parent' => null,
             ]
