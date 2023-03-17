@@ -61,7 +61,7 @@ class RegistryInstantiatorTest extends TestCase
 
 class TestEntityInstantiator implements InstantiatorInterface
 {
-    public function instantiate($className, $hint = null)
+    public function instantiate($className, $hint = null): object
     {
         return new TestEntity([
             'id' => 1
