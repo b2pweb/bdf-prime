@@ -20,6 +20,7 @@ class SingleTableInheritanceMapperTest extends TestCase
     public function test_prepareFromRepository_from_parent(array $data, array $expectations)
     {
         $mapper = new ParentEntityMapper(Prime::service(), 'ParentEntity');
+        $mapper->build();
         $mapper->setMapperFactory(Prime::service()->mappers());
 
         $entity = $mapper->prepareFromRepository($data, Prime::connection('test')->platform());
@@ -93,6 +94,7 @@ class SingleTableInheritanceMapperTest extends TestCase
         ];
 
         $mapper = new ParentEntityMapper(Prime::service(), 'ParentEntity');
+        $mapper->build();
         $mapper->setMapperFactory(Prime::service()->mappers());
 
         $this->expectException('Exception');
@@ -115,6 +117,7 @@ class SingleTableInheritanceMapperTest extends TestCase
         ];
 
         $mapper = new ParentEntityMapper(Prime::service(), 'ParentEntity');
+        $mapper->build();
         $mapper->setMapperFactory(Prime::service()->mappers());
 
         $this->expectException('Exception');
@@ -129,6 +132,7 @@ class SingleTableInheritanceMapperTest extends TestCase
     public function test_getMapperByDiscriminatorValue()
     {
         $mapper = new ParentEntityMapper(Prime::service(), 'ParentEntity');
+        $mapper->build();
         $mapper->setMapperFactory(Prime::service()->mappers());
 
         $this->assertInstanceOf('ChildEntity1Mapper', $mapper->getMapperByDiscriminatorValue('child1'));
@@ -141,6 +145,7 @@ class SingleTableInheritanceMapperTest extends TestCase
     public function test_constraints_from_parent()
     {
         $mapper = new ParentEntityMapper(Prime::service(), 'ParentEntity');
+        $mapper->build();
         $mapper->setMapperFactory(Prime::service()->mappers());
 
         $this->assertEquals([], $mapper->constraints());
@@ -161,6 +166,7 @@ class SingleTableInheritanceMapperTest extends TestCase
     public function test_getDiscriminatorValueByRawData()
     {
         $mapper = new ParentEntityMapper(Prime::service(), 'ParentEntity');
+        $mapper->build();
         $mapper->setMapperFactory(Prime::service()->mappers());
 
         $this->assertEquals(
@@ -177,6 +183,7 @@ class SingleTableInheritanceMapperTest extends TestCase
     public function test_getDiscriminatorValueByRawData_should_throw_exception()
     {
         $mapper = new ParentEntityMapper(Prime::service(), 'ParentEntity');
+        $mapper->build();
         $mapper->setMapperFactory(Prime::service()->mappers());
 
         $this->expectException('Exception');
@@ -193,6 +200,7 @@ class SingleTableInheritanceMapperTest extends TestCase
     public function test_getDiscriminatorType()
     {
         $mapper = new ParentEntityMapper(Prime::service(), 'ParentEntity');
+        $mapper->build();
         $mapper->setMapperFactory(Prime::service()->mappers());
 
         $this->assertEquals('ChildEntity1Mapper', $mapper->getDiscriminatorType('child1'));
@@ -205,6 +213,7 @@ class SingleTableInheritanceMapperTest extends TestCase
     public function test_getDiscriminatorType_should_throw_exception()
     {
         $mapper = new ParentEntityMapper(Prime::service(), 'ParentEntity');
+        $mapper->build();
         $mapper->setMapperFactory(Prime::service()->mappers());
 
         $this->expectException('Exception');
@@ -219,6 +228,7 @@ class SingleTableInheritanceMapperTest extends TestCase
     public function test_get_entity_map()
     {
         $mapper = new ParentEntityMapper(Prime::service(), 'ParentEntity');
+        $mapper->build();
         $mapper->setMapperFactory(Prime::service()->mappers());
 
         $expected = [
@@ -235,6 +245,7 @@ class SingleTableInheritanceMapperTest extends TestCase
     public function test_relation()
     {
         $mapper = new ParentEntityMapper(Prime::service(), 'ParentEntity');
+        $mapper->build();
         $mapper->setMapperFactory(Prime::service()->mappers());
 
         $expected = [

@@ -63,6 +63,7 @@ class MapperTest extends TestCase
     public function test_default()
     {
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
         
         $this->assertEquals(TestEntity::class, $mapper->getEntityClass());
         $this->assertEquals(EntityRepository::class, $mapper->getRepositoryClass());
@@ -78,6 +79,7 @@ class MapperTest extends TestCase
     public function test_repository_class()
     {
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
         
         $mapper->setRepositoryClass('Bdf\Prime\Repository\UnknownRepository');
         $this->assertEquals('Bdf\Prime\Repository\UnknownRepository', $mapper->getRepositoryClass());
@@ -89,6 +91,7 @@ class MapperTest extends TestCase
     public function test_info()
     {
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
 
         $this->assertInstanceOf(MapperInfo::class, $mapper->info());
     }
@@ -99,6 +102,7 @@ class MapperTest extends TestCase
     public function test_property_accessor_class()
     {
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
 
         $mapper->setPropertyAccessorClass('UnknownHydrator');
         $this->assertEquals('UnknownHydrator', $mapper->getPropertyAccessorClass());
@@ -110,6 +114,7 @@ class MapperTest extends TestCase
     public function test_read_only()
     {
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
         
         $mapper->setReadOnly(true);
         $this->assertTrue($mapper->isReadOnly());
@@ -121,6 +126,7 @@ class MapperTest extends TestCase
     public function test_schema_manager()
     {
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
         
         $mapper->disableSchemaManager();
         $this->assertFalse($mapper->hasSchemaManager());
@@ -136,6 +142,7 @@ class MapperTest extends TestCase
         $metadata->expects($this->any())->method('isSequencePrimaryKey')->will($this->returnValue(false));
         
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class, $metadata);
+        $mapper->build();
         
         $this->assertInstanceOf(NullGenerator::class, $mapper->generator());
     }
@@ -150,6 +157,7 @@ class MapperTest extends TestCase
         $metadata->expects($this->any())->method('isSequencePrimaryKey')->will($this->returnValue(false));
         
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class, $metadata);
+        $mapper->build();
         
         $this->assertInstanceOf('Bdf\Prime\IdGenerators\AutoincrementGenerator', $mapper->generator());
     }
@@ -164,6 +172,7 @@ class MapperTest extends TestCase
         $metadata->expects($this->any())->method('isSequencePrimaryKey')->will($this->returnValue(true));
         
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class, $metadata);
+        $mapper->build();
         
         $this->assertInstanceOf(TableGenerator::class, $mapper->generator());
     }
@@ -174,6 +183,7 @@ class MapperTest extends TestCase
     public function test_generator_defined_as_string()
     {
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
         $mapper->setGenerator(GuidGenerator::class);
         
         $this->assertInstanceOf(GuidGenerator::class, $mapper->generator());
@@ -185,6 +195,7 @@ class MapperTest extends TestCase
     public function test_set_generator()
     {
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
         $mapper->setGenerator(new \Bdf\Prime\IdGenerators\GuidGenerator($mapper));
         
         $this->assertInstanceOf(GuidGenerator::class, $mapper->generator());
@@ -198,6 +209,7 @@ class MapperTest extends TestCase
         $hydrator = new MapperHydrator();
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
         $mapper->setHydrator($hydrator);
+        $mapper->build();
 
         $this->assertSame($hydrator, $mapper->hydrator());
     }
@@ -211,6 +223,7 @@ class MapperTest extends TestCase
         $this->expectExceptionMessageMatches('/Trying to set an invalid generator/');
 
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
         $mapper->setGenerator(new TestEntity());
     }
 
@@ -222,6 +235,7 @@ class MapperTest extends TestCase
         $entity = new TestEntity();
         $mapper = new TestEntityMapper(Prime::service(), get_class($entity));
         $mapper->setHydrator($this->hydrators[$hydrator]);
+        $mapper->build();
 
         
         $mapper->setId($entity, 100);
@@ -236,6 +250,7 @@ class MapperTest extends TestCase
         $entity = new TestEntity();
         $mapper = new TestEntityMapper(Prime::service(), get_class($entity));
         $mapper->setHydrator($this->hydrators[$hydrator]);
+        $mapper->build();
 
         
         $entity->id = 99;
@@ -250,6 +265,7 @@ class MapperTest extends TestCase
         $entity = new TestEntity();
         $mapper = new TestEntityMapper(Prime::service(), get_class($entity));
         $mapper->setHydrator($this->hydrators[$hydrator]);
+        $mapper->build();
 
         
         $mapper->hydrateOne($entity, 'name', 'new name');
@@ -264,6 +280,7 @@ class MapperTest extends TestCase
         $entity = new TestEntity();
         $mapper = new TestEntityMapper(Prime::service(), get_class($entity));
         $mapper->setHydrator($this->hydrators[$hydrator]);
+        $mapper->build();
 
         
         $entity->name = 'new name';
@@ -278,6 +295,7 @@ class MapperTest extends TestCase
         $entity = new TestEntity();
         $mapper = new TestEntityMapper(Prime::service(), get_class($entity));
         $mapper->setHydrator($this->hydrators[$hydrator]);
+        $mapper->build();
 
         
         $mapper->hydrateOne($entity, 'foreign.id', 'new id');
@@ -292,6 +310,7 @@ class MapperTest extends TestCase
         $entity = new TestEntity();
         $mapper = new TestEntityMapper(Prime::service(), get_class($entity));
         $mapper->setHydrator($this->hydrators[$hydrator]);
+        $mapper->build();
 
         
         $entity->foreign->id = 'new id';
@@ -308,6 +327,7 @@ class MapperTest extends TestCase
         $entity = new TestEntity();
         $mapper = new TestEntityMapper(Prime::service(), get_class($entity));
         $mapper->setHydrator($this->hydrators[$hydrator]);
+        $mapper->build();
 
         
         $entity->id = 1;
@@ -320,6 +340,7 @@ class MapperTest extends TestCase
     public function test_instantiate()
     {
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
 
         $this->assertInstanceOf(TestEntity::class, $mapper->instantiate());
     }
@@ -339,6 +360,7 @@ class MapperTest extends TestCase
         $entity = new TestEntity($attributes);
         $mapper = new TestEntityMapper(Prime::service(), get_class($entity));
         $mapper->setHydrator($this->hydrators[$hydrator]);
+        $mapper->build();
 
         $this->assertEquals($entity, $mapper->entity($attributes));
     }
@@ -378,6 +400,7 @@ class MapperTest extends TestCase
         
         $mapper = new TestEntityMapper(Prime::service(), get_class($entity));
         $mapper->setHydrator($this->hydrators[$hydrator]);
+        $mapper->build();
 
         $data = $mapper->prepareToRepository($entity, ['id' => true]);
         
@@ -399,6 +422,7 @@ class MapperTest extends TestCase
         
         $mapper = new TestEntityMapper(Prime::service(), get_class($entity));
         $mapper->setHydrator($this->hydrators[$hydrator]);
+        $mapper->build();
 
         $data = $mapper->prepareToRepository($entity);
         
@@ -423,6 +447,7 @@ class MapperTest extends TestCase
         
         $mapper = new TestEntityMapper(Prime::service(), get_class($entity));
         $mapper->setHydrator($this->hydrators[$hydrator]);
+        $mapper->build();
 
         $data = $mapper->prepareToRepository($entity);
         
@@ -452,6 +477,7 @@ class MapperTest extends TestCase
         
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
         $mapper->setHydrator($this->hydrators[$hydrator]);
+        $mapper->build();
         $entity = $mapper->prepareFromRepository($data, Prime::connection('test')->platform());
         
         $this->assertSame(2, $entity->id, 'id');
@@ -472,6 +498,7 @@ class MapperTest extends TestCase
         
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
         $mapper->setHydrator($this->hydrators[$hydrator]);
+        $mapper->build();
         $entity = $mapper->prepareFromRepository($data, Prime::connection('test')->platform());
         
         $this->assertSame(2, $entity->id, 'id');
@@ -495,6 +522,7 @@ class MapperTest extends TestCase
 
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
         $mapper->setHydrator($this->hydrators[$hydrator]);
+        $mapper->build();
         $mapper->prepareFromRepository($data, Prime::connection('test')->platform(), $optimisation);
 
         $this->assertSame([], $optimisation['relations']['foreign.id']);

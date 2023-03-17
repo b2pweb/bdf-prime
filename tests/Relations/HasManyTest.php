@@ -8,6 +8,7 @@ use Bdf\Prime\Collection\Indexer\SingleEntityIndexer;
 use Bdf\Prime\Commit;
 use Bdf\Prime\Company;
 use Bdf\Prime\Developer;
+use Bdf\Prime\Faction;
 use Bdf\Prime\Folder;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
@@ -219,6 +220,24 @@ class HasManyTest extends TestCase
         $this->assertEquals($customer->id, $document->customerId);
         $this->assertEquals(3, $document->uploaderType);
         $this->assertFalse($customer->relation('documents')->isLoaded());
+    }
+
+    /**
+     *
+     */
+    public function test_create_with_constraints()
+    {
+        $customer = $this->getTestPack()->get('customer');
+
+        $doc = $customer
+            ->relation('documents-system')
+            ->create(['id' => 42]);
+
+        $this->assertEquals(new Document([
+            'id' => 42,
+            'customerId' => $customer->id,
+            'uploaderType' => 'system',
+        ]), $doc);
     }
 
     /**

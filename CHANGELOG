@@ -3,6 +3,19 @@ v2.1.0
 
 * Feat: Declare or override platform types using `Bdf\Prime\Configuration::addPlatformType()`
 * Change: EntityGenerator algorithm has changed : now it do not imports class from current namespace and reformat class on update
+* Feat: Handle by() with combine option on walker with KeyWalkStrategy
+* Feat: Instantiate the mapper using PSR-11 container
+    * Add `Bdf\Prime\Mapper\MapperFactoryInterface` and used it on typehint instead of the implementation `Bdf\Prime\Mapper\MapperFactory`
+    * Add `Bdf\Prime\Mapper\ContainerMapperFactory` to use the PSR-11 container as mapper factory
+    * Change: method `Mapper::build()` must be called after the mapper has been instantiated to finish the initialization.
+      This allows to configure the mapper outside of the constructor. Other parameters than ServiceLocator of the constructor are now deprecated and optional.
+* Change: Fill relation entity with constraints
+    * Affect methods `RelationInterface::create()`, `RelationInterface::add()`, `RelationInterface::saveAll()`
+
+v2.0.6
+------
+
+* Change: Compatibility with doctrine/instantiator v2.0
 
 v2.0.0
 ------
