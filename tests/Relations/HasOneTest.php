@@ -162,6 +162,22 @@ class HasOneTest extends TestCase
     {
         $customer = $this->getTestPack()->get('customer-nolocation');
 
+        $location = $customer->relation('locationWithConstraint')->create(['city' => 'home']);
+
+        $this->assertEquals(new Location([
+            'id'      => $customer->id,
+            'address' => '???',
+            'city'    => 'home',
+        ]), $location);
+    }
+
+    /**
+     *
+     */
+    public function test_create_with_constraints_should_be_filled()
+    {
+        $customer = $this->getTestPack()->get('customer-nolocation');
+
         $location = $customer->relation('location')->create(['city' => 'home']);
 
         $this->assertEquals($customer->id, $location->id);
@@ -184,6 +200,29 @@ class HasOneTest extends TestCase
         $nb = Location::where('city', 'home')->count();
 
         $this->assertEquals($customer->id, $customer->location->id);
+        $this->assertEquals(1, $nb);
+        $this->assertEquals(1, $affected);
+    }
+
+    /**
+     *
+     */
+    public function test_save_relation_with_constraints()
+    {
+        $customer = $this->getTestPack()->get('customer-nolocation');
+        $customer->locationWithConstraint = new Location([
+            'city' => 'home',
+        ]);
+
+        $affected = $customer->relation('locationWithConstraint')->saveAll();
+
+        $nb = Location::where('city', 'home')->count();
+
+        $this->assertEquals(new Location([
+            'id'      => $customer->id,
+            'address' => '???',
+            'city'    => 'home',
+        ]), $customer->locationWithConstraint);
         $this->assertEquals(1, $nb);
         $this->assertEquals(1, $affected);
     }

@@ -878,6 +878,7 @@ EOL;
                     "name" => "user-customer",
                     "packs" => null,
                     "location" => null,
+                    "locationWithConstraint" => null,
                     "documents" => null
                 ],
                 "roles" => null,
