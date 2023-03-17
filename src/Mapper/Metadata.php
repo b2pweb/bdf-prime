@@ -5,6 +5,7 @@ namespace Bdf\Prime\Mapper;
 use Bdf\Prime\Entity\Instantiator\InstantiatorInterface;
 use Bdf\Prime\Relations\Builder\RelationBuilder;
 use Bdf\Prime\Relations\Relation;
+use LogicException;
 use stdClass;
 
 /**
@@ -900,6 +901,10 @@ class Metadata
         $field = isset($meta['alias']) ? $meta['alias'] : $attributePath;
         unset($meta['alias']);
 
+        if (isset($this->fields[$field])) {
+            throw new LogicException('Alias "' . $field . '" is already in use. If you want to use the same database field on multiple properties, you can declare an event listener for the "afterLoad", "beforeInsert" and "beforeUpdate" events, using Mapper::customEvents() to manually set the value on all properties.');
+        }
+
         // TODO ne pas gerer les defaults
         $meta += [
             'primary'    => null,
@@ -919,7 +924,7 @@ class Metadata
          */
         if ($meta['primary']) {
             if ($this->primary['type'] !== self::PK_AUTO && $meta['primary'] !== self::PK_AUTO) {
-                throw new \LogicException('Trying to set a primary key');
+                throw new LogicException('Trying to set a primary key');
             }
 
             if ($meta['primary'] === self::PK_AUTO) {

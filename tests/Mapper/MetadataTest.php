@@ -214,6 +214,32 @@ class MetadataTest extends TestCase
             ],
         ], $meta->indexes());
     }
+
+    public function test_duplicated_alias()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Alias "id" is already in use.');
+
+        $mapper = new class(Prime::service(), \stdClass::class) extends Mapper {
+            public function schema(): array
+            {
+                return [
+                    'connection' => 'test',
+                    'table' => 'test_table',
+                ];
+            }
+
+            public function buildFields(FieldBuilder $builder): void
+            {
+                $builder
+                    ->integer('id')->alias('id')
+                    ->string('name')->alias('id')
+                ;
+            }
+        };
+
+        $mapper->build();
+    }
 }
 
 class TestEntityMapper extends Mapper
