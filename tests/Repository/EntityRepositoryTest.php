@@ -2,6 +2,9 @@
 
 namespace Bdf\Prime\Repository;
 
+use Bdf\Prime\Customer;
+use Bdf\Prime\CustomerCriteria;
+use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Events;
 use Bdf\Prime\Mapper\Mapper;
@@ -210,6 +213,13 @@ class EntityRepositoryTest extends TestCase
         $repository = Prime::repository('Bdf\Prime\TestEntity');
         
         $this->assertSameEntity($expected, $repository->get(['id' => 1]));
+    }
+
+    public function test_criteria()
+    {
+        $this->assertEquals(new Criteria(), Prime::repository(TestEntity::class)->criteria());
+        $this->assertEquals(new CustomerCriteria(), Prime::repository(Customer::class)->criteria());
+        $this->assertEquals(new CustomerCriteria(['id' => 5]), Prime::repository(Customer::class)->criteria(['id' => 5]));
     }
     
     /**

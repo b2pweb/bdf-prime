@@ -170,7 +170,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function criteria(array $criteria = []): Criteria
     {
-        return new Criteria($criteria);
+        return $this->mapper->criteria($criteria);
     }
 
     /**

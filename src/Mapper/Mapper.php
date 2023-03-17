@@ -4,6 +4,7 @@ namespace Bdf\Prime\Mapper;
 
 use Bdf\Prime\Behaviors\BehaviorInterface;
 use Bdf\Prime\Cache\CacheInterface;
+use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
 use Bdf\Prime\Entity\Hydrator\MapperHydratorInterface;
 use Bdf\Prime\Entity\ImportableInterface;
@@ -26,6 +27,8 @@ use Bdf\Serializer\PropertyAccessor\PropertyAccessorInterface;
 use Bdf\Serializer\PropertyAccessor\ReflectionAccessor;
 use LogicException;
 use stdClass;
+
+use function class_exists;
 
 /**
  * Mapper
@@ -84,6 +87,14 @@ abstract class Mapper
      * @var class-string<PropertyAccessorInterface>
      */
     private $propertyAccessorClass = ReflectionAccessor::class;
+
+    /**
+     * Class of the criteria to use
+     * If null, the class will be resolved from the entity class with the suffix "Criteria" if exists
+     *
+     * @var class-string<Criteria>|null
+     */
+    private ?string $criteriaClass = null;
 
     /**
      * Set repository read only.
@@ -361,6 +372,17 @@ abstract class Mapper
     }
 
     /**
+     * Define the criteria class
+     * By default, it is the entity class with "Criteria" suffix if exists, else base Criteria class
+     *
+     * @param class-string<Criteria> $className
+     */
+    final public function setCriteriaClass(string $className): void
+    {
+        $this->criteriaClass = $className;
+    }
+
+    /**
      * Set ID value en entity
      * Only sequenceable attribute is set (the first one)
      *
@@ -516,6 +538,25 @@ abstract class Mapper
         $className = $this->repositoryClass;
 
         return new $className($this, $this->serviceLocator, $this->resultCache === false ? null : $this->resultCache);
+    }
+
+    /**
+     * Create a criteria object for this entity
+     *
+     * @param array<string, mixed> $filters
+     *
+     * @return Criteria
+     */
+    public function criteria(array $filters = []): Criteria
+    {
+        $class = $this->criteriaClass;
+
+        if (!$class) {
+            $class = $this->entityClass . 'Criteria';
+            $this->criteriaClass = $class = class_exists($class) ? $class : Criteria::class;
+        }
+
+        return new $class($filters);
     }
 
     /**
