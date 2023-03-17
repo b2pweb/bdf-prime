@@ -4,6 +4,11 @@ v2.1.0
 * Feat: Declare or override platform types using `Bdf\Prime\Configuration::addPlatformType()`
 * Change: EntityGenerator algorithm has changed : now it do not imports class from current namespace and reformat class on update
 
+v2.0.6
+------
+
+* Change: Compatibility with doctrine/instantiator v2.0
+
 v2.0.0
 ------
 
