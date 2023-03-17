@@ -1610,4 +1610,22 @@ class QueryTest extends TestCase
             $query->toSql()
         );
     }
+
+    public function test_whereReplace()
+    {
+        $query = $this->query()->whereReplace('id', 1);
+
+        $this->assertEquals('SELECT * FROM test_ WHERE id = 1', $query->toRawSql());
+        $this->assertEquals('SELECT * FROM test_ WHERE id = 3', $query->whereReplace('id', 3)->toRawSql());
+        $this->assertEquals('SELECT * FROM test_ WHERE id = 3 AND id < 42', $query->whereReplace('id', '<', 42)->toRawSql());
+        $this->assertEquals('SELECT * FROM test_ WHERE id = 3 AND id < 42 AND raw clause', $query->whereRaw('raw clause')->toRawSql());
+    }
+
+    public function test_whereReplace_null()
+    {
+        $query = $this->query()->whereReplace('id', null);
+
+        $this->assertEquals('SELECT * FROM test_ WHERE id IS NULL', $query->toRawSql());
+        $this->assertEquals('SELECT * FROM test_ WHERE id = 42', $query->whereReplace('id', 42)->toRawSql());
+    }
 }
