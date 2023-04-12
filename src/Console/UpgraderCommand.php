@@ -111,13 +111,6 @@ class UpgraderCommand extends Command
 
             $io->line("<comment>{$className}</comment> <info>needs upgrade</info>");
 
-            if ($migration) {
-                $migrationQueries = $schema->queries($useDrop);
-
-                $upQueries = array_merge_recursive($upQueries, $migrationQueries['up']);
-                $downQueries = array_merge_recursive($downQueries, $migrationQueries['down']);
-            }
-
             foreach ($queries as $query) {
                 $nbWarning++;
 
@@ -134,6 +127,11 @@ class UpgraderCommand extends Command
                 } catch (\Throwable $e) {
                     $io->alert($e->getMessage());
                 }
+            } elseif ($migration) {
+                $migrationQueries = $schema->queries($useDrop);
+
+                $upQueries = array_merge_recursive($upQueries, $migrationQueries['up']);
+                $downQueries = array_merge_recursive($downQueries, $migrationQueries['down']);
             }
 
             $io->newLine();
