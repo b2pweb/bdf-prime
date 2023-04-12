@@ -85,13 +85,15 @@ class MigrationManager
      *
      * @param string $name
      * @param string $stage
+     * @param array<string, list<mixed>> $upQueries The queries to execute on up, indexed by connection name
+     * @param array<string, list<mixed>> $downQueries The queries to execute on up, indexed by connection name
      *
      * @return string
      * @throws PrimeException
      */
-    public function createMigration(string $name, string $stage): string
+    public function createMigration(string $name, string $stage, array $upQueries = [], array $downQueries = []): string
     {
-        $path = $this->provider->create($this->repository->newIdentifier(), $name, $stage);
+        $path = $this->provider->create($this->repository->newIdentifier(), $name, $stage, $upQueries, $downQueries);
         $this->provider->import(); // Refresh migration list
 
         return $path;

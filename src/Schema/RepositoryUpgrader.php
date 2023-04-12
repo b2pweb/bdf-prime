@@ -92,6 +92,45 @@ class RepositoryUpgrader implements StructureUpgraderInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function queries(bool $listDrop = true): array
+    {
+        $queries = [];
+
+        $simulation = $this->schema()
+            ->generateRollback()
+            ->simulate(function (SchemaManagerInterface $schema) use ($listDrop) {
+                $schema->useDrop($listDrop);
+                $schema->add($this->table());
+            })
+        ;
+
+        $queries['up'][$this->metadata->connection] = $simulation->pending();
+        $queries['down'][$this->metadata->connection] = $simulation->rollbackQueries();
+
+        if (($schemaSequence = $this->schemaSequence()) === null) {
+            return $queries;
+        }
+
+        $sequenceSimulation = $schemaSequence
+            ->generateRollback()
+            ->simulate(function (SchemaManagerInterface $schema) use ($listDrop) {
+                $schema->useDrop($listDrop);
+                $schema->add($this->sequence());
+            })
+        ;
+
+        $queries['up'][$this->metadata->sequence['connection']] ??= [];
+        $queries['down'][$this->metadata->sequence['connection']] ??= [];
+
+        array_push($queries['up'][$this->metadata->sequence['connection']], ...$sequenceSimulation->pending());
+        array_push($queries['down'][$this->metadata->sequence['connection']], ...$sequenceSimulation->rollbackQueries());
+
+        return $queries;
+    }
+
+    /**
      * Create table schema from meta
      *
      * @param bool $foreignKeys Add foreign key constraints to the schema ?

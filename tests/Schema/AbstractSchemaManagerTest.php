@@ -165,12 +165,20 @@ class AbstractSchemaManagerTest extends TestCase
     public function test_change_table()
     {
         $schema = $this->schema->simulate();
+        $schema->generateRollback();
 
         $schema->change('test_', function(TypesHelperTableBuilder $table) {
             $table->text('new');
         });
         
         $this->assertEquals(['ALTER TABLE test_ ADD COLUMN new CLOB NOT NULL'], $schema->toSql());
+        $this->assertEquals([
+            'CREATE TEMPORARY TABLE __temp__test_ AS SELECT id, name, foreign_key, date_insert FROM test_',
+            'DROP TABLE test_',
+            'CREATE TABLE test_ (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(255) NOT NULL, foreign_key INTEGER DEFAULT NULL, date_insert DATETIME DEFAULT NULL)',
+            'INSERT INTO test_ (id, name, foreign_key, date_insert) SELECT id, name, foreign_key, date_insert FROM __temp__test_',
+            'DROP TABLE __temp__test_',
+        ], $schema->rollbackQueries());
     }
 
     /**
@@ -237,6 +245,7 @@ class AbstractSchemaManagerTest extends TestCase
     public function test_add_unknown_table()
     {
         $manager = $this->schema->simulate();
+        $manager->generateRollback();
 
         $manager->add(new Table(
             'unknown_table_',
@@ -247,6 +256,7 @@ class AbstractSchemaManagerTest extends TestCase
         $this->assertEquals([
             'CREATE TABLE unknown_table_ (col_ VARCHAR(32) NOT NULL)'
         ], $manager->pending());
+        $this->assertEquals(['DROP TABLE unknown_table_'], $manager->rollbackQueries());
     }
 
     /**
@@ -263,10 +273,12 @@ class AbstractSchemaManagerTest extends TestCase
         $this->schema->add($table);
 
         $manager = $this->schema->simulate();
+        $manager->generateRollback();
 
         $manager->add($table);
 
         $this->assertEmpty($manager->pending());
+        $this->assertEmpty($manager->rollbackQueries());
     }
 
     /**
@@ -283,6 +295,7 @@ class AbstractSchemaManagerTest extends TestCase
         $this->schema->add($table);
 
         $manager = $this->schema->simulate();
+        $manager->generateRollback();
 
         $table = new Table(
             'unknown_table_',
@@ -296,6 +309,13 @@ class AbstractSchemaManagerTest extends TestCase
         $manager->add($table);
 
         $this->assertEquals(['ALTER TABLE unknown_table_ ADD COLUMN col2_ VARCHAR(32) NOT NULL'], $manager->pending());
+        $this->assertEquals([
+            'CREATE TEMPORARY TABLE __temp__unknown_table_ AS SELECT col_ FROM unknown_table_',
+            'DROP TABLE unknown_table_',
+            'CREATE TABLE unknown_table_ (col_ VARCHAR(32) NOT NULL)',
+            'INSERT INTO unknown_table_ (col_) SELECT col_ FROM __temp__unknown_table_',
+            'DROP TABLE __temp__unknown_table_',
+        ], $manager->rollbackQueries());
     }
 
     /**
@@ -313,5 +333,24 @@ class AbstractSchemaManagerTest extends TestCase
         });
 
         $this->assertEquals(['CREATE TABLE new_table_ (id_ BIGINT NOT NULL, name_ VARCHAR(32) NOT NULL, PRIMARY KEY(id_))'], $manager->pending());
+    }
+
+    /**
+     *
+     */
+    public function test_table_with_rollback_option()
+    {
+        $manager = $this->schema->simulate();
+        $manager->generateRollback();
+
+        $manager->table('new_table_', function (TypesHelperTableBuilder $builder) {
+            $builder
+                ->bigint('id_')->primary()
+                ->string('name_', 32)
+            ;
+        });
+
+        $this->assertEquals(['CREATE TABLE new_table_ (id_ BIGINT NOT NULL, name_ VARCHAR(32) NOT NULL, PRIMARY KEY(id_))'], $manager->pending());
+        $this->assertEquals(['DROP TABLE new_table_'], $manager->rollbackQueries());
     }
 }

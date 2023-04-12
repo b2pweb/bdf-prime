@@ -160,6 +160,51 @@ class ResolverTest extends TestCase
     /**
      *
      */
+    public function test_functional_queries_table_not_present()
+    {
+        $resolver = Customer::repository()->schema();
+        $resolver->drop();
+
+        $this->assertEquals([
+            'up' => [
+                'test' => [
+                    'CREATE TABLE customer_ (id_ BIGINT NOT NULL, parent_id BIGINT DEFAULT NULL, name_ VARCHAR(255) NOT NULL, PRIMARY KEY(id_))',
+                    'CREATE TABLE customer_seq_ (id BIGINT NOT NULL, PRIMARY KEY(id))',
+                ]
+            ],
+            'down' => [
+                'test' => [
+                    'DROP TABLE customer_',
+                    'DROP TABLE customer_seq_',
+                ]
+            ]
+        ], $resolver->queries());
+    }
+
+    /**
+     *
+     */
+    public function test_functional_queries_without_sequence()
+    {
+        $resolver = User::repository()->schema();
+
+        $this->assertEquals([
+            'up' => [
+                'test' => [
+                    'CREATE TABLE user_ (id_ BIGINT NOT NULL, name_ VARCHAR(255) NOT NULL, roles_ CLOB NOT NULL, customer_id BIGINT NOT NULL, faction_id BIGINT DEFAULT NULL, PRIMARY KEY(id_))',
+                ]
+            ],
+            'down' => [
+                'test' => [
+                    'DROP TABLE user_',
+                ]
+            ]
+        ], $resolver->queries());
+    }
+
+    /**
+     *
+     */
     public function test_functional_migrate_with_cross_connection_sequence()
     {
         $this->prime()->connections()->declareConnection('sequence', [

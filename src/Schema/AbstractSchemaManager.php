@@ -10,6 +10,9 @@ use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Schema\Builder\TableBuilder;
 use Bdf\Prime\Schema\Builder\TypesHelperTableBuilder;
+use Bdf\Prime\Schema\Manager\DatabaseManagerInterface;
+use Bdf\Prime\Schema\Manager\DatabaseStructureManagerInterface;
+use Bdf\Prime\Schema\Manager\TableManagerInterface;
 use Doctrine\DBAL\Exception as DoctrineDBALException;
 
 /**
@@ -25,29 +28,34 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
      *
      * @var C
      */
-    protected $connection;
+    protected ConnectionInterface $connection;
 
     /**
      * The connection platform.
-     *
-     * @var PlatformInterface
      */
-    protected $platform;
+    protected PlatformInterface $platform;
 
     /**
      * The use drop flag. Allows builder to use drop command on diff
-     *
-     * @var bool
      */
-    protected $useDrop = true;
+    protected bool $useDrop = true;
 
     /**
      * The auto flush flag. Allows builder execute query
      *
-     * @var bool
      * @internal
      */
-    protected $autoFlush = true;
+    protected bool $autoFlush = true;
+
+    /**
+     * Generate the rollback query on each change pushed
+     */
+    protected bool $generateRollback = false;
+
+    /**
+     * @var list<mixed> The queries generated for rollback the last migration
+     */
+    protected array $rollbackQueries = [];
 
 
     /**
@@ -76,6 +84,16 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     public function useDrop(bool $flag = true)
     {
         $this->useDrop = $flag;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generateRollback(bool $enable = true)
+    {
+        $this->generateRollback = $enable;
 
         return $this;
     }
@@ -126,12 +144,18 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     public function add($structure)
     {
         if ($this->has($structure->name())) {
-            return $this->push(
-                $this->diff($structure, $this->load($structure->name()))
-            );
+            $current = $this->load($structure->name());
+
+            return $this
+                ->pushRollback(fn (self $schema) => $schema->diff($current, $structure))
+                ->push($this->diff($structure, $current))
+            ;
         }
 
-        return $this->push($this->schema($structure));
+        return $this
+            ->pushRollback(fn (self $schema) => $schema->drop($structure->name()))
+            ->push($this->schema($structure))
+        ;
     }
 
     /**
@@ -149,9 +173,12 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
             )
         );
 
-        return $this->push(
-            $this->diff($builder->build(), $table)
-        );
+        $newTable = $builder->build();
+
+        return $this
+            ->pushRollback(fn (self $schema) => $schema->diff($table, $newTable))
+            ->push($this->diff($newTable, $table))
+        ;
     }
 
     /**
@@ -210,5 +237,37 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     public function isBuffered(): bool
     {
         return !$this->autoFlush;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function rollbackQueries(): array
+    {
+        return $this->rollbackQueries;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function pushRollback($queries)
+    {
+        if (!$this->generateRollback) {
+            return $this;
+        }
+
+        $schema = $this->simulate()->generateRollback(false)->useDrop();
+
+        if (is_callable($queries)) {
+            $queries = $queries($schema);
+        }
+
+        if ($queries && $queries !== $schema) {
+            $schema->push($queries);
+        }
+
+        array_push($this->rollbackQueries, ...$schema->pending());
+
+        return $this;
     }
 }

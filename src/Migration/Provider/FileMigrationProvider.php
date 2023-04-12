@@ -65,7 +65,7 @@ class FileMigrationProvider implements MigrationProviderInterface
      * @throws InvalidArgumentException  If path is not writable
      * @throws RuntimeException
      */
-    public function create(string $version, string $name, string $stage = MigrationInterface::STAGE_DEFAULT): string
+    public function create(string $version, string $name, string $stage = MigrationInterface::STAGE_DEFAULT, array $upQueries = [], array $downQueries = []): string
     {
         $name = $this->normalizeName($name);
 
@@ -92,8 +92,11 @@ class FileMigrationProvider implements MigrationProviderInterface
             : file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'migration-staged.stub')
         ;
 
+        $up = $this->generateQueryCalls($upQueries);
+        $down = $this->generateQueryCalls($downQueries);
+
         // Try to write the migration file
-        if (!file_put_contents($path, str_replace(['{className}', '{version}', '{stage}'], [$name, $version, $stage], $content))) {
+        if (!file_put_contents($path, str_replace(['{className}', '{version}', '{stage}', '{up}', '{down}'], [$name, $version, $stage, $up, $down], $content))) {
             throw new RuntimeException(sprintf(
                 'The file "%s" could not be written to',
                 $path
@@ -249,5 +252,24 @@ class FileMigrationProvider implements MigrationProviderInterface
         $name = ucwords($name);
 
         return str_replace(' ', '', $name);
+    }
+
+    /**
+     * @param array<string, list<string>> $queries Queries indexed by connection name
+     * @return string
+     */
+    private function generateQueryCalls(array $queries): string
+    {
+        $calls = '';
+        foreach ($queries as $connection => $connectionQueries) {
+            $connection = var_export($connection, true);
+
+            foreach ($connectionQueries as $query) {
+                $query = var_export($query, true);
+                $calls .= "\n        \$this->update($query, [], $connection);";
+            }
+        }
+
+        return $calls;
     }
 }

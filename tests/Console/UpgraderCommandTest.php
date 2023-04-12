@@ -8,6 +8,10 @@ require_once __DIR__.'/UpgradeModels/PersonMapper.php';
 require_once __DIR__.'/UpgradeModels/Person.php';
 
 use Bdf\Prime\Console\UpgraderCommand;
+use Bdf\Prime\Migration\MigrationManager;
+use Bdf\Prime\Migration\Provider\FileMigrationProvider;
+use Bdf\Prime\Migration\Provider\MigrationFactory;
+use Bdf\Prime\Migration\Version\DbVersionRepository;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Schema\Builder\TypesHelperTableBuilder;
 use Composer\InstalledVersions;
@@ -15,20 +19,30 @@ use Console\UpgradeModels\Address;
 use Console\UpgradeModels\Person;
 use PackageVersions\Installer;
 use PHPUnit\Framework\TestCase;
+use Psr\Container\ContainerInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Filesystem\Filesystem;
 
 class UpgraderCommandTest extends TestCase
 {
     use PrimeTestCase;
 
-    /** @var UpgraderCommand */
-    protected $command;
+    private const MIGRATION_PATH = __DIR__ . '/_tmp';
+
+    private UpgraderCommand $command;
+    private MigrationManager $migrationManager;
 
     protected function setUp(): void
     {
         $this->primeStart();
 
         $this->command = new UpgraderCommand($this->prime());
+        $this->migrationManager = new MigrationManager(
+            new DbVersionRepository($this->prime()->connection('test'), 'migration'),
+            new FileMigrationProvider(new MigrationFactory($this->createMock(ContainerInterface::class)), self::MIGRATION_PATH)
+        );
+
+        mkdir(self::MIGRATION_PATH, 0777, true);
     }
 
     /**
@@ -37,6 +51,7 @@ class UpgraderCommandTest extends TestCase
     protected function tearDown(): void
     {
         $this->primeReset();
+        (new Filesystem())->remove(self::MIGRATION_PATH);
     }
 
     /**
@@ -112,6 +127,143 @@ Found 0 upgrade(s)
 OUT
  , $tester
 );
+    }
+
+    /**
+     *
+     */
+    public function test_execute_migration_not_available()
+    {
+        Person::repository()->schema()->migrate();
+        Address::repository()->schema()->migrate();
+
+        $tester = new CommandTester($this->command);
+        $tester->execute(['path' => __DIR__.'/UpgradeModels', '--migration' => 'foo']);
+
+        $this->assertStringContainsString('[ERROR] Migration manager is not configured', $tester->getDisplay(true));
+    }
+
+    /**
+     *
+     */
+    public function test_execute_migration_and_execute_options_are_not_compatible()
+    {
+        Person::repository()->schema()->migrate();
+        Address::repository()->schema()->migrate();
+
+        $this->command = new UpgraderCommand($this->prime(), $this->migrationManager);
+
+        $tester = new CommandTester($this->command);
+        $tester->execute(['path' => __DIR__.'/UpgradeModels', '--migration' => 'foo', '--execute' => true]);
+
+        $this->assertStringContainsString('[ERROR] Cannot use --migration option with --execute option', $tester->getDisplay(true));
+    }
+
+    /**
+     *
+     */
+    public function test_execute_migration_without_change_should_do_nothing()
+    {
+        Person::repository()->schema()->migrate();
+        Address::repository()->schema()->migrate();
+
+        $this->command = new UpgraderCommand($this->prime(), $this->migrationManager);
+
+        $tester = new CommandTester($this->command);
+        $tester->execute(['path' => __DIR__.'/UpgradeModels', '--migration' => 'foo']);
+
+        $this->assertStringContainsString('[WARNING] Migration not created, no queries found', $tester->getDisplay(true));
+        $this->assertEmpty(glob(self::MIGRATION_PATH.'/*.php'));
+    }
+
+    /**
+     *
+     */
+    public function test_execute_migration_should_be_generated()
+    {
+        Person::repository()->schema()->migrate();
+
+        $this->command = new UpgraderCommand($this->prime(), $this->migrationManager);
+
+        $tester = new CommandTester($this->command);
+        $tester->execute(['path' => __DIR__.'/UpgradeModels', '--migration' => 'foo']);
+
+        $this->assertStringContainsString('Found 1 upgrade(s)', $tester->getDisplay(true));
+        $files = glob(self::MIGRATION_PATH.'/*.php');
+
+        $this->assertNotEmpty($files);
+        $this->assertStringEndsWith('Foo.php', $files[0]);
+
+        $this->assertEquals(<<<'PHP'
+<?php
+
+use Bdf\Prime\Migration\Migration;
+
+/**
+ * Foo
+ */
+class Foo extends Migration
+{
+    /**
+     * Initialize the migration
+     */
+    public function initialize(): void
+    {
+    }
+
+    /**
+     * Do the migration
+     */
+    public function up(): void
+    {
+        $this->update('CREATE TABLE address (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, street VARCHAR(255) NOT NULL, number INTEGER NOT NULL, city VARCHAR(255) NOT NULL, zipCode VARCHAR(255) NOT NULL, country VARCHAR(255) NOT NULL)', [], 'test');
+    }
+
+    /**
+     * Undo the migration
+     */
+    public function down(): void
+    {
+        $this->update('DROP TABLE address', [], 'test');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function stage(): string
+    {
+        return 'prepare';
+    }
+}
+
+PHP, file_get_contents($files[0])
+        );
+    }
+
+    /**
+     *
+     */
+    public function test_execute_migration_with_multiple_entities_should_be_generated()
+    {
+        $this->command = new UpgraderCommand($this->prime(), $this->migrationManager);
+
+        $tester = new CommandTester($this->command);
+        $tester->execute(['path' => __DIR__.'/UpgradeModels', '--migration' => 'foo']);
+
+        $this->assertStringContainsString('Found 2 upgrade(s)', $tester->getDisplay(true));
+        $files = glob(self::MIGRATION_PATH.'/*.php');
+
+        $this->assertNotEmpty($files);
+        $this->assertStringEndsWith('Foo.php', $files[0]);
+
+        $content = file_get_contents($files[0]);
+
+        // Order is not guaranteed, so we simply check that the queries are present without checking the order
+        $this->assertStringContainsString("\$this->update('CREATE TABLE address (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, street VARCHAR(255) NOT NULL, number INTEGER NOT NULL, city VARCHAR(255) NOT NULL, zipCode VARCHAR(255) NOT NULL, country VARCHAR(255) NOT NULL)', [], 'test');", $content);
+        $this->assertStringContainsString("\$this->update('CREATE TABLE person (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, firstName VARCHAR(255) NOT NULL, lastName VARCHAR(255) NOT NULL, address_id INTEGER NOT NULL)', [], 'test');", $content);
+
+        $this->assertStringContainsString("\$this->update('DROP TABLE address', [], 'test');", $content);
+        $this->assertStringContainsString("\$this->update('DROP TABLE person', [], 'test');", $content);
     }
 
     /**
