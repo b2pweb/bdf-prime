@@ -26,9 +26,13 @@
     <testsuite name="All Test Suite">
       <directory suffix="Test.php">tests</directory>
       <exclude>tests/Php74</exclude>
+      <exclude>tests/Php80</exclude>
     </testsuite>
     <testsuite name="PHP 7.4 compatiblity">
       <directory suffix="Test.php" phpVersion="7.4.0" phpVersionOperator="&gt;=">tests/Php74</directory>
+    </testsuite>
+    <testsuite name="PHP 8.0 compatiblity">
+      <directory suffix="Test.php" phpVersion="8.0.0" phpVersionOperator="&gt;=">tests/Php80</directory>
     </testsuite>
   </testsuites>
 </phpunit>

@@ -61,6 +61,15 @@ class Query
                 })
                 ->get('123')
         );
+        $this->checkPerson(
+            Person::repository()
+                ->filter(fn (Person $person) => $person->getFirstName() === 'John' || $person->getLastName() === 'Doe')
+                ->get('123')
+        );
+        $this->checkPerson(
+            Person::filter(fn (Person $person) => $person->getFirstName() === 'John' || $person->getLastName() === 'Doe')
+                ->get('123')
+        );
     }
 
     public function collection(): void

@@ -37,6 +37,8 @@ use Bdf\Serializer\Metadata\Builder\ClassMetadataBuilder;
  * @psalm-method static EntityQuery with(string|array $relations)
  * @method static QueryInterface by(string $attribute, bool $combine = false)
  * @psalm-method static EntityQuery by(string $attribute, bool $combine = false)
+ * @method static QueryInterface filter(\Closure $filter)
+ * @psalm-method static EntityQuery filter(\Closure $filter)
  *
  * @method static int updateBy(array $attributes, array $criteria = [])
  * @method static int count(array $criteria = [], $attributes = null)

@@ -18,6 +18,7 @@ use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
+use Bdf\Prime\Query\Closure\ClosureCompiler;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\QueryInterface;
@@ -54,6 +55,7 @@ use Exception;
  * @method E|null get(mixed $key)
  * @method E getOrFail(mixed $key)
  * @method E getOrNew(mixed $key)
+ * @method QueryInterface<ConnectionInterface, E> filter(Closure $filter)
  */
 class EntityRepository implements RepositoryInterface, EventSubscriber, ConnectionClosedListenerInterface, RepositoryEventsSubscriberInterface
 {
