@@ -129,7 +129,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
         $this->serviceLocator = $serviceLocator;
 
         $this->collectionFactory = CollectionFactory::forRepository($this);
-        $this->queries = new RepositoryQueryFactory($this, $cache);
+        $this->queries = new RepositoryQueryFactory($this, $cache, $serviceLocator->mappers()->getMetadataCache());
         $this->writer = new Writer($this, $serviceLocator);
 
         $this->mapper->events($this);
@@ -1072,7 +1072,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
         }
 
         // Reset queries
-        $this->queries = new RepositoryQueryFactory($this, $this->resultCache);
+        $this->queries = new RepositoryQueryFactory($this, $this->resultCache, $this->serviceLocator->mappers()->getMetadataCache());
         $this->writer = new Writer($this, $this->serviceLocator);
         $this->relations = []; // Relation may contains inner query : it must be reseted
 
