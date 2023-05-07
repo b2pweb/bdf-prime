@@ -16,6 +16,7 @@ use Bdf\Prime\Test\RepositoryAssertion;
 use Bdf\Prime\TestEntity;
 use Bdf\Prime\TestEmbeddedEntity;
 use PHPUnit\Framework\TestCase;
+use Psr\SimpleCache\CacheInterface;
 
 /**
  *
@@ -741,6 +742,22 @@ class EntityRepositoryTest extends TestCase
         $this->assertEquals('SELECT t0.* FROM test_ t0 WHERE t0.id >= 1 AND t0.id <= 10', $query->toRawSql());
 
         $this->assertEquals([$this->getTestPack()->get('entity')], iterator_to_array($query));
+    }
+
+    public function test_queries_should_have_metadataCache()
+    {
+        // Reset prime
+        $this->unsetPrime();
+        $this->configurePrime();
+
+        $cache = $this->createMock(CacheInterface::class);
+        $this->prime()->mappers()->setMetadataCache($cache);
+
+        $queries = TestEntity::repository()->queries();
+        $r = new \ReflectionProperty($queries, 'metadataCache');
+        $r->setAccessible(true);
+
+        $this->assertSame($cache, $r->getValue($queries));
     }
 }
 
