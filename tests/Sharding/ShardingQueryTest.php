@@ -5,6 +5,7 @@ namespace Bdf\Prime\Sharding;
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Schema\Builder\TypesHelperTableBuilder;
+use Doctrine\DBAL\Logging\DebugStack;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -147,6 +148,34 @@ class ShardingQueryTest extends TestCase
         $this->assertSame(1, $this->query()->pickShard(2)->count());
         $this->assertSame(1, $this->connection->getShardConnection('shard1')->from('test')->count());
         $this->assertSame(0, $this->connection->getShardConnection('shard2')->from('test')->count());
+    }
+
+    public function test_update_should_use_where_to_pick_shard()
+    {
+        $this->connection->getConfiguration()->setSQLLogger($logger = new DebugStack());
+
+        $this->query()->insert(['id' => 1, 'name' => 'John']);
+        $this->query()->insert(['id' => 2, 'name' => 'Mike']);
+
+        $this->assertCount(2, $logger->queries);
+
+        $this->query()->where('id', 1)->update(['name' => 'Jean']);
+        $this->assertCount(3, $logger->queries);
+
+        $this->assertSame('Jean', $this->query()->pickShard(1)->first()['name']);
+    }
+
+    public function test_update_should_priorize_data_to_where()
+    {
+        $this->query()->insert(['id' => 1, 'name' => 'John']);
+        $this->query()->insert(['id' => 2, 'name' => 'Mike']);
+
+        $this->query()->where('id', 1)->update(['id' => 4]);
+
+        $this->assertEquals([
+            ['id' => 2, 'name' => 'Mike'],
+            ['id' => 1, 'name' => 'John'],
+        ], $this->query()->all());
     }
 
     /**

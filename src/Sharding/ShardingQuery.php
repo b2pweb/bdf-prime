@@ -54,9 +54,16 @@ class ShardingQuery extends Query
         try {
             $distributionKey = $this->connection->getDistributionKey();
 
-            if (!$this->shardId && isset($this->statements['values']['data'][$distributionKey])) {
+            if ($this->shardId) {
+                $this->connection->useShard($this->shardId);
+            } elseif (isset($this->statements['values']['data'][$distributionKey])) {
                 $this->connection->pickShard($this->statements['values']['data'][$distributionKey]);
+            } elseif ($this->statements['where']) {
+                $this->explodeQueryClauses($this->statements['where'], $distributionKey);
             } else {
+                // To keep the old behavior : use $this->shardId instead of null constant
+                // because falsy comparison is used instead of strict null comparison, so $this->shardId can be 0 or "0"
+                // which has a different meaning than null
                 $this->connection->useShard($this->shardId);
             }
 
