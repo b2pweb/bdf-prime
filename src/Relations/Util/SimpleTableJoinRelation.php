@@ -39,11 +39,6 @@ trait SimpleTableJoinRelation
      */
     public function join(EntityJoinable $query, string $alias): void
     {
-        // @fixme ?
-//        if ($alias === null) {
-//            $alias = $this->attributeAim;
-//        }
-
         $query->joinEntity(
             $this->distant->entityName(),
             function (JoinClause $clause) use ($alias, $query) {

@@ -63,11 +63,6 @@ abstract class OneOrMany extends Relation
      */
     public function join(EntityJoinable $query, string $alias): void
     {
-        // @fixme ?
-//        if ($alias === null) {
-//            $alias = $this->attributeAim;
-//        }
-
         $query->joinEntity($this->distant->entityName(), $this->distantKey, $this->getLocalAlias($query).$this->localKey, $alias);
 
         // apply relation constraints

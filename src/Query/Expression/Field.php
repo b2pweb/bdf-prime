@@ -3,7 +3,6 @@
 namespace Bdf\Prime\Query\Expression;
 
 use Bdf\Prime\Query\CompilableClause;
-use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 
 /**
@@ -48,10 +47,7 @@ class Field implements ExpressionInterface
      */
     public function build(CompilableClause $query, object $compiler)
     {
-//        if ($compiler->platform()->name() === 'mysql') {
+        // @todo only mysql ?
         return 'FIELD('.$compiler->quoteIdentifier($query, $query->preprocessor()->field($this->search)).','.implode(',', $this->values).')';
-//        }
-//
-//        return '';
     }
 }

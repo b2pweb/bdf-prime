@@ -44,11 +44,11 @@ class Graphviz extends AbstractVisitor
         $this->output .= 'graph [fontname="helvetica", fontsize=12];' . "\n";
         $this->output .= 'node [fontname="helvetica", fontsize=12];' . "\n";
         $this->output .= 'edge [fontname="helvetica", fontsize=12];' . "\n";
-//        $this->output .= 'splines = true;' . "\n";
-//        $this->output .= 'overlap = false;' . "\n";
-//        $this->output .= 'outputorder=edgesfirst;'."\n";
-//        $this->output .= 'mindist = 0.6;' . "\n";
-//        $this->output .= 'sep = .2;' . "\n";
+        //$this->output .= 'splines = true;' . "\n";
+        //$this->output .= 'overlap = false;' . "\n";
+        //$this->output .= 'outputorder=edgesfirst;'."\n";
+        //$this->output .= 'mindist = 0.6;' . "\n";
+        //$this->output .= 'sep = .2;' . "\n";
     }
 
     /**

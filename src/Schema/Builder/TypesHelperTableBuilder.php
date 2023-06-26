@@ -352,12 +352,12 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
      *
      * @return $this
      */
-//    public function enum($name, array $allowed)
-//    {
-//        $this->addTypeAsString($name, 'enum', ['allowed' => $allowed]);
-//
-//        return $this;
-//    }
+    //public function enum($name, array $allowed)
+    //{
+    //    $this->addTypeAsString($name, 'enum', ['allowed' => $allowed]);
+    //
+    //    return $this;
+    //}
 
     /**
      * {@inheritdoc}

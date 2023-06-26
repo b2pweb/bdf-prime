@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Migration\Console;
 
 use Bdf\Util\Console\BdfStyle;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -10,6 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class RedoCommand
  */
+#[AsCommand('prime:migration:redo', 'Redo a specific migration')]
 class RedoCommand extends AbstractCommand
 {
     protected static $defaultName = 'prime:migration:redo';
