@@ -4,6 +4,7 @@ namespace Bdf\Prime\Migration\Console;
 
 use Bdf\Prime\Migration\MigrationInterface;
 use Bdf\Util\Console\BdfStyle;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,6 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class MigrateCommand
  */
+#[AsCommand('prime:migration:migrate', 'Run all migrations')]
 class MigrateCommand extends AbstractCommand
 {
     protected static $defaultName = 'prime:migration:migrate';

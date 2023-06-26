@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Migration\Console;
 
 use Bdf\Util\Console\BdfStyle;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -11,6 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * CheckCommand
  */
+#[AsCommand('prime:migration:check', 'Check all migrations have been run, exit with non-zero if not')]
 class CheckCommand extends AbstractCommand
 {
     protected static $defaultName = 'prime:migration:check';

@@ -2,12 +2,14 @@
 
 namespace Bdf\Prime\Migration\Console;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Class InitCommand
  */
+#[AsCommand('prime:migration:init', 'Initialise this directory for use with migration')]
 class InitCommand extends AbstractCommand
 {
     protected static $defaultName = 'prime:migration:init';
