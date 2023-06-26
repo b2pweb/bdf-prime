@@ -25,7 +25,7 @@ interface RelationInterface
     public const BY_INHERITANCE    = 'byInheritance';
     public const MORPH_TO          = 'morphTo';
     public const CUSTOM            = 'custom';
-//    const MORPH_TO_MANY     = 'morphToMany';
+    //const MORPH_TO_MANY     = 'morphToMany';
 
     /**
      * Get the relation repository.

@@ -164,11 +164,6 @@ class BelongsToMany extends Relation
      */
     public function join(EntityJoinable $query, string $alias): void
     {
-        // @fixme ??
-//        if ($alias === null) {
-//            $alias = $this->attributeAim;
-//        }
-
         // TODO rechercher l'alias de through dans les tables alias du query builder
 
         $query->joinEntity($this->through->entityName(), $this->throughLocal, $this->getLocalAlias($query).$this->localKey, $this->attributeAim.'Through');

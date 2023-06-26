@@ -343,8 +343,8 @@ public function __construct(array $data = [])
         // If entity doesn't exist or we're re-generating the entities entirely
         if ($this->isNew || !$file) {
             return $this->generateEntityClass($mapper);
-        // If entity exists and we're allowed to update the entity class
         } elseif ($this->updateEntityIfExists && $file) {
+            // If entity exists and we're allowed to update the entity class
             return $this->generateUpdatedEntityClass($mapper, $file);
         }
 

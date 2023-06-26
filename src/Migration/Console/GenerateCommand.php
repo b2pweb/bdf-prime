@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Migration\Console;
 
 use Bdf\Prime\Migration\MigrationInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -11,6 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * Class GenerateCommand
  */
+#[AsCommand('prime:migration:generate', 'Generate a new migration')]
 class GenerateCommand extends AbstractCommand
 {
     protected static $defaultName = 'prime:migration:generate';
