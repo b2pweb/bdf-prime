@@ -34,8 +34,8 @@ use Bdf\Prime\ServiceLocator;
 class User extends Model
 {
     public $id;
-    public $name;
-    public $password;
+    public $firstName;
+    public $lastName;
     public $email;
 
     public function __construct(array $data) 
@@ -59,8 +59,8 @@ class UserMapper extends Mapper
     {
         $builder
             ->bigint('id')->autoincrement()
-            ->string('name')
-            ->string('password')
+            ->string('firstName')
+            ->string('lastName')
             ->string('email')
         ;
     }
@@ -82,8 +82,8 @@ $repository = $manager->repository(User::class);
 
 // Get and update an entity
 $user = User::findById(1);
-$user->setName('john')->save();
+$user->setFirstName('john')->save();
 
 // Use a query builder for searching entities 
-User::where('name', 'john')->orWhere('email', (new Like('john%'))->startsWith())->all();
+User::where('firstName', 'john')->orWhere('email', (new Like('john%'))->startsWith())->all();
 ```
