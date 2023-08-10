@@ -394,6 +394,15 @@ class QueryTest extends TestCase
     /**
      *
      */
+    public function test_where_raw_string_not_allowed()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->query()->where([['a']]);
+    }
+
+    /**
+     *
+     */
     public function test_where_with_not_null()
     {
         $query = $this->query()->where('id', '!=', null);

@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Query;
 
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 /**
@@ -122,7 +123,12 @@ class Clause implements ClauseInterface
                     // Special command
                     $this->addCommand($key, $value);
                 } elseif (is_int($key)) {
-                    // Raw value
+                    @trigger_error('Raw SQL expression is deprecated since Prime 1.3.2. Use Query::whereRaw() or Clause::buildRaw() instead.', E_USER_DEPRECATED);
+
+                    if (!$value instanceof ExpressionInterface) {
+                        throw new \InvalidArgumentException('Raw SQL expression must be an instance of ExpressionInterface');
+                    }
+
                     $this->buildRaw($statement, $value, $glue);
                 } else {
                     // Column with operator

@@ -11,6 +11,7 @@ use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Expression\Attribute;
 use Bdf\Prime\Query\Expression\Like;
+use Bdf\Prime\Query\Expression\Raw;
 use Bdf\Prime\Query\Expression\RawValue;
 use Bdf\Prime\Query\Expression\Value;
 use Bdf\Prime\Repository\RepositoryInterface;
@@ -578,7 +579,7 @@ class QueryOrmTest extends TestCase
             "SELECT t0.* FROM $this->table t0 WHERE 1 AND 2",
             
             $this->query
-            ->where(['1', '2'])
+            ->where([new Raw('1'), new Raw('2')])
             ->toSql()
         );
     }
