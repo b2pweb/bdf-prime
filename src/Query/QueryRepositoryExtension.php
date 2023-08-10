@@ -108,6 +108,12 @@ class QueryRepositoryExtension extends QueryCompatExtension
         if (!is_array($id)) {
             list($identifierName) = $this->metadata->primary['attributes'];
             $id = [$identifierName => $id];
+        } else {
+            foreach ($id as $key => $value) {
+                if (is_int($key)) {
+                    throw new \InvalidArgumentException('Raw SQL expressions are not allowed in get() method');
+                }
+            }
         }
 
         return $query->where($id)->first($attributes);
