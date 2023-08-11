@@ -1,3 +1,9 @@
+v2.0.8
+------
+
+* Fix: Raw SQL expression are disabled on Query::get()/getOrFail()/getOrNew()
+* Fix: Raw SQL expression on where() must be wrapped into ExpressionInterface object. Use whereRaw() to use string as raw expression.
+
 v2.0.6
 ------
 
