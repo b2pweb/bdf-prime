@@ -211,6 +211,15 @@ class RepositoryQueryFactoryTest extends TestCase
     /**
      *
      */
+    public function test_get_should_disallow_raw_expression()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->factory->get([['true']]);
+    }
+
+    /**
+     *
+     */
     public function test_getOrFail_success()
     {
         $this->assertEntity($this->pack()->get('entity'), $this->factory->getOrFail(1));

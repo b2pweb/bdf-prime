@@ -27,6 +27,12 @@ v2.1.0
     * AliasResolver and OrmPreprocessor now use the flag to allow or not the use of unknown attributes
     * By default the flag is null, which will raise a deprecation warning, but allow usage of undefined attributes. The default value will be false in next major version.
 
+v2.0.8
+------
+
+* Fix: Raw SQL expression are disabled on Query::get()/getOrFail()/getOrNew()
+* Fix: Raw SQL expression on where() must be wrapped into ExpressionInterface object. Use whereRaw() to use string as raw expression.
+
 v2.0.6
 ------
 

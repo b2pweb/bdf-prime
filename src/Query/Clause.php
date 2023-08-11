@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Query;
 
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 use function explode;
@@ -125,7 +126,12 @@ class Clause implements ClauseInterface
                     // Custom filter
                     $this->customFilters[$key]($this, $value);
                 } elseif (is_int($key)) {
-                    // Raw value
+                    @trigger_error('Raw SQL expression is deprecated since Prime 1.3.2. Use Query::whereRaw() or Clause::buildRaw() instead.', E_USER_DEPRECATED);
+
+                    if (!$value instanceof ExpressionInterface) {
+                        throw new \InvalidArgumentException('Raw SQL expression must be an instance of ExpressionInterface');
+                    }
+
                     $this->buildRaw($statement, $value, $glue);
                 } elseif ($key[0] === ':') {
                     // Special command
