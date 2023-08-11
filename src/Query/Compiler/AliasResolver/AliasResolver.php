@@ -2,12 +2,14 @@
 
 namespace Bdf\Prime\Query\Compiler\AliasResolver;
 
+use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Query\Contract\EntityJoinable;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypesRegistryInterface;
+use InvalidArgumentException;
 
 /**
  * Create and resolve query alias and relation paths
@@ -82,6 +84,20 @@ class AliasResolver
      */
     private $rootRepositoryRegistered = false;
 
+    /**
+     * Allow usage of unknown attribute
+     *
+     * If true, the resolver will not throw an exception if the attribute is not found in the metadata, and use it as is
+     * This is useful for example for the select compilation, where the attribute can be a DBAL expression,
+     * but can produce security issue if input is not properly checked
+     *
+     * For compatibility reason, this value is null by default, which will raise a deprecated notice, and enable the feature.
+     * In next major version, this value will be false by default, and should be manually enabled on Mapper.
+     *
+     * @var bool|null
+     */
+    private ?bool $allowUnknownAttribute = null;
+
 
     /**
      * AliasResolver constructor.
@@ -104,6 +120,17 @@ class AliasResolver
     public function setQuery(?QueryInterface $query = null): void
     {
         $this->query = $query;
+    }
+
+    /**
+     * Define if usage of unknown attribute is allowed
+     * If true, the resolver will not throw an exception if the attribute is not found in the metadata, and use it as is
+     *
+     * @see Mapper::allowUnknownAttribute()
+     */
+    public function setAllowUnknownAttribute(?bool $allowUnknownAttribute): void
+    {
+        $this->allowUnknownAttribute = $allowUnknownAttribute;
     }
 
     /**
@@ -149,7 +176,17 @@ class AliasResolver
 
             //No metadata found => DBAL expression.
             if ($metadata === null) {
-                return $attribute;
+                if ($this->allowUnknownAttribute) {
+                    return $attribute;
+                }
+
+                if ($this->allowUnknownAttribute === null) {
+                    @trigger_error('Using unknown attribute "'.$attribute.'" on on entity "'.$this->repository->entityName().'" is deprecated, and will raise an exception on Prime 3. Please use Mapper::allowUnknownAttribute() to enable this feature.', E_USER_DEPRECATED);
+
+                    return $attribute;
+                }
+
+                throw new InvalidArgumentException('Unknown attribute "'.$attribute.'" on entity "'.$this->repository->entityName().'"');
             }
         }
 

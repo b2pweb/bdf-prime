@@ -80,6 +80,30 @@ class AliasResolverTest extends TestCase
     /**
      *
      */
+    public function test_resolve_dbal_expression_enabled()
+    {
+        $this->resolver->setAllowUnknownAttribute(true);
+
+        $this->assertEquals('123.456', $this->resolver->resolve('123.456'));
+        $this->assertEquals('123', $this->resolver->resolve('123'));
+    }
+
+    /**
+     *
+     */
+    public function test_resolve_dbal_expression_disabled()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown attribute "123.456" on entity "Bdf\Prime\Document"');
+
+        $this->resolver->setAllowUnknownAttribute(false);
+
+        $this->resolver->resolve('123.456');
+    }
+
+    /**
+     *
+     */
     public function test_resolve_attribute()
     {
         $this->assertEquals('t0.id_', $this->resolver->resolve('id'));

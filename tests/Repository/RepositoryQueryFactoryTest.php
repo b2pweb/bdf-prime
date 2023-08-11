@@ -116,6 +116,18 @@ class RepositoryQueryFactoryTest extends TestCase
     /**
      *
      */
+    public function test_builder_with_allow_unknown_attribute()
+    {
+        $this->repository->mapper()->setAllowUnknownAttribute(false);
+        $this->assertFalse($this->factory->builder()->isAllowUnknownAttribute());
+
+        $this->repository->mapper()->setAllowUnknownAttribute(true);
+        $this->assertTrue($this->factory->builder()->isAllowUnknownAttribute());
+    }
+
+    /**
+     *
+     */
     public function test_fromAlias()
     {
         $query = $this->factory->fromAlias('alias');

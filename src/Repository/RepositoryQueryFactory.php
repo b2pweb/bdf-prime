@@ -352,6 +352,10 @@ class RepositoryQueryFactory
             $query->useQuoteIdentifier();
         }
 
+        if (method_exists($query, 'allowUnknownAttribute')) {
+            $query->allowUnknownAttribute($this->repository->mapper()->allowUnknownAttribute());
+        }
+
         $query->setCustomFilters($this->repository->mapper()->filters());
         $query->from($this->metadata->table, $alias);
 

@@ -120,6 +120,20 @@ abstract class Mapper
     private $useQuoteIdentifier = false;
 
     /**
+     * Allow usage of unknown attribute
+     *
+     * If true, query with undeclared attributes on criteria will not throw an exception , and use it as is
+     * This is useful for example for the select compilation, where the attribute can be a DBAL expression,
+     * but can produce security issue if input is not properly checked
+     *
+     * For compatibility reason, this value is null by default, which will raise a deprecated notice, and enable the feature.
+     * In next major version, this value will be false by default, and should be manually enabled on Mapper.
+     *
+     * @var bool|null
+     */
+    private ?bool $allowUnknownAttribute = null;
+
+    /**
      * The relation builder
      *
      * @var RelationBuilder
@@ -300,6 +314,40 @@ abstract class Mapper
     public function hasQuoteIdentifier(): bool
     {
         return $this->useQuoteIdentifier;
+    }
+
+    /**
+     * Allow usage of unknown attribute
+     *
+     * If true, query with undeclared attributes on criteria will not throw an exception , and use it as is
+     * This is useful for example for the select compilation, where the attribute can be a DBAL expression,
+     * but can produce security issue if input is not properly checked
+     *
+     * For compatibility reason, this value is null by default, which will raise a deprecated notice, and enable the feature.
+     * In next major version, this value will be false by default, and should be manually enabled on Mapper.
+     *
+     * @return bool|null
+     */
+    final public function allowUnknownAttribute(): ?bool
+    {
+        return $this->allowUnknownAttribute;
+    }
+
+    /**
+     * Allow or not usage of unknown attribute on query
+     *
+     * If true, query with undeclared attributes on criteria will not throw an exception , and use it as is
+     * This is useful for example for the select compilation, where the attribute can be a DBAL expression,
+     * but can produce security issue if input is not properly checked
+     *
+     * By default, this value is null, which will raise a deprecated notice, and enable the feature.
+     * In next major version, this value will be false by default, and should be manually enabled.
+     *
+     * @param bool $allowUnknownAttribute
+     */
+    final public function setAllowUnknownAttribute(bool $allowUnknownAttribute): void
+    {
+        $this->allowUnknownAttribute = $allowUnknownAttribute;
     }
 
     /**
