@@ -22,6 +22,12 @@ v2.1.0
 * Feat: Add `Clause::replaceClause()` and `Wherable::replaceWhere()` to replace a single filter value. Method `Wherable::replaceWhere()` is commented for now to avoid BC break.
 * Change: Declaring two fields with the same alias is now forbidden
 
+v2.0.8
+------
+
+* Fix: Raw SQL expression are disabled on Query::get()/getOrFail()/getOrNew()
+* Fix: Raw SQL expression on where() must be wrapped into ExpressionInterface object. Use whereRaw() to use string as raw expression.
+
 v2.0.6
 ------
 
