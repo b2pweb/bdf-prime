@@ -18,6 +18,12 @@ use Bdf\Prime\Query\Contract\ReadOperation;
  * @method R|null get($pk) Get one entity by its identifier
  * @method R getOrFail($pk) Get one entity or throws when entity is not found
  * @method R getOrNew($pk) Get one entity or return a new one if not found in repository
+ * @method R|null findById(mixed|array $pk) Get one entity by its primary key or null if not found in repository
+ * @method R findByIdOrFail(mixed|array $pk) Get one entity by its primary key or throws if not found in repository
+ * @method R findByIdOrNew(mixed|array $pk) Get one entity by its primary key or return a new one if not found in repository, using the where criteria as default values
+ * @method R firstOrFail() Get the first result of the query, or throws an exception if no result
+ * @method R firstOrNew(bool $useCriteriaAsDefault = true) Get the first result of the query, or create a new instance if no result. If $useCriteriaAsDefault is true, the where criteria will be used as default values for the new instance.
+ * @method array<string, mixed>|null toCriteria() Transform the query where clause to simple key/value criteria. Return null if the query is not a simple criteria.
  *
  * @template C as \Bdf\Prime\Connection\ConnectionInterface
  * @template R as object|array
