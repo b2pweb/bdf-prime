@@ -4,6 +4,8 @@ namespace Bdf\Prime\Types;
 
 use Bdf\Prime\Bench\DummyPlatform;
 use Bdf\Prime\Exception\TypeNotFoundException;
+use Bdf\Prime\Platform\PlatformInterface;
+use Bdf\Prime\Platform\PlatformTypeInterface;
 use Bdf\Prime\Platform\Sql\Types\SqlIntegerType;
 use PHPUnit\Framework\TestCase;
 
@@ -152,5 +154,33 @@ class TypesRegistryTest extends TestCase
             ),
             $type
         );
+    }
+
+    public function test_get_not_registered_facade_type()
+    {
+        $this->assertInstanceOf(NotRegisteredFacadeType::class, $this->registry->get(NotRegisteredFacadeType::class));
+    }
+}
+
+class NotRegisteredFacadeType extends AbstractFacadeType
+{
+    protected function defaultType()
+    {
+        // TODO: Implement defaultType() method.
+    }
+
+    public function fromDatabase($value, array $fieldOptions = [])
+    {
+        // TODO: Implement fromDatabase() method.
+    }
+
+    public function toDatabase($value)
+    {
+        // TODO: Implement toDatabase() method.
+    }
+
+    public function phpType(): string
+    {
+        // TODO: Implement phpType() method.
     }
 }

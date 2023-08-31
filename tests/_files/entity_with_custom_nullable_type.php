@@ -35,7 +35,7 @@ class MyCustomNullableEntityMapper extends Mapper
     {
         $builder
             ->integer('id')->autoincrement()
-            ->add('foo', Foo::class)
+            ->add('foo', FooType::class)
         ;
     }
 }
