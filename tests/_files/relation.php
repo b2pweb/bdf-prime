@@ -256,6 +256,7 @@ class User extends Model
     public $roles;
     public $faction;
     public $documents;
+    public $none;
 
     public function __construct(array $attributes = [])
     {
@@ -315,6 +316,8 @@ class UserMapper extends Mapper
 
         $builder->on('documents')
             ->morphMany(Document::class.'::uploaderId', 'uploaderType=user');
+
+        $builder->on('none')->null();
     }
     
     /**

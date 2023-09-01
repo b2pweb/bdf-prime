@@ -3,6 +3,8 @@
 namespace Bdf\Prime\Relations\Builder;
 
 use ArrayAccess;
+use Bdf\Prime\Relations\CustomRelationInterface;
+use Bdf\Prime\Relations\NullRelation;
 use Bdf\Prime\Relations\Relation;
 use Bdf\Prime\Relations\RelationInterface;
 use IteratorAggregate;
@@ -35,20 +37,21 @@ use IteratorAggregate;
 class RelationBuilder implements ArrayAccess, IteratorAggregate
 {
     public const MODE_EAGER = "EAGER";
+    public const MODE_LAZY = "LAZY";
 
     /**
      * Array of relations definition
      *
      * @var array<string, RelationDefinition>
      */
-    protected $relations = [];
+    protected array $relations = [];
 
     /**
      * The name of the current relation
      *
-     * @var string
+     * @var string|null
      */
-    private $current;
+    private ?string $current = null;
 
 
     /**
@@ -56,7 +59,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return array<string, RelationDefinition>
      */
-    public function relations()
+    public function relations(): array
     {
         return $this->relations;
     }
@@ -68,7 +71,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function on($property)
+    public function on(string $property): self
     {
         $this->current = $property;
 
@@ -89,7 +92,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function belongsTo($entity, $key)
+    public function belongsTo(string $entity, string $key): self
     {
         list($entity, $primaryKey) = Relation::parseEntity($entity);
 
@@ -113,7 +116,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function hasOne($entity, $key = 'id')
+    public function hasOne(string $entity, string $key = 'id'): self
     {
         list($entity, $foreignKey) = Relation::parseEntity($entity);
 
@@ -137,7 +140,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function hasMany($entity, $key = 'id')
+    public function hasMany(string $entity, string $key = 'id'): self
     {
         list($entity, $foreignKey) = Relation::parseEntity($entity);
 
@@ -163,7 +166,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function belongsToMany($entity, $key = 'id')
+    public function belongsToMany(string $entity, string $key = 'id'): self
     {
         list($entity, $primaryKey) = Relation::parseEntity($entity);
 
@@ -186,7 +189,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function through($through, $throughLocal, $throughDistant)
+    public function through(string $through, string $throughLocal, string $throughDistant): self
     {
         $this->relations[$this->current]['through'] = $through;
         $this->relations[$this->current]['throughLocal'] = $throughLocal;
@@ -211,7 +214,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function morphTo($key, $discriminator, array $map)
+    public function morphTo(string $key, string $discriminator, array $map): self
     {
         $this->add(RelationInterface::MORPH_TO, $key);
 
@@ -233,7 +236,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function morphOne($entity, $discriminator, $key = 'id')
+    public function morphOne(string $entity, string $discriminator, string $key = 'id'): self
     {
         list($discriminator, $discriminatorValue) = explode('=', $discriminator);
 
@@ -255,7 +258,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function morphMany($entity, $discriminator, $key = 'id')
+    public function morphMany(string $entity, string $discriminator, string $key = 'id'): self
     {
         list($discriminator, $discriminatorValue) = explode('=', $discriminator);
 
@@ -269,7 +272,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function inherit($key)
+    public function inherit(string $key): self
     {
         return $this->add(RelationInterface::BY_INHERITANCE, $key);
     }
@@ -286,14 +289,27 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      * ;
      * </code>
      *
-     * @param string $relationClass The relation class name
+     * @param class-string<CustomRelationInterface> $relationClass The relation class name
      * @param array $options The relation options
      *
      * @return $this
      */
-    public function custom($relationClass, array $options = [])
+    public function custom(string $relationClass, array $options = []): self
     {
         $this->relations[$this->current] = ['type' => RelationInterface::CUSTOM, 'relationClass' => $relationClass] + $options;
+
+        return $this;
+    }
+
+    /**
+     * Add a placeholder relation
+     *
+     * @return $this
+     * @see NullRelation
+     */
+    public function null(): self
+    {
+        $this->relations[$this->current] = ['type' => RelationInterface::NULL];
 
         return $this;
     }
@@ -319,7 +335,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @see RelationBuilder::custom()
      */
-    public function entity($entity)
+    public function entity(string $entity): self
     {
         list($entity, $foreignKey) = Relation::parseEntity($entity);
 
@@ -344,7 +360,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function option($name, $value)
+    public function option(string $name, $value): self
     {
         $this->relations[$this->current][$name] = $value;
 
@@ -360,9 +376,14 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    protected function add($type, $key, array $options = [])
+    protected function add(string $type, string $key, array $options = []): self
     {
-        $this->relations[$this->current] = ['type' => $type, 'localKey' => $key] + $options;
+        if (($this->relations[$this->current]['type'] ?? null) === RelationInterface::BY_INHERITANCE) {
+            // Inherit from previous relation configuration
+            $this->relations[$this->current] = ['type' => $type, 'localKey' => $key] + $options + $this->relations[$this->current];
+        } else {
+            $this->relations[$this->current] = ['type' => $type, 'localKey' => $key] + $options;
+        }
 
         return $this;
     }
@@ -377,7 +398,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    protected function map($discriminator, array $map)
+    protected function map(string $discriminator, array $map): self
     {
         $this->relations[$this->current]['discriminator'] = $discriminator;
         $this->relations[$this->current]['map'] = $map;
@@ -399,7 +420,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function morph($discriminator, $value)
+    public function morph(string $discriminator, string $value): self
     {
         $this->relations[$this->current]['discriminator'] = $discriminator;
         $this->relations[$this->current]['discriminatorValue'] = $value;
@@ -415,11 +436,11 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      * $builder->on('customer')->constraints(['enabled' => true]);
      * </code>
      *
-     * @param array|\Closure $constraints   The globale constraints for this relation
+     * @param array|\Closure $constraints   The global constraints for this relation
      *
      * @return $this
      */
-    public function constraints($constraints)
+    public function constraints($constraints): self
     {
         $this->relations[$this->current]['constraints'] = $constraints;
 
@@ -439,7 +460,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function detached($flag = true)
+    public function detached(bool $flag = true): self
     {
         $this->relations[$this->current]['detached'] = $flag;
 
@@ -459,7 +480,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function saveStrategy($strategy)
+    public function saveStrategy(int $strategy): self
     {
         $this->relations[$this->current]['saveStrategy'] = $strategy;
 
@@ -483,7 +504,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      * @see \Bdf\Prime\Collection\CollectionInterface
      * @see \Bdf\Prime\Query\Query::wrapAs()
      */
-    public function wrapAs($wrapper)
+    public function wrapAs($wrapper): self
     {
         $this->relations[$this->current]['wrapper'] = $wrapper;
 
@@ -538,13 +559,35 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     /**
      * Set the relation fetch mode
      *
-     * @param string $mode
+     * @param self::MODE_* $mode
      * @return $this
      */
-    public function mode($mode)
+    public function mode(string $mode): self
     {
         $this->relations[$this->current]['mode'] = $mode;
 
         return $this;
+    }
+
+    /**
+     * Enable eager loading
+     * This is same as calling `$builder->mode(self::MODE_EAGER)`
+     *
+     * @return $this
+     */
+    public function eager(): self
+    {
+        return $this->mode(self::MODE_EAGER);
+    }
+
+    /**
+     * Disable eager loading
+     * This is same as calling `$builder->mode(self::MODE_LAZY)`
+     *
+     * @return $this
+     */
+    public function lazy(): self
+    {
+        return $this->mode(self::MODE_LAZY);
     }
 }

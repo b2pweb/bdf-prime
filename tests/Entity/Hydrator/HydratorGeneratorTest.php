@@ -883,7 +883,8 @@ EOL;
                 ],
                 "roles" => null,
                 "faction" => null,
-                "documents" => null
+                "documents" => null,
+                "none" => null,
             ],
             "uploaderType" => "user",
             "contact" => null

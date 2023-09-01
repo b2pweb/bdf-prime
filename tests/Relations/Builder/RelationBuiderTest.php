@@ -294,6 +294,34 @@ class RelationBuilderTest extends TestCase
     /**
      *
      */
+    public function test_inherit_should_keep_previous_config()
+    {
+        $builder = new RelationBuilder();
+
+        $builder->on('target')
+            ->inherit('targetId')
+            ->eager()
+            ->option('foo', 'bar')
+        ;
+
+        $builder->on('target')
+            ->belongsTo('Target', 'targetId');
+
+        $expected = [
+            'type'     => 'belongsTo',
+            'localKey' => 'targetId',
+            'entity' => 'Target',
+            'foo' => 'bar',
+            'mode' => 'EAGER',
+            'distantKey' => 'id',
+        ];
+
+        $this->assertEquals(['target' => $expected], $builder->relations());
+    }
+
+    /**
+     *
+     */
     public function test_custom()
     {
         $builder = new RelationBuilder();
@@ -306,6 +334,22 @@ class RelationBuilderTest extends TestCase
             'relationClass' => MyCustomRelation::class,
             'entity'        => DistantEntityForCustomRelation::class,
             'keys'          => ['l1' => 'd1', 'l2' => 'l1']
+        ];
+
+        $this->assertEquals(['target' => $expected], $builder->relations());
+    }
+
+    /**
+     *
+     */
+    public function test_null()
+    {
+        $builder = new RelationBuilder();
+
+        $builder->on('target')->null();
+
+        $expected = [
+            'type'          => 'null',
         ];
 
         $this->assertEquals(['target' => $expected], $builder->relations());
@@ -447,6 +491,30 @@ class RelationBuilderTest extends TestCase
         $builder->on('relation1')->hasOne('Entity1::distant')->mode(RelationBuilder::MODE_EAGER);
 
         $this->assertEquals(RelationBuilder::MODE_EAGER, $builder['relation1']['mode']);
+    }
+
+    /**
+     *
+     */
+    public function test_eager()
+    {
+        $builder = new RelationBuilder();
+
+        $builder->on('relation1')->hasOne('Entity1::distant')->eager();
+
+        $this->assertEquals(RelationBuilder::MODE_EAGER, $builder['relation1']['mode']);
+    }
+
+    /**
+     *
+     */
+    public function test_lazy()
+    {
+        $builder = new RelationBuilder();
+
+        $builder->on('relation1')->hasOne('Entity1::distant')->lazy();
+
+        $this->assertEquals(RelationBuilder::MODE_LAZY, $builder['relation1']['mode']);
     }
 
     /**
