@@ -47,7 +47,7 @@ final class NullRelation implements RelationInterface
      */
     public function setLocalAlias(?string $localAlias)
     {
-        // No-op
+        return $this;
     }
 
     /**
@@ -104,6 +104,7 @@ final class NullRelation implements RelationInterface
     public function associate($owner, $entity)
     {
         // No-op
+        return $owner;
     }
 
     /**
@@ -112,6 +113,7 @@ final class NullRelation implements RelationInterface
     public function dissociate($owner)
     {
         // No-op
+        return $owner;
     }
 
     /**
