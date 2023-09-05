@@ -13,6 +13,10 @@ use Bdf\Prime\IdGenerators\AutoIncrementGenerator;
 use Bdf\Prime\IdGenerators\GeneratorInterface;
 use Bdf\Prime\IdGenerators\NullGenerator;
 use Bdf\Prime\IdGenerators\TableGenerator;
+use Bdf\Prime\Mapper\Attribute\Filter;
+use Bdf\Prime\Mapper\Attribute\MapperConfigurationInterface;
+use Bdf\Prime\Mapper\Attribute\RepositoryMethod;
+use Bdf\Prime\Mapper\Attribute\Scope;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Mapper\Builder\IndexBuilder;
 use Bdf\Prime\Mapper\Info\MapperInfo;
@@ -25,10 +29,15 @@ use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\ServiceLocator;
 use Bdf\Serializer\PropertyAccessor\PropertyAccessorInterface;
 use Bdf\Serializer\PropertyAccessor\ReflectionAccessor;
+use Closure;
 use LogicException;
+use ReflectionAttribute;
+use ReflectionObject;
 use stdClass;
 
 use function class_exists;
+use function is_string;
+use function method_exists;
 
 /**
  * Mapper
@@ -55,9 +64,9 @@ abstract class Mapper
     protected $resultCache;
 
     /**
-     * @var Metadata
+     * @var Metadata|null
      */
-    private $metadata;
+    private ?Metadata $metadata;
 
     /**
      * Id generator
@@ -65,28 +74,28 @@ abstract class Mapper
      * Could be defined as string (generator class name). It would be instantiated
      * by mapper on generator() method
      *
-     * @var \Bdf\Prime\IdGenerators\GeneratorInterface|null
+     * @var GeneratorInterface|class-string<GeneratorInterface>|null
      */
     protected $generator;
 
     /**
      * @var class-string
      */
-    private $repositoryClass = EntityRepository::class;
+    private string $repositoryClass = EntityRepository::class;
 
     /**
      * The real name of entity class. Could be an none existing class
      *
      * @var class-string<E>
      */
-    private $entityClass;
+    private string $entityClass;
 
     /**
      * The property accessor class name to use by default
      *
      * @var class-string<PropertyAccessorInterface>
      */
-    private $propertyAccessorClass = ReflectionAccessor::class;
+    private string $propertyAccessorClass = ReflectionAccessor::class;
 
     /**
      * Class of the criteria to use
@@ -101,7 +110,7 @@ abstract class Mapper
      *
      * @var bool
      */
-    private $readOnly = false;
+    private bool $readOnly = false;
 
     /**
      * Use schema resolver
@@ -109,7 +118,7 @@ abstract class Mapper
      *
      * @var bool
      */
-    private $useSchemaManager = true;
+    private bool $useSchemaManager = true;
 
     /**
      * Use quote identifier
@@ -117,33 +126,48 @@ abstract class Mapper
      *
      * @var bool
      */
-    private $useQuoteIdentifier = false;
+    private bool $useQuoteIdentifier = false;
 
     /**
      * The relation builder
      *
      * @var RelationBuilder
      */
-    private $relationBuilder;
+    private ?RelationBuilder $relationBuilder = null;
 
     /**
      * The collection of behaviors
      *
      * @var BehaviorInterface<E>[]
      */
-    private $behaviors;
+    private ?array $behaviors = null;
 
     /**
      * The service locator
      *
      * @var ServiceLocator
      */
-    protected $serviceLocator;
+    protected ServiceLocator $serviceLocator;
 
     /**
      * @var MapperHydratorInterface<E>|null
      */
-    protected $hydrator;
+    protected ?MapperHydratorInterface $hydrator;
+
+    /**
+     * @var array<string, callable>|null
+     */
+    private ?array $scopes = null;
+
+    /**
+     * @var array<string, callable>|null
+     */
+    private ?array $filters = null;
+
+    /**
+     * @var array<string, callable(\Bdf\Prime\Repository\RepositoryInterface<E>,mixed...):mixed>|null
+     */
+    private ?array $queries = null;
 
 
     /**
@@ -188,6 +212,9 @@ abstract class Mapper
      *
      * @return Metadata
      * @final
+     *
+     * @psalm-suppress InvalidNullableReturnType
+     * @psalm-suppress NullableReturnStatement
      */
     public function metadata(): Metadata
     {
@@ -692,21 +719,41 @@ abstract class Mapper
 
     /**
      * Gets custom filters
-     * To overwrite
+     *
+     * Returns additional filters for query
+     * You can use PHP 8 attributes to mark methods as scopes using {@see Filter}
+     * instead of overriding this method
+     *
+     * Note: you cannot mix PHP 8 attributes and overriding this method
      *
      * <code>
-     *  return [
-     *      'customFilterName' => function(<Bdf\Prime\Query\QueryInterface> $query, <mixed> $value) {
-     *          return <void>
-     *      },
-     *  ];
+     * class MyMapper extends Mapper
+     * {
+     *     // Legacy way
+     *     public function filters(): array
+     *     {
+     *         return [
+     *            'customFilterName' => function(<Bdf\Prime\Query\QueryInterface> $query, <mixed> $value) {
+     *                return <void>
+     *            },
+     *         ];
+     *     }
+     *
+     *     // PHP 8 way
+     *     #[Filter]
+     *     public function customFilterName(QueryInterface $query, $test): void
+     *     {
+     *     }
+     * }
+     *
+     * $repository->where('customFilterName', 'test');
      * </code>
      *
      * @return array<string, callable>
      */
     public function filters(): array
     {
-        return [];
+        return $this->filters ??= $this->loadMethodsFromAttributes(Filter::class);
     }
 
     /**
@@ -754,14 +801,31 @@ abstract class Mapper
 
     /**
      * Repository extension
-     * returns additional methods in repository
+     *
+     * Returns additional methods in repository or query
+     * You can use PHP 8 attributes to mark methods as scopes using {@see Scope}
+     * instead of overriding this method
+     *
+     * Note: you cannot mix PHP 8 attributes and overriding this method
      *
      * <code>
-     * return [
-     *     'customMethod' => function($query, $test) {
+     * class MyMapper extends Mapper
+     * {
+     *     // Legacy way
+     *     public function scopes(): array
+     *     {
+     *         return [
+     *             'customMethod' => function($query, $test) {
      *
-     *     },
-     * ];
+     *             },
+     *         ];
+     *     }
+     *
+     *     // PHP 8 way
+     *     #[Scope]
+     *     public function customMethod($query, $test) {
+     *     }
+     * }
      *
      * $repository->customMethod('test');
      * </code>
@@ -770,29 +834,55 @@ abstract class Mapper
      */
     public function scopes(): array
     {
-        throw new LogicException('No scopes have been defined in "' . get_class($this) . '"');
+        $scopes = ($this->scopes ??= $this->loadMethodsFromAttributes(Scope::class));
+
+        if (!$scopes) {
+            throw new LogicException('No scopes have been defined in "' . get_class($this) . '"');
+        }
+
+        return $this->scopes = $scopes;
     }
 
     /**
      * Get custom queries for repository
+     *
      * A custom query works mostly like scopes, but with some differences :
      * - Cannot be called using a query (i.e. $query->where(...)->myScope())
-     * - The function has responsability of creating the query instance
+     * - The function has responsibility of creating the query instance
      * - The first argument is the repository
      *
+     *  You can use PHP 8 attributes to mark methods as scopes using {@see RepositoryMethod}
+     *  instead of overriding this method
+     *
+     *  Note: you cannot mix PHP 8 attributes and overriding this method
+     *
      * <code>
-     * return [
-     *     'findByCustom' => function (EntityRepository $repository, $search) {
-     *         return $repository->make(MyCustomQuery::class)->where('first', $search)->first();
+     * class MyMapper extends Mapper
+     * {
+     *     // Legacy way
+     *     public function queries(): array
+     *     {
+     *         return [
+     *             'findByCustom' => function (EntityRepository $repository, $search) {
+     *                 return $repository->make(MyCustomQuery::class)->where('first', $search)->first();
+     *             }
+     *         ];
      *     }
-     * ];
+     *
+     *     // PHP 8 way
+     *     #[RepositoryMethod]
+     *     public function findByCustom(EntityRepository $repository, $search)
+     *     {
+     *        return $repository->make(MyCustomQuery::class)->where('first', $search)->first();
+     *     }
+     * }
      * </code>
      *
      * @return array<string, callable(\Bdf\Prime\Repository\RepositoryInterface<E>,mixed...):mixed>
      */
     public function queries(): array
     {
-        return [];
+        return $this->queries ??= $this->loadMethodsFromAttributes(RepositoryMethod::class);
     }
 
     /**
@@ -829,11 +919,7 @@ abstract class Mapper
      */
     final public function behaviors(): array
     {
-        if ($this->behaviors === null) {
-            $this->behaviors = $this->getDefinedBehaviors();
-        }
-
-        return $this->behaviors;
+        return $this->behaviors ??= $this->getDefinedBehaviors();
     }
 
     /**
@@ -919,10 +1005,10 @@ abstract class Mapper
      */
     public function destroy(): void
     {
-        $this->serviceLocator = null;
-        $this->generator = null;
-        $this->hydrator = null;
-        $this->metadata = null;
+        unset($this->serviceLocator);
+        unset($this->generator);
+        unset($this->hydrator);
+        unset($this->metadata);
     }
 
     /**
@@ -961,6 +1047,11 @@ abstract class Mapper
 
         if (!$metadata) {
             $metadata = $this->metadata = new Metadata();
+            $metadata->configurators = $this->loadConfigurators();
+        }
+
+        foreach ($metadata->configurators as $configurator) {
+            $configurator->configure($this);
         }
 
         $this->configure();
@@ -970,5 +1061,60 @@ abstract class Mapper
         $this->hydrator ??= new MapperHydrator();
         $this->hydrator->setPrimeMetadata($metadata);
         $this->hydrator->setPrimeInstantiator($this->serviceLocator->instantiator());
+    }
+
+    /**
+     * Loads the mapper configurators from attributes
+     *
+     * @return MapperConfigurationInterface[]
+     */
+    private function loadConfigurators(): array
+    {
+        if (!method_exists(ReflectionObject::class, 'getAttributes')) {
+            return [];
+        }
+
+        $attributes = (new ReflectionObject($this))->getAttributes(MapperConfigurationInterface::class, ReflectionAttribute::IS_INSTANCEOF);
+        $configurators = [];
+
+        foreach ($attributes as $attribute) {
+            $configurators[] = $attribute->newInstance();
+        }
+
+        return $configurators;
+    }
+
+    /**
+     * Loads methods marked with given attribute, and store them in an array with method name as key
+     *
+     * @param class-string<Scope>|class-string<RepositoryMethod>|class-string<Filter> $attributeClass
+     * @return array<string, callable>
+     */
+    private function loadMethodsFromAttributes(string $attributeClass): array
+    {
+        if (!method_exists(ReflectionObject::class, 'getAttributes')) {
+            return [];
+        }
+
+        $functions = [];
+
+        foreach ((new ReflectionObject($this))->getMethods() as $method) {
+            foreach ($method->getAttributes($attributeClass) as $attribute) {
+                $query = $attribute->newInstance();
+                $name = $query->name() ?? $method->getName();
+
+                if ($method->isPrivate()) {
+                    throw new LogicException('The method "' . static::class . '::' . $method->getName() . '" must be public or protected to be used with attribute ' . $attributeClass);
+                }
+
+                if ($method->isPublic()) {
+                    $functions[$name] = [$this, $method->getName()];
+                } else {
+                    $functions[$name] = Closure::fromCallable([$this, $method->getName()]);
+                }
+            }
+        }
+
+        return $functions;
     }
 }
