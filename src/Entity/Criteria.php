@@ -327,7 +327,7 @@ class Criteria implements ArrayAccess, IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    public function getIterator(): iterable
+    public function getIterator(): Traversable
     {
         yield from $this->all();
     }
