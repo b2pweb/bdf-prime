@@ -147,6 +147,20 @@ class OrmPreprocessorTest extends TestCase
     /**
      *
      */
+    public function test_field_on_write_not_found_not_allowed()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown attribute "not_found" on entity "Bdf\Prime\Faction"');
+
+        Faction::repository()->mapper()->setAllowUnknownAttribute(false);
+        $this->preprocessor = new OrmPreprocessor(Prime::repository(Faction::class));
+
+        $this->preprocessor->field('not_found');
+    }
+
+    /**
+     *
+     */
     public function test_field_on_select_unit()
     {
         $resolver = $this->createMock(AliasResolver::class);

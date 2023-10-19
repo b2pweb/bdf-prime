@@ -20,6 +20,8 @@ class CompilableClause extends Clause implements CompilableClauseInterface
      */
     private $quoteIdentifier = false;
 
+    private ?bool $allowUnknownAttributes = null;
+
     /**
      * @var CompilerState
      */
@@ -68,5 +70,21 @@ class CompilableClause extends Clause implements CompilableClauseInterface
     public function isQuoteIdentifier(): bool
     {
         return $this->quoteIdentifier;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isAllowUnknownAttribute(): ?bool
+    {
+        return $this->allowUnknownAttributes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function allowUnknownAttribute(?bool $allowUnknownAttributes = true): void
+    {
+        $this->allowUnknownAttributes = $allowUnknownAttributes;
     }
 }

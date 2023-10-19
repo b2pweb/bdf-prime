@@ -23,6 +23,7 @@ use Bdf\Prime\TestFiltersEntityMapper;
 use Bdf\Prime\User;
 use Doctrine\DBAL\Cache\ArrayResult;
 use Doctrine\DBAL\Result;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -631,6 +632,23 @@ class QueryOrmTest extends TestCase
      */
     public function test_from_dbal_value()
     {
+        $this->assertEquals(
+            "SELECT t0.* FROM $this->table t0, customer_ c WHERE c.name_ = ?",
+
+            $this->query->from('customer_', 'c')->where('c.name_', 'test')->toSql()
+        );
+    }
+
+    /**
+     *
+     */
+    public function test_from_dbal_value_disable_unknown_attributes()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown attribute "c.name_" on entity "Bdf\Prime\TestEntity"');
+
+        $this->query->allowUnknownAttribute(false);
+
         $this->assertEquals(
             "SELECT t0.* FROM $this->table t0, customer_ c WHERE c.name_ = ?",
 
