@@ -25,6 +25,7 @@ interface RelationInterface
     public const BY_INHERITANCE    = 'byInheritance';
     public const MORPH_TO          = 'morphTo';
     public const CUSTOM            = 'custom';
+    public const NULL              = 'null';
     //const MORPH_TO_MANY     = 'morphToMany';
 
     /**

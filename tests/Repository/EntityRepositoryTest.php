@@ -2,11 +2,14 @@
 
 namespace Bdf\Prime\Repository;
 
+use Bdf\Prime\CompositePkEntity;
 use Bdf\Prime\Customer;
 use Bdf\Prime\CustomerCriteria;
 use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Events;
+use Bdf\Prime\Exception\EntityNotFoundException;
+use Bdf\Prime\Exception\QueryBuildingException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
@@ -250,6 +253,152 @@ class EntityRepositoryTest extends TestCase
         
         $this->assertSameEntity($expected, $repository->getOrNew(1));
         $this->assertSameEntity(new TestEntity(), $repository->getOrNew('unknow'));
+    }
+
+    public function test_firstOrFail_success()
+    {
+        $expected = $this->getTestPack()->get('entity');
+        $repository = Prime::repository(TestEntity::class);
+
+        $this->assertSameEntity($expected, $repository->where('name', 'Entity')->firstOrFail());
+    }
+
+    public function test_firstOrFail_failure()
+    {
+        $repository = Prime::repository(TestEntity::class);
+
+        $this->expectException(EntityNotFoundException::class);
+        $repository->where('name', 'unknow')->firstOrFail();
+    }
+
+    public function test_firstOrNew_success()
+    {
+        $expected = $this->getTestPack()->get('entity');
+        $repository = Prime::repository(TestEntity::class);
+
+        $this->assertSameEntity($expected, $repository->where('name', 'Entity')->firstOrNew());
+    }
+
+    public function test_firstOrNew_not_found()
+    {
+        $repository = Prime::repository(TestEntity::class);
+
+        $entity = $repository
+            ->where('name', 'unknow')
+            ->where('id', 42)
+            ->firstOrNew()
+        ;
+
+        $this->assertSameEntity(new TestEntity([
+            'name' => 'unknow',
+            'id' => 42,
+        ]), $entity);
+
+        $entity = $repository
+            ->where('name', 'unknow')
+            ->where('id', 42)
+            ->firstOrNew(false)
+        ;
+
+        $this->assertSameEntity(new TestEntity(), $entity);
+    }
+
+    public function test_findById_with_single_key()
+    {
+        $expected = $this->getTestPack()->get('entity');
+        $repository = Prime::repository(TestEntity::class);
+
+        $this->assertSameEntity($expected, $repository->queries()->builder()->findById(1));
+        $this->assertNull($repository->queries()->builder()->findById(404));
+    }
+
+    public function test_findByIdOrFail_success()
+    {
+        $expected = $this->getTestPack()->get('entity');
+        $repository = Prime::repository(TestEntity::class);
+
+        $this->assertSameEntity($expected, $repository->queries()->builder()->findByIdOrFail(1));
+    }
+
+    public function test_findByIdOrFail_not_found()
+    {
+        $this->expectException(EntityNotFoundException::class);
+        $this->expectExceptionMessage('Cannot resolve entity identifier "404"');
+
+        $repository = Prime::repository(TestEntity::class);
+        $repository->queries()->builder()->findByIdOrFail(404);
+    }
+
+    public function test_findByIdOrNew()
+    {
+        $expected = $this->getTestPack()->get('entity');
+        $repository = Prime::repository(TestEntity::class);
+        $this->getTestPack()->declareEntity(CompositePkEntity::class);
+
+        $this->assertSameEntity($expected, $repository->queries()->builder()->findByIdOrNew(1));
+        $this->assertSameEntity(new TestEntity(['id' => 404]), $repository->queries()->builder()->findByIdOrNew(404));
+        $this->assertSameEntity(new CompositePkEntity(['key1' => 'foo', 'key2' => 'bar']), CompositePkEntity::builder()->findByIdOrNew(['key1' => 'foo', 'key2' => 'bar']));
+        $this->assertSameEntity(new CompositePkEntity(['key1' => 'foo', 'key2' => 'bar', 'value' => 'a']), CompositePkEntity::builder()->where('key1', 'foo')->where('value', 'a')->findByIdOrNew('bar'));
+        $this->assertSameEntity(new CompositePkEntity(['key1' => 'foo', 'key2' => 'bar', 'value' => 'a']), CompositePkEntity::keyValue()->where('key1', 'foo')->where('value', 'a')->findByIdOrNew('bar'));
+    }
+
+    public function test_findById_with_composite_key()
+    {
+        $repository = Prime::repository(CompositePkEntity::class);
+        $expected = (new CompositePkEntity())->setKey1('foo')->setKey2('bar')->setValue('baz');
+        $this->getTestPack()->nonPersist($expected);
+
+        $this->assertSameEntity($expected, $repository->queries()->builder()->findById(['key1' => 'foo', 'key2' => 'bar']));
+        $this->assertNull($repository->queries()->builder()->findById(['key1' => 'foo', 'key2' => 'baz']));
+    }
+
+    public function test_findById_disallow_missing_keys()
+    {
+        $this->expectException(QueryBuildingException::class);
+        $this->expectExceptionMessage('Only primary keys must be passed to findById(). Missing keys : key1');
+
+        $repository = Prime::repository(CompositePkEntity::class);
+        $repository->queries()->builder()->findById(['key2' => 'bar']);
+    }
+
+    public function test_findById_disallow_extra_keys()
+    {
+        $this->expectException(QueryBuildingException::class);
+        $this->expectExceptionMessage('Only primary keys must be passed to findById(). Unexpected keys : value');
+
+        $repository = Prime::repository(CompositePkEntity::class);
+        $repository->queries()->builder()->findById(['key1' => 'bar', 'key2' => 'bar', 'value' => 'baz']);
+    }
+
+    public function test_findById_should_complete_key_from_criteria()
+    {
+        $repository = Prime::repository(CompositePkEntity::class);
+        $expected = (new CompositePkEntity())->setKey1('foo')->setKey2('bar')->setValue('baz');
+        $this->getTestPack()->nonPersist($expected);
+
+        $this->assertSameEntity($expected, $repository->queries()->builder()->where('key1', 'foo')->findById(['key2' => 'bar']));
+        $this->assertSameEntity($expected, $repository->queries()->builder()->where('key1', 'foo')->findById('bar'));
+        $this->assertSameEntity($expected, $repository->queries()->builder()->where('key2', 'bar')->findById('foo'));
+        $this->assertSameEntity($expected, $repository->queries()->builder()->where('key2', 'bar')->where('key1', 'foo')->findById([]));
+        $this->assertSameEntity($expected, $repository->queries()->builder()->where('key1', 'foo')->where('value', 'baz')->findById('bar'));
+        $this->assertNull($repository->queries()->builder()->where('key1', 'foo')->where('value', '???')->findById('bar'));
+        $this->assertSameEntity($expected, $repository->queries()->keyValue()->where('key1', 'foo')->findById('bar'));
+    }
+
+    public function test_findById_ambiguous()
+    {
+        $this->expectException(QueryBuildingException::class);
+        $this->expectExceptionMessage('Ambiguous findById() call : All primary key attributes are already defined on query, so missing part of the primary key cannot be resolved. Use an array as parameter instead to explicitly define the primary key attribute name.');
+
+        $repository = Prime::repository(CompositePkEntity::class);
+        $repository->queries()->builder()->where('key2', 'bar')->where('key1', 'foo')->findById('foo');
+    }
+
+    public function test_toCriteria_from_keyvalue_query()
+    {
+        $repository = Prime::repository(TestEntity::class);
+
+        $this->assertEquals(['foo' => 'aaa', 'bar' => 'bbb'], $repository->queries()->keyValue()->where('foo', 'aaa')->where('bar', 'bbb')->toCriteria());
     }
 
     /**

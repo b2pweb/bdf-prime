@@ -13,6 +13,7 @@ use Bdf\Prime\Query\Expression\TypedExpressionInterface;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
+use InvalidArgumentException;
 use LogicException;
 
 /**
@@ -47,6 +48,7 @@ class OrmPreprocessor implements PreprocessorInterface
      * @var PlatformInterface
      */
     protected $platform;
+    private ?bool $allowUnknownAttribute;
 
 
     /**
@@ -60,6 +62,7 @@ class OrmPreprocessor implements PreprocessorInterface
         $this->repository = $repository;
         $this->metadata = $repository->metadata();
         $this->platform = $repository->connection()->platform();
+        $this->allowUnknownAttribute = $repository->mapper()->allowUnknownAttribute();
     }
 
     /**
@@ -127,6 +130,10 @@ class OrmPreprocessor implements PreprocessorInterface
 
             $this->aliasResolver->setQuery($compilerQuery);
 
+            if (method_exists($compilerQuery, 'isAllowUnknownAttribute')) {
+                $this->aliasResolver->setAllowUnknownAttribute($compilerQuery->isAllowUnknownAttribute());
+            }
+
             if ($clause->state()->needsCompile('from')) {
                 if ($needReset) {
                     $this->aliasResolver->reset();
@@ -173,7 +180,17 @@ class OrmPreprocessor implements PreprocessorInterface
     {
         // @fixme Throw exception if wants to write on undefined attribute ?
         if (!isset($this->metadata->attributes[$attribute])) {
-            return $attribute;
+            if ($this->allowUnknownAttribute) {
+                return $attribute;
+            }
+
+            if ($this->allowUnknownAttribute === null) {
+                @trigger_error('Using unknown attribute "'.$attribute.'" on on entity "'.$this->repository->entityName().'" is deprecated, and will raise an exception on Prime 3. Please use Mapper::allowUnknownAttribute() to enable this feature.', E_USER_DEPRECATED);
+
+                return $attribute;
+            }
+
+            throw new InvalidArgumentException('Unknown attribute "'.$attribute.'" on entity "'.$this->repository->entityName().'"');
         }
 
         $meta = $this->metadata->attributes[$attribute];

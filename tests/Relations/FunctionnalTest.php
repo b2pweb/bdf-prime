@@ -2,12 +2,16 @@
 
 namespace Bdf\Prime\Relations;
 
+use Bdf\Prime\BarConfig;
+use Bdf\Prime\BaseConfig;
 use Bdf\Prime\Collection\EntityCollection;
 use Bdf\Prime\Commit;
 use Bdf\Prime\Company;
 use Bdf\Prime\Developer;
 use Bdf\Prime\Faction;
 use Bdf\Prime\Folder;
+use Bdf\Prime\FooConfig;
+use Bdf\Prime\FooExtraConfig;
 use Bdf\Prime\Integrator;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Customer;
@@ -491,5 +495,31 @@ class FunctionnalTest extends TestCase
 
         $this->assertInstanceOf(EntityCollection::class, $folder->files);
         $this->assertEntities([$file1, $file2, $file3], $folder->files->all());
+    }
+
+    public function test_inheritance_eager_loading()
+    {
+        $this->getTestPack()->nonPersist([
+            $bar = new BarConfig([
+                'id' => 42,
+                'value' => 'bar',
+            ]),
+            $foo = new FooConfig([
+                'id' => 43,
+                'value' => 'foo',
+            ]),
+            $extra = new FooExtraConfig([
+                'id' => 43,
+                'foo' => 'extra',
+            ]),
+        ]);
+
+        $entities = BaseConfig::all();
+
+        $this->assertEntities([$bar, $foo], $entities);
+        $this->assertNull($entities[0]->extra);
+        $this->assertTrue($entities[0]->relation('extra')->isLoaded());
+        $this->assertEntity($extra, $entities[1]->extra);
+        $this->assertTrue($entities[1]->relation('extra')->isLoaded());
     }
 }

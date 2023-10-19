@@ -4,6 +4,11 @@ namespace Bdf\Prime\Types;
 
 use Bdf\Prime\Exception\TypeNotFoundException;
 
+use function is_string;
+use function is_subclass_of;
+use function str_ends_with;
+use function substr;
+
 /**
  * Prime types registry
  */
@@ -14,7 +19,7 @@ class TypesRegistry implements TypesRegistryInterface
      *
      * @var array<string, class-string<TypeInterface>|TypeInterface>
      */
-    private $types = [];
+    private array $types = [];
 
 
     /**
@@ -56,11 +61,15 @@ class TypesRegistry implements TypesRegistryInterface
             return $this->types[$type];
         }
 
-        if (strpos($type, '[]', -2) !== false) {
+        if (str_ends_with($type, '[]')) {
             return $this->types[$type] = new ArrayOfType(
                 $this->get(TypeInterface::TARRAY),
                 $this->get(substr($type, 0, -2))
             );
+        }
+
+        if (is_subclass_of($type, FacadeTypeInterface::class)) {
+            return $this->types[$type] = $this->instantiate($type, $type);
         }
 
         throw new TypeNotFoundException($type);
@@ -75,7 +84,7 @@ class TypesRegistry implements TypesRegistryInterface
             return true;
         }
 
-        if (strpos($type, '[]', -2) === false) {
+        if (!str_ends_with($type, '[]')) {
             return false;
         }
 

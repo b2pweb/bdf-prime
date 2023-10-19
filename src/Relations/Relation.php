@@ -242,6 +242,10 @@ abstract class Relation extends AbstractRelation
                 $relation = $relationMeta['relationClass']::make($repository, $relationName, $relationMeta);
                 break;
 
+            case RelationInterface::NULL:
+                $relation = new NullRelation($repository);
+                break;
+
             default:
                 throw new RuntimeException('Unknown type from relation "' . $relationName . '" in ' . $repository->entityName());
         }

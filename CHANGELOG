@@ -30,6 +30,11 @@ v2.1.0
     * `Bdf\Prime\Mapper\Attribute\Filter` to replace overrides of `Mapper::filters()`
     * `Bdf\Prime\Mapper\Attribute\RepositoryMethod` to replace overrides of `Mapper::queries()`
     * `Bdf\Prime\Mapper\Attribute\Scope` to replace overrides of `Mapper::scopes()`
+* Feat: Flag for disallowing the use of unknown attributes on query
+    * Add `Bdf\Prime\Mapper\Mapper::setAllowUnknownAttribute()` / `Bdf\Prime\Mapper\Mapper::allowUnknownAttribute()` for define the flag on the entity
+    * Add `Bdf\Prime\Query\CompilableClauseInterface::allowUnknownAttribute()` / `Bdf\Prime\Query\Contract\ReadOperation::isAllowUnknownAttribute()` for define the flag on the query
+    * AliasResolver and OrmPreprocessor now use the flag to allow or not the use of unknown attributes
+    * By default the flag is null, which will raise a deprecation warning, but allow usage of undefined attributes. The default value will be false in next major version.
 
 v2.0.8
 ------

@@ -71,6 +71,7 @@ class MapperTest extends TestCase
         $this->assertFalse($mapper->isReadOnly());
         $this->assertTrue($mapper->hasSchemaManager());
         $this->assertInstanceOf(MapperHydrator::class, $mapper->hydrator());
+        $this->assertNull($mapper->allowUnknownAttribute());
     }
     
     /**
@@ -119,7 +120,19 @@ class MapperTest extends TestCase
         $mapper->setReadOnly(true);
         $this->assertTrue($mapper->isReadOnly());
     }
-    
+
+    /**
+     *
+     */
+    public function test_allow_unknown_attribute()
+    {
+        $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
+
+        $mapper->setAllowUnknownAttribute(true);
+        $this->assertTrue($mapper->allowUnknownAttribute());
+    }
+
     /**
      * 
      */
