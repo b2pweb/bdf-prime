@@ -29,6 +29,8 @@ use Bdf\Serializer\Metadata\Builder\ClassMetadataBuilder;
  * @method static static getOrNew(mixed $key)
  * @method static static getOrFail(mixed $key)
  * @method static static|null findById(mixed $key)
+ * @method static static findByIdOrNew(mixed $key)
+ * @method static static findByIdOrFail(mixed $key)
  * @method static static|null findOne(array $criteria, ?array $attributes = null)
  *
  * @method static QueryInterface where(string|array|callable $column, mixed|null $operator = null, mixed $value = null)

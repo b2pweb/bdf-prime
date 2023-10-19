@@ -18,6 +18,7 @@ use Bdf\Prime\Query\Expression\RawValue;
 use Bdf\Prime\Query\Expression\Value;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Right;
+use Bdf\Prime\TestEntity;
 use Bdf\Prime\TestFiltersEntity;
 use Bdf\Prime\TestFiltersEntityMapper;
 use Bdf\Prime\User;
@@ -1207,5 +1208,53 @@ class QueryOrmTest extends TestCase
         $query = Customer::where($criteria);
 
         $this->assertEquals('SELECT t0.* FROM customer_ t0 WHERE t0.name_ LIKE \'foo%\' AND t0.id_ > \'5\'', $query->toRawSql());
+    }
+
+    public function test_toCriteria_empty()
+    {
+        $this->assertSame([], $this->query->toCriteria());
+    }
+
+    public function test_toCriteria_simple()
+    {
+        $this->assertSame([
+            'id' => 42,
+            'name' => 'Robert',
+        ], $this->query->where('id', 42)->where('name', 'Robert')->toCriteria());
+    }
+
+    public function test_toCriteria_simple_nested()
+    {
+        $this->assertSame([
+            'id' => 42,
+            'name' => 'Robert',
+        ], $this->query->where(['id' => 42, 'name' => 'Robert'])->toCriteria());
+    }
+
+    public function test_toCriteria_not_supported()
+    {
+        $this->assertNull($this->query->where('id', '>', 42)->toCriteria());
+        $this->assertNull($this->query->where('id', 42)->orWhere('name', 'foo')->toCriteria());
+        $this->assertNull($this->query->where('id', [42, 45])->toCriteria());
+        $this->assertNull(TestEntity::builder()
+            ->where(['id' => 42, 'name' => 'Robert'])
+            ->where(function (Query $query) {
+                $query->where([
+                    'value' => 'xxx',
+                    'other' => 'yyy',
+                ]);
+            })
+            ->toCriteria()
+        );
+    }
+
+    public function test_toCriteria_with_filter()
+    {
+        $this->assertSame([
+            'id' => 42,
+            'name' => 'Robert',
+        ], $this->query
+            ->filter(fn (TestEntity $entity) => $entity->id === 42 && $entity->name === 'Robert')
+            ->toCriteria());
     }
 }

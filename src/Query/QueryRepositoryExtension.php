@@ -9,14 +9,22 @@ use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Events;
 use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Exception\QueryBuildingException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Query\Closure\ClosureCompiler;
+use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\Whereable;
 use Bdf\Prime\Relations\Relation;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Closure;
+use Doctrine\DBAL\Query\Expression\CompositeExpression;
+
+use function array_diff;
+use function array_keys;
+use function count;
+use function is_array;
 
 /**
  * QueryRepositoryExtension
@@ -108,9 +116,12 @@ class QueryRepositoryExtension extends QueryCompatExtension
      * @param null|string|array  $attributes
      *
      * @return E|null
+     * @deprecated Since 2.1. Use {@see findById()} instead.
      */
     public function get(ReadCommandInterface $query, $id, $attributes = null)
     {
+        @trigger_error('Query::get()/getOrFail()/getOrNew() is deprecated since 2.1. Use findById() instead.', E_USER_DEPRECATED);
+
         if (empty($id)) {
             return null;
         }
@@ -139,6 +150,7 @@ class QueryRepositoryExtension extends QueryCompatExtension
      * @return E
      *
      * @throws EntityNotFoundException  If entity is not found
+     * @deprecated Since 2.1. Use {@see findByIdOrFail()} instead.
      */
     public function getOrFail(ReadCommandInterface $query, $id, $attributes = null)
     {
@@ -159,6 +171,7 @@ class QueryRepositoryExtension extends QueryCompatExtension
      * @param null|string|array $attributes
      *
      * @return E
+     * @deprecated Since 2.1. Use {@see findByIdOrNew()} instead.
      */
     public function getOrNew(ReadCommandInterface $query, $id, $attributes = null)
     {
@@ -169,6 +182,168 @@ class QueryRepositoryExtension extends QueryCompatExtension
         }
 
         return $this->repository->entity();
+    }
+
+    /**
+     * Find entity by its primary key
+     * In case of composite primary key, the primary key can be resolved by previous where() call
+     *
+     * Note: If criterion which is not part of the primary key is passed, or if the primary key is not complete, the query will throw an {@see QueryBuildingException}.
+     *
+     * <code>
+     * $queries->findById(2);
+     * $queries->findById(['key1' => 1, 'key2' => 5]);
+     * $queries->where('key1', 1)->findById(5); // Same as above: the composite key is completed by previous where() call
+     * </code>
+     *
+     * @param ReadCommandInterface<ConnectionInterface, E>&Whereable $query
+     * @param mixed|array<string, mixed> $id The entity PK. Use an array for composite PK
+     *
+     * @return E|null The entity or null if not found
+     * @throws PrimeException When query fail
+     */
+    public function findById(ReadCommandInterface $query, $id)
+    {
+        $pkAttributes = $this->metadata->primary['attributes'];
+        $criteria = null;
+
+        // Scalar id is used, so resolve the primary key attribute name
+        if (!is_array($id)) {
+            if (count($pkAttributes) === 1) {
+                // Single primary key
+                $id = [$pkAttributes[0] => $id];
+            } else {
+                // Composite primary key : resolve missing primary key attributes
+                $criteria = $this->toCriteria($query) ?? [];
+
+                foreach ($pkAttributes as $key) {
+                    if (!isset($criteria[$key])) {
+                        $id = [$key => $id];
+                        break;
+                    }
+                }
+
+                if (!is_array($id)) {
+                    throw new QueryBuildingException('Ambiguous findById() call : All primary key attributes are already defined on query, so missing part of the primary key cannot be resolved. Use an array as parameter instead to explicitly define the primary key attribute name.');
+                }
+            }
+        }
+
+        $keys = array_keys($id);
+
+        // Some criteria are not part of the primary key
+        if ($extraKeys = array_diff($keys, $pkAttributes)) {
+            throw new QueryBuildingException('Only primary keys must be passed to findById(). Unexpected keys : ' . implode(', ', $extraKeys));
+        }
+
+        $missingPk = array_diff($pkAttributes, $keys);
+
+        if ($missingPk) {
+            // Some primary key attributes are missing
+            // so check if they are defined in the query on previous where() call
+            $criteria ??= $this->toCriteria($query) ?? [];
+
+            foreach ($missingPk as $i => $key) {
+                if (isset($criteria[$key])) {
+                    unset($missingPk[$i]);
+                }
+            }
+
+            if ($missingPk) {
+                throw new QueryBuildingException('Only primary keys must be passed to findById(). Missing keys : ' . implode(', ', $missingPk));
+            }
+        }
+
+        return $query->where($id)->first();
+    }
+
+    /**
+     * Find entity by its primary key, or throws exception if not found in repository
+     * In case of composite primary key, the primary key can be resolved by previous where() call
+     *
+     * Note: If criterion which is not part of the primary key is passed, or if the primary key is not complete, the query will throw an {@see QueryBuildingException}.
+     *
+     * @param ReadCommandInterface<ConnectionInterface, E>&Whereable $query
+     * @param mixed|array<string, mixed> $id The entity PK. Use an array for composite PK
+     *
+     * @return E
+     *
+     * @throws EntityNotFoundException  If entity is not found
+     * @throws PrimeException           When query fail
+     */
+    public function findByIdOrFail(ReadCommandInterface $query, $id)
+    {
+        $entity = $this->findById($query, $id);
+
+        if ($entity !== null) {
+            return $entity;
+        }
+
+        throw new EntityNotFoundException('Cannot resolve entity identifier "'.implode('", "', (array)$id).'"');
+    }
+
+    /**
+     * Find entity by its primary key, or throws exception if not found in repository
+     * In case of composite primary key, the primary key can be resolved by previous where() call
+     *
+     * Note: If criterion which is not part of the primary key is passed, or if the primary key is not complete, the query will throw an {@see QueryBuildingException}.
+     *
+     * @param ReadCommandInterface<ConnectionInterface, E>&Whereable $query
+     * @param mixed|array<string, mixed> $id The entity PK. Use an array for composite PK
+     *
+     * @return E
+     *
+     * @throws EntityNotFoundException  If entity is not found
+     * @throws PrimeException           When query fail
+     */
+    public function findByIdOrNew(ReadCommandInterface $query, $id)
+    {
+        $entity = $this->findById($query, $id);
+
+        if ($entity !== null) {
+            return $entity;
+        }
+
+        return $this->repository->entity($this->toCriteria($query) ?? []);
+    }
+
+    /**
+     * Execute the query and return the first result, or throw {@see EntityNotFoundException} if no result
+     *
+     * @param ReadCommandInterface<ConnectionInterface, E> $query
+     *
+     * @return E
+     */
+    public function firstOrFail(ReadCommandInterface $query)
+    {
+        $entity = $query->first();
+
+        if ($entity !== null) {
+            return $entity;
+        }
+
+        throw new EntityNotFoundException('Cannot resolve entity');
+    }
+
+    /**
+     * Execute the query and return the first result, or instantiate a new entity if no result
+     *
+     * @param ReadCommandInterface<ConnectionInterface, E> $query
+     * @param bool $useCriteriaAsDefault If true, the criteria of the query will be used as default attributes
+     *
+     * @return E
+     */
+    public function firstOrNew(ReadCommandInterface $query, bool $useCriteriaAsDefault = true)
+    {
+        $entity = $query->first();
+
+        if ($entity !== null) {
+            return $entity;
+        }
+
+        $attributes = $useCriteriaAsDefault ? $this->toCriteria($query) : null;
+
+        return $this->repository->entity($attributes ?? []);
     }
 
     /**
@@ -260,6 +435,58 @@ class QueryRepositoryExtension extends QueryCompatExtension
         ];
 
         return $query;
+    }
+
+    /**
+     * Convert query where clause to key-value criteria
+     *
+     * @param ReadCommandInterface $query
+     *
+     * @return array<string, mixed>|null
+     */
+    public function toCriteria(ReadCommandInterface $query): ?array
+    {
+        if ($query instanceof KeyValueQueryInterface) {
+            return $query->statement('where');
+        }
+
+        $criteria = [];
+
+        $statements = [];
+
+        // Flatten query with a single level of nesting
+        foreach ($query->statement('where') as $statement) {
+            if (CompositeExpression::TYPE_AND !== ($statement['glue'] ?? null)) {
+                // Only AND composite expression are supported
+                return null;
+            }
+
+            if (!isset($statement['nested'])) {
+                $statements[] = $statement;
+            } else {
+                $statements = [...$statements, ...$statement['nested']];
+            }
+        }
+
+        foreach ($statements as $statement) {
+            if (
+                !isset($statement['column'], $statement['glue'], $statement['operator'])
+                || $statement['glue'] !== CompositeExpression::TYPE_AND
+                || $statement['operator'] !== '=' // @todo support :eq etc...
+            ) {
+                return null; // Cannot extract complex criteria
+            }
+
+            $value = $statement['value'] ?? null;
+
+            if (is_array($value)) {
+                return null;
+            }
+
+            $criteria[$statement['column']] = $value;
+        }
+
+        return $criteria;
     }
 
     /**
