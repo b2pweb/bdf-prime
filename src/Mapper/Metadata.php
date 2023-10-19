@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Mapper;
 
 use Bdf\Prime\Entity\Instantiator\InstantiatorInterface;
+use Bdf\Prime\Mapper\Attribute\MapperConfigurationInterface;
 use Bdf\Prime\Relations\Builder\RelationBuilder;
 use Bdf\Prime\Relations\Relation;
 use LogicException;
@@ -213,6 +214,13 @@ class Metadata
      * @var array
      */
     public $eagerRelations = [];
+
+    /**
+     * List of mapper configurators
+     *
+     * @var array<MapperConfigurationInterface>
+     */
+    public array $configurators = [];
 
     /**
      * Get entity class name

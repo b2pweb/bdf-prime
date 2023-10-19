@@ -21,6 +21,15 @@ v2.1.0
 * Feat: Add `Bdf\Prime\Query\Expression\Operator` to wrap the operator and the value as expression. So it can be used in on criteria setters
 * Feat: Add `Clause::replaceClause()` and `Wherable::replaceWhere()` to replace a single filter value. Method `Wherable::replaceWhere()` is commented for now to avoid BC break.
 * Change: Declaring two fields with the same alias is now forbidden
+* Feat: Add PHP 8 attributes to configure Mapper
+    * `Bdf\Prime\Mapper\Attribute\CriteriaClass` to replace `Mapper::setCriteriaClass()`
+    * `Bdf\Prime\Mapper\Attribute\DisableSchemaManager` to replace `Mapper::disableSchemaManager()`
+    * `Bdf\Prime\Mapper\Attribute\DisableWrite` to replace `Mapper::setReadOnly()`
+    * `Bdf\Prime\Mapper\Attribute\RepositoryClass` to replace `Mapper::setRepositoryClass()`
+    * `Bdf\Prime\Mapper\Attribute\UseQuoteIdentifier` to replace `Mapper::setQuoteIdentifier()`
+    * `Bdf\Prime\Mapper\Attribute\Filter` to replace overrides of `Mapper::filters()`
+    * `Bdf\Prime\Mapper\Attribute\RepositoryMethod` to replace overrides of `Mapper::queries()`
+    * `Bdf\Prime\Mapper\Attribute\Scope` to replace overrides of `Mapper::scopes()`
 * Feat: Flag for disallowing the use of unknown attributes on query
     * Add `Bdf\Prime\Mapper\Mapper::setAllowUnknownAttribute()` / `Bdf\Prime\Mapper\Mapper::allowUnknownAttribute()` for define the flag on the entity
     * Add `Bdf\Prime\Query\CompilableClauseInterface::allowUnknownAttribute()` / `Bdf\Prime\Query\Contract\ReadOperation::isAllowUnknownAttribute()` for define the flag on the query

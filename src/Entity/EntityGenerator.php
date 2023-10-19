@@ -22,6 +22,9 @@ use Nette\PhpGenerator\PromotedParameter;
 use Nette\PhpGenerator\Property;
 use Nette\PhpGenerator\TraitUse;
 
+use function array_map;
+use function class_exists;
+
 /**
  * Generic class used to generate PHP 7 and 8 entity classes from Mapper.
  *
@@ -286,7 +289,13 @@ class EntityGenerator
             $class->addImplement($interface);
         }
 
-        $class->setTraits($this->traits);
+        // Compatibility with nette/php-generator 3.6 and 4.1
+        if (class_exists(TraitUse::class)) {
+            $class->setTraits(array_map(fn ($trait) => new TraitUse($trait), $this->traits));
+        } else {
+            /** @psalm-suppress InvalidArgument */
+            $class->setTraits($this->traits);
+        }
     }
 
     /**
