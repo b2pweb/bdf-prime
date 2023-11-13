@@ -1233,7 +1233,7 @@ class QueryTest extends TestCase
             'name' => 'test-name1'
         ]);
 
-        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
+        $cache = new ArrayCache();
         $query = $this->query();
         $query->setCache($cache)->useCache();
 
@@ -1271,7 +1271,7 @@ class QueryTest extends TestCase
             'name' => 'test-name1'
         ]);
 
-        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
+        $cache = new ArrayCache();
         $query = $this->query();
         $query->setCache($cache)->useCache();
 
@@ -1447,7 +1447,7 @@ class QueryTest extends TestCase
             'name' => 'John'
         ]];
 
-        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
+        $cache = new ArrayCache();
 
         $query = $this->query();
         $query->setCache($cache)->useCache();
@@ -1471,7 +1471,7 @@ class QueryTest extends TestCase
             'name' => 'John'
         ]];
 
-        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
+        $cache = new ArrayCache();
 
         $query = $this->query();
         $query->setCache($cache)->useCache();
@@ -1509,7 +1509,7 @@ class QueryTest extends TestCase
             'name' => 'test-name1'
         ]);
 
-        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
+        $cache = new ArrayCache();
         $query = $this->query();
         $query
             ->setCache($cache)
@@ -1539,7 +1539,7 @@ class QueryTest extends TestCase
             'name' => 'test-name1'
         ]);
 
-        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
+        $cache = new ArrayCache();
         $query = $this->query();
         $query
             ->setCache($cache)

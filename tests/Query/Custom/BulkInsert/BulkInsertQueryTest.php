@@ -310,7 +310,7 @@ class BulkInsertQueryTest extends TestCase
      */
     public function test_insert_will_clear_cache()
     {
-        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
+        $cache = new ArrayCache();
         $key = new CacheKey('test:person', 'foo');
         $cache->set($key, 'bar');
         $this->assertSame('bar', $cache->get($key));
@@ -331,7 +331,7 @@ class BulkInsertQueryTest extends TestCase
      */
 //    public function test_orm_cache()
 //    {
-//        Prime::service()->mappers()->setResultCache($cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache()));
+//        Prime::service()->mappers()->setResultCache($cache = new ArrayCache();
 //
 //        $this->pack()->declareEntity(TestEntity::class);
 //
