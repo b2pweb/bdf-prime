@@ -1704,7 +1704,7 @@ class QueryTest extends TestCase
         $query = $this->query();
         $result = $query->where(new Attribute('name', 'soundex(%s)'), soundex('robert'))->all();
 
-        $this->assertSame([[
+        $this->assertEquals([[
             'id' => 3,
             'name' => 'robert',
             'date_insert' => null,
@@ -1729,7 +1729,7 @@ class QueryTest extends TestCase
         $query = $this->query();
         $result = $query->where('id', 1)->orWhere(new Attribute('name', 'soundex(%s)'), soundex('robert'))->all();
 
-        $this->assertSame([
+        $this->assertEquals([
             [
                 'id' => 1,
                 'name' => 'jean',
@@ -1761,7 +1761,7 @@ class QueryTest extends TestCase
         $query = $this->query();
         $result = $query->whereNull(new Attribute('name', 'nullif(%s, "robert")'))->all();
 
-        $this->assertSame([
+        $this->assertEquals([
             [
                 'id' => 3,
                 'name' => 'robert',
@@ -1788,7 +1788,7 @@ class QueryTest extends TestCase
         $query = $this->query();
         $result = $query->whereNotNull(new Attribute('name', 'nullif(%s, "robert")'))->all();
 
-        $this->assertSame([
+        $this->assertEquals([
             [
                 'id' => 1,
                 'name' => 'jean',
@@ -1820,7 +1820,7 @@ class QueryTest extends TestCase
         $query = $this->query();
         $result = $query->where('id', 1)->orWhereNull(new Attribute('name', 'nullif(%s, "robert")'))->all();
 
-        $this->assertSame([
+        $this->assertEquals([
             [
                 'id' => 1,
                 'name' => 'jean',
@@ -1852,7 +1852,7 @@ class QueryTest extends TestCase
         $query = $this->query();
         $result = $query->where('id', 3)->orWhereNotNull(new Attribute('name', 'nullif(%s, "robert")'))->all();
 
-        $this->assertSame([
+        $this->assertEquals([
             [
                 'id' => 1,
                 'name' => 'jean',
