@@ -70,7 +70,7 @@ trait SimpleWhereTrait
      *
      * @see Whereable::whereNull()
      */
-    public function whereNull(string $column, string $type = CompositeExpression::TYPE_AND)
+    public function whereNull($column, string $type = CompositeExpression::TYPE_AND)
     {
         $this->compilerState->invalidate('where');
 
@@ -82,7 +82,7 @@ trait SimpleWhereTrait
      *
      * @see Whereable::whereNotNull()
      */
-    public function whereNotNull(string $column, string $type = CompositeExpression::TYPE_AND)
+    public function whereNotNull($column, string $type = CompositeExpression::TYPE_AND)
     {
         $this->compilerState->invalidate('where');
 
@@ -94,7 +94,7 @@ trait SimpleWhereTrait
      *
      * @see Whereable::orWhereNull()
      */
-    public function orWhereNull(string $column)
+    public function orWhereNull($column)
     {
         return $this->whereNull($column, CompositeExpression::TYPE_OR);
     }
@@ -104,7 +104,7 @@ trait SimpleWhereTrait
      *
      * @see Whereable::orWhereNotNull()
      */
-    public function orWhereNotNull(string $column)
+    public function orWhereNotNull($column)
     {
         return $this->whereNotNull($column, CompositeExpression::TYPE_OR);
     }

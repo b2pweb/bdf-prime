@@ -7,6 +7,7 @@ use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Contract\SelfExecutable;
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 
 /**
  * Base type for perform an SGBD command
@@ -41,7 +42,7 @@ interface CommandInterface extends CompilableClauseInterface, SelfExecutable
     /**
      * {@inheritdoc}
      *
-     * @param string|array $columns Filter result columns
+     * @param string|ExpressionInterface|array $columns Filter result columns
      *
      * @return ResultSetInterface<array<string, mixed>>
      * @throws PrimeException When execute fail

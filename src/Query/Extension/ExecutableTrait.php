@@ -46,7 +46,7 @@ trait ExecutableTrait
      * @return list<mixed>
      */
     #[ReadOperation]
-    public function inRows(string $column): array
+    public function inRows($column): array
     {
         return $this->execute($column)->asColumn()->all();
     }
@@ -56,7 +56,7 @@ trait ExecutableTrait
      * @see QueryInterface::inRow()
      */
     #[ReadOperation]
-    public function inRow(string $column)
+    public function inRow($column)
     {
         foreach ($this->limit(1)->execute($column)->asColumn() as $value) {
             return $value;

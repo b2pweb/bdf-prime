@@ -1637,4 +1637,237 @@ class QueryTest extends TestCase
         $this->assertEquals('SELECT * FROM test_ WHERE id IS NULL', $query->toRawSql());
         $this->assertEquals('SELECT * FROM test_ WHERE id = 42', $query->whereReplace('id', 42)->toRawSql());
     }
+
+    /**
+     *
+     */
+    public function test_inRows_with_expression()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'jean'
+        ]);
+        $this->push([
+            'id'   => 2,
+            'name' => 'george'
+        ]);
+        $this->push([
+            'id'   => 3,
+            'name' => 'robert'
+        ]);
+
+        $query = $this->query();
+        $result = $query->inRows(new Attribute('name', 'soundex(%s)'));
+
+        $this->assertSame(['J500', 'G620', 'R163'], $result);
+    }
+
+    /**
+     *
+     */
+    public function test_inRow_with_expression()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'jean'
+        ]);
+        $this->push([
+            'id'   => 2,
+            'name' => 'george'
+        ]);
+        $this->push([
+            'id'   => 3,
+            'name' => 'robert'
+        ]);
+
+        $query = $this->query();
+        $result = $query->where('id', 2)->inRow(new Attribute('name', 'soundex(%s)'));
+
+        $this->assertSame('G620', $result);
+    }
+
+    public function test_where_with_expression_on_left()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'jean'
+        ]);
+        $this->push([
+            'id'   => 2,
+            'name' => 'george'
+        ]);
+        $this->push([
+            'id'   => 3,
+            'name' => 'robert'
+        ]);
+
+        $query = $this->query();
+        $result = $query->where(new Attribute('name', 'soundex(%s)'), soundex('robert'))->all();
+
+        $this->assertSame([[
+            'id' => 3,
+            'name' => 'robert',
+            'date_insert' => null,
+        ]], $result);
+    }
+
+    public function test_orWhere_with_expression_on_left()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'jean'
+        ]);
+        $this->push([
+            'id'   => 2,
+            'name' => 'george'
+        ]);
+        $this->push([
+            'id'   => 3,
+            'name' => 'robert'
+        ]);
+
+        $query = $this->query();
+        $result = $query->where('id', 1)->orWhere(new Attribute('name', 'soundex(%s)'), soundex('robert'))->all();
+
+        $this->assertSame([
+            [
+                'id' => 1,
+                'name' => 'jean',
+                'date_insert' => null,
+            ],
+            [
+                'id' => 3,
+                'name' => 'robert',
+                'date_insert' => null,
+            ],
+        ], $result);
+    }
+
+    public function test_whereNull_with_expression()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'jean'
+        ]);
+        $this->push([
+            'id'   => 2,
+            'name' => 'george'
+        ]);
+        $this->push([
+            'id'   => 3,
+            'name' => 'robert'
+        ]);
+
+        $query = $this->query();
+        $result = $query->whereNull(new Attribute('name', 'nullif(%s, "robert")'))->all();
+
+        $this->assertSame([
+            [
+                'id' => 3,
+                'name' => 'robert',
+                'date_insert' => null,
+            ],
+        ], $result);
+    }
+
+    public function test_whereNotNull_with_expression()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'jean'
+        ]);
+        $this->push([
+            'id'   => 2,
+            'name' => 'george'
+        ]);
+        $this->push([
+            'id'   => 3,
+            'name' => 'robert'
+        ]);
+
+        $query = $this->query();
+        $result = $query->whereNotNull(new Attribute('name', 'nullif(%s, "robert")'))->all();
+
+        $this->assertSame([
+            [
+                'id' => 1,
+                'name' => 'jean',
+                'date_insert' => null,
+            ],
+            [
+                'id' => 2,
+                'name' => 'george',
+                'date_insert' => null,
+            ],
+        ], $result);
+    }
+
+    public function test_orWhereNull_with_expression()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'jean'
+        ]);
+        $this->push([
+            'id'   => 2,
+            'name' => 'george'
+        ]);
+        $this->push([
+            'id'   => 3,
+            'name' => 'robert'
+        ]);
+
+        $query = $this->query();
+        $result = $query->where('id', 1)->orWhereNull(new Attribute('name', 'nullif(%s, "robert")'))->all();
+
+        $this->assertSame([
+            [
+                'id' => 1,
+                'name' => 'jean',
+                'date_insert' => null,
+            ],
+            [
+                'id' => 3,
+                'name' => 'robert',
+                'date_insert' => null,
+            ],
+        ], $result);
+    }
+
+    public function test_orWhereNotNull_with_expression()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'jean'
+        ]);
+        $this->push([
+            'id'   => 2,
+            'name' => 'george'
+        ]);
+        $this->push([
+            'id'   => 3,
+            'name' => 'robert'
+        ]);
+
+        $query = $this->query();
+        $result = $query->where('id', 3)->orWhereNotNull(new Attribute('name', 'nullif(%s, "robert")'))->all();
+
+        $this->assertSame([
+            [
+                'id' => 1,
+                'name' => 'jean',
+                'date_insert' => null,
+            ],
+            [
+                'id' => 2,
+                'name' => 'george',
+                'date_insert' => null,
+            ],
+            [
+                'id' => 3,
+                'name' => 'robert',
+                'date_insert' => null,
+            ],
+        ], $result);
+    }
 }

@@ -7,6 +7,7 @@ use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\Cachable;
 use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 
 /**
  * Base type for "read" operation commands
@@ -135,7 +136,7 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      * <code>
      *     $result = $query
      *         ->from('users')
-     *         ->inRows('name);
+     *         ->inRows('name');
      *
      *     print_r($result);
      *     // display
@@ -144,15 +145,19 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      *            [0] => 'foo'
      *            [1] => 'bar'
      *             ...
+     *
+     *      // Expressions can also be used
+     *      $query->from('users')->inRows(new Raw('options->>"$.darkMode"'));
      * </code>
      *
-     * @param string $column
+     * @param string|ExpressionInterface $column The column to return, or an expression
      *
      * @return list<mixed>
      * @throws PrimeException When execute fail
+     * @todo Change parameter type hint on prime 3.0
      */
     #[ReadOperation]
-    public function inRows(string $column): array;
+    public function inRows(string/*|ExpressionInterface*/ $column): array;
 
     /**
      * Get a column value
@@ -160,17 +165,21 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      * <code>
      *     $result = $query
      *         ->from('users')
-     *         ->inRow('name);
+     *         ->inRow('name');
      *
      *     echo $result;
      *     // display 'foo'
+     *
+     *     // Expressions can also be used
+     *     $query->from('users')->inRow(new Raw('options->>"$.darkMode"'));
      * </code>
      *
-     * @param string $column
+     * @param string|ExpressionInterface $column The column to return, or an expression
      *
      * @return mixed
      * @throws PrimeException When execute fail
+     * @todo Change parameter type hint on prime 3.0
      */
     #[ReadOperation]
-    public function inRow(string $column);
+    public function inRow(string/*|ExpressionInterface*/ $column);
 }

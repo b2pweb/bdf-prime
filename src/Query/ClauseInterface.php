@@ -68,7 +68,8 @@ interface ClauseInterface
      *         ->buildClause('where', 'u.id', '=', '1') // interpreted expression: will replace by positionnal char
      *         ->buildClause('where', 'u.id', '1')  // default operator is '='
      *         ->buildClause('where', ['u.id' => '1']);  // send criteria
-     *         ->buildClause('where', ['u.id =' => '1']);  // send criteria with operator
+     *         ->buildClause('where', ['u.id =' => '1'])  // send criteria with operator
+     *         ->buildClause('where', new JsonExtract('foo', '$.bar'), 'baz');  // use expression as left operand instead of column
      * </code>
      *
      * Does not manage expression with ExpressionInterface
@@ -82,7 +83,7 @@ interface ClauseInterface
      * </code>
      *
      * @param string $statement
-     * @param string|array<string,mixed> $expression The restriction predicates.
+     * @param string|array<string,mixed>|ExpressionInterface $expression The restriction predicates.
      * @param string|null|mixed $operator
      * @param mixed $value
      * @param string $type

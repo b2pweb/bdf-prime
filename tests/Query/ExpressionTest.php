@@ -4,6 +4,9 @@ namespace Bdf\Prime\Query;
 
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Query\Expression\AbstractExpressionTransformer;
+use Bdf\Prime\Query\Expression\Like;
+use Bdf\Prime\Query\Expression\Raw;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -143,5 +146,29 @@ class ExpressionTest extends TestCase
             ->where([new Expression\FullTextMatch('name', 'test', true)])
             ->toSql()
         );
+    }
+
+    public function test_expression_in_left_operand()
+    {
+        $query = $this->query->where(new Expression\Raw('json->>"$.foo"'), 'bar');
+
+        $this->assertEquals(
+            "SELECT t0.* FROM $this->table t0 WHERE json->>\"$.foo\" = ?",
+            $query->toSql()
+        );
+
+        $this->assertEquals(['bar'], $query->getBindings());
+    }
+
+    public function test_expression_in_left_operand_and_expression_transformer()
+    {
+        $query = $this->query->where(new Expression\Raw('json->>"$.foo"'), (new Like('bar'))->startsWith());
+
+        $this->assertEquals(
+            "SELECT t0.* FROM $this->table t0 WHERE json->>\"$.foo\" LIKE ?",
+            $query->toSql()
+        );
+
+        $this->assertEquals(['bar%'], $query->getBindings());
     }
 }

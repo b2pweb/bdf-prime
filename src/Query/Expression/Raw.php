@@ -5,28 +5,28 @@ namespace Bdf\Prime\Query\Expression;
 use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 
+use function trigger_error;
+
 /**
  * SQL Expression
  *
  * inject sql expression into query builder
  *
  * @package Bdf\Prime\Query\Expression
+ * @final
  */
 class Raw implements ExpressionInterface
 {
-    /**
-     * @var string
-     */
-    protected $value;
+    protected string $value;
 
     /**
      * Instanciate a new raw sql
      *
-     * @param mixed $value
+     * @param string $value
      */
     public function __construct($value)
     {
-        $this->value = $value;
+        $this->value = (string) $value;
     }
 
     /**
@@ -36,14 +36,16 @@ class Raw implements ExpressionInterface
      */
     public function __toString()
     {
-        return (string)$this->value;
+        @trigger_error('Using Raw expression as string is deprecated since Prime 2.2, and will be removed in prime 3.0.', E_USER_DEPRECATED);
+
+        return $this->value;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function build(CompilableClause $query, object $compiler)
+    public function build(CompilableClause $query, object $compiler): string
     {
-        return $this->__toString();
+        return $this->value;
     }
 }
