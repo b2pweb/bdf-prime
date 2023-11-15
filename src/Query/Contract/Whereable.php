@@ -93,6 +93,8 @@ interface Whereable
      * @param string $type
      *
      * @return $this This Query instance.
+     *
+     * @psalm-suppress MismatchingDocblockParamType
      * @todo Change column type hint on prime 3.0
      */
     public function whereNull(string/*|ExpressionInterface*/ $column, string $type = CompositeExpression::TYPE_AND);
@@ -104,6 +106,8 @@ interface Whereable
      * @param string $type
      *
      * @return $this This Query instance.
+     *
+     * @psalm-suppress MismatchingDocblockParamType
      * @todo Change column type hint on prime 3.0
      */
     public function whereNotNull(string/*|ExpressionInterface*/ $column, string $type = CompositeExpression::TYPE_AND);
@@ -114,6 +118,8 @@ interface Whereable
      * @param string|ExpressionInterface $column
      *
      * @return $this This Query instance.
+     *
+     * @psalm-suppress MismatchingDocblockParamType
      * @todo Change column type hint on prime 3.0
      */
     public function orWhereNull(string/*|ExpressionInterface*/ $column);
@@ -124,6 +130,8 @@ interface Whereable
      * @param string|ExpressionInterface $column
      *
      * @return $this This Query instance.
+     *
+     * @psalm-suppress MismatchingDocblockParamType
      * @todo Change column type hint on prime 3.0
      */
     public function orWhereNotNull(string/*|ExpressionInterface*/ $column);

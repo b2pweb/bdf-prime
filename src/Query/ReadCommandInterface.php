@@ -154,6 +154,8 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      *
      * @return list<mixed>
      * @throws PrimeException When execute fail
+     *
+     * @psalm-suppress MismatchingDocblockParamType
      * @todo Change parameter type hint on prime 3.0
      */
     #[ReadOperation]
@@ -178,6 +180,8 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      *
      * @return mixed
      * @throws PrimeException When execute fail
+     *
+     * @psalm-suppress MismatchingDocblockParamType
      * @todo Change parameter type hint on prime 3.0
      */
     #[ReadOperation]

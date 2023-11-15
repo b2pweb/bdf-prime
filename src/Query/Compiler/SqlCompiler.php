@@ -774,7 +774,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
     /**
      * Compile the left operand of the expression
      *
-     * @param CompilableClause $query
+     * @param SqlQueryInterface&CompilableClause $query
      * @param string|ExpressionInterface $expression The left operand. If string, it will be interpreted as a column name
      *
      * @return string
