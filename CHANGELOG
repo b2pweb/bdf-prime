@@ -10,7 +10,7 @@ v2.2.0
     * `Whereable::whereNotNull()`
 
 BC Breaks
-* Change: `Bdf\Prime\Query/Expression/Raw::__toString()` is now deprecated, and its constructor value will be cast to string on constructor.
+* Change: `Bdf\Prime\Query/Expression/Raw::__toString()` is now deprecated, and its constructor value will be cast to string.
 
 v2.1.0
 ------
