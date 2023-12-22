@@ -48,12 +48,12 @@ class ShardingConnectionFactoryTest extends TestCase
 
         $delegate->expects($this->at(0))
             ->method('create')
-            ->with($connectionName.'.shard1', ['driver' => 'pdo_sqlite', 'memory' => true, 'dbname' => 'TEST_SHARD1'], $config)
+            ->with($connectionName.'.shard1', ['driver' => 'pdo_sqlite', 'memory' => true, 'dbname' => 'TEST_SHARD1'], $config->withName('foo'))
             ->willReturn($shard1);
 
         $delegate->expects($this->at(1))
             ->method('create')
-            ->with($connectionName.'.shard2', ['driver' => 'pdo_sqlite', 'memory' => true, 'dbname' => 'TEST_SHARD2'], $config)
+            ->with($connectionName.'.shard2', ['driver' => 'pdo_sqlite', 'memory' => true, 'dbname' => 'TEST_SHARD2'], $config->withName('foo'))
             ->willReturn($shard2);
 
         $globalParameters = [
@@ -68,7 +68,7 @@ class ShardingConnectionFactoryTest extends TestCase
         ];
         $delegate->expects($this->at(2))
             ->method('create')
-            ->with($connectionName, $globalParameters, $config)
+            ->with($connectionName, $globalParameters, $config->withName('foo'))
             ->willReturn($this->createMock(ConnectionInterface::class));
 
         $factory->create($connectionName, $parameters, $config);

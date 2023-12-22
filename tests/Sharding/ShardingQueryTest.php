@@ -153,6 +153,8 @@ class ShardingQueryTest extends TestCase
     public function test_update_should_use_where_to_pick_shard()
     {
         $this->connection->getConfiguration()->setSQLLogger($logger = new DebugStack());
+        $this->connection->getShardConnection('shard1')->getConfiguration()->setSQLLogger($logger);
+        $this->connection->getShardConnection('shard2')->getConfiguration()->setSQLLogger($logger);
 
         $this->query()->insert(['id' => 1, 'name' => 'John']);
         $this->query()->insert(['id' => 2, 'name' => 'Mike']);

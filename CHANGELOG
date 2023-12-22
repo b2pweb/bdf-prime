@@ -1,3 +1,14 @@
+v2.2.0
+------
+
+* Feat: Add `Bdf\Prime\Connection\Middleware\LoggerMiddleware` to log queries using new middleware system
+* Change: Mark `Bdf\Prime\Logger\PsrLogger` as deprecated. Use `Bdf\Prime\Connection\Middleware\LoggerMiddleware` instead.
+* Change: `Bdf\Prime\Configuration` now store the connection name, which is set by connection factory.
+* Change: `Bdf\Prime\Configuration::getMiddleware()` will set the configuration instance if the middleware implements `ConfigurationAwareMiddlewareInterface`
+
+BC Breaks
+* Change: `Bdf\Prime\Configuration` instances are not shared anymore between connections. So change of the default configuration during runtime will not affect already created connections.
+
 v2.1.0
 ------
 

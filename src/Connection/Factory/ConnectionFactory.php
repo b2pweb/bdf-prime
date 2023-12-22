@@ -36,6 +36,12 @@ class ConnectionFactory implements ConnectionFactoryInterface
      */
     public function create(string $connectionName, array $parameters, ?Configuration $config = null): ConnectionInterface
     {
+        if (!$config) {
+            $config = new Configuration(['name' => $connectionName]);
+        } else {
+            $config = $config->withName($connectionName);
+        }
+
         $connection = $this->createConnection($parameters, $config);
 
         // Store connection and return adapter instance
@@ -56,7 +62,7 @@ class ConnectionFactory implements ConnectionFactoryInterface
      * Create the instance of the connection
      *
      * @param array{wrapperClass?: class-string<T>} $parameters
-     * @param Configuration|null $config
+     * @param Configuration $config
      * @param EventManager|null $eventManager The event manager, optional.
      *
      * @return ConnectionInterface
@@ -64,7 +70,7 @@ class ConnectionFactory implements ConnectionFactoryInterface
      *
      * @template T as ConnectionInterface
      */
-    private function createConnection(array $parameters, Configuration $config = null, EventManager $eventManager = null): ConnectionInterface
+    private function createConnection(array $parameters, Configuration $config, EventManager $eventManager = null): ConnectionInterface
     {
         // Set the custom driver class + wrapper
         if (isset($parameters['driver']) && isset(self::$driversMap[$parameters['driver']])) {
@@ -86,10 +92,6 @@ class ConnectionFactory implements ConnectionFactoryInterface
         // default wrapper
         if (!isset($parameters['wrapperClass'])) {
             $parameters['wrapperClass'] = SimpleConnection::class;
-        }
-
-        if ($config === null) {
-            $config = new Configuration();
         }
 
         try {

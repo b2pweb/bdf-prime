@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Connection\Middleware\ConfigurationAwareMiddlewareInterface;
 use Bdf\Prime\Platform\PlatformTypeInterface;
 use Bdf\Prime\Types\TypesRegistry;
 use Bdf\Prime\Types\TypesRegistryInterface;
@@ -23,6 +24,11 @@ class Configuration extends BaseConfiguration
      * @var array<class-string<PlatformTypeInterface>|PlatformTypeInterface>
      */
     private array $platformTypes = [];
+
+    /**
+     * The connection name
+     */
+    private ?string $name = null;
 
     /**
      * Set configuration
@@ -94,5 +100,53 @@ class Configuration extends BaseConfiguration
     public function getPlatformTypes(): array
     {
         return $this->platformTypes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMiddlewares(): array
+    {
+        $configuredMiddlewares = [];
+
+        foreach (parent::getMiddlewares() as $middleware) {
+            if ($middleware instanceof ConfigurationAwareMiddlewareInterface) {
+                $middleware = $middleware->withConfiguration($this);
+            }
+
+            $configuredMiddlewares[] = $middleware;
+        }
+
+        return $configuredMiddlewares;
+    }
+
+    /**
+     * Get the connection name
+     *
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Define the connection name on the configuration
+     * This method will return a new instance of the configuration
+     *
+     * @param string $name The connection name
+     *
+     * @return static The new configuration instance
+     */
+    public function withName(string $name): self
+    {
+        if ($this->name === $name) {
+            return $this;
+        }
+
+        $clone = clone $this;
+        $clone->name = $name;
+
+        return $clone;
     }
 }

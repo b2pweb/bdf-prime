@@ -10,6 +10,9 @@ use Psr\Log\LoggerInterface;
 
 /**
  * PsrDecorator
+ *
+ * @deprecated Since Prime 2.2. Use middleware instead.
+ * @see \Bdf\Prime\Connection\Middleware\LoggerMiddleware for the replacement
  */
 class PsrDecorator implements SQLLogger, ConnectionAwareInterface
 {
