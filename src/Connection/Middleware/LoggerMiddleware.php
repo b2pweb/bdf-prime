@@ -61,7 +61,7 @@ final class LoggerMiddleware implements ConfigurationAwareMiddlewareInterface
 
                 public function log($level, $message, array $context = []): void
                 {
-                    $this->logger->log($level, $this->format($message, $context), ['connection' => $this->connectionName] + $context);
+                    $this->logger->log((string) $level, $this->format((string) $message, $context), ['connection' => $this->connectionName] + $context);
                 }
 
                 /**
@@ -79,6 +79,7 @@ final class LoggerMiddleware implements ConfigurationAwareMiddlewareInterface
             };
         }
 
+        /** @psalm-suppress InternalMethod */
         return new LoggingDriver($driver, $logger);
     }
 }
