@@ -27,6 +27,7 @@ jobs:
       with:
         php-version: ${{ matrix.php-versions }}
         extensions: json
+        coverage: none # disable xdebug
         ini-values: date.timezone=Europe/Paris
     - name: Check PHP Version
       run: php -v
