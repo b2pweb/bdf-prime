@@ -161,7 +161,7 @@ class Clause implements ClauseInterface
                 $operator = '=';
             }
 
-            if (isset($this->customFilters[$expression])) {
+            if (is_string($expression) && isset($this->customFilters[$expression])) {
                 // Custom filter
                 $this->customFilters[$expression]($this, $value);
             } else {

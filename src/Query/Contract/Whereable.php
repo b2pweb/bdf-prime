@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Query\Contract;
 
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 /**
@@ -18,9 +19,9 @@ interface Whereable
      *     $query
      *         ->select('u.name')
      *         ->from('users', 'u')
-     *         ->where('u.id = 1')  // RAW sql
-     *         ->where('u.id', '=', '1') // interpreted expression: will replace by positionnal char
-     *         ->where('u.id', '1')  // default operator is '='
+     *         ->where('id', '=', '1') // Use column name
+     *         ->where('id', '1')  // default operator is '='
+     *         ->where(new Raw('u.id'), '=', '1') // use expression instead of column name
      *         ->where(['u.id' => '1']);  // send criteria
      *
      *     // You can build nested expressions
@@ -30,7 +31,7 @@ interface Whereable
      *         })
      * </code>
      *
-     * @param string|array<string,mixed>|callable(static):void $column The restriction predicates.
+     * @param string|array<string,mixed>|callable(static):void|ExpressionInterface $column The restriction predicates.
      * @param string|mixed|null $operator The comparison operator, or the value is you want to use "=" operator
      * @param mixed $value
      *
@@ -71,11 +72,11 @@ interface Whereable
      *     $query
      *         ->select('u.name')
      *         ->from('users', 'u')
-     *         ->where('u.id = 1')
-     *         ->orWhere('u.id = 2');
+     *         ->where('u.id', 1)
+     *         ->orWhere('u.id', 2);
      * </code>
      *
-     * @param string|array<string,mixed>|callable(static):void $column The restriction predicates.
+     * @param string|array<string,mixed>|callable(static):void|ExpressionInterface $column The restriction predicates.
      * @param string|mixed|null $operator The comparison operator, or the value is you want to use "=" operator
      * @param mixed $value
      *
@@ -88,40 +89,52 @@ interface Whereable
     /**
      * Add where IS NULL expression
      *
-     * @param string $column
+     * @param string|ExpressionInterface $column
      * @param string $type
      *
      * @return $this This Query instance.
+     *
+     * @psalm-suppress MismatchingDocblockParamType
+     * @todo Change column type hint on prime 3.0
      */
-    public function whereNull(string $column, string $type = CompositeExpression::TYPE_AND);
+    public function whereNull(string/*|ExpressionInterface*/ $column, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add where IS NOT NULL expression
      *
-     * @param string $column
+     * @param string|ExpressionInterface $column
      * @param string $type
      *
      * @return $this This Query instance.
+     *
+     * @psalm-suppress MismatchingDocblockParamType
+     * @todo Change column type hint on prime 3.0
      */
-    public function whereNotNull(string $column, string $type = CompositeExpression::TYPE_AND);
+    public function whereNotNull(string/*|ExpressionInterface*/ $column, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add OR where IS NULL expression
      *
-     * @param string $column
+     * @param string|ExpressionInterface $column
      *
      * @return $this This Query instance.
+     *
+     * @psalm-suppress MismatchingDocblockParamType
+     * @todo Change column type hint on prime 3.0
      */
-    public function orWhereNull(string $column);
+    public function orWhereNull(string/*|ExpressionInterface*/ $column);
 
     /**
      * Add OR where IS NOT NULL expression
      *
-     * @param string $column
+     * @param string|ExpressionInterface $column
      *
      * @return $this This Query instance.
+     *
+     * @psalm-suppress MismatchingDocblockParamType
+     * @todo Change column type hint on prime 3.0
      */
-    public function orWhereNotNull(string $column);
+    public function orWhereNotNull(string/*|ExpressionInterface*/ $column);
 
     /**
      * Add where SQL expression

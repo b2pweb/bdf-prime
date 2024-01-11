@@ -21,6 +21,7 @@ use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Query\Closure\ClosureCompiler;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\QueryRepositoryExtension;
 use Bdf\Prime\Relations\EntityRelation;
@@ -966,7 +967,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * @see QueryInterface::where
      *
-     * @param string|array<string,mixed>|callable(static):void $column The restriction predicates.
+     * @param string|array<string,mixed>|callable(static):void|ExpressionInterface $column The restriction predicates.
      * @param string|mixed|null $operator The comparison operator, or the value is you want to use "=" operator
      * @param mixed $value
      *
