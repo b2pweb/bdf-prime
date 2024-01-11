@@ -11,6 +11,9 @@ use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\TestEntity;
 use Cache\Adapter\PHPArray\ArrayCachePool;
 use PHPUnit\Framework\TestCase;
+use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 
 /**
  *
@@ -52,7 +55,7 @@ class MapperFactoryTest extends TestCase
     {
         $factory = new MapperFactory();
         
-        $factory->setMetadataCache($cache = new ArrayCachePool());
+        $factory->setMetadataCache($cache = new Psr16Cache(new ArrayAdapter()));
         $this->assertEquals($cache, $factory->getMetadataCache());
     }
     
@@ -140,7 +143,7 @@ class MapperFactoryTest extends TestCase
     public function test_createMapper_save_metadata_in_cache()
     {
         $factory = new MapperFactory();
-        $factory->setMetadataCache($cache = new ArrayCachePool());
+        $factory->setMetadataCache($cache = new Psr16Cache(new ArrayAdapter()));
         
         $mapper = $factory->createMapper(Prime::service(), 'Bdf\Prime\TestEntityMapper');
         
@@ -153,7 +156,7 @@ class MapperFactoryTest extends TestCase
      */
     public function test_createMapper_load_metadata_from_cache()
     {
-        $cache = $this->createPartialMock(ArrayCachePool::class, ['get', 'set']);
+        $cache = $this->createMock(CacheInterface::class);
         $cache->expects($this->once())->method('get')->will($this->returnValue(new Metadata()));
         $cache->expects($this->never())->method('set');
         

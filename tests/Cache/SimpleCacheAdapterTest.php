@@ -2,29 +2,26 @@
 
 namespace Bdf\Prime\Cache;
 
-use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 
 /**
  *
  */
-class DoctrineCacheAdapterTest extends TestCase
+class SimpleCacheAdapterTest extends TestCase
 {
-    /**
-     * @var DoctrineCacheAdapter
-     */
-    private $cache;
+    private SimpleCacheAdapter $cache;
 
     protected function setUp(): void
     {
-        $this->cache = new DoctrineCacheAdapter(DoctrineProvider::wrap(new ArrayAdapter()));
+        $this->cache = new SimpleCacheAdapter(new Psr16Cache(new ArrayAdapter()));
     }
 
     /**
      * 
      */
-    public function test_get_on_unknown_key()
+    public function test_get_on_unknow_key()
     {
         $this->assertNull($this->cache->get((new CacheKey())->setNamespace('namespace')->setKey('id')));
     }
@@ -38,6 +35,43 @@ class DoctrineCacheAdapterTest extends TestCase
         $this->cache->set($key, 'data');
         
         $this->assertEquals('data', $this->cache->get($key));
+    }
+
+    /**
+     *
+     */
+    public function test_set_with_reserved_characters()
+    {
+        $key = (new CacheKey())->setNamespace('/:namespace:/')->setKey('(id)');
+        $this->cache->set($key, 'data');
+
+        $this->assertEquals('data', $this->cache->get($key));
+    }
+
+    /**
+     *
+     */
+    public function test_set_unit_without_lifetime()
+    {
+        $cache = new SimpleCacheAdapter($inner = $this->createMock(\Psr\SimpleCache\CacheInterface::class));
+        $inner->expects($this->once())->method('set')->with('namespace%5B1%5D%5Bid%5D', 'data', null);
+
+        $key = (new CacheKey())->setNamespace('namespace')->setKey('id');
+
+        $cache->set($key, 'data');
+    }
+
+    /**
+     *
+     */
+    public function test_set_unit_with_lifetime()
+    {
+        $cache = new SimpleCacheAdapter($inner = $this->createMock(\Psr\SimpleCache\CacheInterface::class));
+        $inner->expects($this->once())->method('set')->with('namespace%5B1%5D%5Bid%5D', 'data', 123);
+
+        $key = (new CacheKey())->setNamespace('namespace')->setKey('id')->setLifetime(123);
+
+        $cache->set($key, 'data');
     }
     
     /**
@@ -94,7 +128,7 @@ class DoctrineCacheAdapterTest extends TestCase
         $this->cache->set($key3, 'data');
 
         $this->cache->clear();
-
+        
         $this->assertNull($this->cache->get($key1));
         $this->assertNull($this->cache->get($key2));
         $this->assertNull($this->cache->get($key3));

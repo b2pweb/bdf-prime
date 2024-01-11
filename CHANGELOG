@@ -5,9 +5,17 @@ v2.2.0
 * Change: Mark `Bdf\Prime\Logger\PsrLogger` as deprecated. Use `Bdf\Prime\Connection\Middleware\LoggerMiddleware` instead.
 * Change: `Bdf\Prime\Configuration` now store the connection name, which is set by connection factory.
 * Change: `Bdf\Prime\Configuration::getMiddleware()` will set the configuration instance if the middleware implements `ConfigurationAwareMiddlewareInterface`
-
+* Change: Allow usage of ExpressionInterface on :
+    * `ReadCommandInterface::inRows()`
+    * `ReadCommandInterface::inRow()`
+    * `Whereable::where()` on first parameter (column)
+    * `Whereable::orWhere()` on first parameter (column)
+    * `Whereable::whereNull()`
+    * `Whereable::whereNotNull()`
+    
 BC Breaks
 * Change: `Bdf\Prime\Configuration` instances are not shared anymore between connections. So change of the default configuration during runtime will not affect already created connections.
+* Change: `Bdf\Prime\Query/Expression/Raw::__toString()` is now deprecated, and its constructor value will be cast to string.
 
 v2.1.0
 ------

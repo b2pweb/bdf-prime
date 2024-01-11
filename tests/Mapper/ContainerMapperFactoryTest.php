@@ -9,9 +9,11 @@ use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\TestEntity;
 use Bdf\Prime\TestEntityMapper;
-use Cache\Adapter\PHPArray\ArrayCachePool;
 use PHPUnit\Framework\TestCase;
 use PrimeTests\ArrayContainer;
+use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 
 /**
  *
@@ -54,7 +56,7 @@ class ContainerMapperFactoryTest extends TestCase
      */
     public function test_setter_getter_cache()
     {
-        $this->factory->setMetadataCache($cache = new ArrayCachePool());
+        $this->factory->setMetadataCache($cache = new Psr16Cache(new ArrayAdapter()));
         $this->assertEquals($cache, $this->factory->getMetadataCache());
     }
     
@@ -135,7 +137,7 @@ class ContainerMapperFactoryTest extends TestCase
     public function test_createMapper_save_metadata_in_cache()
     {
         $this->container->set(TestEntityMapper::class, new TestEntityMapper($this->prime()));
-        $this->factory->setMetadataCache($cache = new ArrayCachePool());
+        $this->factory->setMetadataCache($cache = new Psr16Cache(new ArrayAdapter()));
         
         $mapper = $this->factory->createMapper(Prime::service(), TestEntityMapper::class);
         
@@ -149,7 +151,7 @@ class ContainerMapperFactoryTest extends TestCase
     public function test_createMapper_load_metadata_from_cache()
     {
         $this->container->set(TestEntityMapper::class, new TestEntityMapper($this->prime()));
-        $cache = $this->createPartialMock(ArrayCachePool::class, ['get', 'set']);
+        $cache = $this->createMock(CacheInterface::class);
         $cache->expects($this->once())->method('get')->will($this->returnValue(new Metadata()));
         $cache->expects($this->never())->method('set');
         

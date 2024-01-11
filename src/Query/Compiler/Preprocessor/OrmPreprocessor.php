@@ -16,6 +16,9 @@ use Bdf\Prime\Types\TypeInterface;
 use InvalidArgumentException;
 use LogicException;
 
+use function is_array;
+use function is_string;
+
 /**
  * Preprocessor for Orm operation (i.e. with EntityRepository and Alias resolver)
  */
@@ -218,7 +221,7 @@ class OrmPreprocessor implements PreprocessorInterface
      */
     public function expression(array $expression): array
     {
-        if (isset($expression['column'])) {
+        if (isset($expression['column']) && is_string($expression['column'])) {
             $type = true;
 
             /** @var TypeInterface $type */

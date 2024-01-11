@@ -574,7 +574,7 @@ class KeyValueQueryTest extends TestCase
             'name' => 'John'
         ]];
 
-        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
+        $cache = new ArrayCache();
 
         $query = $this->query()->from('test_');
         $query
@@ -601,7 +601,7 @@ class KeyValueQueryTest extends TestCase
             'name' => 'John'
         ]];
 
-        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
+        $cache = new ArrayCache();
 
         $query = $this->query()->from('test_');
         $query->setCache($cache)->useCache();
@@ -631,7 +631,7 @@ class KeyValueQueryTest extends TestCase
             'name' => 'John'
         ]];
 
-        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
+        $cache = new ArrayCache();
 
         $query = $this->query()->from('test_')->where('id', 1);
         $query->setCache($cache);
@@ -753,7 +753,7 @@ class KeyValueQueryTest extends TestCase
             'name' => 'John'
         ]];
 
-        $cache = new DoctrineCacheAdapter(new \Doctrine\Common\Cache\ArrayCache());
+        $cache = new ArrayCache();
 
         $query = $this->query()->from('test_')->where('id', 1);
         $query->setCache($cache);

@@ -9,13 +9,14 @@ use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Faction;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Query;
-use Bdf\Prime\TestEmbeddedEntity;
 use Bdf\Prime\TestEntity;
 use Bdf\Prime\User;
 use Closure;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use PHPUnit\Framework\TestCase;
 use Psr\SimpleCache\CacheInterface;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 
 class ClosureCompilerTest extends TestCase
 {
@@ -98,35 +99,12 @@ class ClosureCompilerTest extends TestCase
 
     public function test_compile_with_cache()
     {
-        $this->cache = $cache = new class implements CacheInterface {
-            public array $data = [];
-
-            public function get($key, $default = null)
-            {
-                if (!array_key_exists($key, $this->data)) {
-                    return $default;
-                }
-
-                return unserialize($this->data[$key]);
-            }
-
-            public function set($key, $value, $ttl = null)
-            {
-                $this->data[$key] = serialize($value);
-            }
-
-            public function delete($key) {}
-            public function clear() {}
-            public function getMultiple($keys, $default = null) {}
-            public function setMultiple($values, $ttl = null) {}
-            public function deleteMultiple($keys) {}
-            public function has($key) {}
-        };
+        $this->cache = new Psr16Cache($cache = new ArrayAdapter());
 
         $this->test_compile_simple(); // For build cache
         $this->test_compile_simple(); // Test with cache
 
-        $this->assertCount(15, $cache->data);
+        $this->assertCount(15, $cache->getValues());
     }
 
     public function test_missing_parameter_type()

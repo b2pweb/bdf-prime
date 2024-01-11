@@ -17,6 +17,8 @@ use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use UnexpectedValueException;
 
+use function is_string;
+
 /**
  * Base compiler for SQL queries
  *
@@ -640,7 +642,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      * Determine which operator to use based on custom and standard syntax
      *
      * @param SqlQueryInterface&CompilableClause $query
-     * @param string $column
+     * @param string|ExpressionInterface $column The left operand. If string, it will be interpreted as a column name
      * @param string $operator
      * @param mixed  $value
      * @param bool $converted
@@ -650,9 +652,13 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      * @throws UnexpectedValueException
      * @throws PrimeException
      */
-    protected function compileExpression(CompilableClause $query, string $column, string $operator, $value, bool $converted): string
+    protected function compileExpression(CompilableClause $query, $column, string $operator, $value, bool $converted): string
     {
         if ($value instanceof ExpressionTransformerInterface) {
+            if ($column instanceof ExpressionInterface) {
+                $column = $column->build($query, $this);
+            }
+
             /** @psalm-suppress InvalidArgument */
             $value->setContext($this, $column, $operator);
 
@@ -668,28 +674,28 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
                 if (is_array($value)) {
                     return $this->compileIntoExpression($query, $value, $column, '<', $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' < '.$this->compileExpressionValue($query, $value, $converted);
+                return $this->compileLeftExpression($query, $column).' < '.$this->compileExpressionValue($query, $value, $converted);
 
             case '<=':
             case ':lte':
                 if (is_array($value)) {
                     return $this->compileIntoExpression($query, $value, $column, '<=', $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' <= '.$this->compileExpressionValue($query, $value, $converted);
+                return $this->compileLeftExpression($query, $column).' <= '.$this->compileExpressionValue($query, $value, $converted);
 
             case '>':
             case ':gt':
                 if (is_array($value)) {
                     return $this->compileIntoExpression($query, $value, $column, '>', $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' > '.$this->compileExpressionValue($query, $value, $converted);
+                return $this->compileLeftExpression($query, $column).' > '.$this->compileExpressionValue($query, $value, $converted);
 
             case '>=':
             case ':gte':
                 if (is_array($value)) {
                     return $this->compileIntoExpression($query, $value, $column, '>=', $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' >= '.$this->compileExpressionValue($query, $value, $converted);
+                return $this->compileLeftExpression($query, $column).' >= '.$this->compileExpressionValue($query, $value, $converted);
 
             case '~=':
             case '=~':
@@ -697,25 +703,25 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
                 if (is_array($value)) {
                     return $this->compileIntoExpression($query, $value, $column, 'REGEXP', $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' REGEXP '.$this->compileExpressionValue($query, (string)$value, $converted);
+                return $this->compileLeftExpression($query, $column).' REGEXP '.$this->compileExpressionValue($query, (string)$value, $converted);
 
             case ':like':
                 if (is_array($value)) {
                     return $this->compileIntoExpression($query, $value, $column, 'LIKE', $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' LIKE '.$this->compileExpressionValue($query, $value, $converted);
+                return $this->compileLeftExpression($query, $column).' LIKE '.$this->compileExpressionValue($query, $value, $converted);
 
             case ':notlike':
             case '!like':
                 if (is_array($value)) {
                     return $this->compileIntoExpression($query, $value, $column, 'NOT LIKE', $converted, CompositeExpression::TYPE_AND);
                 }
-                return $this->quoteIdentifier($query, $column).' NOT LIKE '.$this->compileExpressionValue($query, $value, $converted);
+                return $this->compileLeftExpression($query, $column).' NOT LIKE '.$this->compileExpressionValue($query, $value, $converted);
 
             case 'in':
             case ':in':
                 if (empty($value)) {
-                    return $this->platform()->grammar()->getIsNullExpression($this->quoteIdentifier($query, $column));
+                    return $this->platform()->grammar()->getIsNullExpression($this->compileLeftExpression($query, $column));
                 }
                 return $this->compileInExpression($query, $value, $column, 'IN', $converted);
 
@@ -723,16 +729,16 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
             case '!in':
             case ':notin':
                 if (empty($value)) {
-                    return $this->platform()->grammar()->getIsNotNullExpression($this->quoteIdentifier($query, $column));
+                    return $this->platform()->grammar()->getIsNotNullExpression($this->compileLeftExpression($query, $column));
                 }
                 return $this->compileInExpression($query, $value, $column, 'NOT IN', $converted);
 
             case 'between':
             case ':between':
                 if (is_array($value)) {
-                    return $this->platform()->grammar()->getBetweenExpression($this->quoteIdentifier($query, $column), $this->compileExpressionValue($query, $value[0], $converted), $this->compileExpressionValue($query, $value[1], $converted));
+                    return $this->platform()->grammar()->getBetweenExpression($this->compileLeftExpression($query, $column), $this->compileExpressionValue($query, $value[0], $converted), $this->compileExpressionValue($query, $value[1], $converted));
                 }
-                return $this->platform()->grammar()->getBetweenExpression($this->quoteIdentifier($query, $column), '0', $this->compileExpressionValue($query, $value, $converted));
+                return $this->platform()->grammar()->getBetweenExpression($this->compileLeftExpression($query, $column), '0', $this->compileExpressionValue($query, $value, $converted));
 
             case '!between':
             case ':notbetween':
@@ -743,26 +749,43 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
             case ':ne':
             case ':not':
                 if (is_null($value)) {
-                    return $this->platform()->grammar()->getIsNotNullExpression($this->quoteIdentifier($query, $column));
+                    return $this->platform()->grammar()->getIsNotNullExpression($this->compileLeftExpression($query, $column));
                 }
                 if (is_array($value)) {
                     return $this->compileExpression($query, $column, ':notin', $value, $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' != '.$this->compileExpressionValue($query, $value, $converted);
+                return $this->compileLeftExpression($query, $column).' != '.$this->compileExpressionValue($query, $value, $converted);
 
             case '=':
             case ':eq':
                 if (is_null($value)) {
-                    return $this->platform()->grammar()->getIsNullExpression($this->quoteIdentifier($query, $column));
+                    return $this->platform()->grammar()->getIsNullExpression($this->compileLeftExpression($query, $column));
                 }
                 if (is_array($value)) {
                     return $this->compileExpression($query, $column, ':in', $value, $converted);
                 }
-                return $this->quoteIdentifier($query, $column).' = '.$this->compileExpressionValue($query, $value, $converted);
+                return $this->compileLeftExpression($query, $column).' = '.$this->compileExpressionValue($query, $value, $converted);
 
             default:
                 throw new UnexpectedValueException("Unsupported operator '" . $operator . "' in WHERE clause");
         }
+    }
+
+    /**
+     * Compile the left operand of the expression
+     *
+     * @param SqlQueryInterface&CompilableClause $query
+     * @param string|ExpressionInterface $expression The left operand. If string, it will be interpreted as a column name
+     *
+     * @return string
+     */
+    protected function compileLeftExpression(CompilableClause $query, $expression): string
+    {
+        if (is_string($expression)) {
+            return $this->quoteIdentifier($query, $expression);
+        }
+
+        return $expression->build($query, $this);
     }
 
     /**
@@ -862,14 +885,14 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      *
      * @param SqlQueryInterface&CompilableClause $query
      * @param array|QueryInterface|ExpressionInterface  $values
-     * @param string $column
+     * @param string|ExpressionInterface $column
      * @param string $operator
      * @param boolean $converted
      *
      * @return string
      * @throws PrimeException
      */
-    protected function compileInExpression(CompilableClause $query, $values, string $column, string $operator = 'IN', bool $converted = false)
+    protected function compileInExpression(CompilableClause $query, $values, $column, string $operator = 'IN', bool $converted = false)
     {
         if (is_array($values)) {
             $hasNullValue = null;
@@ -885,7 +908,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
             // If the collection has a null value we add the null expression
             if ($hasNullValue) {
                 if ($values) {
-                    $expression = '('.$this->quoteIdentifier($query, $column).' '.$operator.' ('.implode(',', $values).')';
+                    $expression = '('.$this->compileLeftExpression($query, $column).' '.$operator.' ('.implode(',', $values).')';
 
                     if ($operator === 'IN') {
                         return $expression.' OR '.$this->compileExpression($query, $column, 'in', null, $converted).')';
@@ -907,7 +930,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
             $values = '('.$values.')'; // @todo utile ?
         }
 
-        return $this->quoteIdentifier($query, $column).' '.$operator.' '.$values;
+        return $this->compileLeftExpression($query, $column).' '.$operator.' '.$values;
     }
 
     /**
@@ -916,7 +939,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      *
      * @param SqlQueryInterface&CompilableClause $query
      * @param array $values
-     * @param string $column
+     * @param string|ExpressionInterface $column
      * @param string $operator
      * @param bool $converted True if the value is already converted, or false to convert into bind()
      * @param string $separator The expressions separators. By default set to OR, but should be AND on negative (NOT) expressions. See CompositeExpression
@@ -924,11 +947,11 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      * @return string
      * @throws PrimeException
      */
-    public function compileIntoExpression(CompilableClause $query, array $values, $column, $operator, $converted, $separator = CompositeExpression::TYPE_OR)
+    public function compileIntoExpression(CompilableClause $query, array $values, $column, $operator, bool $converted, string $separator = CompositeExpression::TYPE_OR): string
     {
         $into = [];
 
-        $column = $this->quoteIdentifier($query, $column);
+        $column = $this->compileLeftExpression($query, $column);
 
         foreach ($values as $value) {
             $into[] = $column.' '.$operator.' '.$this->compileExpressionValue($query, $value, $converted);

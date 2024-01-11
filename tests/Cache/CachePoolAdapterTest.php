@@ -2,29 +2,28 @@
 
 namespace Bdf\Prime\Cache;
 
-use Doctrine\Common\Cache\Psr6\DoctrineProvider;
 use PHPUnit\Framework\TestCase;
+use Psr\Cache\CacheItemInterface;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 
 /**
  *
  */
-class DoctrineCacheAdapterTest extends TestCase
+class CachePoolAdapterTest extends TestCase
 {
-    /**
-     * @var DoctrineCacheAdapter
-     */
-    private $cache;
+    private CachePoolAdapter $cache;
 
     protected function setUp(): void
     {
-        $this->cache = new DoctrineCacheAdapter(DoctrineProvider::wrap(new ArrayAdapter()));
+        $this->cache = new CachePoolAdapter(new ArrayAdapter());
     }
 
     /**
      * 
      */
-    public function test_get_on_unknown_key()
+    public function test_get_on_unknow_key()
     {
         $this->assertNull($this->cache->get((new CacheKey())->setNamespace('namespace')->setKey('id')));
     }
@@ -39,7 +38,73 @@ class DoctrineCacheAdapterTest extends TestCase
         
         $this->assertEquals('data', $this->cache->get($key));
     }
-    
+
+    /**
+     *
+     */
+    public function test_set_with_reserved_character()
+    {
+        $key = (new CacheKey())->setNamespace('/:namespace:/')->setKey('(id)');
+        $this->cache->set($key, 'data');
+
+        $this->assertEquals('data', $this->cache->get($key));
+    }
+
+    /**
+     *
+     */
+    public function test_set_unit_without_lifetime()
+    {
+        $cache = new CachePoolAdapter($inner = $this->createMock(CacheItemPoolInterface::class));
+        $item = $this->createMock(CacheItemInterface::class);
+
+        $inner->expects($this->exactly(2))->method('getItem')
+            ->withConsecutive(
+                ['namespace%5Bversion%5D'],
+                ['namespace%5B1%5D%5Bid%5D']
+            )->willReturn(
+                $this->createMock(CacheItemInterface::class),
+                $item
+            )
+        ;
+
+        $item->expects($this->once())->method('set')->with('data')->willReturnSelf();
+
+        $inner->expects($this->once())->method('save')->with($item);
+
+        $key = (new CacheKey())->setNamespace('namespace')->setKey('id');
+
+        $cache->set($key, 'data');
+    }
+
+    /**
+     *
+     */
+    public function test_set_unit_with_lifetime()
+    {
+        $cache = new CachePoolAdapter($inner = $this->createMock(CacheItemPoolInterface::class));
+        $item = $this->createMock(CacheItemInterface::class);
+
+        $inner->expects($this->exactly(2))->method('getItem')
+            ->withConsecutive(
+                ['namespace%5Bversion%5D'],
+                ['namespace%5B1%5D%5Bid%5D']
+            )->willReturn(
+                $this->createMock(CacheItemInterface::class),
+                $item
+            )
+        ;
+
+        $item->expects($this->once())->method('set')->with('data')->willReturnSelf();
+        $item->expects($this->once())->method('expiresAfter')->with(123)->willReturnSelf();
+
+        $inner->expects($this->once())->method('save')->with($item);
+
+        $key = (new CacheKey())->setNamespace('namespace')->setKey('id')->setLifetime(123);
+
+        $cache->set($key, 'data');
+    }
+
     /**
      * 
      */
@@ -94,7 +159,7 @@ class DoctrineCacheAdapterTest extends TestCase
         $this->cache->set($key3, 'data');
 
         $this->cache->clear();
-
+        
         $this->assertNull($this->cache->get($key1));
         $this->assertNull($this->cache->get($key2));
         $this->assertNull($this->cache->get($key3));

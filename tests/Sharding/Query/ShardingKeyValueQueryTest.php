@@ -4,6 +4,8 @@ namespace Bdf\Prime\Sharding\Query;
 
 use Bdf\Prime\Cache\ArrayCache;
 use Bdf\Prime\Cache\CacheKey;
+use Bdf\Prime\Cache\CachePoolAdapter;
+use Bdf\Prime\Cache\SimpleCacheAdapter;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\ConnectionRegistry;
 use Bdf\Prime\Connection\Factory\ConnectionFactory;
@@ -13,6 +15,8 @@ use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Schema\Builder\TypesHelperTableBuilder;
 use Bdf\Prime\Sharding\ShardingConnection;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 
 class ShardingKeyValueQueryTest extends TestCase
 {
@@ -338,7 +342,7 @@ class ShardingKeyValueQueryTest extends TestCase
         $this->connection->insert('test', ['id' => 2, 'name' => 'Bob']);
         $this->connection->insert('test', ['id' => 3, 'name' => 'Bill']);
 
-        $cache = new ArrayCache();
+        $cache = new CachePoolAdapter(new ArrayAdapter());
 
         $this->query()->setCache($cache);
 
@@ -358,7 +362,7 @@ class ShardingKeyValueQueryTest extends TestCase
         $this->connection->insert('test', ['id' => 2, 'name' => 'Bob']);
         $this->connection->insert('test', ['id' => 3, 'name' => 'Bill']);
 
-        $cache = new ArrayCache();
+        $cache = new SimpleCacheAdapter(new Psr16Cache(new ArrayAdapter()));
 
         $this->query()->setCache($cache);
 
