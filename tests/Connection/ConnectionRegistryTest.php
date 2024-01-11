@@ -132,6 +132,8 @@ class ConnectionRegistryTest extends TestCase
     public function test_configuration_resolver()
     {
         $configuration = new Configuration();
+        $configuration->setDisableTypeComments(true);
+
         $resolver = new ConfigurationResolver();
         $resolver->addConfiguration('foo', $configuration);
 
@@ -139,7 +141,7 @@ class ConnectionRegistryTest extends TestCase
         $registry->declareConnection('foo', ['adapter' => 'sqlite', 'memory' => true]);
         $registry->declareConnection('bar', ['adapter' => 'sqlite', 'memory' => true]);
 
-        $this->assertSame($configuration, $registry->getConnection('foo')->getConfiguration());
-        $this->assertNotSame($configuration, $registry->getConnection('bar')->getConfiguration());
+        $this->assertEquals($configuration->withName('foo'), $registry->getConnection('foo')->getConfiguration());
+        $this->assertNotEquals($configuration->withName('bar'), $registry->getConnection('bar')->getConfiguration());
     }
 }

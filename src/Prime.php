@@ -9,10 +9,13 @@ use Bdf\Prime\Connection\Factory\ChainFactory;
 use Bdf\Prime\Connection\Factory\ConnectionFactory;
 use Bdf\Prime\Connection\Factory\MasterSlaveConnectionFactory;
 use Bdf\Prime\Connection\Factory\ShardingConnectionFactory;
+use Bdf\Prime\Connection\Middleware\LoggerMiddleware;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\MapperFactory;
 use Bdf\Prime\Repository\RepositoryInterface;
+use Doctrine\DBAL\Logging\SQLLogger;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 /**
@@ -456,8 +459,12 @@ class Prime
         );
 
         if ($logger = static::$config['logger'] ?? null) {
-            /** @psalm-suppress InternalMethod */
-            $configuration->setSQLLogger($logger);
+            if ($logger instanceof SQLLogger) {
+                /** @psalm-suppress InternalMethod */
+                $configuration->setSQLLogger($logger);
+            } elseif ($logger instanceof LoggerInterface) {
+                $configuration->setMiddlewares([new LoggerMiddleware($logger)]);
+            }
         }
 
         if ($types = static::$config['types'] ?? null) {
