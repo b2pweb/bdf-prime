@@ -6,6 +6,8 @@ use Doctrine\Common\Cache\CacheProvider;
 
 /**
  * Adapter for doctrine cache provider
+ *
+ * @deprecated Since 2.2. Use SimpleCacheAdapter or CachePoolAdapter instead.
  */
 class DoctrineCacheAdapter implements CacheInterface
 {
