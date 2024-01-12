@@ -52,7 +52,7 @@ jobs:
         EOF
 
     - name: 'Show MySQL version'
-      run: mysql -u root --password=root -e 'show variables like "version";'
+      run: mysql -h 127.0.0.1 -u root --password=root -e 'show variables like "version";'
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
