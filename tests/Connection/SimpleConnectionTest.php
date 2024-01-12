@@ -497,6 +497,7 @@ class SimpleConnectionTest extends TestCase
      */
     public function test_reconnection()
     {
+        mysqli_report(MYSQLI_REPORT_ERROR|MYSQLI_REPORT_STRICT);
         Prime::service()->connections()->declareConnection('test_reconnection', [
             'driver' => 'mysqli',
             'user' => MYSQL_USER,
@@ -521,6 +522,7 @@ class SimpleConnectionTest extends TestCase
      */
     public function test_reconnection_on_prepared_query()
     {
+        mysqli_report(MYSQLI_REPORT_ERROR|MYSQLI_REPORT_STRICT);
         Prime::service()->connections()->declareConnection('test_reconnection', [
             'driver' => 'mysqli',
             'user' => MYSQL_USER,
