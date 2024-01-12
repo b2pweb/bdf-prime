@@ -90,6 +90,8 @@ jobs:
           ./configure --prefix=/usr/local
           make
           sudo make install
+          ldconfig
+          sqlite3 --version
 
       - name: Install PHP
         uses: shivammathur/setup-php@v2
