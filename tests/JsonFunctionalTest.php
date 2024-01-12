@@ -468,8 +468,8 @@ class JsonFunctionalTest extends TestCase
     protected function normalizeWithJson($data)
     {
         if (is_array($data)) {
-            $data = array_map([$this, 'normalizeWithJson'], $data);
             ksort($data);
+            $data = array_map([$this, 'normalizeWithJson'], $data);
 
             return $data;
         }

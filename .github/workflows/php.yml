@@ -57,14 +57,6 @@ jobs:
 
     - name: Check sqlite3 version
       run: sqlite3 --version
-    - name: Reinstall sqlite3
-      run: |
-        download_link="https://www.sqlite.org/2023/sqlite-tools-linux-x64-3440200.zip"
-        wget "$download_link" -P /tmp
-        unzip "/tmp/$(basename "$download_link")" -d /tmp
-        sudo install /tmp/sqlite3 /usr/local/bin/
-    - name: Check sqlite3 version
-      run: sqlite3 --version
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
