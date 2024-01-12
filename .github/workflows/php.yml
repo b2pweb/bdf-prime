@@ -34,7 +34,7 @@ jobs:
 
     - uses: mirromutth/mysql-action@v1.1
       with:
-        mysql version: '8.2'
+        mysql version: '8.1'
         mysql root password: 'root'
 
     - name: Reset mysql password
