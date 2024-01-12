@@ -468,10 +468,7 @@ class JsonFunctionalTest extends TestCase
     protected function normalizeWithJson($data)
     {
         if (is_array($data)) {
-            ksort($data);
-            $data = array_map([$this, 'normalizeWithJson'], $data);
-
-            return $data;
+            return array_map([$this, 'normalizeWithJson'], $data);
         }
 
         if (!is_string($data)) {
@@ -483,6 +480,13 @@ class JsonFunctionalTest extends TestCase
         // This is not JSON data
         if (json_last_error() !== JSON_ERROR_NONE) {
             return $data;
+        }
+
+        // Ensure the JSON keys are sorted
+        if ($decoded instanceof \stdClass) {
+            $decoded = (array) $decoded;
+            ksort($decoded);
+            $decoded = (object) $decoded;
         }
 
         return json_encode($decoded);
