@@ -32,6 +32,9 @@ jobs:
     - name: Check PHP Version
       run: php -v
 
+    - name: Shutdown Ubuntu MySQL (SUDO)
+      run: sudo service mysql stop
+
     - uses: mirromutth/mysql-action@v1.1
       with:
         mysql version: '8.1'
@@ -47,6 +50,9 @@ jobs:
           UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
           FLUSH PRIVILEGES;
         EOF
+
+    - name: 'Show MySQL version'
+      run: mysql -u root --password=root -e 'show variables like "version";'
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
