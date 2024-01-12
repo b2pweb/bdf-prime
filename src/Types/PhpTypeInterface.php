@@ -18,4 +18,5 @@ interface PhpTypeInterface
     public const INTEGER = 'integer';
     public const DOUBLE = 'double';
     public const STRING = 'string';
+    public const MIXED = 'mixed';
 }

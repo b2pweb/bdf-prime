@@ -9,6 +9,7 @@ use Bdf\Prime\Platform\Sql\Types\SqlBooleanType;
 use Bdf\Prime\Platform\Sql\Types\SqlDateTimeType;
 use Bdf\Prime\Platform\Sql\Types\SqlFloatType;
 use Bdf\Prime\Platform\Sql\Types\SqlIntegerType;
+use Bdf\Prime\Platform\Sql\Types\SqlJsonType;
 use Bdf\Prime\Platform\Sql\Types\SqlStringType;
 use Bdf\Prime\Types\ArrayObjectType;
 use Bdf\Prime\Types\ArrayOfType;
@@ -51,6 +52,7 @@ class PlatformTypesTest extends TestCase
                 TypeInterface::DOUBLE   => SqlFloatType::class,
                 TypeInterface::DATETIME => SqlDateTimeType::class,
                 TypeInterface::BOOLEAN  => SqlBooleanType::class,
+                TypeInterface::JSON     => SqlJsonType::class,
             ],
             new TypesRegistry([
                 TypeInterface::DATETIME => DateTimeType::class,
@@ -94,7 +96,8 @@ class PlatformTypesTest extends TestCase
      */
     public function test_get()
     {
-        $this->assertInstanceOf(JsonType::class, $this->types->get(TypeInterface::JSON));
+        $this->assertInstanceOf(SqlJsonType::class, $this->types->get(TypeInterface::JSON));
+        $this->assertInstanceOf(ArrayType::class, $this->types->get(TypeInterface::TARRAY));
         $this->assertInstanceOf(SqlDateTimeType::class, $this->types->get(TypeInterface::DATETIME));
         $this->assertInstanceOf(SqlIntegerType::class, $this->types->get(TypeInterface::INTEGER));
     }
@@ -125,7 +128,7 @@ class PlatformTypesTest extends TestCase
      */
     public function test_native()
     {
-        $this->assertInstanceOf(SqlStringType::class, $this->types->native(TypeInterface::JSON));
+        $this->assertInstanceOf(SqlJsonType::class, $this->types->native(TypeInterface::JSON));
         $this->assertInstanceOf(SqlStringType::class, $this->types->native(TypeInterface::OBJECT));
         $this->assertInstanceOf(SqlDateTimeType::class, $this->types->native(TypeInterface::DATETIME));
         $this->assertInstanceOf(SqlIntegerType::class, $this->types->native(TypeInterface::INTEGER));
