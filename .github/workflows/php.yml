@@ -90,7 +90,7 @@ jobs:
           ./configure --prefix=/usr/local
           make
           sudo make install
-          ldconfig
+          sudo ldconfig
           sqlite3 --version
 
       - name: Install PHP
@@ -99,6 +99,9 @@ jobs:
           php-version: 8.1
           extensions: json
           ini-values: date.timezone=Europe/Paris
+
+      - name: SQLite version on PHP
+        run: php -r 'echo (new PDO("sqlite::memory:"))->query("select sqlite_version()")->fetchColumn();'
 
       - uses: mirromutth/mysql-action@v1.1
         with:
