@@ -39,6 +39,7 @@ jobs:
       with:
         mysql version: '8.1'
         mysql root password: 'root'
+        mysql database: 'test'
 
     - name: Reset mysql password
       run: |
@@ -53,6 +54,17 @@ jobs:
 
     - name: 'Show MySQL version'
       run: mysql -h 127.0.0.1 -u root -e 'show variables like "version";'
+
+    - name: Check sqlite3 version
+      run: sqlite3 --version
+    - name: Reinstall sqlite3
+      run: |
+        download_link="https://www.sqlite.org/2023/sqlite-tools-linux-x64-3440200.zip"
+        wget "$download_link" -P /tmp
+        unzip "/tmp/$(basename "$download_link")" -d /tmp
+        sudo install /tmp/sqlite3 /usr/local/bin/
+    - name: Check sqlite3 version
+      run: sqlite3 --version
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
