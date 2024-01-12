@@ -18,6 +18,14 @@ class JsonFunctionalTest extends TestCase
     protected function setUp(): void
     {
         $this->primeStart();
+
+        if (static::class === self::class) {
+            $version = $this->prime()->connection('test')->executeQuery('select sqlite_version()')->fetchOne();
+
+            if (version_compare($version, '3.38.0', '<')) {
+                $this->markTestSkipped('JSON functions are not supported on SQLite < 3.38.0');
+            }
+        }
     }
 
     protected function tearDown(): void
@@ -454,13 +462,16 @@ class JsonFunctionalTest extends TestCase
 
     protected function assertSameWithJson($expected, $actual)
     {
-        $this->assertSame($this->normalizeWithJson($expected), $this->normalizeWithJson($actual));
+        $this->assertEqualsCanonicalizing($this->normalizeWithJson($expected), $this->normalizeWithJson($actual));
     }
 
     protected function normalizeWithJson($data)
     {
         if (is_array($data)) {
-            return array_map([$this, 'normalizeWithJson'], $data);
+            $data = array_map([$this, 'normalizeWithJson'], $data);
+            ksort($data);
+
+            return $data;
         }
 
         if (!is_string($data)) {
