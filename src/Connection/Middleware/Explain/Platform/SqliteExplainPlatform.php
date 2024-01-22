@@ -11,6 +11,8 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 
+use function explode;
+use function in_array;
 use function preg_match;
 use function stripos;
 use function strpos;
@@ -151,10 +153,18 @@ final class SqliteExplainPlatform implements ExplainPlatformInterface
 
     private function parseTable(string $detail): ?string
     {
-        if (!preg_match('/ TABLE ([^ ]+) /', $detail, $matches)) {
-            return null;
+        $parts = explode(' ', $detail);
+
+        // SQLite < 3.36 : format SCAN TABLE t1
+        if (count($parts) >= 3 && $parts[1] === 'TABLE') {
+            return $parts[2];
         }
 
-        return $matches[1];
+        // SQLite >= 3.36 : format SCAN t1
+        if (count($parts) >= 2 && in_array($parts[0], ['SCAN', 'SEARCH'], true) && $parts[1] !== 'CONSTANT') {
+            return $parts[1];
+        }
+
+        return null;
     }
 }
