@@ -159,7 +159,7 @@ class ConnectionRegistry implements ConnectionRegistryInterface
                 $parameters['path'] = $request->getPath();
             }
         } elseif (!isset($parameters['dbname'])) {
-            $parameters['dbname'] = trim($request->getPath(), '/');
+            $parameters['dbname'] = $request->getPath() === null ? null : trim($request->getPath(), '/');
         }
 
         return $parameters;

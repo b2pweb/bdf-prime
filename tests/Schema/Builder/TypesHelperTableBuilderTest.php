@@ -337,7 +337,7 @@ class TypesHelperTableBuilderTest extends TestCase
 
         $column = $this->builder->column()->build();
         $this->assertEquals('data_', $column->name());
-        $this->assertEquals('text', $column->type()->name());
+        $this->assertEquals('json', $column->type()->name());
     }
 
     /**

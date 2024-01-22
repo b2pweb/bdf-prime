@@ -5,6 +5,7 @@ namespace Bdf\Prime\Mapper\Builder;
 use ArrayAccess;
 use ArrayIterator;
 use Bdf\Prime\Mapper\Metadata;
+use Bdf\Prime\Platform\Sql\Types\SqlJsonType;
 use Bdf\Prime\Types\TypeInterface;
 use Bdf\Prime\Types\TypesHelperInterface;
 use Closure;
@@ -539,6 +540,18 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     }
 
     /**
+     * Declare the column as JSON type instead of TEXT.
+     *
+     * @param bool $flag true to use native json type, false to use text type
+     *
+     * @return $this
+     */
+    public function useNativeJsonType(bool $flag = true)
+    {
+        return $this->schemaOption(SqlJsonType::OPTION_USE_NATIVE_JSON, $flag);
+    }
+
+    /**
      * Set php class name of the attribute.
      *
      * @param class-string $className  The php class name
@@ -560,6 +573,21 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     public function timezone(string $timezone)
     {
         return $this->phpOptions('timezone', $timezone);
+    }
+
+    /**
+     * Convert JSON objects are as associative arrays instead of stdClass.
+     * By default this flag is enabled, and should be disabled manually by setting it to false.
+     *
+     * @param bool $flag true to convert to array, false to keep stdClass
+     *
+     * @return $this
+     *
+     * @see json_decode() The assoc parameter
+     */
+    public function jsonObjectAsArray(bool $flag = true)
+    {
+        return $this->phpOptions(SqlJsonType::OPTION_OBJECT_AS_ARRAY, $flag);
     }
 
     /**
@@ -591,6 +619,23 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     public function schemaOptions(array $options)
     {
         $this->fields[$this->current]['customSchemaOptions'] = $options;
+
+        return $this;
+    }
+
+    /**
+     * Add a single schema option.
+     *
+     * @param string $key The option name
+     * @param mixed $value The option value
+     *
+     * @return $this This builder instance
+     *
+     * @see \Doctrine\DBAL\Schema\Table for the detail
+     */
+    public function schemaOption(string $key, $value)
+    {
+        $this->fields[$this->current]['customSchemaOptions'][$key] = $value;
 
         return $this;
     }

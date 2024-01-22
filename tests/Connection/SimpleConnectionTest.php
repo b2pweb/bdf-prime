@@ -497,10 +497,12 @@ class SimpleConnectionTest extends TestCase
      */
     public function test_reconnection()
     {
+        mysqli_report(MYSQLI_REPORT_ERROR|MYSQLI_REPORT_STRICT);
         Prime::service()->connections()->declareConnection('test_reconnection', [
             'driver' => 'mysqli',
-            'user' => 'root',
-            'host' => '127.0.0.1',
+            'user' => MYSQL_USER,
+            'password' => MYSQL_PASSWORD,
+            'host' => MYSQL_HOST,
 //            'adapter' => 'sqlite',
 //            'memory' => true
         ]);
@@ -520,10 +522,12 @@ class SimpleConnectionTest extends TestCase
      */
     public function test_reconnection_on_prepared_query()
     {
+        mysqli_report(MYSQLI_REPORT_ERROR|MYSQLI_REPORT_STRICT);
         Prime::service()->connections()->declareConnection('test_reconnection', [
             'driver' => 'mysqli',
-            'user' => 'root',
-            'host' => '127.0.0.1',
+            'user' => MYSQL_USER,
+            'password' => MYSQL_PASSWORD,
+            'host' => MYSQL_HOST,
 //            'adapter' => 'sqlite',
 //            'memory' => true
         ]);

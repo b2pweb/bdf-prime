@@ -13,6 +13,7 @@ use Bdf\Prime\Platform\Sql\Types\SqlDecimalType;
 use Bdf\Prime\Platform\Sql\Types\SqlFloatType;
 use Bdf\Prime\Platform\Sql\Types\SqlGuidType;
 use Bdf\Prime\Platform\Sql\Types\SqlIntegerType;
+use Bdf\Prime\Platform\Sql\Types\SqlJsonType;
 use Bdf\Prime\Platform\Sql\Types\SqlStringType;
 use Bdf\Prime\Platform\Sql\Types\SqlTimeType;
 use Bdf\Prime\Types\TypeInterface;
@@ -56,6 +57,7 @@ class SqlPlatform implements PlatformInterface
                 TypeInterface::FLOAT => SqlFloatType::class,
                 TypeInterface::BOOLEAN => SqlBooleanType::class,
                 TypeInterface::GUID => SqlGuidType::class,
+                TypeInterface::JSON => SqlJsonType::class,
             ],
             $types
         );
