@@ -27,7 +27,7 @@ final class ExplainMiddleware implements Driver\Middleware
      */
     public function wrap(Driver $driver): Driver
     {
-        return new class($driver, $this->reporter, $this->platformFactory) extends AbstractDriverMiddleware {
+        return new class ($driver, $this->reporter, $this->platformFactory) extends AbstractDriverMiddleware {
             private ExplainReporter $reporter;
             private ExplainPlatformFactory $platformFactory;
 
@@ -39,6 +39,12 @@ final class ExplainMiddleware implements Driver\Middleware
                 $this->platformFactory = $platformFactory;
             }
 
+            /**
+             * {@inheritdoc}
+             *
+             * @psalm-suppress InternalClass
+             * @psalm-suppress InternalMethod
+             */
             public function connect(array $params): Connection
             {
                 $connection = parent::connect($params);
