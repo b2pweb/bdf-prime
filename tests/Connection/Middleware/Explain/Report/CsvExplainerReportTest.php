@@ -159,10 +159,10 @@ CSV
     public function test_flush_has_no_write_on_file_should_throw_error()
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Unable to open file /invalid');
+        $this->expectExceptionMessage('Unable to open file /proc/cpuinfo');
         $this->expectExceptionMessage('Permission denied');
 
-        $reporter = new CsvExplainerReport('/invalid');
+        $reporter = new CsvExplainerReport('/proc/cpuinfo');
         TestEmbeddedEntity::repository()->schema()->migrate();
 
         $query = TestEmbeddedEntity::where('id', [12, 45, 96])->order('name')->toRawSql();

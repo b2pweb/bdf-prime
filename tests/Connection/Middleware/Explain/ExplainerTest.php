@@ -343,7 +343,7 @@ class ExplainerTest extends TestCase
             TestEntity::where(
                 'foreign.id',
                 ':in',
-                TestEmbeddedEntity::where('name', 'toto')->select('id')
+                TestEmbeddedEntity::repository()->queries()->fromAlias('emb')->where('name', 'toto')->select('id')
             )
                 ->toRawSql()
         );

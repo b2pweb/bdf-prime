@@ -402,13 +402,32 @@ class SqliteExplainPlatformTest extends TestCase
         $this->assertEquals('USE TEMP B-TREE FOR GROUP BY', $result->steps[2]->extra);
     }
 
-    public function parse(array $rows): ExplainResult
+    public function test_should_resolve_alias()
+    {
+        $result = $this->parse(['SCAN TABLE t2 USING INDEX i4'], 'SELECT * FROM foo t2 ORDER BY c');
+        $this->assertEquals(QueryType::SCAN, $result->type);
+        $this->assertEquals(['foo'], $result->tables);
+        $this->assertEquals(['i4'], $result->indexes);
+        $this->assertFalse($result->temporary);
+        $this->assertFalse($result->covering);
+        $this->assertNull($result->rows);
+        $this->assertCount(1, $result->steps);
+        $this->assertEquals(QueryType::SCAN, $result->steps[0]->type);
+        $this->assertEquals('foo', $result->steps[0]->table);
+        $this->assertEquals('i4', $result->steps[0]->index);
+        $this->assertFalse($result->steps[0]->covering);
+        $this->assertFalse($result->steps[0]->temporary);
+        $this->assertNull($result->steps[0]->rows);
+        $this->assertEquals('SCAN TABLE t2 USING INDEX i4', $result->steps[0]->extra);
+    }
+
+    public function parse(array $rows, ?string $query = null): ExplainResult
     {
         $rows = array_map(fn ($v) => ['detail' => $v], $rows);
 
         $result = $this->createMock(Result::class);
         $result->method('fetchAllAssociative')->willReturn($rows);
 
-        return (new SqliteExplainPlatform())->parse($result);
+        return (new SqliteExplainPlatform())->parse($query ?? 'SELECT * FROM foo', $result);
     }
 }

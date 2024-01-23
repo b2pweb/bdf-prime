@@ -28,10 +28,11 @@ interface ExplainPlatformInterface
     /**
      * Parse the explain result to normalize it
      *
+     * @param string $query The original query
      * @param Result $result The explain result
      * @return mixed
      */
-    public function parse(Result $result): ExplainResult;
+    public function parse(string $query, Result $result): ExplainResult;
 
     /**
      * Check if the given platform is supported by this explain platform

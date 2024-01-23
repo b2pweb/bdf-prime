@@ -55,6 +55,6 @@ final class Explainer
             return null;
         }
 
-        return $this->platform->parse($result);
+        return $this->platform->parse($query, $result);
     }
 }

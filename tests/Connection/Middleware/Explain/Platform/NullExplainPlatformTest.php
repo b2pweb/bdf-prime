@@ -17,7 +17,7 @@ class NullExplainPlatformTest extends TestCase
 
     public function test_parse()
     {
-        $this->assertEquals(new ExplainResult(), (new NullExplainPlatform())->parse($this->createMock(Result::class)));
+        $this->assertEquals(new ExplainResult(), (new NullExplainPlatform())->parse('SELECT * FROM foo', $this->createMock(Result::class)));
     }
 
     public function test_supports()

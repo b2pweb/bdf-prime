@@ -23,7 +23,7 @@ final class NullExplainPlatform implements ExplainPlatformInterface
     /**
      * {@inheritdoc}
      */
-    public function parse(Result $result): ExplainResult
+    public function parse(string $query, Result $result): ExplainResult
     {
         return new ExplainResult();
     }

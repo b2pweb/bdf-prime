@@ -46,15 +46,16 @@ final class SqliteExplainPlatform implements ExplainPlatformInterface
     /**
      * {@inheritdoc}
      */
-    public function parse(Result $result): ExplainResult
+    public function parse(string $query, Result $result): ExplainResult
     {
         $explain = new ExplainResult();
-        $explain->covering = true;
+        $tables = SqlUtil::tables($query);
 
+        $explain->covering = true;
         $explain->raw = $result->fetchAllAssociative();
 
         foreach ($explain->raw as $rawStep) {
-            $step = $this->parseStep($rawStep['detail']);
+            $step = $this->parseStep($tables, $rawStep['detail']);
 
             // The step does not contain any information (like "MULTI-INDEX")
             if (
@@ -91,16 +92,18 @@ final class SqliteExplainPlatform implements ExplainPlatformInterface
         return $platform instanceof SqlitePlatform;
     }
 
-    private function parseStep(string $detail): ExplainStep
+    private function parseStep(array $tables, string $detail): ExplainStep
     {
         $step = new ExplainStep();
 
         $step->type = $this->parseType($detail);
-
-        $this->parseIndex($step, $detail);
-        $step->table = $this->parseTable($detail);
         $step->temporary = strpos($detail, 'TEMP B-TREE') !== false;
         $step->extra = $detail;
+
+        $this->parseIndex($step, $detail);
+
+        $table = $this->parseTable($detail);
+        $step->table = $tables[$table] ?? $table;
 
         return $step;
     }
