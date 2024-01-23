@@ -19,7 +19,7 @@ final class ExplainPlatformFactory
      */
     public function __construct(?array $platforms = null)
     {
-        $this->platforms = $platforms ?? [SqliteExplainPlatform::class];
+        $this->platforms = $platforms ?? [SqliteExplainPlatform::class, MysqlExplainPlatform::class];
     }
 
     /**
