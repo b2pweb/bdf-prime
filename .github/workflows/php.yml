@@ -32,10 +32,14 @@ jobs:
     - name: Check PHP Version
       run: php -v
 
+    - name: Shutdown Ubuntu MySQL (SUDO)
+      run: sudo service mysql stop
+
     - uses: mirromutth/mysql-action@v1.1
       with:
-        mysql version: '5.7'
+        mysql version: '8.0'
         mysql root password: 'root'
+        mysql database: 'test'
 
     - name: Reset mysql password
       run: |
@@ -47,6 +51,12 @@ jobs:
           UPDATE mysql.user SET authentication_string = null WHERE user = 'root';
           FLUSH PRIVILEGES;
         EOF
+
+    - name: 'Show MySQL version'
+      run: mysql -h 127.0.0.1 -u root -e 'show variables like "version";'
+
+    - name: Check sqlite3 version
+      run: sqlite3 --version
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
@@ -120,8 +130,9 @@ jobs:
 
       - uses: mirromutth/mysql-action@v1.1
         with:
-          mysql version: '5.7'
+          mysql version: '8.0'
           mysql root password: 'root'
+          mysql database: 'test'
 
       - name: Reset mysql password
         run: |

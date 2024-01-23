@@ -294,6 +294,25 @@ class FieldBuilderTest extends TestCase
             ->schemaOptions(['custom' => 'test']);
 
         $this->assertSame('test', $builder['name']['customSchemaOptions']['custom']);
+
+        $builder->schemaOption('custom2', 'test2');
+        $this->assertSame('test2', $builder['name']['customSchemaOptions']['custom2']);
+    }
+
+    public function test_useNativeJsonType()
+    {
+        $builder = new FieldBuilder();
+
+        $builder->json('foo')->useNativeJsonType();
+        $this->assertSame(['use_native_json' => true], $builder['foo']['customSchemaOptions']);
+    }
+
+    public function test_jsonObjectAsArray()
+    {
+        $builder = new FieldBuilder();
+
+        $builder->json('foo')->jsonObjectAsArray(false);
+        $this->assertSame(['object_as_array' => false], $builder['foo']['phpOptions']);
     }
 
     /**
