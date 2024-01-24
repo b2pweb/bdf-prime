@@ -6,11 +6,13 @@ use Bdf\Prime\Connection\Middleware\Explain\ExplainResult;
 
 use RuntimeException;
 
+use function count;
 use function dirname;
 use function fopen;
 use function implode;
 use function is_dir;
 use function mkdir;
+use function time;
 
 /**
  * Report bad queries to a CSV file
@@ -26,7 +28,7 @@ use function mkdir;
  * - temporary: Whether the query use a temporary table (0 or 1)
  * - rows: The number of rows returned by the query (can be empty)
  */
-final class CsvExplainerReport implements ExplainReporterInterface
+final class CsvExplainerReporter implements ExplainReporterInterface
 {
     /**
      * The CSV file path
@@ -34,16 +36,23 @@ final class CsvExplainerReport implements ExplainReporterInterface
     private string $file;
 
     /**
-     * Whether the file should be flushed after each report
-     */
-    private bool $flush;
-
-    /**
      * Filter explain results to write
      *
      * @var (callable(ExplainResult):bool)|null
      */
     private $filter;
+
+    /**
+     * Write reports to the file when the pending reports count reach this value
+     * If null, reports will be written only on flush() call, or on destruct
+     */
+    private ?int $autoFlushCount;
+
+    /**
+     * Write reports to the file after this interval (in seconds)
+     * If null, reports will be written only on flush() call, or on destruct
+     */
+    private ?int $autoFlushInterval;
 
     /**
      * The file handle resource
@@ -60,15 +69,22 @@ final class CsvExplainerReport implements ExplainReporterInterface
     private array $pending = [];
 
     /**
-     * @param string $file The CSV file path
-     * @param bool $flush Whether the file should be flushed after each report
-     * @param (callable(ExplainResult):bool)|null $filter The filter to apply on reports. If null, all reports are written
+     * Time of the last flush (use {@see time()})
      */
-    public function __construct(string $file, bool $flush = false, ?callable $filter = null)
+    private ?int $lastFlush = null;
+
+    /**
+     * @param string $file The CSV file path
+     * @param (callable(ExplainResult):bool)|null $filter The filter to apply on reports. If null, all reports are written
+     * @param int|null $autoFlushCount Write reports to the file when the pending reports count reach this value. If null, reports will be written only on flush() call, or on destruct
+     * @param int|null $autoFlushInterval Write reports to the file after this interval (in seconds). If null, reports will be written only on flush() call, or on destruct
+     */
+    public function __construct(string $file, ?callable $filter = null, ?int $autoFlushCount = null, ?int $autoFlushInterval = null)
     {
         $this->file = $file;
-        $this->flush = $flush;
         $this->filter = $filter;
+        $this->autoFlushCount = $autoFlushCount;
+        $this->autoFlushInterval = $autoFlushInterval;
     }
 
     /**
@@ -92,7 +108,7 @@ final class CsvExplainerReport implements ExplainReporterInterface
             $result->rows === null ? '' : (string) $result->rows,
         ];
 
-        if ($this->flush) {
+        if ($this->shouldFlush()) {
             $this->flush();
         }
     }
@@ -140,8 +156,27 @@ final class CsvExplainerReport implements ExplainReporterInterface
             }
 
             $this->pending = [];
+            $this->lastFlush = time();
         } finally {
             flock($this->handle, LOCK_UN);
         }
+    }
+
+    private function shouldFlush(): bool
+    {
+        if ($this->autoFlushCount && count($this->pending) >= $this->autoFlushCount) {
+            return true;
+        }
+
+        if ($this->autoFlushInterval === null) {
+            return false;
+        }
+
+        if ($this->lastFlush === null) {
+            $this->lastFlush = time();
+            return false;
+        }
+
+        return time() - $this->lastFlush >= $this->autoFlushInterval;
     }
 }

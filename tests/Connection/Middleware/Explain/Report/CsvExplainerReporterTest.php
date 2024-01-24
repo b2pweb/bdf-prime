@@ -5,19 +5,19 @@ namespace Connection\Middleware\Explain\Report;
 use Bdf\Prime\Connection\Middleware\Explain\Explainer;
 use Bdf\Prime\Connection\Middleware\Explain\Platform\SqliteExplainPlatform;
 use Bdf\Prime\Connection\Middleware\Explain\QueryType;
-use Bdf\Prime\Connection\Middleware\Explain\Report\CsvExplainerReport;
+use Bdf\Prime\Connection\Middleware\Explain\Report\CsvExplainerReporter;
 use Bdf\Prime\Connection\Middleware\Explain\Report\ExplainResultFilter;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Expression\Like;
 use Bdf\Prime\TestEmbeddedEntity;
 use PHPUnit\Framework\TestCase;
 
-class CsvExplainerReportTest extends TestCase
+class CsvExplainerReporterTest extends TestCase
 {
     use PrimeTestCase;
 
     private Explainer $explainer;
-    private CsvExplainerReport $reporter;
+    private CsvExplainerReporter $reporter;
     private string $file;
 
     protected function setUp(): void
@@ -36,7 +36,7 @@ class CsvExplainerReportTest extends TestCase
         );
 
         $this->file = tempnam(sys_get_temp_dir(), 'csv_explain_report');
-        $this->reporter = new CsvExplainerReport($this->file);
+        $this->reporter = new CsvExplainerReporter($this->file);
     }
 
     protected function tearDown(): void
@@ -92,7 +92,7 @@ CSV
 
     public function test_explain_with_auto_flush()
     {
-        $this->reporter = new CsvExplainerReport($this->file, true);
+        $this->reporter = new CsvExplainerReporter($this->file, null, 1);
         TestEmbeddedEntity::repository()->schema()->migrate();
 
         $query = TestEmbeddedEntity::where('id', [12, 45, 96])->order('name')->toRawSql();
@@ -108,11 +108,68 @@ CSV
 , file_get_contents($this->file));
     }
 
+    public function test_explain_with_auto_flush_count()
+    {
+        $this->reporter = new CsvExplainerReporter($this->file, null, 5);
+        TestEmbeddedEntity::repository()->schema()->migrate();
+
+        $query = TestEmbeddedEntity::where('id', [12, 45, 96])->order('name')->toRawSql();
+        $result = $this->explainer->explain($query);
+        $this->reporter->report($query, $result, __FILE__, 49);
+
+        $this->assertEmpty(file_get_contents($this->file));
+        $this->reporter->report($query, $result, __FILE__, 49);
+        $this->assertEmpty(file_get_contents($this->file));
+        $this->reporter->report($query, $result, __FILE__, 49);
+        $this->reporter->report($query, $result, __FILE__, 49);
+        $this->reporter->report($query, $result, __FILE__, 49);
+
+        $currenFile = __FILE__;
+
+        $this->assertEquals(<<<CSV
+"SELECT t0.* FROM foreign_ t0 WHERE t0.pk_id IN (12,45,96) ORDER BY t0.name_ ASC",$currenFile,49,primary,foreign_,"PRIMARY KEY",0,1,
+"SELECT t0.* FROM foreign_ t0 WHERE t0.pk_id IN (12,45,96) ORDER BY t0.name_ ASC",$currenFile,49,primary,foreign_,"PRIMARY KEY",0,1,
+"SELECT t0.* FROM foreign_ t0 WHERE t0.pk_id IN (12,45,96) ORDER BY t0.name_ ASC",$currenFile,49,primary,foreign_,"PRIMARY KEY",0,1,
+"SELECT t0.* FROM foreign_ t0 WHERE t0.pk_id IN (12,45,96) ORDER BY t0.name_ ASC",$currenFile,49,primary,foreign_,"PRIMARY KEY",0,1,
+"SELECT t0.* FROM foreign_ t0 WHERE t0.pk_id IN (12,45,96) ORDER BY t0.name_ ASC",$currenFile,49,primary,foreign_,"PRIMARY KEY",0,1,
+
+CSV
+, file_get_contents($this->file));
+    }
+
+    public function test_explain_with_auto_flush_time()
+    {
+        $this->reporter = new CsvExplainerReporter($this->file, null, null, 1);
+        TestEmbeddedEntity::repository()->schema()->migrate();
+
+        $query = TestEmbeddedEntity::where('id', [12, 45, 96])->order('name')->toRawSql();
+        $result = $this->explainer->explain($query);
+        $this->reporter->report($query, $result, __FILE__, 49);
+        $this->reporter->report($query, $result, __FILE__, 49);
+        $this->reporter->report($query, $result, __FILE__, 49);
+
+        $this->assertEmpty(file_get_contents($this->file));
+        sleep(1);
+        $this->reporter->report($query, $result, __FILE__, 49);
+        $this->reporter->report($query, $result, __FILE__, 49); // Ignored
+
+        $currenFile = __FILE__;
+
+        $this->assertEquals(<<<CSV
+"SELECT t0.* FROM foreign_ t0 WHERE t0.pk_id IN (12,45,96) ORDER BY t0.name_ ASC",$currenFile,49,primary,foreign_,"PRIMARY KEY",0,1,
+"SELECT t0.* FROM foreign_ t0 WHERE t0.pk_id IN (12,45,96) ORDER BY t0.name_ ASC",$currenFile,49,primary,foreign_,"PRIMARY KEY",0,1,
+"SELECT t0.* FROM foreign_ t0 WHERE t0.pk_id IN (12,45,96) ORDER BY t0.name_ ASC",$currenFile,49,primary,foreign_,"PRIMARY KEY",0,1,
+"SELECT t0.* FROM foreign_ t0 WHERE t0.pk_id IN (12,45,96) ORDER BY t0.name_ ASC",$currenFile,49,primary,foreign_,"PRIMARY KEY",0,1,
+
+CSV
+, file_get_contents($this->file));
+    }
+
     public function test_explain_filter()
     {
         $filter = new ExplainResultFilter();
         $filter->minimumType = QueryType::INDEX;
-        $this->reporter = new CsvExplainerReport($this->file, true, $filter);
+        $this->reporter = new CsvExplainerReporter($this->file, $filter, 1);
 
         TestEmbeddedEntity::repository()->schema()->migrate();
 
@@ -137,7 +194,7 @@ CSV
     {
         $this->file = sys_get_temp_dir().'/csv_explain_report/'.uniqid().'-explain.csv';
 
-        $this->reporter = new CsvExplainerReport($this->file);
+        $this->reporter = new CsvExplainerReporter($this->file);
         TestEmbeddedEntity::repository()->schema()->migrate();
 
         $query = TestEmbeddedEntity::where('id', [12, 45, 96])->order('name')->toRawSql();
@@ -162,7 +219,7 @@ CSV
         $this->expectExceptionMessage('Unable to open file /proc/cpuinfo');
         $this->expectExceptionMessage('Permission denied');
 
-        $reporter = new CsvExplainerReport('/proc/cpuinfo');
+        $reporter = new CsvExplainerReporter('/proc/cpuinfo');
         TestEmbeddedEntity::repository()->schema()->migrate();
 
         $query = TestEmbeddedEntity::where('id', [12, 45, 96])->order('name')->toRawSql();
