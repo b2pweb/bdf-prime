@@ -74,7 +74,7 @@ class MapperCommand extends Command
         }
 
         $visitor = new MapperVisitor($connection->getName(), $this->locator->mappers()->getNameResolver());
-        $schema->visit($visitor);
+        $visitor->onSchema($schema);
 
         if (!$io->option('output')) {
             $io->line($visitor->getOutput());

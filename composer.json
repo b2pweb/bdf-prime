@@ -33,7 +33,7 @@
     "b2pweb/bdf-event-notifier": "~1.0",
     "b2pweb/bdf-serializer": "~1.0",
     "b2pweb/bdf-util": "~1.0",
-    "doctrine/dbal": "~3.0",
+    "doctrine/dbal": "~3.7",
     "doctrine/inflector": "~1.0|~2.0",
     "doctrine/instantiator": "^1.0.3|~2.0",
     "psr/container": "~1.0|~2.0",

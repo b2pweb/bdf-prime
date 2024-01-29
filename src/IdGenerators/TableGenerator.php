@@ -5,7 +5,18 @@ namespace Bdf\Prime\IdGenerators;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Metadata;
+use Bdf\Prime\Platform\Sql\SqlPlatform;
+use Bdf\Prime\Platform\Sql\SqlPlatformOperationInterface;
+use Bdf\Prime\Platform\Sql\SqlPlatformOperationTrait;
 use Bdf\Prime\ServiceLocator;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
+
+use LogicException;
+
+use function get_class;
+use function method_exists;
 
 /**
  * Sequence table
@@ -45,24 +56,49 @@ class TableGenerator extends AbstractGenerator
      */
     protected function incrementSequence(ConnectionInterface $connection, Metadata $metadata)
     {
+        $table = $metadata->sequence['table'];
+        $column = $metadata->sequence['column'];
+
         $platform = $connection->platform();
 
-        switch ($platform->name()) {
-            case 'mysql':
-                $connection->executeUpdate('UPDATE '.$metadata->sequence['table']
-                    .' SET '. $metadata->sequence['column'].' = LAST_INSERT_ID('.$metadata->sequence['column'].'+1)');
-                return (string) $connection->lastInsertId();
-
-            case 'sqlite':
-                $connection->executeUpdate('UPDATE '.$metadata->sequence['table']
-                    .' SET '.$metadata->sequence['column'].' = '.$metadata->sequence['column'].'+1');
-                return (string) $connection->executeQuery('SELECT '.$metadata->sequence['column']
-                    .' FROM '.$metadata->sequence['table'])->fetchOne();
-
-            default:
-                return (string) $connection->executeQuery(
-                    $platform->grammar()->getSequenceNextValSQL($metadata->sequence['table'])
-                )->fetchOne();
+        if (!method_exists($platform, 'apply')) {
+            throw new LogicException('The platform ' . get_class($platform) . ' does not support the method apply().');
         }
+
+        return $platform->apply(new class ($connection, $table, $column) implements SqlPlatformOperationInterface {
+            use SqlPlatformOperationTrait;
+
+            /** @var \Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection */
+            private ConnectionInterface $connection;
+            private string $table;
+            private string $column;
+
+            /**
+             * @param \Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection $connection
+             */
+            public function __construct(ConnectionInterface $connection, string $table, string $column)
+            {
+                $this->connection = $connection;
+                $this->table = $table;
+                $this->column = $column;
+            }
+
+            public function onMysqlPlatform(SqlPlatform $platform, AbstractMySQLPlatform $grammar): string
+            {
+                $this->connection->executeStatement('UPDATE '.$this->table.' SET '. $this->column.' = LAST_INSERT_ID('.$this->column.'+1)');
+                return (string) $this->connection->lastInsertId();
+            }
+
+            public function onSqlitePlatform(SqlPlatform $platform, SqlitePlatform $grammar): string
+            {
+                $this->connection->executeStatement('UPDATE '.$this->table.' SET '.$this->column.' = '.$this->column.'+1');
+                return (string) $this->connection->executeQuery('SELECT '.$this->column.' FROM '.$this->table)->fetchOne();
+            }
+
+            public function onGenericSqlPlatform(SqlPlatform $platform, AbstractPlatform $grammar): string
+            {
+                return (string) $this->connection->executeQuery($grammar->getSequenceNextValSQL($this->table))->fetchOne();
+            }
+        });
     }
 }

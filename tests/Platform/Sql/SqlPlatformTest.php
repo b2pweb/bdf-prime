@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Platform\Sql;
 
+use Bdf\Prime\Platform\PlatformSpecificOperationInterface;
 use Bdf\Prime\Platform\PlatformTypes;
 use Bdf\Prime\Platform\Sql\Types\SqlBooleanType;
 use Bdf\Prime\Platform\Sql\Types\SqlDateTimeType;
@@ -12,6 +13,8 @@ use Bdf\Prime\Types\TypeInterface;
 use Bdf\Prime\Types\TypesRegistry;
 use DateTime;
 use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -39,6 +42,54 @@ class SqlPlatformTest extends TestCase
     public function test_name()
     {
         $this->assertEquals('mysql', $this->platform->name());
+    }
+
+    public function test_apply_not_sql_operation()
+    {
+        $operation = $this->createMock(PlatformSpecificOperationInterface::class);
+        $operation->expects($this->once())->method('onUnknownPlatform')
+            ->with($this->platform, $this->platform->grammar())
+            ->willReturn('foo')
+        ;
+
+        $this->assertSame('foo', $this->platform->apply($operation));
+    }
+
+    public function test_apply_sql_operation_mysql()
+    {
+        $operation = $this->createMock(SqlPlatformOperationInterface::class);
+        $operation->expects($this->once())->method('onMysqlPlatform')
+            ->with($this->platform, $this->platform->grammar())
+            ->willReturn('foo')
+        ;
+
+        $this->assertSame('foo', $this->platform->apply($operation));
+    }
+
+    public function test_apply_sql_operation_sqlite()
+    {
+        $this->platform = new SqlPlatform(new SqlitePlatform(), new TypesRegistry());
+
+        $operation = $this->createMock(SqlPlatformOperationInterface::class);
+        $operation->expects($this->once())->method('onSqlitePlatform')
+            ->with($this->platform, $this->platform->grammar())
+            ->willReturn('foo')
+        ;
+
+        $this->assertSame('foo', $this->platform->apply($operation));
+    }
+
+    public function test_apply_sql_operation_other()
+    {
+        $this->platform = new SqlPlatform(new PostgreSQLPlatform(), new TypesRegistry());
+
+        $operation = $this->createMock(SqlPlatformOperationInterface::class);
+        $operation->expects($this->once())->method('onGenericSqlPlatform')
+            ->with($this->platform, $this->platform->grammar())
+            ->willReturn('foo')
+        ;
+
+        $this->assertSame('foo', $this->platform->apply($operation));
     }
 
     /**

@@ -34,6 +34,7 @@ class Configuration extends BaseConfiguration
      * Set configuration
      *
      * @param array $options
+     * @psalm-suppress DeprecatedMethod
      */
     public function __construct(array $options = [])
     {

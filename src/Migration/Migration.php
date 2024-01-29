@@ -211,7 +211,7 @@ class Migration implements MigrationInterface
      */
     public function update($sql, array $params = [], $connectionName = null)
     {
-        return $this->connection($connectionName)->executeUpdate($sql, $params);
+        return (int) $this->connection($connectionName)->executeStatement($sql, $params);
     }
 
     /**
