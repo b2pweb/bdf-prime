@@ -37,7 +37,7 @@ abstract class AbstractPlatformSpecificExpression implements ExpressionInterface
     {
         // @todo create a dedicated interface for platform() getter ?
         if (!$compiler instanceof CompilerInterface) {
-            throw new BadMethodCallException('The expression ' . static::class . 'is not supported by the current compiler');
+            throw new BadMethodCallException('The expression ' . static::class . ' is not supported by the current compiler');
         }
 
         $configured = clone $this;
@@ -110,7 +110,7 @@ abstract class AbstractPlatformSpecificExpression implements ExpressionInterface
      */
     protected function buildForUnknownPlatform(Q $query, CompilerInterface $compiler, PlatformInterface $platform, object $grammar): string
     {
-        throw new BadMethodCallException('The expression ' . static::class . 'is not supported by the platform ' . get_class($platform));
+        throw new BadMethodCallException('The expression ' . static::class . ' is not supported by the platform ' . get_class($platform));
     }
 
     /**

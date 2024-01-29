@@ -8,6 +8,7 @@ use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Compiler\Preprocessor\OrmPreprocessor;
 use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Expression\Raw;
+use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\TestEntity;
 use Bdf\Prime\User;
 use PHPUnit\Framework\TestCase;
@@ -180,6 +181,26 @@ class KeyValueSqlCompilerTest extends TestCase
         $query = $this->query()->from('test_')->where('id', 5)->offset(1);
 
         $this->assertEquals($this->connection->prepare('SELECT * FROM test_ WHERE id = ? LIMIT -1 OFFSET 1'), $this->compiler->compileSelect($query));
+        $this->assertSame([5], $this->compiler->getBindings($query));
+    }
+
+    /**
+     *
+     */
+    public function test_compileSelect_offset_simple_mysql()
+    {
+        $this->prime()->connections()->declareConnection('mysql', MYSQL_CONNECTION_DSN);
+        $this->connection = Prime::connection('mysql');
+
+        TestEntity::repository()->on('mysql', function (EntityRepository $repository) {
+            $repository->schema()->migrate();
+        });
+
+        $this->compiler = new KeyValueSqlCompiler($this->connection);
+
+        $query = $this->query()->from('test_')->where('id', 5)->offset(1);
+
+        $this->assertEquals($this->connection->prepare('SELECT * FROM test_ WHERE id = ? LIMIT 18446744073709551615 OFFSET 1'), $this->compiler->compileSelect($query));
         $this->assertSame([5], $this->compiler->getBindings($query));
     }
 
