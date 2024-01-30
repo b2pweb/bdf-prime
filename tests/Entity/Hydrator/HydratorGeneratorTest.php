@@ -2,14 +2,14 @@
 
 namespace Bdf\Prime\Entity\Hydrator;
 
-use DateTimeImmutable;
-use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Admin;
 use Bdf\Prime\ArrayHydratorTestEntity;
 use Bdf\Prime\ArrayHydratorTestEntity2;
 use Bdf\Prime\Bench\DummyPlatform;
 use Bdf\Prime\Bench\HydratorGeneration;
+use Bdf\Prime\City;
 use Bdf\Prime\Contact;
+use Bdf\Prime\Country;
 use Bdf\Prime\Customer;
 use Bdf\Prime\Document;
 use Bdf\Prime\DocumentControlTask;
@@ -19,17 +19,27 @@ use Bdf\Prime\Entity\Hydrator\Exception\HydratorGenerationException;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Folder;
 use Bdf\Prime\Location;
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Mapper\Mapper;
+use Bdf\Prime\Name;
+use Bdf\Prime\PersonId;
+use Bdf\Prime\PersonWithValueObject;
 use Bdf\Prime\PolymorphContainer;
 use Bdf\Prime\PolymorphSubA;
 use Bdf\Prime\PolymorphSubB;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Street;
 use Bdf\Prime\Task;
 use Bdf\Prime\TestEmbeddedEntity;
 use Bdf\Prime\TestEntity;
+use Bdf\Prime\TestEntityId;
+use Bdf\Prime\TestEntityName;
+use Bdf\Prime\TestEntityWithValueObject;
 use Bdf\Prime\TestFile;
 use Bdf\Prime\User;
+use Bdf\Prime\ZipCode;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\DateTime;
 
@@ -1242,6 +1252,264 @@ EOL;
 
         $hydrator->hydrateOne($entity, 'embedded.location.city', 'my city');
         $this->assertEquals('my city', $entity->embedded()->location()->city);
+    }
+
+    public function test_with_value_object()
+    {
+        $hydrator = $this->createGeneratedHydrator(TestEntityWithValueObject::class);
+
+        $entity = new TestEntityWithValueObject();
+        $entity->id = TestEntityId::from(42);
+        $entity->name = TestEntityName::from('foo');
+
+        $this->assertSame([
+            'id' => 42,
+            'dateInsert' => null,
+            'name' => 'foo',
+        ], $hydrator->flatExtract($entity));
+
+        $this->assertSame([
+            'id' => 42,
+            'name' => 'foo',
+        ], $hydrator->flatExtract($entity, ['id' => 'id', 'name' => 'name']));
+
+        $this->assertSame(42, $hydrator->extractOne($entity, 'id'));
+        $this->assertSame('foo', $hydrator->extractOne($entity, 'name'));
+        $this->assertSame(null, $hydrator->extractOne($entity, 'dateInsert'));
+
+        $entity = new TestEntityWithValueObject();
+        $entity->name = TestEntityName::from('foo');
+        $this->assertSame([
+            'id' => null,
+            'dateInsert' => null,
+            'name' => 'foo',
+        ], $hydrator->flatExtract($entity));
+
+        $this->assertSame([
+            'id' => null,
+            'name' => 'foo',
+        ], $hydrator->flatExtract($entity, ['id' => 'id', 'name' => 'name']));
+
+        $this->assertSame(null, $hydrator->extractOne($entity, 'id'));
+        $this->assertSame('foo', $hydrator->extractOne($entity, 'name'));
+        $this->assertSame(null, $hydrator->extractOne($entity, 'dateInsert'));
+
+        $entity = new TestEntityWithValueObject();
+        $hydrator->flatHydrate($entity, [
+            'id' => 42,
+            'name' => 'foo',
+            'date_insert' => '2019-06-10 10:09:20',
+        ], Prime::service()->connection('test')->platform()->types());
+
+        $this->assertEquals(TestEntityId::from(42), $entity->id);
+        $this->assertEquals(TestEntityName::from('foo'), $entity->name);
+        $this->assertEquals(new DateTimeImmutable('2019-06-10T10:09:20+02:00'), $entity->dateInsert);
+
+        $hydrator->hydrateOne($entity, 'id', 43);
+        $hydrator->hydrateOne($entity, 'name', 'bar');
+
+        $this->assertEquals(TestEntityId::from(43), $entity->id);
+        $this->assertEquals(TestEntityName::from('bar'), $entity->name);
+
+        $hydrator->hydrateOne($entity, 'id', null);
+        $this->assertNull($entity->id);
+
+        $hydrator->hydrateOne($entity, 'id', $id = TestEntityId::from(66));
+        $this->assertSame($id, $entity->id);
+    }
+
+    public function test_with_embedded_value_object()
+    {
+        $hydrator = $this->createGeneratedHydrator(PersonWithValueObject::class);
+        $entity = new PersonWithValueObject();
+
+        $this->assertSame([
+            'id' => null,
+            'firstName' => null,
+            'lastName' => null,
+            'address.street' => null,
+            'address.city' => null,
+            'address.zip' => null,
+            'address.country' => null,
+        ], $hydrator->flatExtract($entity));
+
+        $this->assertNull($hydrator->extractOne($entity, 'address.street'));
+        $this->assertNull($hydrator->extractOne($entity, 'address.zip'));
+
+        $hydrator->flatHydrate($entity, [
+            'id' => 42,
+            'first_name' => 'foo',
+            'last_name' => 'bar',
+            'address_street' => 'street',
+            'address_city' => 'city',
+            'address_zip' => 'zip',
+            'address_country' => 'country',
+        ], Prime::service()->connection('test')->platform()->types());
+
+        $this->assertEquals(PersonId::from(42), $entity->id);
+        $this->assertEquals(Name::from('foo'), $entity->firstName);
+        $this->assertEquals(Name::from('bar'), $entity->lastName);
+        $this->assertEquals(Street::from('street'), $entity->address->street);
+        $this->assertEquals(City::from('city'), $entity->address->city);
+        $this->assertEquals(ZipCode::from('zip'), $entity->address->zip);
+        $this->assertEquals(Country::from('country'), $entity->address->country);
+
+        $this->assertSame('street', $hydrator->extractOne($entity, 'address.street'));
+        $this->assertSame('zip', $hydrator->extractOne($entity, 'address.zip'));
+
+        $this->assertSame([
+            'id' => 42,
+            'firstName' => 'foo',
+            'lastName' => 'bar',
+            'address.street' => 'street',
+            'address.city' => 'city',
+            'address.zip' => 'zip',
+            'address.country' => 'country',
+        ], $hydrator->flatExtract($entity));
+
+        $this->assertSame([
+            'firstName' => 'foo',
+            'address.street' => 'street',
+        ], $hydrator->flatExtract($entity, ['firstName' => 'firstName', 'address.street' => 'address.street']));
+
+        $hydrator->hydrateOne($entity, 'address.street', 'new street');
+        $this->assertEquals(Street::from('new street'), $entity->address->street);
+
+        $hydrator->hydrateOne($entity, 'address.street', $street = Street::from('other street'));
+        $this->assertSame($street, $entity->address->street);
+
+        $hydrator->hydrateOne($entity, 'address.street', null);
+        $this->assertNull($entity->address->street);
+    }
+
+    public function test_generate_with_value_object()
+    {
+        $generator = new HydratorGenerator($this->prime(), PersonWithValueObject::repository()->mapper(), PersonWithValueObject::class);
+        $code = $generator->generate();
+
+        $this->assertStringContainsString(
+            <<<'PHP'
+            $data = ['id' => ((($__tmp21cbdc47b952809cabb7cfc01d270fbf = $object->id) instanceof \Bdf\Prime\PersonId ? $__tmp21cbdc47b952809cabb7cfc01d270fbf->value() : $__tmp21cbdc47b952809cabb7cfc01d270fbf)), 'firstName' => ((($__tmp23745ef42afcfb9f8ec0457505e80664 = $object->firstName) instanceof \Bdf\Prime\Name ? $__tmp23745ef42afcfb9f8ec0457505e80664->value() : $__tmp23745ef42afcfb9f8ec0457505e80664)), 'lastName' => ((($__tmpd76d23ae2a340bd0b2a745e5baad4ea5 = $object->lastName) instanceof \Bdf\Prime\Name ? $__tmpd76d23ae2a340bd0b2a745e5baad4ea5->value() : $__tmpd76d23ae2a340bd0b2a745e5baad4ea5))];
+            PHP
+            , $code
+        );
+
+        $this->assertStringContainsString(
+            <<<'PHP'
+            $data['address.street'] = (($__tmp5b90a947a0e37fea1f656a08f590ba6c = $__embedded->street) instanceof \Bdf\Prime\Street ? $__tmp5b90a947a0e37fea1f656a08f590ba6c->value() : $__tmp5b90a947a0e37fea1f656a08f590ba6c);
+            PHP
+            , $code
+        );
+
+        $this->assertStringContainsString(
+            <<<'PHP'
+                        if (isset($attributes['id'])) {
+                            $data['id'] = (($__tmp21cbdc47b952809cabb7cfc01d270fbf = $object->id) instanceof \Bdf\Prime\PersonId ? $__tmp21cbdc47b952809cabb7cfc01d270fbf->value() : $__tmp21cbdc47b952809cabb7cfc01d270fbf);
+                        }
+            PHP
+            , $code
+        );
+
+        $this->assertStringContainsString(
+<<<'PHP'
+        if (array_key_exists('address_street', $data)) {
+            $value = $typestring->fromDatabase($data['address_street']);
+            { //START accessor for address
+                try {
+                    $__embedded = $object->address;
+                } catch (\Error $e) {
+                    // Ignore not initialized property if embedded is instantiated
+                    $__embedded = null;
+                }
+                if ($__embedded === null) {
+                    $__embedded = $this->__instantiator->instantiate('Bdf\Prime\AddressWithValueObject', 1);
+                    $object->address = $__embedded;
+                }
+            } //END accessor for address
+            
+            $__embedded->street = (($__tmp7d0596c36891967f3bb9d994b4a97c19 = $value) !== null ? \Bdf\Prime\Street::from($__tmp7d0596c36891967f3bb9d994b4a97c19) : $__tmp7d0596c36891967f3bb9d994b4a97c19);
+        }
+PHP
+            , $code
+        );
+
+        $this->assertStringContainsString(
+<<<'PHP'
+        if (array_key_exists('id', $data)) {
+            $value = $typeinteger->fromDatabase($data['id']);
+            $object->id = (($__tmp7d0596c36891967f3bb9d994b4a97c19 = $value) !== null ? \Bdf\Prime\PersonId::from($__tmp7d0596c36891967f3bb9d994b4a97c19) : $__tmp7d0596c36891967f3bb9d994b4a97c19);
+        }
+PHP
+            , $code
+        );
+
+        $this->assertStringContainsString(
+<<<'PHP'
+            case 'id':
+                return (($__tmp21cbdc47b952809cabb7cfc01d270fbf = $object->id) instanceof \Bdf\Prime\PersonId ? $__tmp21cbdc47b952809cabb7cfc01d270fbf->value() : $__tmp21cbdc47b952809cabb7cfc01d270fbf);
+PHP
+            , $code
+        );
+
+        $this->assertStringContainsString(
+<<<'PHP'
+            case 'address.street':
+                { //START accessor for address
+                    try {
+                        $__embedded = $object->address;
+                    } catch (\Error $e) {
+                        // Ignore not initialized property if embedded is instantiated
+                        $__embedded = null;
+                    }
+                    if ($__embedded === null) {
+                        $__embedded = $this->__instantiator->instantiate('Bdf\Prime\AddressWithValueObject', 1);
+                        $object->address = $__embedded;
+                    }
+                } //END accessor for address
+                
+                return (($__tmp5b90a947a0e37fea1f656a08f590ba6c = $__embedded->street) instanceof \Bdf\Prime\Street ? $__tmp5b90a947a0e37fea1f656a08f590ba6c->value() : $__tmp5b90a947a0e37fea1f656a08f590ba6c);
+PHP
+            , $code
+        );
+
+        $this->assertStringContainsString(
+<<<'PHP'
+            case 'id':
+                try {
+                    $object->id = (($__tmp7d0596c36891967f3bb9d994b4a97c19 = $value) !== null && !$__tmp7d0596c36891967f3bb9d994b4a97c19 instanceof \Bdf\Prime\PersonId ? \Bdf\Prime\PersonId::from($__tmp7d0596c36891967f3bb9d994b4a97c19) : $__tmp7d0596c36891967f3bb9d994b4a97c19);
+                } catch (\TypeError $e) {
+                    throw new \Bdf\Prime\Entity\Hydrator\Exception\InvalidTypeException($e, 'integer');
+                }
+                break;
+PHP
+            , $code
+        );
+
+        $this->assertStringContainsString(
+<<<'PHP'
+            case 'address.street':
+                try {
+                    { //START accessor for address
+                        try {
+                            $__embedded = $object->address;
+                        } catch (\Error $e) {
+                            // Ignore not initialized property if embedded is instantiated
+                            $__embedded = null;
+                        }
+                        if ($__embedded === null) {
+                            $__embedded = $this->__instantiator->instantiate('Bdf\Prime\AddressWithValueObject', 1);
+                            $object->address = $__embedded;
+                        }
+                    } //END accessor for address
+                    
+                    $__embedded->street = (($__tmp7d0596c36891967f3bb9d994b4a97c19 = $value) !== null && !$__tmp7d0596c36891967f3bb9d994b4a97c19 instanceof \Bdf\Prime\Street ? \Bdf\Prime\Street::from($__tmp7d0596c36891967f3bb9d994b4a97c19) : $__tmp7d0596c36891967f3bb9d994b4a97c19);
+                } catch (\TypeError $e) {
+                    throw new \Bdf\Prime\Entity\Hydrator\Exception\InvalidTypeException($e, 'string');
+                }
+                break;
+PHP
+            , $code
+        );
     }
 
     /**

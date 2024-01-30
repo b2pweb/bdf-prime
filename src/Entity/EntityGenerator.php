@@ -24,6 +24,7 @@ use Nette\PhpGenerator\TraitUse;
 
 use function array_map;
 use function class_exists;
+use function var_export;
 
 /**
  * Generic class used to generate PHP 7 and 8 entity classes from Mapper.
@@ -499,7 +500,7 @@ class EntityGenerator
                 $generator->setTypeHint($property->phpType());
             }
 
-            if ($property->hasDefault() && !$property->isDateTime()) {
+            if ($property->hasDefault() && $property->isPrimitive()) {
                 $generator->setDefaultValue($property->convert($property->getDefault()));
             } elseif ($property->isArray()) {
                 $generator->setDefaultValue([]);
@@ -509,14 +510,18 @@ class EntityGenerator
                 $generator->setDefaultValue(null);
             }
 
-            if ($property->hasDefault() && $property->isDateTime()) {
-                $constructorArgs = '';
-                // Add the default timezone from the property type.
-                if ($timezone = $property->getTimezone()) {
-                    $constructorArgs = "'now', new \DateTimeZone('$timezone')";
-                }
+            if ($property->hasDefault()) {
+                if ($property->isDateTime()) {
+                    $constructorArgs = '';
+                    // Add the default timezone from the property type.
+                    if ($timezone = $property->getTimezone()) {
+                        $constructorArgs = "'now', new \DateTimeZone('$timezone')";
+                    }
 
-                $generator->setInitialize('new '.$property->phpType().'('.$constructorArgs.')');
+                    $generator->setInitialize('new '.$property->phpType().'('.$constructorArgs.')');
+                } elseif ($property->isValueObject()) {
+                    $generator->setInitialize($property->phpType().'::from(' . var_export($property->convert($property->getDefault()), true) . ')');
+                }
             }
         }
 

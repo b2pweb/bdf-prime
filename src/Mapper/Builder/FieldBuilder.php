@@ -8,6 +8,7 @@ use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Platform\Sql\Types\SqlJsonType;
 use Bdf\Prime\Types\TypeInterface;
 use Bdf\Prime\Types\TypesHelperInterface;
+use Bdf\Prime\ValueObject\ValueObjectInterface;
 use Closure;
 use IteratorAggregate;
 
@@ -561,6 +562,30 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     public function phpClass(string $className)
     {
         return $this->phpOptions('className', $className);
+    }
+
+    /**
+     * Define the value object wrapper class.
+     *
+     * Usage:
+     * <code>
+     *     $builder->string('firstName', 64)->valueObject(FirstName::class)->nillable();
+     * </code>
+     *
+     * When used, {@see ValueObjectInterface::from()} will be called to create the value object, with the value transformed from database using the type,
+     * and {@see ValueObjectInterface::value()} will be called to get the database value, before transformed to database value using the type.
+     *
+     * If the database value is null, the value object will be null (so {@see ValueObjectInterface::from()} will not be called).
+     *
+     * @param class-string<ValueObjectInterface> $valueObjectClass The value object class name
+     *
+     * @return $this
+     */
+    public function valueObject(string $valueObjectClass): self
+    {
+        $this->fields[$this->current]['valueObject'] = $valueObjectClass;
+
+        return $this;
     }
 
     /**

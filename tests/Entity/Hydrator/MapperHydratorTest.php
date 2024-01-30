@@ -3,18 +3,26 @@
 namespace Bdf\Prime\Entity\Hydrator;
 
 use Bdf\Prime\Bench\DummyPlatform;
+use Bdf\Prime\City;
+use Bdf\Prime\Country;
 use Bdf\Prime\Customer;
 use Bdf\Prime\Document;
 use Bdf\Prime\Entity\Hydrator\Exception\FieldNotDeclaredException;
 use Bdf\Prime\Location;
+use Bdf\Prime\Name;
+use Bdf\Prime\PersonId;
+use Bdf\Prime\PersonWithValueObject;
 use Bdf\Prime\PolymorphContainer;
 use Bdf\Prime\PolymorphSubA;
 use Bdf\Prime\PolymorphSubB;
+use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\ServiceLocator;
+use Bdf\Prime\Street;
 use Bdf\Prime\TestEmbeddedEntity;
 use Bdf\Prime\TestEntity;
 use Bdf\Prime\TestEntityMapper;
+use Bdf\Prime\ZipCode;
 use DateTime;
 use PHPUnit\Framework\TestCase;
 
@@ -491,5 +499,73 @@ class MapperHydratorTest extends TestCase
         $entity = new PolymorphContainer(['id' => 123]);
 
         $hydrator->hydrateOne($entity, 'embedded.name', 'my new name');
+    }
+
+    public function test_with_value_object()
+    {
+        $mapper = PersonWithValueObject::repository()->mapper();
+        $hydrator = new MapperHydrator();
+        $hydrator->setPrimeInstantiator(PersonWithValueObject::locator()->instantiator());
+        $hydrator->setPrimeMetadata($mapper->metadata());
+
+        $entity = new PersonWithValueObject();
+
+        $this->assertSame([
+            'id' => null,
+            'firstName' => null,
+            'lastName' => null,
+            'address.street' => null,
+            'address.city' => null,
+            'address.zip' => null,
+            'address.country' => null,
+        ], $hydrator->flatExtract($entity));
+
+        $this->assertNull($hydrator->extractOne($entity, 'address.street'));
+        $this->assertNull($hydrator->extractOne($entity, 'address.zip'));
+
+        $hydrator->flatHydrate($entity, [
+            'id' => 42,
+            'first_name' => 'foo',
+            'last_name' => 'bar',
+            'address_street' => 'street',
+            'address_city' => 'city',
+            'address_zip' => 'zip',
+            'address_country' => 'country',
+        ], Prime::service()->connection('test')->platform()->types());
+
+        $this->assertEquals(PersonId::from(42), $entity->id);
+        $this->assertEquals(Name::from('foo'), $entity->firstName);
+        $this->assertEquals(Name::from('bar'), $entity->lastName);
+        $this->assertEquals(Street::from('street'), $entity->address->street);
+        $this->assertEquals(City::from('city'), $entity->address->city);
+        $this->assertEquals(ZipCode::from('zip'), $entity->address->zip);
+        $this->assertEquals(Country::from('country'), $entity->address->country);
+
+        $this->assertSame('street', $hydrator->extractOne($entity, 'address.street'));
+        $this->assertSame('zip', $hydrator->extractOne($entity, 'address.zip'));
+
+        $this->assertSame([
+            'id' => 42,
+            'firstName' => 'foo',
+            'lastName' => 'bar',
+            'address.street' => 'street',
+            'address.city' => 'city',
+            'address.zip' => 'zip',
+            'address.country' => 'country',
+        ], $hydrator->flatExtract($entity));
+
+        $this->assertSame([
+            'firstName' => 'foo',
+            'address.street' => 'street',
+        ], $hydrator->flatExtract($entity, ['firstName' => 'firstName', 'address.street' => 'address.street']));
+
+        $hydrator->hydrateOne($entity, 'address.street', 'new street');
+        $this->assertEquals(Street::from('new street'), $entity->address->street);
+
+        $hydrator->hydrateOne($entity, 'address.street', $street = Street::from('other street'));
+        $this->assertSame($street, $entity->address->street);
+
+        $hydrator->hydrateOne($entity, 'address.street', null);
+        $this->assertNull($entity->address->street);
     }
 }

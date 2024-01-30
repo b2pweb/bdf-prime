@@ -2,11 +2,16 @@
 
 namespace Bdf\Prime\Entity\Hydrator\Generator;
 
+use Bdf\Prime\AddressWithValueObject;
 use Bdf\Prime\Admin;
 use Bdf\Prime\Document;
 use Bdf\Prime\Location;
+use Bdf\Prime\PersonWithValueObject;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Street;
+use Bdf\Prime\TestEntityId;
+use Bdf\Prime\TestEntityWithValueObject;
 use Bdf\Prime\User;
 use PHPUnit\Framework\TestCase;
 
@@ -70,6 +75,33 @@ class AttributesResolverTest extends TestCase
         $this->assertTrue($attribute->isInitializedByDefault());
         $this->assertEquals('id', $attribute->reflection()->getName());
         $this->assertEquals(Document::class, $attribute->reflection()->class);
+        $this->assertNull($attribute->valueObject());
+    }
+
+    /**
+     *
+     */
+    public function test_attribute_simple_value_object()
+    {
+        $this->resolver = new AttributesResolver(
+            TestEntityWithValueObject::repository()->mapper(),
+            Prime::service()
+        );
+
+        $attribute = $this->resolver->attribute('id');
+
+        $this->assertEquals('id', $attribute->name());
+        $this->assertEquals('id', $attribute->property());
+        $this->assertEquals('id', $attribute->field());
+        $this->assertEquals('integer', $attribute->type());
+        $this->assertFalse($attribute->isEmbedded());
+        $this->assertEquals(TestEntityWithValueObject::class, $attribute->containerClassName());
+        $this->assertTrue($attribute->isTyped());
+        $this->assertTrue($attribute->isNullable());
+        $this->assertTrue($attribute->isInitializedByDefault());
+        $this->assertSame(TestEntityId::class, $attribute->valueObject());
+        $this->assertEquals('id', $attribute->reflection()->getName());
+        $this->assertEquals(TestEntityWithValueObject::class, $attribute->reflection()->class);
     }
 
     /**
@@ -90,9 +122,39 @@ class AttributesResolverTest extends TestCase
         $this->assertTrue($attribute->isInitializedByDefault());
         $this->assertEquals('address', $attribute->reflection()->getName());
         $this->assertEquals(Location::class, $attribute->reflection()->class);
+        $this->assertNull($attribute->valueObject());
 
         $this->assertInstanceOf(EmbeddedInfo::class, $attribute->embedded());
         $this->assertEquals('contact.location', $attribute->embedded()->path());
+    }
+
+    /**
+     *
+     */
+    public function test_attribute_embedded_value_object()
+    {
+        $this->resolver = new AttributesResolver(
+            PersonWithValueObject::repository()->mapper(),
+            Prime::service()
+        );
+
+        $attribute = $this->resolver->attribute('address.street');
+
+        $this->assertEquals('address.street', $attribute->name());
+        $this->assertEquals('street', $attribute->property());
+        $this->assertEquals('address_street', $attribute->field());
+        $this->assertEquals('string', $attribute->type());
+        $this->assertTrue($attribute->isEmbedded());
+        $this->assertEquals(AddressWithValueObject::class, $attribute->containerClassName());
+        $this->assertTrue($attribute->isTyped());
+        $this->assertTrue($attribute->isNullable());
+        $this->assertTrue($attribute->isInitializedByDefault());
+        $this->assertEquals('street', $attribute->reflection()->getName());
+        $this->assertEquals(AddressWithValueObject::class, $attribute->reflection()->class);
+        $this->assertSame(Street::class, $attribute->valueObject());
+
+        $this->assertInstanceOf(EmbeddedInfo::class, $attribute->embedded());
+        $this->assertEquals('address', $attribute->embedded()->path());
     }
 
     /**

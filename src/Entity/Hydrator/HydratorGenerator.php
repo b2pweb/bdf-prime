@@ -24,52 +24,28 @@ class HydratorGenerator
      *
      * @var string
      */
-    private $stub = __DIR__.'/Generator/stubs/hydrator.php.stub';
+    private string $stub = __DIR__.'/Generator/stubs/hydrator.php.stub';
+    private CodeGenerator $code;
+    private ClassAccessor $accessor;
+    private AccessorResolver $accessors;
+    private AttributesResolver $resolver;
+    private ServiceLocator $prime;
+    private Mapper $mapper;
 
     /**
-     * @var CodeGenerator
+     * @var class-string
      */
-    private $code;
+    private string $className;
 
     /**
-     * @var ClassAccessor
+     * @var class-string
      */
-    private $accessor;
-
-    /**
-     * @var AccessorResolver
-     */
-    private $accessors;
-
-    /**
-     * @var AttributesResolver
-     */
-    private $resolver;
-
-    /**
-     * @var ServiceLocator
-     */
-    private $prime;
-
-    /**
-     * @var Mapper
-     */
-    private $mapper;
-
-    /**
-     * @var string
-     */
-    private $className;
-
-    /**
-     * @var string
-     */
-    private $interface = HydratorGeneratedInterface::class;
+    private string $interface = HydratorGeneratedInterface::class;
 
     /**
      * @var array
      */
-    private $embeddedHydrators = [];
+    private array $embeddedHydrators = [];
 
 
     /**
@@ -77,11 +53,11 @@ class HydratorGenerator
      *
      * @param ServiceLocator $prime
      * @param Mapper $mapper
-     * @param string $className
+     * @param class-string $className
      *
      * @throws HydratorGenerationException
      */
-    public function __construct(ServiceLocator $prime, Mapper $mapper, $className)
+    public function __construct(ServiceLocator $prime, Mapper $mapper, string $className)
     {
         $this->prime = $prime;
         $this->mapper = $mapper;
@@ -113,7 +89,7 @@ class HydratorGenerator
      *
      * @return string
      */
-    public function hydratorNamespace()
+    public function hydratorNamespace(): string
     {
         return implode('\\', array_slice(explode('\\', $this->className), 0, -1));
     }
@@ -123,7 +99,7 @@ class HydratorGenerator
      *
      * @return string
      */
-    public function hydratorClassName()
+    public function hydratorClassName(): string
     {
         return 'Hydrator_' . str_replace('\\', '_', $this->className);
     }
@@ -133,7 +109,7 @@ class HydratorGenerator
      *
      * @return string
      */
-    public function hydratorFullClassName()
+    public function hydratorFullClassName(): string
     {
         return $this->hydratorNamespace() . '\\' . $this->hydratorClassName();
     }
@@ -143,7 +119,7 @@ class HydratorGenerator
      *
      * @return string
      */
-    public function generate()
+    public function generate(): string
     {
         $this->resolveHydrators();
 
@@ -183,7 +159,7 @@ class HydratorGenerator
      *
      * @throws HydratorGenerationException
      */
-    protected function hydratorTemplate()
+    protected function hydratorTemplate(): string
     {
         return $this->code->generate($this->stub, [
             'namespace'                 => $this->code->namespace($this->hydratorNamespace()),
@@ -486,7 +462,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateFlatExtractAll()
+    protected function generateFlatExtractAll(): string
     {
         $simpleArray = [];
         $extractors = [];
@@ -496,7 +472,7 @@ PHP;
                 $accessor = $this->accessors->embedded($attribute->embedded());
                 $extractor = <<<PHP
 {$accessor->getEmbedded('$__embedded')}
-\$data['{$attribute->name()}'] = {$accessor->getter('$__embedded', $attribute->property())};
+\$data['{$attribute->name()}'] = {$accessor->getter('$__embedded', $attribute->property(), $attribute->valueObject())};
 PHP;
 
                 if (!$attribute->isInitializedByDefault()) {
@@ -511,11 +487,11 @@ PHP;
 
                 $extractors[] = $extractor;
             } elseif ($attribute->isInitializedByDefault()) {
-                $simpleArray[] = "'{$attribute->name()}' => ({$this->accessor->getter('$object', $attribute->property())})";
+                $simpleArray[] = "'{$attribute->name()}' => ({$this->accessor->primitiveGetter('$object', $attribute->property(), $attribute->valueObject())})";
             } else {
                 $extractors[] = <<<PHP
 try {
-    \$data['{$attribute->name()}'] = {$this->accessor->getter('$object', $attribute->property())};
+    \$data['{$attribute->name()}'] = {$this->accessor->primitiveGetter('$object', $attribute->property(), $attribute->valueObject())};
 } catch (\Error \$e) {
     throw new \Bdf\Prime\Entity\Hydrator\Exception\UninitializedPropertyException('{$attribute->containerClassName()}', '{$attribute->property()}');
 }
@@ -541,7 +517,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateFlatExtractSelected()
+    protected function generateFlatExtractSelected(): string
     {
         $lines = '';
 
@@ -551,10 +527,10 @@ PHP;
 
                 $code = <<<PHP
 {$accessor->getEmbedded('$__embedded')}
-\$data['{$attribute->name()}'] = {$accessor->getter('$__embedded', $attribute->property())};
+\$data['{$attribute->name()}'] = {$accessor->getter('$__embedded', $attribute->property(), $attribute->valueObject())};
 PHP;
             } else {
-                $code = "\$data['{$attribute->name()}'] = {$this->accessor->getter('$object', $attribute->property())};";
+                $code = "\$data['{$attribute->name()}'] = {$this->accessor->primitiveGetter('$object', $attribute->property(), $attribute->valueObject())};";
             }
 
             $lines .= <<<PHP
@@ -581,7 +557,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateFlatHydrate()
+    protected function generateFlatHydrate(): string
     {
         $types = new TypeAccessor($this->code);
 
@@ -621,7 +597,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateAttributeFlatHydrate(AttributeInfo $attribute, array $relationKeys, TypeAccessor $types)
+    protected function generateAttributeFlatHydrate(AttributeInfo $attribute, array $relationKeys, TypeAccessor $types): string
     {
         $options = '';
         if ($attribute->phpOptions()) {
@@ -633,21 +609,21 @@ PHP;
 
         if (!$attribute->isEmbedded()) {
             if ($attribute->isNullable()) {
-                return $out."\n".$this->accessor->setter('$object', $attribute->name(), $target, false).';';
+                return $out."\n".$this->accessor->valueObjectSetter('$object', $attribute->name(), $target, $attribute->valueObject()).';';
             }
 
             return <<<PHP
 {$out}
 
 if ({$target} !== null) {
-    {$this->accessor->setter('$object', $attribute->name(), $target, false)};
+    {$this->accessor->valueObjectSetter('$object', $attribute->name(), $target, $attribute->valueObject())};
 }
 PHP;
         }
 
         $accessor = $this->accessors
             ->embedded($attribute->embedded())
-            ->fullSetter($attribute->property(), $target, '$__embedded', '$data').';'
+            ->fullSetter($attribute->property(), $target, '$__embedded', '$data', $attribute->valueObject()).';'
         ;
 
         if (!$attribute->isNullable()) {
@@ -668,7 +644,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateExtractOneBody()
+    protected function generateExtractOneBody(): string
     {
         $cases = [];
 
@@ -703,9 +679,9 @@ PHP
         if ($attribute->isEmbedded()) {
             $accessor = $this->accessors->embedded($attribute->embedded());
 
-            $body = $accessor->getEmbedded('$__embedded').$this->code->eol().'return '.$accessor->getter('$__embedded', $attribute->property()).';';
+            $body = $accessor->getEmbedded('$__embedded').$this->code->eol().'return '.$accessor->getter('$__embedded', $attribute->property(), $attribute->valueObject()).';';
         } else {
-            $body = "return {$this->accessor->getter('$object', $attribute->property())};";
+            $body = "return {$this->accessor->primitiveGetter('$object', $attribute->property(), $attribute->valueObject())};";
         }
 
         if ($attribute->isInitializedByDefault()) {
@@ -784,15 +760,15 @@ PHP
      *
      * @throws HydratorGenerationException
      */
-    protected function generateHydrateOneCaseAttribute($attribute)
+    protected function generateHydrateOneCaseAttribute(AttributeInfo $attribute): string
     {
         if ($attribute->isEmbedded()) {
             $code = $this->accessors
                 ->embedded($attribute->embedded())
-                ->fullSetter($attribute->property(), '$value', '$__embedded').';'
+                ->fullSetter($attribute->property(), '$value', '$__embedded', null, $attribute->valueObject(), true).';'
             ;
         } else {
-            $code = $this->accessor->setter('$object', $attribute->property(), '$value', false) . ';';
+            $code = $this->accessor->valueObjectSetter('$object', $attribute->property(), '$value', $attribute->valueObject(), true) . ';';
         }
 
         // Always surround with try catch because setter can also be typed

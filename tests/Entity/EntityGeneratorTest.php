@@ -9,11 +9,13 @@ use Bdf\Prime\Customer;
 use Bdf\Prime\Document;
 use Bdf\Prime\Faction;
 use Bdf\Prime\Folder;
+use Bdf\Prime\PersonWithValueObject;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Project;
 use Bdf\Prime\Task;
 use Bdf\Prime\TestEntity;
+use Bdf\Prime\TestEntityWithValueObject;
 use Bdf\Prime\User;
 use PHPUnit\Framework\TestCase;
 
@@ -825,10 +827,22 @@ PHP
         $this->assertStringEqualsFile(__DIR__.'/_files/company_up_to_date_with_promoted_properties.php', $entity);
     }
 
+    public function test_generate_with_value_object()
+    {
+        $generator = new EntityGenerator(Prime::service());
+        $generator->useTypedProperties();
+        $generator->setClassToExtend(Model::class);
+
+        $entity = $generator->generate(PersonWithValueObject::repository()->mapper());
+
+        $this->assertStringEqualsFile(__DIR__.'/_files/person_with_value_object.php', $entity);
+    }
+
     public function provideEntities(): array
     {
         return [
             [User::class], [Customer::class], [Document::class],  [Task::class], [Admin::class], [Faction::class],
+            [TestEntityWithValueObject::class], [PersonWithValueObject::class],
         ];
     }
 

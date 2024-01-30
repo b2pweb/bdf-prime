@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Mapper\Builder;
 
+use Bdf\Prime\Name;
 use Bdf\Prime\PolymorphSubA;
 use Bdf\Prime\PolymorphSubB;
 use PHPUnit\Framework\TestCase;
@@ -127,6 +128,23 @@ class FieldBuilderTest extends TestCase
                     ],
                 ]
             ]
+        ];
+
+        $this->assertSame($expected, $builder->fields());
+    }
+
+    public function test_valueObject()
+    {
+        $builder = new FieldBuilder();
+        $builder->string('name')->valueObject(Name::class);
+
+        $expected = [
+            'name' => [
+                'type'       => 'string',
+                'default'    => null,
+                'length'     => 255,
+                'valueObject' => Name::class,
+            ],
         ];
 
         $this->assertSame($expected, $builder->fields());

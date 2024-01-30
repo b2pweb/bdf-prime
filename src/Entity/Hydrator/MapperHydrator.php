@@ -79,6 +79,12 @@ class MapperHydrator implements MapperHydratorInterface
                 $value = $this->readFromAttribute($object, $metadata);
             }
 
+            $valueObjectClass = $metadata['valueObject'] ?? null;
+
+            if ($valueObjectClass && $value instanceof $valueObjectClass) {
+                $value = $value->value();
+            }
+
             $values[$attribute] = $value;
         }
 
@@ -97,14 +103,21 @@ class MapperHydrator implements MapperHydratorInterface
         ];
 
         foreach ($data as $field => $value) {
-            if (!isset($metadata[$field])) {
+            $fieldMetadata = $metadata[$field] ?? null;
+
+            if (!isset($fieldMetadata)) {
                 continue;
             }
 
-            $value = $types->get($metadata[$field]['type'])->fromDatabase($value, $metadata[$field]['phpOptions']);
+            $value = $types->get($fieldMetadata['type'])->fromDatabase($value, $fieldMetadata['phpOptions']);
+            $valueObjectClass = $fieldMetadata['valueObject'] ?? null;
 
-            if (isset($metadata[$field]['embedded'])) {
-                $path = $metadata[$field]['embedded'];
+            if ($valueObjectClass && $value !== null) {
+                $value = $valueObjectClass::from($value);
+            }
+
+            if (isset($fieldMetadata['embedded'])) {
+                $path = $fieldMetadata['embedded'];
 
                 //creation du cache d'objet. Le but est de parcourir les paths de l'embedded
                 //de creer les objets et de les associés entre eux
@@ -138,9 +151,9 @@ class MapperHydrator implements MapperHydratorInterface
                     }
                 }
 
-                $this->writeToAttribute($cacheEmbedded[$path], $metadata[$field], $value, true);
+                $this->writeToAttribute($cacheEmbedded[$path], $fieldMetadata, $value, true);
             } else {
-                $this->writeToAttribute($object, $metadata[$field], $value, true);
+                $this->writeToAttribute($object, $fieldMetadata, $value, true);
             }
         }
     }
@@ -150,21 +163,31 @@ class MapperHydrator implements MapperHydratorInterface
      */
     public function extractOne($object, string $attribute)
     {
-        if (!isset($this->metadata->attributes[$attribute])) {
+        $attributeMetadata = $this->metadata->attributes[$attribute] ?? null;
+
+        if ($attributeMetadata === null) {
             if (!isset($this->metadata->embeddeds[$attribute])) {
                 throw new FieldNotDeclaredException($this->metadata->entityClass, $attribute);
             }
 
             return $this->readFromEmbedded($object, $this->metadata->embeddeds[$attribute]);
         } else {
-            $ownerObject = $this->getOwnerObject($object, $this->metadata->attributes[$attribute]);
+            $ownerObject = $this->getOwnerObject($object, $attributeMetadata);
 
             // Polymorphic embedded not instantiated
             if ($ownerObject === null) {
                 return null;
             }
 
-            return $this->readFromAttribute($ownerObject, $this->metadata->attributes[$attribute]);
+            $value = $this->readFromAttribute($ownerObject, $attributeMetadata);
+
+            $valueObjectClass = $attributeMetadata['valueObject'] ?? null;
+
+            if ($valueObjectClass && $value instanceof $valueObjectClass) {
+                $value = $value->value();
+            }
+
+            return $value;
         }
     }
 
@@ -173,21 +196,29 @@ class MapperHydrator implements MapperHydratorInterface
      */
     public function hydrateOne($object, string $attribute, $value): void
     {
-        if (!isset($this->metadata->attributes[$attribute])) {
+        $attributeMetadata = $this->metadata->attributes[$attribute] ?? null;
+
+        if ($attributeMetadata === null) {
             if (!isset($this->metadata->embeddeds[$attribute])) {
                 throw new FieldNotDeclaredException($this->metadata->entityClass, $attribute);
             }
 
             $this->writeToEmbedded($object, $this->metadata->embeddeds[$attribute], $value, false);
         } else {
-            $ownerObject = $this->getOwnerObject($object, $this->metadata->attributes[$attribute]);
+            $ownerObject = $this->getOwnerObject($object, $attributeMetadata);
 
             // Polymorphic embedded not instantiated
             if ($ownerObject === null) {
                 throw new \InvalidArgumentException('Cannot write to attribute '.$attribute.' : the embedded entity cannot be resolved');
             }
 
-            $this->writeToAttribute($ownerObject, $this->metadata->attributes[$attribute], $value, false);
+            $valueObjectClass = $attributeMetadata['valueObject'] ?? null;
+
+            if ($valueObjectClass && $value !== null && !$value instanceof $valueObjectClass) { // Allow hydrate directly the value object
+                $value = $valueObjectClass::from($value);
+            }
+
+            $this->writeToAttribute($ownerObject, $attributeMetadata, $value, false);
         }
     }
 
@@ -410,11 +441,10 @@ class MapperHydrator implements MapperHydratorInterface
      */
     private function shouldSkipValue(ReflectionProperty $property, $value): bool
     {
-        if (PHP_VERSION_ID < 70400 || $value !== null) {
+        if ($value !== null) {
             return false;
         }
 
-        /** @psalm-suppress UndefinedMethod */
         return $property->hasType() && !$property->getType()->allowsNull();
     }
 

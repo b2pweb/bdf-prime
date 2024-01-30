@@ -12,7 +12,12 @@ v2.2.0
     * `Whereable::orWhere()` on first parameter (column)
     * `Whereable::whereNull()`
     * `Whereable::whereNotNull()`
-    
+* Feat: Introduce value object on mapper
+    * Add `Bdf\Prime\Mapper\Builder\FieldBuilder::valueObject()` to declare the value object class of a field
+    * Add `Bdf\Prime\ValueObject\ValueObjectInterface` to implement on value object class
+    * Add `Bdf\Prime\ValueObject\BaseString` and `Bdf\Prime\ValueObject\BaseInteger` to use as base class for value object
+    * Update hydrator and entity generator to handle value object
+
 BC Breaks
 * Change: `Bdf\Prime\Configuration` instances are not shared anymore between connections. So change of the default configuration during runtime will not affect already created connections.
 * Change: `Bdf\Prime\Query/Expression/Raw::__toString()` is now deprecated, and its constructor value will be cast to string.

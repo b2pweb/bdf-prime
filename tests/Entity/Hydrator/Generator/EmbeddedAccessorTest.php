@@ -6,6 +6,7 @@ use Bdf\Prime\Document;
 use Bdf\Prime\PolymorphContainer;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Street;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -118,6 +119,17 @@ PHP
     {
         $this->assertEquals('$emb->address', $this->accessor->getter('$emb', 'address'));
         $this->assertEquals('$emb->address = $val', $this->accessor->setter('$emb', 'address', '$val'));
+    }
+
+
+    /**
+     *
+     */
+    public function test_value_object_getter_setter()
+    {
+        $this->assertEquals('(($__tmpaf6c196ddcc53f08c8b82e2fe9807f52 = $emb->address) instanceof \Bdf\Prime\Street ? $__tmpaf6c196ddcc53f08c8b82e2fe9807f52->value() : $__tmpaf6c196ddcc53f08c8b82e2fe9807f52)', $this->accessor->getter('$emb', 'address', Street::class));
+        $this->assertEquals('$emb->address = (($__tmp244f38266c59587d696aec08a771b803 = $val) !== null ? \Bdf\Prime\Street::from($__tmp244f38266c59587d696aec08a771b803) : $__tmp244f38266c59587d696aec08a771b803)', $this->accessor->valueObjectSetter('$emb', 'address', '$val', Street::class));
+        $this->assertEquals('$emb->address = (($__tmp244f38266c59587d696aec08a771b803 = $val) !== null && !$__tmp244f38266c59587d696aec08a771b803 instanceof \Bdf\Prime\Street ? \Bdf\Prime\Street::from($__tmp244f38266c59587d696aec08a771b803) : $__tmp244f38266c59587d696aec08a771b803)', $this->accessor->valueObjectSetter('$emb', 'address', '$val', Street::class, true));
     }
 
     /**
