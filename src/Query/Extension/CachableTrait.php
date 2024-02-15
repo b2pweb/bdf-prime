@@ -47,16 +47,12 @@ trait CachableTrait
      *
      * @see Cachable::useCache()
      */
-    public function useCache(int $lifetime = 0, ?string $key = null)
+    public function useCache(int $lifetime = 0, ?string $key = null, ?string $namespace = null)
     {
         if ($this->cacheKey === null) {
             $this->cacheKey = new CacheKey(
-                function () {
-                    return $this->cacheNamespace();
-                },
-                $key ?? function () {
-                    return $this->cacheKey();
-                },
+                $namespace ?? fn () => $this->cacheNamespace(),
+                $key ?? fn () => $this->cacheKey(),
                 $lifetime
             );
 
@@ -92,7 +88,7 @@ trait CachableTrait
     public function setCacheLifetime(int $lifetime)
     {
         if (!$this->cacheKey) {
-            $this->useCache();
+            return $this->useCache($lifetime);
         }
 
         $this->cacheKey->setLifetime($lifetime);
@@ -108,7 +104,7 @@ trait CachableTrait
     public function setCacheKey(?string $cacheKey)
     {
         if (!$this->cacheKey) {
-            $this->useCache();
+            return $this->useCache(0, $cacheKey);
         }
 
         $this->cacheKey->setKey($cacheKey);
@@ -124,7 +120,7 @@ trait CachableTrait
     public function setCacheNamespace(string $namespace)
     {
         if (!$this->cacheKey) {
-            $this->useCache();
+            return $this->useCache(0, null, $namespace);
         }
 
         $this->cacheKey->setNamespace($namespace);

@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Repository;
 
 use Bdf\Prime\Cache\ArrayCache;
+use Bdf\Prime\Collection\EntityCollection;
 use Bdf\Prime\CompositePkEntity;
 use Bdf\Prime\Customer;
 use Bdf\Prime\CustomerPack;
@@ -10,6 +11,7 @@ use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\QueryBuildingException;
 use Bdf\Prime\Faction;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Query\Compiled\CompiledSqlQuery;
 use Bdf\Prime\Query\Compiler\Preprocessor\OrmPreprocessor;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\Pagination\Walker;
@@ -417,5 +419,61 @@ class RepositoryQueryFactoryTest extends TestCase
 
         $this->assertInstanceOf(Walker::class, $walker);
         $this->assertInstanceOf(PaginationWalkStrategy::class, $walker->getStrategy());
+    }
+
+    public function test_compiled()
+    {
+        $query = $this->factory->compiled('SELECT * FROM test_');
+
+        $this->assertInstanceOf(CompiledSqlQuery::class, $query);
+
+        $this->assertEquals([$this->pack()->get('entity')], $query->all());
+    }
+
+    public function test_compiled_with_bindings()
+    {
+        $query = $this->factory->compiled('SELECT * FROM test_ WHERE id = ?');
+
+        $this->assertInstanceOf(CompiledSqlQuery::class, $query);
+
+        $this->assertNotSame($query, $query->withBindings([1]));
+        $this->assertEquals($this->pack()->get('entity'), $query->withBindings([1])->first());
+    }
+
+    public function test_compiled_with_extension_metadata()
+    {
+        $query = $this->factory->compiled('SELECT * FROM test_');
+
+        $this->assertInstanceOf(CompiledSqlQuery::class, $query);
+
+        $meta = ['byOptions' => ['attribute' => 'name', 'combine' => true], 'withRelations' => ['foreign' => ['relations' => [], 'constraints' => []]]];
+        $this->assertNotSame($query, $query->withExtensionMetadata($meta));
+
+        $expected = ['Entity' => [(clone $this->pack()->get('entity'))]];
+        $expected['Entity'][0]->foreign = (clone $this->pack()->get('embedded'));
+
+        $this->assertEquals($expected, $query->withExtensionMetadata($meta)->all());
+    }
+
+    public function test_compiled_with_wrapper()
+    {
+        $query = $this->factory->compiled('SELECT * FROM test_');
+
+        $this->assertInstanceOf(CompiledSqlQuery::class, $query);
+
+        $this->assertNotSame($query, $query->wrapAs(EntityCollection::class));
+
+        $this->assertEquals(new EntityCollection(TestEntity::repository(), [$this->pack()->get('entity')]), $query->wrapAs(EntityCollection::class)->all());
+    }
+
+    public function test_compiled_with_metadata()
+    {
+        $query = $this->factory->compiled('SELECT * FROM test_');
+
+        $this->assertInstanceOf(CompiledSqlQuery::class, $query);
+
+        $this->assertNotSame($query, $query->withMetadata(['wrapper' => EntityCollection::class]));
+
+        $this->assertEquals(new EntityCollection(TestEntity::repository(), [$this->pack()->get('entity')]), $query->withMetadata(['wrapper' => EntityCollection::class])->all());
     }
 }

@@ -31,6 +31,7 @@ interface Cachable
      *
      * @param int $lifetime The cache lifetime
      * @param string|null $key The cache key. If null, a key will be generated
+     * @param string|null $namespace The cache namespace. If null, the namespace will be generated
      *
      * @return $this
      *
@@ -38,7 +39,7 @@ interface Cachable
      * @see Cachable::setCacheKey()
      * @see Cachable::setCacheNamespace()
      */
-    public function useCache(int $lifetime = 0, ?string $key = null);
+    public function useCache(int $lifetime = 0, ?string $key = null/*, ?string $namespace = null*/);
 
     /**
      * Define the cache lifetime

@@ -4,13 +4,13 @@ namespace Bdf\Prime\Query\Custom\KeyValue;
 
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
-use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\AbstractReadCommand;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 use Bdf\Prime\Query\Contract\Compilable;
+use Bdf\Prime\Query\Contract\JitCompilable;
 use Bdf\Prime\Query\Contract\Limitable;
 use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
@@ -41,7 +41,7 @@ use Bdf\Prime\Query\Extension\ProjectionableTrait;
  * @implements Paginable<R>
  * @extends AbstractReadCommand<C, R>
  */
-class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterface, Compilable, Paginable, Limitable
+class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterface, JitCompilable, Paginable, Limitable
 {
     use CompilableTrait;
     use LimitableTrait;
@@ -279,16 +279,52 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     }
 
     /**
-     * Get the SQL query
-     *
-     * @return string|false
-     * @throws PrimeException
+     * {@inheritdoc}
      */
     public function toSql()
     {
         $this->compile();
 
+        // @todo return null in prime 3.0 instead of false
         return $this->compilerState->compiledParts['sql'] ?? false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsJitCompilation(): bool
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetadata(): array
+    {
+        $metadata = [];
+
+        if ($this->wrapper) {
+            $metadata['wrapper'] = $this->wrapper;
+        }
+
+        if ($this->cacheKey) {
+            $metadata['cache_key'] = [
+                'key' => $this->cacheKey->key(),
+                'namespace' => $this->cacheKey->namespace(),
+                'lifetime' => $this->cacheKey->lifetime(),
+            ];
+        }
+
+        return $metadata;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtension(): ?object
+    {
+        return $this->extension;
     }
 
     /**

@@ -9,6 +9,7 @@ use Bdf\Prime\Exception\QueryBuildingException;
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Query\Closure\ClosureCompiler;
 use Bdf\Prime\Query\CommandInterface;
+use Bdf\Prime\Query\Compiled\CompiledQueryInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\OrmPreprocessor;
 use Bdf\Prime\Query\Contract\Cachable;
 use Bdf\Prime\Query\Contract\Paginable;
@@ -18,7 +19,10 @@ use Bdf\Prime\Query\Pagination\PaginatorFactory;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\QueryRepositoryExtension;
 use Bdf\Prime\Query\ReadCommandInterface;
+use LogicException;
 use Psr\SimpleCache\CacheInterface as Psr16Cache;
+
+use function method_exists;
 
 /**
  * Factory for repository queries
@@ -318,10 +322,40 @@ class RepositoryQueryFactory
     }
 
     /**
+     * Create a constant SQL query
+     * This query can only be executed (cache or wrapper can be used)
+     *
+     * This method is used for perform low level select queries, or internally on JIT queries
+     *
+     * The result query is immutable, so it's safe to share it and reuse between multiple calls
+     *
+     * @param string $sql
+     * @return CompiledQueryInterface<E>
+     */
+    public function compiled(string $sql): CompiledQueryInterface
+    {
+        $factory = $this->repository->connection()->factory();
+
+        if (!method_exists($factory, 'compiled')) {
+            throw new LogicException('This connection does not support compiled queries');
+        }
+
+        /** @var CompiledQueryInterface<E> $query */
+        $query = $factory->compiled($sql);
+
+        return $query
+            ->setTable($this->metadata->table)
+            ->setExtension($this->extension())
+            ->setCache($this->resultCache)
+            ->setCollectionFactory($this->repository->collectionFactory())
+        ;
+    }
+
+    /**
      * Delegates call to corresponding query
      *
      * @param string $name
-     * @param string $arguments
+     * @param array $arguments
      *
      * @return mixed
      */

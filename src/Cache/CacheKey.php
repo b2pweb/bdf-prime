@@ -2,6 +2,8 @@
 
 namespace Bdf\Prime\Cache;
 
+use function is_callable;
+
 /**
  * Class CacheKey
  */
@@ -99,5 +101,25 @@ final class CacheKey
     public function valid(): bool
     {
         return !empty($this->key());
+    }
+
+    /**
+     * Check if the key is computed, and not constant
+     *
+     * @return bool
+     */
+    public function isComputedKey(): bool
+    {
+        return is_callable($this->key);
+    }
+
+    /**
+     * Check if the namespace is computed, and not constant
+     *
+     * @return bool
+     */
+    public function isComputedNamespace(): bool
+    {
+        return is_callable($this->namespace);
     }
 }

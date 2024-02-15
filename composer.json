@@ -68,6 +68,6 @@
   "suggest": {
     "b2p/bdf-console": "required to use prime commands (~1.5)",
     "b2p/bdf-web": "required to use service provider (~1.5)",
-    "nikic/php-parser": "required to use closure filters (~4.15)"
+    "nikic/php-parser": "required to use closure filters or jit (~4.15)"
   }
 }

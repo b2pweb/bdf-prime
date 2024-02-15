@@ -369,4 +369,13 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     {
         return $this->connection->getName().':'.$this->statements['table'];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsJitCompilation(): bool
+    {
+        // @todo enable support if JIT on future
+        return false;
+    }
 }

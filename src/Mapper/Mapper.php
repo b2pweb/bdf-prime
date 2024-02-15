@@ -20,6 +20,8 @@ use Bdf\Prime\Mapper\Attribute\Scope;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Mapper\Builder\IndexBuilder;
 use Bdf\Prime\Mapper\Info\MapperInfo;
+use Bdf\Prime\Mapper\Jit\JitManager;
+use Bdf\Prime\Mapper\Jit\MapperJit;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Relations\Builder\RelationBuilder;
 use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
@@ -167,6 +169,9 @@ abstract class Mapper
      * @var MapperHydratorInterface<E>|null
      */
     protected ?MapperHydratorInterface $hydrator;
+
+    private ?JitManager $jitManager = null;
+    private ?MapperJit $jit = null;
 
     /**
      * @var array<string, callable>|null
@@ -444,6 +449,17 @@ abstract class Mapper
         }
 
         return $this;
+    }
+
+    /**
+     * Define the jit manager
+     *
+     * @param JitManager|null $jitManager
+     * @return void
+     */
+    public function setJitManager(?JitManager $jitManager): void
+    {
+        $this->jitManager = $jitManager;
     }
 
     /**
@@ -1057,6 +1073,11 @@ abstract class Mapper
         unset($this->generator);
         unset($this->hydrator);
         unset($this->metadata);
+        unset($this->jitManager);
+        unset($this->jit);
+        unset($this->scopes);
+        unset($this->filters);
+        unset($this->queries);
     }
 
     /**
@@ -1156,10 +1177,17 @@ abstract class Mapper
                 }
 
                 if ($method->isPublic()) {
-                    $functions[$name] = [$this, $method->getName()];
+                    $function = [$this, $method->getName()];
                 } else {
-                    $functions[$name] = Closure::fromCallable([$this, $method->getName()]);
+                    $function = Closure::fromCallable([$this, $method->getName()]);
                 }
+
+                if ($query instanceof RepositoryMethod && $query->jit() && $this->jitManager) {
+                    $jit = ($this->jit ??= $this->jitManager->forMapper($this));
+                    $function = $jit->handle($name, $function);
+                }
+
+                $functions[$name] = $function;
             }
         }
 

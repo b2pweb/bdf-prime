@@ -40,10 +40,10 @@ trait PrimeTestCase
     /**
      * 
      */
-    public function configurePrime()
+    public function configurePrime(array $config = [])
     {
         if (!Prime::isConfigured()) {
-            Prime::configure([
+            Prime::configure($config + [
 //                'logger' => new PsrDecorator(new Logger()),
 //                'resultCache' => new \Bdf\Prime\Cache\ArrayCache(),
                 'connection' => [
