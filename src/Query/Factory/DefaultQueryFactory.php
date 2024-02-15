@@ -124,10 +124,12 @@ class DefaultQueryFactory implements QueryFactoryInterface
      */
     public function compiled($query): CompiledQueryInterface
     {
-        if (!$this->compiledQueryClass) {
+        $className = $this->compiledQueryClass;
+
+        if (!$className) {
             throw new LogicException('This connection does not support compiled queries');
         }
 
-        return new ($this->compiledQueryClass)($this->connection, $query);
+        return new $className($this->connection, $query);
     }
 }
