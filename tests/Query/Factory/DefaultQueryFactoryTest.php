@@ -5,6 +5,7 @@ namespace Bdf\Prime\Query\Factory;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Query\Compiled\CompiledSqlQuery;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\SqlCompiler;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
@@ -39,6 +40,12 @@ class DefaultQueryFactoryTest extends TestCase
         ], [
             'keyValue' => KeyValueQuery::class
         ]);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->primeStop();
+        $this->unsetPrime();
     }
 
     /**
@@ -109,5 +116,29 @@ class DefaultQueryFactoryTest extends TestCase
         $this->factory->register(Query::class, $compiler);
 
         $this->assertSame($compiler, $this->factory->compiler(Query::class));
+    }
+
+    public function test_compiled_not_defined()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('This connection does not support compiled queries');
+
+        $this->factory->compiled('SELECT * FROM test');
+    }
+
+    public function test_compiled()
+    {
+        $this->factory = new DefaultQueryFactory(
+            $this->connection,
+            new SqlCompiler($this->connection),
+            [KeyValueQuery::class => KeyValueSqlCompiler::class],
+            ['keyValue' => KeyValueQuery::class],
+            CompiledSqlQuery::class
+        );
+
+        $compiled = $this->factory->compiled('SELECT * FROM test');
+
+        $this->assertInstanceOf(CompiledSqlQuery::class, $compiled);
+        $this->assertSame('SELECT * FROM test', $compiled->compile());
     }
 }

@@ -585,4 +585,45 @@ class QueryRepositoryExtension extends QueryCompatExtension
         $query->setExtension($this);
         $query->post([$this, 'processEntities'], false);
     }
+
+    /**
+     * Extract the current configuration of the extension
+     *
+     * Only properties that has been changed (i.e. not set to default value) are returned,
+     * so an empty array means that the extension has not been configured.
+     *
+     * @return array
+     * @internal Used by JIT
+     */
+    public function getMetadata(): array
+    {
+        $metadata = [];
+
+        if ($this->withRelations) {
+            $metadata['withRelations'] = $this->withRelations;
+        }
+
+        if ($this->withoutRelations) {
+            $metadata['withoutRelations'] = $this->withoutRelations;
+        }
+
+        if ($this->byOptions) {
+            $metadata['byOptions'] = $this->byOptions;
+        }
+
+        return $metadata;
+    }
+
+    /**
+     * Apply metadata extracted from {@see getMetadata()}
+     *
+     * @param array $metadata
+     * @internal Used by JIT
+     */
+    public function applyMetadata(array $metadata): void
+    {
+        $this->withRelations = $metadata['withRelations'] ?? [];
+        $this->withoutRelations = $metadata['withoutRelations'] ?? [];
+        $this->byOptions = $metadata['byOptions'] ?? null;
+    }
 }

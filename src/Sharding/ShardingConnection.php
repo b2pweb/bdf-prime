@@ -7,9 +7,13 @@ use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Connection\SubConnectionManagerInterface;
 use Bdf\Prime\Exception\ShardingException;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
+use Bdf\Prime\Query\Compiler\SqlCompiler;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
+use Bdf\Prime\Query\Custom\BulkInsert\BulkInsertSqlCompiler;
+use Bdf\Prime\Query\Custom\KeyValue\KeyValueSqlCompiler;
 use Bdf\Prime\Query\Factory\DefaultQueryFactory;
+use Bdf\Prime\Query\Factory\QueryFactoryInterface;
 use Bdf\Prime\Sharding\Query\ShardingInsertQuery;
 use Bdf\Prime\Sharding\Query\ShardingKeyValueQuery;
 use Doctrine\Common\EventManager;
@@ -125,14 +129,23 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
         $this->connections = $params['shard_connections'];
 
         parent::__construct($params, $driver, $config, $eventManager);
+    }
 
-        /** @var DefaultQueryFactory $queryFactory */
-        $queryFactory = $this->factory();
-
+    protected function createQueryFactory(): QueryFactoryInterface
+    {
         /** @psalm-suppress InvalidArgument */
-        $queryFactory->alias(InsertQueryInterface::class, ShardingInsertQuery::class);
-        /** @psalm-suppress InvalidArgument */
-        $queryFactory->alias(KeyValueQueryInterface::class, ShardingKeyValueQuery::class);
+        return new DefaultQueryFactory(
+            $this,
+            new SqlCompiler($this),
+            [
+                ShardingKeyValueQuery::class   => KeyValueSqlCompiler::class,
+                ShardingInsertQuery::class => BulkInsertSqlCompiler::class,
+            ],
+            [
+                KeyValueQueryInterface::class => ShardingKeyValueQuery::class,
+                InsertQueryInterface::class   => ShardingInsertQuery::class,
+            ],
+        );
     }
 
     /**

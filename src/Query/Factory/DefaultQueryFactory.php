@@ -4,8 +4,10 @@ namespace Bdf\Prime\Query\Factory;
 
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Query\CommandInterface;
+use Bdf\Prime\Query\Compiled\CompiledQueryInterface;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
+use LogicException;
 
 /**
  * Base query factory
@@ -37,6 +39,10 @@ class DefaultQueryFactory implements QueryFactoryInterface
      */
     private $alias = [];
 
+    /**
+     * @var class-string<CompiledQueryInterface>|null
+     */
+    private ?string $compiledQueryClass;
 
     /**
      * DefaultQueryFactory constructor.
@@ -45,13 +51,15 @@ class DefaultQueryFactory implements QueryFactoryInterface
      * @param object $defaultCompiler
      * @param array<class-string<CommandInterface>, class-string> $compilers
      * @param array<class-string<CommandInterface>, class-string<CommandInterface>> $alias
+     * @param class-string<CompiledQueryInterface>|null $compiledQueryClass
      */
-    public function __construct(ConnectionInterface $connection, object $defaultCompiler, array $compilers, array $alias)
+    public function __construct(ConnectionInterface $connection, object $defaultCompiler, array $compilers, array $alias, ?string $compiledQueryClass = null)
     {
         $this->connection = $connection;
         $this->defaultCompiler = $defaultCompiler;
         $this->compilers = $compilers;
         $this->alias = $alias;
+        $this->compiledQueryClass = $compiledQueryClass;
     }
 
     /**
@@ -109,5 +117,17 @@ class DefaultQueryFactory implements QueryFactoryInterface
         }
 
         return $compiler;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function compiled($query): CompiledQueryInterface
+    {
+        if (!$this->compiledQueryClass) {
+            throw new LogicException('This connection does not support compiled queries');
+        }
+
+        return new ($this->compiledQueryClass)($this->connection, $query);
     }
 }

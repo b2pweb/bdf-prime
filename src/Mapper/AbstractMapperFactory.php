@@ -5,6 +5,7 @@ namespace Bdf\Prime\Mapper;
 use Bdf\Prime\Cache\CacheInterface;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
 use Bdf\Prime\Entity\Hydrator\MapperHydratorInterface;
+use Bdf\Prime\Mapper\Jit\JitManager;
 use Bdf\Prime\Mapper\NameResolver\ResolverInterface;
 use Bdf\Prime\Mapper\NameResolver\SuffixResolver;
 use Bdf\Prime\ServiceLocator;
@@ -22,17 +23,19 @@ abstract class AbstractMapperFactory implements MapperFactoryInterface
     private ResolverInterface $nameResolver;
     private ?Psr16CacheInterface $metadataCache;
     private ?CacheInterface $resultCache;
+    private ?JitManager $jitManager;
 
     /**
      * @param ResolverInterface|null $nameResolver
      * @param Psr16CacheInterface|null $metadataCache
      * @param CacheInterface|null $resultCache
      */
-    public function __construct(ResolverInterface $nameResolver = null, Psr16CacheInterface $metadataCache = null, CacheInterface $resultCache = null)
+    public function __construct(ResolverInterface $nameResolver = null, Psr16CacheInterface $metadataCache = null, CacheInterface $resultCache = null, ?JitManager $jitManager = null)
     {
         $this->nameResolver = $nameResolver ?? new SuffixResolver();
         $this->metadataCache = $metadataCache;
         $this->resultCache = $resultCache;
+        $this->jitManager = $jitManager;
     }
 
     /**
@@ -80,6 +83,7 @@ abstract class AbstractMapperFactory implements MapperFactoryInterface
 
         $mapper->setEntityClass($entityClass);
         $mapper->setHydrator($hydrator);
+        $mapper->setJitManager($this->jitManager);
 
         if ($metadata) {
             $mapper->setMetadata($metadata);

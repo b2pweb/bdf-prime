@@ -200,4 +200,13 @@ class ShardingQuery extends Query
 
         return $aggregate;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsJitCompilation(): bool
+    {
+        // @todo enable support if JIT on future
+        return false;
+    }
 }

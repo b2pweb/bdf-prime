@@ -9,7 +9,7 @@ use Bdf\Prime\Query\Contract\Joinable;
 use Bdf\Prime\Query\Contract\Limitable;
 use Bdf\Prime\Query\Contract\Lockable;
 use Bdf\Prime\Query\Contract\Orderable;
-use Bdf\Prime\Query\Expression\Raw;
+use Bdf\Prime\Query\Contract\SqlCompilable;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 /**
@@ -20,7 +20,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
  *
  * @extends QueryInterface<C, R>
  */
-interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Orderable, Joinable, Lockable, EntityJoinable
+interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Orderable, Joinable, Lockable, EntityJoinable, SqlCompilable
 {
     /**
      * {@inheritdoc}

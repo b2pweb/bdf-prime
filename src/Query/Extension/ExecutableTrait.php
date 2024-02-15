@@ -5,19 +5,21 @@ namespace Bdf\Prime\Query\Extension;
 use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Query\Contract\Executable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\QueryInterface;
 
 /**
  * Trait for provide execute() wrapper methods
  *
- * @psalm-require-implements \Bdf\Prime\Query\ReadCommandInterface
+ * @psalm-require-implements Executable
  */
 trait ExecutableTrait
 {
     /**
      * {@inheritdoc}
      * @see QueryInterface::all()
+     * @psalm-suppress InvalidReturnType
      */
     #[ReadOperation]
     public function all($columns = null)
@@ -91,5 +93,5 @@ trait ExecutableTrait
      *
      * @see QueryInterface::limit()
      */
-    abstract public function limit(?int $limit, ?int $offset = null);
+    abstract protected function limit(?int $limit, ?int $offset = null);
 }
