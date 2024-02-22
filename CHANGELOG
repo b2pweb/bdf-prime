@@ -12,7 +12,8 @@ v2.2.0
     * `Whereable::orWhere()` on first parameter (column)
     * `Whereable::whereNull()`
     * `Whereable::whereNotNull()`
-    
+* Change: Allow usage of entity class name to resolve relations, instead of relation name
+
 BC Breaks
 * Change: `Bdf\Prime\Configuration` instances are not shared anymore between connections. So change of the default configuration during runtime will not affect already created connections.
 * Change: `Bdf\Prime\Query/Expression/Raw::__toString()` is now deprecated, and its constructor value will be cast to string.

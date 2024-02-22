@@ -32,8 +32,6 @@ use Bdf\Prime\Query\ReadCommandInterface;
  * @psalm-method int count()
  *
  * @mixin ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>
- *
- * @noinspection PhpHierarchyChecksInspection
  */
 class EntityRelation
 {

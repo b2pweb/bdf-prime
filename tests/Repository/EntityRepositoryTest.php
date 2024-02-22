@@ -11,13 +11,16 @@ use Bdf\Prime\Events;
 use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\QueryBuildingException;
 use Bdf\Prime\Mapper\Mapper;
+use Bdf\Prime\Pack;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Query;
+use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
 use Bdf\Prime\Right;
 use Bdf\Prime\Test\RepositoryAssertion;
 use Bdf\Prime\TestEntity;
 use Bdf\Prime\TestEmbeddedEntity;
+use Bdf\Prime\User;
 use PHPUnit\Framework\TestCase;
 use Psr\SimpleCache\CacheInterface;
 
@@ -563,6 +566,39 @@ class EntityRepositoryTest extends TestCase
         $repository->reloadRelations($entity, 'foreign');
         $this->assertNotSame($loadedForeign, $entity->foreign);
     }
+
+    /**
+     *
+     */
+    public function test_reloadRelations_with_relation_class()
+    {
+        Prime::push(TestEmbeddedEntity::class, [
+            'id'   => 20,
+            'name' => 'test embedded'
+        ]);
+        Prime::push(TestEntity::class, [
+            'id'         => 21,
+            'name'       => 'relation',
+            'foreign'    => ['id' => 20]
+        ]);
+
+        $repository = Prime::repository(TestEntity::class);
+
+        $entity = $repository->findOne([
+            'id' => 21,
+        ]);
+
+        $this->assertNull($entity->foreign->name);
+
+        $repository->loadRelations($entity, TestEmbeddedEntity::class);
+        $loadedForeign = $entity->foreign;
+
+        $repository->loadRelations($entity, TestEmbeddedEntity::class);
+        $this->assertSame($loadedForeign, $entity->foreign);
+
+        $repository->reloadRelations($entity, TestEmbeddedEntity::class);
+        $this->assertNotSame($loadedForeign, $entity->foreign);
+    }
     
     /**
      * 
@@ -592,6 +628,31 @@ class EntityRepositoryTest extends TestCase
     /**
      *
      */
+    public function test_load_relation_using_relation_class()
+    {
+        Prime::push(TestEmbeddedEntity::class, [
+            'id'   => 20,
+            'name' => 'test embedded'
+        ]);
+        Prime::push(TestEntity::class, [
+            'id'         => 21,
+            'name'       => 'relation',
+            'foreign'    => ['id' => 20]
+        ]);
+
+        $repository = Prime::repository(TestEntity::class);
+
+        $entity = $repository->with(TestEmbeddedEntity::class)->findOne([
+            'id' => 21,
+        ]);
+
+        $this->assertEquals(20, $entity->foreign->id);
+        $this->assertEquals('test embedded', $entity->foreign->name);
+    }
+
+    /**
+     *
+     */
     public function test_on_relation()
     {
         Prime::push('Bdf\Prime\TestEmbeddedEntity', [
@@ -611,6 +672,96 @@ class EntityRepositoryTest extends TestCase
 
         $this->assertEquals(20, $foreign->id);
         $this->assertEquals('test embedded', $foreign->name);
+    }
+
+    /**
+     *
+     */
+    public function test_on_relation_with_relation_class()
+    {
+        Prime::push(TestEmbeddedEntity::class, [
+            'id'   => 20,
+            'name' => 'test embedded'
+        ]);
+        Prime::push(TestEntity::class, [
+            'id'         => 21,
+            'name'       => 'relation',
+            'foreign'    => ['id' => 20]
+        ]);
+
+        $repository = Prime::repository(TestEntity::class);
+
+        $entity = $repository->get(21);
+        $foreign = $repository->onRelation(TestEmbeddedEntity::class, $entity)->query()->first();
+
+        $this->assertEquals(20, $foreign->id);
+        $this->assertEquals('test embedded', $foreign->name);
+    }
+
+    /**
+     *
+     */
+    public function test_on_relation_with_relation_class_ambiguous()
+    {
+        $this->expectException(RelationNotFoundException::class);
+        $this->expectExceptionMessage('Multiple relations found for class "Bdf\Prime\User" in Bdf\Prime\Customer. Please specify the relation name (available relations: users, webUsers)');
+
+        $this->pack()->nonPersist([
+            $customer = new Customer([
+                'id' => 1,
+                'name' => 'customer',
+                'roles' => []
+            ]),
+            $user = new User([
+                'id' => 1,
+                'name' => 'user',
+                'roles' => [],
+                'customer' => $customer
+            ]),
+        ]);
+
+        $repository = Prime::repository(Customer::class);
+
+        $repository->onRelation(User::class, $customer)->query()->first();
+    }
+
+    /**
+     *
+     */
+    public function test_on_relation_with_relation_class_and_name()
+    {
+        $this->pack()->nonPersist([
+            $customer = new Customer([
+                'id' => 1,
+                'name' => 'customer',
+                'roles' => []
+            ]),
+            $user = new User([
+                'id' => 1,
+                'name' => 'user',
+                'roles' => [],
+                'customer' => $customer
+            ]),
+        ]);
+
+        $repository = Prime::repository(Customer::class);
+
+        $this->assertEquals($user, $repository->onRelation(User::class, $customer, 'users')->query()->with(Customer::class)->first());
+        $this->assertNull($repository->onRelation(User::class, $customer, 'webUsers')->query()->with(Customer::class)->first());
+    }
+
+    /**
+     *
+     */
+    public function test_relation_should_keep_instance()
+    {
+        $repository = Prime::repository(Customer::class);
+
+        $this->assertSame($repository->relation('packs'), $repository->relation(Pack::class));
+        $this->assertSame($repository->relation(Pack::class), $repository->relation(Pack::class, 'packs'));
+        $this->assertSame($repository->relation('users'), $repository->relation(User::class, 'users'));
+        $this->assertSame($repository->relation('webUsers'), $repository->relation(User::class, 'webUsers'));
+        $this->assertNotSame($repository->relation('webUsers'), $repository->relation(User::class, 'users'));
     }
 
     /**
@@ -788,12 +939,50 @@ class EntityRepositoryTest extends TestCase
     /**
      *
      */
+    public function test_saveAll_with_relation_class()
+    {
+        $entity = $this->getTestPack()->get('entity');
+        $entity->name = 'saveAll';
+        $entity->foreign->name = 'saveAll foreign';
+
+        $nb = Prime::repository(TestEntity::class)->saveAll($entity, TestEmbeddedEntity::class);
+
+        $entity = Prime::repository(TestEntity::class)
+            ->with('foreign')
+            ->get($entity->id);
+
+        $this->assertEquals(2, $nb);
+        $this->assertEquals('saveAll', $entity->name);
+        $this->assertEquals('saveAll foreign', $entity->foreign->name);
+    }
+
+    /**
+     *
+     */
     public function test_deleteAll_delete_entity_and_relations()
     {
         $entity = $this->getTestPack()->get('entity');
         $foreign = $entity->foreign;
 
         $nb = Prime::repository('Bdf\Prime\TestEntity')->deleteAll($entity, 'foreign');
+
+        $foreign = Prime::refresh($foreign);
+        $entity = Prime::refresh($entity);
+
+        $this->assertEquals(2, $nb);
+        $this->assertEquals(null, $entity);
+        $this->assertEquals(null, $foreign);
+    }
+
+    /**
+     *
+     */
+    public function test_deleteAll_with_relation_class()
+    {
+        $entity = $this->getTestPack()->get('entity');
+        $foreign = $entity->foreign;
+
+        $nb = Prime::repository(TestEntity::class)->deleteAll($entity, TestEmbeddedEntity::class);
 
         $foreign = Prime::refresh($foreign);
         $entity = Prime::refresh($entity);

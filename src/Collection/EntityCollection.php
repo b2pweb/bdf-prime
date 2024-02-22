@@ -96,24 +96,27 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
      *
      * <code>
      * // Perform query on customer.customerPack.pack
-     * $customer->relation('packs')
+     * $customer->relation(CustomerPack::class)
      *     ->wrapAs('collection')
      *     ->all()
-     *     ->link('pack')
+     *     ->link(Pack::class)
      *     ->where(...)
      *     ->all()
      * ;
      * </code>
      *
-     * @param string $relation The relation name
+     * @param class-string<R>|string $relationClass The relation class, or the relation name
+     * @param string|null $relationName The relation name, if ambiguous
      *
-     * @return QueryInterface
+     * @return QueryInterface<ConnectionInterface, R>
+     *
+     * @template R as object
      * @fixme Works with Polymorph
      */
-    public function link($relation)
+    public function link(string $relationClass, ?string $relationName = null)
     {
         return $this->repository
-            ->relation($relation)
+            ->relation($relationClass, $relationName)
             ->link($this->all())
         ;
     }

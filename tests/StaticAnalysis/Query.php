@@ -82,6 +82,7 @@ class Query
         $this->checkPersonCollection(Person::collection([new Person()]));
         $this->checkPersonCollection(Person::repository()->all());
         $this->checkPersonCollection(Person::where('firstName', 'John')->all());
+        $this->checkAddressCollection(Person::collection([new Person()])->link(Address::class)->all());
     }
 
     public function test_pagination(): void
@@ -114,6 +115,28 @@ class Query
     {
         /** @var EntityRelation<Person, Address> */
         $relation = Person::getOrFail(123)->relation('address');
+
+        $this->checkAddress($relation->first());
+        $this->checkAddress($relation->get(123));
+        $this->checkAddress($relation->findById(123));
+        $this->checkAddressNotNull($relation->findByIdOrFail(123));
+        $this->checkAddressNotNull($relation->findByIdOrNew(123));
+        $this->checkAddressNotNull($relation->getOrFail(123));
+        $this->checkAddressNotNull($relation->getOrNew(123));
+        $this->checkAddressCollection($relation->all());
+        $this->checkAddress($relation->with('foo')->first());
+        $this->checkAddress($relation->by('zipCode')->first());
+        $this->checkAddress($relation->where('zipCode', '84660')->first());
+        $this->checkAddressNotNull($relation->where('zipCode', '84660')->firstOrFail());
+        $this->checkAddressNotNull($relation->where('zipCode', '84660')->firstOrNew());
+        $this->checkAddressCollection($relation->by('zipCode')->all());
+        $this->checkAddress($relation->create());
+        $this->checkInt($relation->count());
+    }
+
+    public function test_relation_with_class(): void
+    {
+        $relation = Person::getOrFail(123)->relation(Address::class);
 
         $this->checkAddress($relation->first());
         $this->checkAddress($relation->get(123));

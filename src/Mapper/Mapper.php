@@ -36,8 +36,12 @@ use ReflectionObject;
 use stdClass;
 
 use function class_exists;
+use function count;
+use function current;
+use function implode;
 use function is_string;
 use function method_exists;
+use function sprintf;
 
 /**
  * Mapper
@@ -148,6 +152,12 @@ abstract class Mapper
      * @var RelationBuilder
      */
     private ?RelationBuilder $relationBuilder = null;
+
+    /**
+     * @var array<class-string, array<string, string>>|null
+     * @see Mapper::resolveRelationNamesByClass()
+     */
+    private ?array $relationClassesToNames = null;
 
     /**
      * The collection of behaviors
@@ -653,21 +663,52 @@ abstract class Mapper
      *
      * Build object relation defined by user
      *
-     * @param string $relationName
+     * @param class-string $relationClass
+     * @param string|null $relationName
      *
-     * @return array  Metadata for relation definition
+     * @return RelationDefinition  Metadata for relation definition
      *
      * @throws \RuntimeException  If relation or type does not exist
      */
-    public function relation(string $relationName): array
+    public function relation(string $relationClass, ?string $relationName = null): array
     {
         $relations = $this->relations();
+        $matchingName = $this->resolveRelationNamesByClass($relationClass);
 
-        if (!isset($relations[$relationName])) {
-            throw new RelationNotFoundException('Relation "' . $relationName . '" is not set in ' . $this->metadata->entityName);
+        if ($relationName && !isset($matchingName[$relationName])) {
+            throw new RelationNotFoundException(sprintf(
+                'Relation "%s" is not set in %s or does not match the given class "%s"',
+                $relationName,
+                $this->metadata->entityName,
+                $relationClass
+            ));
         }
 
-        return $relations[$relationName];
+        if ($matchingName && !$relationName) {
+            if (count($matchingName) > 1) {
+                throw new RelationNotFoundException(sprintf(
+                    'Multiple relations found for class "%s" in %s. Please specify the relation name (available relations: %s)',
+                    $relationClass,
+                    $this->metadata->entityName,
+                    implode(', ', $matchingName)
+                ));
+            }
+
+            // Get the relation name from the matching class
+            $relationName = current($matchingName);
+        }
+
+        $relationName ??= $relationClass;
+        $relation = $relations[$relationName] ?? null;
+
+        if (!$relation) {
+            throw new RelationNotFoundException(sprintf('Relation "%s" is not set in %s', $relationName, $this->metadata->entityName));
+        }
+
+        // For compatibility with old relation definition (method relations() overridden for return an array)
+        $relation['name'] ??= $relationName;
+
+        return $relation;
     }
 
     //
@@ -1109,6 +1150,40 @@ abstract class Mapper
         $this->hydrator ??= new MapperHydrator();
         $this->hydrator->setPrimeMetadata($metadata);
         $this->hydrator->setPrimeInstantiator($this->serviceLocator->instantiator());
+    }
+
+    /**
+     * Try to resolve the relation names by the relation class
+     *
+     * @param string|class-string $relationClass The relation class name
+     *
+     * @return array<string, string>|null List of matching relation names, or null if none. The result array contains the relation names in both keys and values.
+     */
+    private function resolveRelationNamesByClass(string $relationClass): ?array
+    {
+        if ($this->relationClassesToNames !== null) {
+            return $this->relationClassesToNames[$relationClass] ?? null;
+        }
+
+        // Build relations
+        $relations = $this->relations();
+
+        if ($this->relationBuilder) {
+            $mapping = $this->relationBuilder->relationClassesToNames();
+        } else {
+            // Legacy way: a raw array is used instead of a RelationBuilder
+            $mapping = [];
+
+            foreach ($relations as $name => $metadata) {
+                if ($entity = $metadata['entity'] ?? null) {
+                    $mapping[$entity][$name] = $name;
+                }
+            }
+        }
+
+        $this->relationClassesToNames = $mapping;
+
+        return $mapping[$relationClass] ?? null;
     }
 
     /**

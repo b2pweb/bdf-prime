@@ -378,26 +378,34 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Get a entity relation wrapper linked to the entity
      *
-     * @param string $relationName
+     * @param class-string<R>|string $relationClass The relation class name, or the relation name
+     * @param string|null $relationName The relation name if the there is multiple relation on the same class
      * @param E $entity
      *
-     * @return EntityRelation<E, object>
+     * @return EntityRelation<E, R>
+     * @template R as object
      */
-    public function onRelation(string $relationName, $entity): EntityRelation
+    public function onRelation(string $relationClass, $entity, ?string $relationName = null): EntityRelation
     {
-        return new EntityRelation($entity, $this->relation($relationName));
+        return new EntityRelation($entity, $this->relation($relationClass, $relationName));
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @psalm-suppress InvalidReturnType
+     * @psalm-suppress InvalidReturnStatement
      */
-    public function relation(string $relationName): RelationInterface
+    public function relation(string $relationClass, ?string $relationName = null): RelationInterface
     {
-        if (!isset($this->relations[$relationName])) {
-            $this->relations[$relationName] = Relation::make($this, $relationName, $this->mapper->relation($relationName));
+        if ($relation = $this->relations[$relationName ?? $relationClass] ?? null) {
+            return $relation;
         }
 
-        return $this->relations[$relationName];
+        $metadata = $this->mapper->relation($relationClass, $relationName);
+        $relationName = $metadata['name'];
+
+        return ($this->relations[$relationName] ??= Relation::make($this, $relationName, $metadata));
     }
 
     /**

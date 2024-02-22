@@ -13,6 +13,7 @@ use IteratorAggregate;
  * RelationBuilder
  *
  * @psalm-type RelationDefinition = array{
+ *     name: string,
  *     type: string,
  *     localKey: string,
  *     entity?: class-string,
@@ -53,6 +54,13 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      */
     private ?string $current = null;
 
+    /**
+     * Mapping of the relation classes to their names
+     *
+     * @var array<class-string, array<string, string>>
+     */
+    private array $relationClassesToNames = [];
+
 
     /**
      * Get all defined relations
@@ -62,6 +70,16 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     public function relations(): array
     {
         return $this->relations;
+    }
+
+    /**
+     * Mapping of the relation classes to their names
+     *
+     * @return array<class-string, array<string, string>>
+     */
+    public function relationClassesToNames(): array
+    {
+        return $this->relationClassesToNames;
     }
 
     /**
@@ -296,7 +314,11 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      */
     public function custom(string $relationClass, array $options = []): self
     {
-        $this->relations[$this->current] = ['type' => RelationInterface::CUSTOM, 'relationClass' => $relationClass] + $options;
+        $this->relations[$this->current] = ['name' => $this->current, 'type' => RelationInterface::CUSTOM, 'relationClass' => $relationClass] + $options;
+
+        if ($entity = $options['entity'] ?? null) {
+            $this->relationClassesToNames[$entity][$this->current] = $this->current;
+        }
 
         return $this;
     }
@@ -309,7 +331,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      */
     public function null(): self
     {
-        $this->relations[$this->current] = ['type' => RelationInterface::NULL];
+        $this->relations[$this->current] = ['name' => $this->current, 'type' => RelationInterface::NULL];
 
         return $this;
     }
@@ -341,6 +363,8 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
 
         $this->relations[$this->current]['entity'] = $entity;
         $this->relations[$this->current]['distantKey'] = $foreignKey;
+
+        $this->relationClassesToNames[$entity][$this->current] = $this->current;
 
         return $this;
     }
@@ -380,9 +404,13 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     {
         if (($this->relations[$this->current]['type'] ?? null) === RelationInterface::BY_INHERITANCE) {
             // Inherit from previous relation configuration
-            $this->relations[$this->current] = ['type' => $type, 'localKey' => $key] + $options + $this->relations[$this->current];
+            $this->relations[$this->current] = ['name' => $this->current, 'type' => $type, 'localKey' => $key] + $options + $this->relations[$this->current];
         } else {
-            $this->relations[$this->current] = ['type' => $type, 'localKey' => $key] + $options;
+            $this->relations[$this->current] = ['name' => $this->current, 'type' => $type, 'localKey' => $key] + $options;
+        }
+
+        if ($entity = $options['entity'] ?? null) {
+            $this->relationClassesToNames[$entity][$this->current] = $this->current;
         }
 
         return $this;
