@@ -112,6 +112,8 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
      *
      * @template R as object
      * @fixme Works with Polymorph
+     *
+     * @psalm-suppress TooManyArguments - @todo to remove in prime 3.0: RepositoryInterface::relation() has only 1 declared parameter for bc break
      */
     public function link(string $relationClass, ?string $relationName = null)
     {
