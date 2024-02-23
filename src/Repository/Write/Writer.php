@@ -12,6 +12,7 @@ use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\ServiceLocator;
+use LogicException;
 
 /**
  * Base implementation of repository writer
@@ -72,6 +73,10 @@ class Writer implements WriterInterface
         /** @var EntityRepository<E> $repository */
         $repository = $this->repository;
 
+        if ($repository->isReadOnly()) {
+            throw new LogicException('Repository "'.$repository->entityName().'" is read only. Cannot execute write query');
+        }
+
         if ($repository->notify(Events::PRE_INSERT, [$entity, $repository]) === false) {
             return 0;
         }
@@ -96,6 +101,10 @@ class Writer implements WriterInterface
     #[WriteOperation]
     public function update($entity, array $options = []): int
     {
+        if ($this->repository->isReadOnly()) {
+            throw new LogicException('Repository "'.$this->repository->entityName().'" is read only. Cannot execute write query');
+        }
+
         /** @var EntityRepository<E> $this->repository */
         $attributes = isset($options['attributes']) ? new \ArrayObject($options['attributes']) : null;
 
@@ -129,6 +138,10 @@ class Writer implements WriterInterface
     #[WriteOperation]
     public function delete($entity, array $options = []): int
     {
+        if ($this->repository->isReadOnly()) {
+            throw new LogicException('Repository "'.$this->repository->entityName().'" is read only. Cannot execute write query');
+        }
+
         /** @var EntityRepository<E> $this->repository */
         if ($this->repository->notify(Events::PRE_DELETE, [$entity, $this->repository]) === false) {
             return 0;
