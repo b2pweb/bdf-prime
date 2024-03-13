@@ -908,6 +908,82 @@ class EntityRepositoryTest extends TestCase
 
         $this->assertSame($cache, $r->getValue($queries));
     }
+
+    /**
+     *
+     */
+    public function test_insert_write_enabled_disabled()
+    {
+        $repository = TestEntity::repository();
+
+        $repository->insert($entity = new TestEntity(['id' => 42, 'name' => 'foo']));
+        $this->assertEquals($entity, TestEntity::refresh($entity));
+
+        $repository->mapper()->setReadOnly(true);
+
+        $entity = new TestEntity(['id' => 43, 'name' => 'bar']);
+        try {
+            $repository->insert($entity);
+            $this->fail('Should throw an exception');
+        } catch (\LogicException $e) {
+            $this->assertEquals('Repository "Bdf\Prime\TestEntity" is read only. Cannot execute write query', $e->getMessage());
+        }
+
+        $this->assertNull(TestEntity::refresh($entity));
+        $repository->mapper()->setReadOnly(false);
+    }
+
+    /**
+     *
+     */
+    public function test_update_write_enabled_disabled()
+    {
+        $repository = TestEntity::repository();
+
+        $repository->insert($entity = new TestEntity(['id' => 42, 'name' => 'foo']));
+
+        $entity->name = 'foo2';
+        $repository->update($entity);
+        $this->assertEquals($entity, TestEntity::refresh($entity));
+
+        $repository->mapper()->setReadOnly(true);
+
+        try {
+            $entity->name = 'foo3';
+            $repository->update($entity);
+            $this->fail('Should throw an exception');
+        } catch (\LogicException $e) {
+            $this->assertEquals('Repository "Bdf\Prime\TestEntity" is read only. Cannot execute write query', $e->getMessage());
+        }
+
+        $this->assertEquals('foo2', TestEntity::refresh($entity)->name);
+        $repository->mapper()->setReadOnly(false);
+    }
+
+    /**
+     *
+     */
+    public function test_delete_write_enabled_disabled()
+    {
+        $repository = TestEntity::repository();
+
+        $repository->insert($entity = new TestEntity(['id' => 42, 'name' => 'foo']));
+        $repository->delete($entity);
+        $this->assertNull(TestEntity::refresh($entity));
+
+        $repository->insert($entity = new TestEntity(['id' => 42, 'name' => 'foo']));
+        $repository->mapper()->setReadOnly(true);
+
+        try {
+            $repository->delete($entity);
+            $this->fail('Should throw an exception');
+        } catch (\LogicException $e) {
+            $this->assertEquals('Repository "Bdf\Prime\TestEntity" is read only. Cannot execute write query', $e->getMessage());
+        }
+
+        $this->assertEquals($entity, TestEntity::refresh($entity));
+        $repository->mapper()->setReadOnly(false);
+    }
 }
 
 
