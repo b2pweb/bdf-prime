@@ -2,10 +2,14 @@
 
 namespace Bdf\Prime\Query\Expression\Json;
 
+use Bdf\Prime\Platform\Sql\SqlPlatform;
 use Bdf\Prime\Query\CompilableClause as Q;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
+use Bdf\Prime\Query\Expression\AbstractPlatformSpecificExpression;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use LogicException;
 
 /**
@@ -17,7 +21,7 @@ use LogicException;
  *     $query->whereRaw(new JsonContainsPath('json_field', '$.bar')); // Search rows that contains has the "bar" field the json_field
  * </code>
  */
-final class JsonContainsPath implements ExpressionInterface
+final class JsonContainsPath extends AbstractPlatformSpecificExpression
 {
     /**
      * @var string|ExpressionInterface
@@ -35,29 +39,44 @@ final class JsonContainsPath implements ExpressionInterface
         $this->path = $path;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function build(Q $query, object $compiler): string
+    protected function buildForSqlite(Q $query, CompilerInterface $compiler, SqlPlatform $platform, SqlitePlatform $grammar): string
     {
-        if (!$compiler instanceof QuoteCompilerInterface || !$compiler instanceof CompilerInterface) {
+        if (!$compiler instanceof QuoteCompilerInterface) {
             throw new LogicException('JsonContainsPath expression is not supported by the current compiler');
         }
 
-        $target = $this->target instanceof ExpressionInterface
+        return self::getSqliteExpression(
+            $compiler,
+            $this->target($query, $compiler),
+            $this->path
+        );
+    }
+
+    protected function buildForGenericSql(Q $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractPlatform $grammar): string
+    {
+        if (!$compiler instanceof QuoteCompilerInterface) {
+            throw new LogicException('JsonContainsPath expression is not supported by the current compiler');
+        }
+
+        return self::getDefaultExpression(
+            $compiler,
+            $this->target($query, $compiler),
+            $this->path
+        );
+    }
+
+    /**
+     * @param Q $query
+     * @param CompilerInterface&QuoteCompilerInterface $compiler
+     * @return string
+     * @throws \Bdf\Prime\Exception\PrimeException
+     */
+    private function target(Q $query, CompilerInterface $compiler)
+    {
+        return $this->target instanceof ExpressionInterface
             ? $this->target->build($query, $compiler)
             : $compiler->quoteIdentifier($query, $query->preprocessor()->field($this->target))
         ;
-
-        $dbms = $compiler->platform()->name();
-
-        switch ($dbms) {
-            case 'sqlite':
-                return self::getSqliteExpression($compiler, $target, $this->path);
-
-            default:
-                return self::getDefaultExpression($compiler, $target, $this->path);
-        }
     }
 
     /**

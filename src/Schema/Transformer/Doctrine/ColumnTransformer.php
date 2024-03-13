@@ -51,7 +51,7 @@ final class ColumnTransformer
             $this->columnOptions()
         );
 
-        $column->setCustomSchemaOptions($this->column->options());
+        $column->setPlatformOptions($this->column->options());
 
         return $column;
     }

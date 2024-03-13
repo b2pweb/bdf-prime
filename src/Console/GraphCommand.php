@@ -68,7 +68,7 @@ class GraphCommand extends Command
             : $this->getSchemaFromModel($io, $io->argument('path'));
 
         $graph = new Graphviz();
-        $schema->visit($graph);
+        $graph->onSchema($schema);
 
         if (!$io->option('output')) {
             $io->line($graph->getOutput());

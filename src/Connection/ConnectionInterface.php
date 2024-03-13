@@ -16,12 +16,16 @@ use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Schema\Manager\DatabaseManagerInterface;
 use Bdf\Prime\Schema\SchemaManagerInterface;
 use Bdf\Prime\Types\TypeInterface;
+use Closure;
 use Doctrine\Common\EventManager;
 
 /**
  * Base connection type
  *
  * Allows creating and executing queries, and handle a platform
+ *
+ * @method void addConnectionClosedListener(Closure $listener)
+ * @method void removeConnectionClosedListener(Closure $listener)
  */
 interface ConnectionInterface
 {
@@ -163,8 +167,28 @@ interface ConnectionInterface
      *       C'est actuellement le plus simple et léger, mais ajoute une dépendence forte à Doctrine
      *
      * @internal
+     * @deprecated Since 2.2. Will be removed in 3.0 without replacement
      */
     public function getEventManager();
+
+    /**
+     * Add a new listener to be notified when the connection is closed or reset
+     *
+     * @param Closure(ConnectionInterface):void $listener The listener to add. The connection instance is passed as argument.
+     *
+     * @return void
+     */
+    //public function addConnectionClosedListener(Closure $listener): void;
+
+    /**
+     * Remove the connection closed listener
+     * If the listener is not registered, do nothing
+     *
+     * @param Closure(ConnectionInterface):void $listener The listener to remove. Should be the same instance as the added listener.
+     *
+     * @return void
+     */
+    //public function removeConnectionClosedListener(Closure $listener): void;
 
     /**
      * Closes the connection and trigger "onConnectionClosed" event

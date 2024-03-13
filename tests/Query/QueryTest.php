@@ -820,6 +820,18 @@ class QueryTest extends TestCase
     /**
      *
      */
+    public function test_between_one_operand()
+    {
+        $query = $this->query()
+            ->where(['id :between' => 3]);
+
+        $this->assertEquals("SELECT * FROM test_ WHERE id BETWEEN 0 AND ?", $query->toSql());
+        $this->assertEquals([3], $query->getBindings());
+    }
+
+    /**
+     *
+     */
     public function test_between_functional()
     {
         $this->push([

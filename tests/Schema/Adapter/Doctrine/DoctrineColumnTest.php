@@ -101,7 +101,7 @@ class DoctrineColumnTest extends TestCase
             $this->types
         );
 
-        $doctrine->setCustomSchemaOptions(['foo' => 'bar']);
+        $doctrine->setPlatformOptions(['foo' => 'bar']);
 
         $this->assertEquals(['foo' => 'bar'], $column->options());
         $this->assertEquals('bar', $column->option('foo'));

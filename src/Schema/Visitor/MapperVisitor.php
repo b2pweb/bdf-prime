@@ -13,9 +13,12 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\Visitor\AbstractVisitor;
+use Doctrine\DBAL\Types\Type;
 
 /**
  * Create a mapper output from a Schema.
+ * @psalm-suppress DeprecatedClass
+ * @psalm-suppress DeprecatedInterface
  */
 class MapperVisitor extends AbstractVisitor
 {
@@ -113,6 +116,36 @@ class MapperVisitor extends AbstractVisitor
     }
 
     /**
+     * Parse the schema to create mapper definition
+     *
+     * @param Schema $schema
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public function onSchema(Schema $schema): void
+    {
+        $this->acceptSchema($schema);
+
+        foreach ($schema->getTables() as $table) {
+            $this->onTable($table);
+        }
+    }
+
+    private function onTable(Table $table): void
+    {
+        $this->acceptTable($table);
+
+        foreach ($table->getColumns() as $column) {
+            $this->acceptColumn($table, $column);
+        }
+
+        foreach ($table->getIndexes() as $index) {
+            $this->acceptIndex($table, $index);
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function acceptSchema(Schema $schema)
@@ -128,9 +161,10 @@ class MapperVisitor extends AbstractVisitor
         $primaries = [];
         $sequence = null;
         $tableName = $table->getName();
+        $pkIndex = $table->getPrimaryKey();
 
         // Evaluate metadata for primary keys
-        if ($table->hasPrimaryKey()) {
+        if ($pkIndex) {
             // prepare sequence info for the method Mapper::sequence() and the metadata primary
             $sequence = $this->inflector->getSequenceName($tableName);
             if (!$this->schema->hasTable($sequence)) {
@@ -138,8 +172,7 @@ class MapperVisitor extends AbstractVisitor
             }
 
             // get the type of primary
-            foreach ($table->getPrimaryKeyColumns() as $primary) {
-                $primary = $primary->getName();
+            foreach ($pkIndex->getColumns() as $primary) {
                 $column = $table->getColumn($primary);
 
                 if ($column->getAutoincrement()) {
@@ -168,7 +201,7 @@ class MapperVisitor extends AbstractVisitor
     public function acceptColumn(Table $table, Column $column)
     {
         $field = $column->getName();
-        $type = $column->getType()->getName();
+        $type = Type::lookupName($column->getType());
         $default = $column->getDefault();
         $length = $column->getLength();
         $tableName = $table->getName();

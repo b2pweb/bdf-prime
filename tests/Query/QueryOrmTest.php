@@ -23,6 +23,7 @@ use Bdf\Prime\TestFiltersEntity;
 use Bdf\Prime\TestFiltersEntityMapper;
 use Bdf\Prime\User;
 use Doctrine\DBAL\Cache\ArrayResult;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Result;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
@@ -113,7 +114,7 @@ class QueryOrmTest extends TestCase
         
         $this->assertStringContainsString('IGNORE', $this->query->toSql());
         
-        if ($this->repository->connection()->platform()->name() === 'mysql') {
+        if ($this->repository->connection()->platform()->grammar() instanceof MySQLPlatform) {
             $this->assertEquals("INSERT IGNORE INTO $this->table (id, name, foreign_key) VALUES(?, ?, ?)", $this->query->toSql());
         } else {
             $this->assertEquals("INSERT OR IGNORE INTO $this->table (id, name, foreign_key) VALUES(?, ?, ?)", $this->query->toSql());

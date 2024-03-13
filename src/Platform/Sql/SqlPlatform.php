@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Platform\Sql;
 
 use Bdf\Prime\Platform\PlatformInterface;
+use Bdf\Prime\Platform\PlatformSpecificOperationInterface;
 use Bdf\Prime\Platform\PlatformTypes;
 use Bdf\Prime\Platform\PlatformTypesInterface;
 use Bdf\Prime\Platform\Sql\Types\SqlBooleanType;
@@ -18,7 +19,9 @@ use Bdf\Prime\Platform\Sql\Types\SqlStringType;
 use Bdf\Prime\Platform\Sql\Types\SqlTimeType;
 use Bdf\Prime\Types\TypeInterface;
 use Bdf\Prime\Types\TypesRegistryInterface;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 
 /**
  * Base class for SQL platforms
@@ -76,6 +79,7 @@ class SqlPlatform implements PlatformInterface
      */
     public function name(): string
     {
+        /** @psalm-suppress DeprecatedMethod */
         return $this->grammar->getName();
     }
 
@@ -93,5 +97,26 @@ class SqlPlatform implements PlatformInterface
     public function grammar()
     {
         return $this->grammar;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function apply(PlatformSpecificOperationInterface $operation)
+    {
+        $grammar = $this->grammar;
+
+        if (!$operation instanceof SqlPlatformOperationInterface) {
+            return $operation->onUnknownPlatform($this, $this->grammar);
+        }
+
+        switch (true) {
+            case $grammar instanceof AbstractMySQLPlatform:
+                return $operation->onMysqlPlatform($this, $grammar);
+            case $grammar instanceof SqlitePlatform:
+                return $operation->onSqlitePlatform($this, $grammar);
+            default:
+                return $operation->onGenericSqlPlatform($this, $grammar);
+        }
     }
 }
