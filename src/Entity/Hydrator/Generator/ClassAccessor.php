@@ -3,11 +3,17 @@
 namespace Bdf\Prime\Entity\Hydrator\Generator;
 
 use Bdf\Prime\Entity\Hydrator\Exception\HydratorGenerationException;
+use Bdf\Prime\ValueObject\ValueObjectInterface;
+use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
 
+use function md5;
+
 /**
  * Handle accessor from class
+ *
+ * @template T as object
  */
 class ClassAccessor
 {
@@ -17,52 +23,52 @@ class ClassAccessor
     /**
      * The class name
      *
-     * @var string
+     * @var class-string<T>
      */
-    private $className;
+    private string $className;
 
     /**
      * @var string[]
      */
-    private $subClasses;
+    private array $subClasses;
 
     /**
      * The scope which accessor will be called
      *
      * @var string
      */
-    private $scope;
+    private string $scope;
 
     /**
-     * @var \ReflectionClass
+     * @var ReflectionClass<T>
      */
-    private $reflection;
+    private ReflectionClass $reflection;
 
 
     /**
      * ClassAccessor constructor.
      *
-     * @param string $className
+     * @param class-string<T> $className
      * @param string $scope
-     * @param array $subClasses List of potential sub-classes which the property can be redefined
+     * @param string[] $subClasses List of potential sub-classes which the property can be redefined
      *
      * @throws ReflectionException
      */
-    public function __construct($className, $scope, array $subClasses = [])
+    public function __construct(string $className, string $scope, array $subClasses = [])
     {
         $this->className = $className;
         $this->scope = $scope;
         $this->subClasses = $subClasses;
 
-        $this->reflection = new \ReflectionClass($className);
+        $this->reflection = new ReflectionClass($className);
     }
 
     /**
-     * Get the relected class name
+     * Get the selected class name
      *
-     * @return string
+     * @return class-string<T>
      */
-    public function className()
+    public function className(): string
     {
         return $this->className;
     }
@@ -77,7 +83,7 @@ class ClassAccessor
      *
      * @throws HydratorGenerationException When the attribute is not readable
      */
-    public function getter($varName, $attribute)
+    public function getter(string $varName, string $attribute): string
     {
         if ($this->isPropertyAccessible($attribute)) {
             return $varName.'->'.$attribute;
@@ -93,6 +99,31 @@ class ClassAccessor
     }
 
     /**
+     * Generate the getter for one attribute, and extract the primitive value in case of value object
+     * So this method will generate the call to {@see ValueObjectInterface::value()} if the attribute is configured as value object
+     *
+     * @param string $varName The object (entity container) var name
+     * @param string $attribute The attribute to get
+     * @param class-string<ValueObjectInterface>|null $valueObjectClass The value object class name
+     *
+     * @return string
+     *
+     * @throws HydratorGenerationException When the attribute is not readable
+     */
+    public function primitiveGetter(string $varName, string $attribute, ?string $valueObjectClass): string
+    {
+        $getter = $this->getter($varName, $attribute);
+
+        if (!$valueObjectClass) {
+            return $getter;
+        }
+
+        $tmp = '$__tmp'. md5($getter);
+
+        return "(({$tmp} = {$getter}) instanceof \\{$valueObjectClass} ? {$tmp}->value() : {$tmp})";
+    }
+
+    /**
      * Generate setter for one attribute
      *
      * @param string $varName The object variable name
@@ -104,7 +135,7 @@ class ClassAccessor
      *
      * @throws HydratorGenerationException When the attribute is not accessible
      */
-    public function setter($varName, $attribute, $value, $useSetterInPriority = true)
+    public function setter(string $varName, string $attribute, string $value, bool $useSetterInPriority = true): string
     {
         if ($useSetterInPriority && method_exists($this->className, 'set'.ucfirst($attribute))) {
             return $varName.'->set'.ucfirst($attribute).'('.$value.')';
@@ -122,6 +153,35 @@ class ClassAccessor
     }
 
     /**
+     * Generate setter for one attribute, and wrap the value in a value object if needed
+     *
+     * @param string $varName The object variable name
+     * @param string $attribute The attribute to set
+     * @param string $value The value to pass
+     * @param class-string<ValueObjectInterface>|null $valueObjectClass The value object class name. If null, the value will not be wrapped
+     * @param bool $allowWrappedValue Allow to pass a value object instance as value (if true, and if the value is a value object, the value will be passed as is)
+     *
+     * @return string
+     *
+     * @throws HydratorGenerationException When the attribute is not accessible
+     */
+    public function valueObjectSetter(string $varName, string $attribute, string $value, ?string $valueObjectClass = null, bool $allowWrappedValue = false): string
+    {
+        if ($valueObjectClass) {
+            $tmp = '$__tmp'. md5($value);
+            $condition = "({$tmp} = {$value}) !== null";
+
+            if ($allowWrappedValue) {
+                $condition .= " && !{$tmp} instanceof \\{$valueObjectClass}";
+            }
+
+            $value = "({$condition} ? \\{$valueObjectClass}::from({$tmp}) : $tmp)";
+        }
+
+        return $this->setter($varName, $attribute, $value, false);
+    }
+
+    /**
      * Check is a property is accessible from the scope without getters
      *
      * @param string $prop The property name
@@ -130,7 +190,7 @@ class ClassAccessor
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    public function isPropertyAccessible($prop)
+    public function isPropertyAccessible(string $prop): bool
     {
         try {
             $propertyReflection = $this->reflection->getProperty($prop);

@@ -94,8 +94,10 @@ class PropertyInfo implements InfoInterface
      */
     public function phpType(): string
     {
-        if (isset($this->metadata['phpOptions']['className'])) {
-            return '\\'.ltrim($this->metadata['phpOptions']['className'], '\\');
+        $class = $this->metadata['phpOptions']['className'] ?? $this->metadata['valueObject'] ?? null;
+
+        if ($class) {
+            return '\\'.ltrim($class, '\\');
         }
 
         $type = $this->type();
@@ -172,6 +174,26 @@ class PropertyInfo implements InfoInterface
     public function isDateTime(): bool
     {
         return is_subclass_of($this->phpType(), DateTimeInterface::class);
+    }
+
+    /**
+     * Check if the property is wrapped into a value object
+     *
+     * @return bool
+     */
+    public function isValueObject(): bool
+    {
+        return !empty($this->metadata['valueObject']);
+    }
+
+    /**
+     * Check if the property is a primitive type (not value object or datetime)
+     *
+     * @return bool
+     */
+    public function isPrimitive(): bool
+    {
+        return !$this->isObject() && !$this->isDateTime() && !$this->isValueObject();
     }
 
     /**

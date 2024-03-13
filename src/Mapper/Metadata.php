@@ -6,6 +6,7 @@ use Bdf\Prime\Entity\Instantiator\InstantiatorInterface;
 use Bdf\Prime\Mapper\Attribute\MapperConfigurationInterface;
 use Bdf\Prime\Relations\Builder\RelationBuilder;
 use Bdf\Prime\Relations\Relation;
+use Bdf\Prime\ValueObject\ValueObjectInterface;
 use LogicException;
 use stdClass;
 
@@ -16,6 +17,7 @@ use stdClass;
  * @todo exception si aucune primary ou unique n'a été définit ?
  * @todo doit on injecter si private ??
  *
+ * @todo Allow enum class on valueObject ?
  * @psalm-type FieldMetadata = array{
  *     primary: Metadata::PK_*|null,
  *     type: string,
@@ -29,7 +31,8 @@ use stdClass;
  *     nillable?: bool,
  *     unsigned?: bool,
  *     unique?: bool|string,
- *     class?: class-string
+ *     class?: class-string,
+ *     valueObject?: class-string<ValueObjectInterface>,
  * }
  *
  * @psalm-type SequenceMetadata = array{

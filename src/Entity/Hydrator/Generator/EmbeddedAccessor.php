@@ -3,31 +3,25 @@
 namespace Bdf\Prime\Entity\Hydrator\Generator;
 
 use Bdf\Prime\Entity\Hydrator\Exception\HydratorGenerationException;
+use Bdf\Prime\ValueObject\ValueObjectInterface;
 
 /**
  * Accessor for embedded entity
  */
 class EmbeddedAccessor
 {
-    /**
-     * @var CodeGenerator
-     */
-    private $code;
-
-    /**
-     * @var EmbeddedInfo
-     */
-    private $embedded;
+    private CodeGenerator $code;
+    private EmbeddedInfo $embedded;
 
     /**
      * @var ClassAccessor[]
      */
-    private $accessors;
+    private array $accessors;
 
     /**
      * @var EmbeddedAccessor|ClassAccessor
      */
-    private $parentAccessor;
+    private object $parentAccessor;
 
 
     /**
@@ -53,13 +47,13 @@ class EmbeddedAccessor
      *
      * @param string $target The target var
      * @param bool $instantiate Instantiate the last embedded object
-     * @param string $rawDataVarName The variable name which store raw database data
+     * @param string|null $rawDataVarName The variable name which store raw database data
      *
      * @return string
      *
      * @throws HydratorGenerationException
      */
-    public function getEmbedded($target, $instantiate = true, $rawDataVarName = null)
+    public function getEmbedded(string $target, bool $instantiate = true, ?string $rawDataVarName = null): string
     {
         return <<<PHP
 { //START accessor for {$this->embedded->path()}
@@ -71,20 +65,22 @@ PHP;
 
     /**
      * Generate getter for one attribute
+     * If $valueObjectClass is given this method will generate the call to {@see ValueObjectInterface::value()} if the attribute is configured as value object
      *
      * /!\ The generated code by getEmbedded() must be set before, with $varName with same value as $target
      *
      * @param string $varName The object var name
      * @param string $attribute The attribute to get
+     * @param class-string<ValueObjectInterface>|null $valueObjectClass The value object class name, to unwrap the value
      *
      * @return string
      *
      * @throws HydratorGenerationException When the attribute is not readable
      */
-    public function getter($varName, $attribute)
+    public function getter(string $varName, string $attribute, ?string $valueObjectClass = null): string
     {
         if (count($this->accessors) === 1) {
-            $getter = $this->accessors[0]->getter($varName, $attribute);
+            $getter = $this->accessors[0]->primitiveGetter($varName, $attribute, $valueObjectClass);
 
             return $this->nillable()
                 ? '('.$varName.' === null ? null : '.$getter.')'
@@ -95,7 +91,7 @@ PHP;
         $getter = '';
 
         foreach ($this->accessors as $accessor) {
-            $getter .= '('.$varName.' instanceof '.$this->code->className($accessor->className()).' ? '.$accessor->getter($varName, $attribute).' : ';
+            $getter .= '('.$varName.' instanceof '.$this->code->className($accessor->className()).' ? '.$accessor->primitiveGetter($varName, $attribute, $valueObjectClass).' : ';
         }
 
         $getter .= 'null'.str_repeat(')', count($this->accessors));
@@ -117,7 +113,7 @@ PHP;
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    public function setter($varName, $attribute, $value, $useSetterInPriority = true)
+    public function setter(string $varName, string $attribute, string $value, bool $useSetterInPriority = true): string
     {
         if (count($this->accessors) === 1) {
             $setter = $this->accessors[0]->setter($varName, $attribute, $value, $useSetterInPriority);
@@ -140,23 +136,56 @@ PHP;
     }
 
     /**
-     * Generate full setter code for an embedded attribute
-     * Unlike setter(), there is no need to call getEmbedded()
+     * Generate setter for one attribute, and wrap the value in case of value object
      *
-     * @param string $attribute The attrbute to get
-     * @param string $value The value to set
-     * @param string $tmpVarName Temporary variable used for store the embedded instance
-     * @param string $rawDataVarName The variable name which store raw database data
+     * /!\ The generated code by getEmbedded() must be set before, with $varName with same value as $target
+     *
+     * @param string $varName The object variable name
+     * @param string $attribute The attribute to set
+     * @param string $value The value to pass
+     * @param class-string<ValueObjectInterface>|null $valueObjectClass The value object class name
+     * @param bool $allowWrappedValue Allow the value to be wrapped in value object
      *
      * @return string
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    public function fullSetter($attribute, $value, $tmpVarName = '$__owner', $rawDataVarName = null)
+    public function valueObjectSetter(string $varName, string $attribute, string $value, ?string $valueObjectClass = null, bool $allowWrappedValue = false): string
+    {
+        if ($valueObjectClass) {
+            $tmp = '$__tmp'. md5($value);
+            $condition = "({$tmp} = {$value}) !== null";
+
+            if ($allowWrappedValue) {
+                $condition .= " && !{$tmp} instanceof \\{$valueObjectClass}";
+            }
+
+            $value = "($condition ? \\{$valueObjectClass}::from({$tmp}) : {$tmp})";
+        }
+
+        return $this->setter($varName, $attribute, $value, true);
+    }
+
+    /**
+     * Generate full setter code for an embedded attribute
+     * Unlike setter(), there is no need to call getEmbedded()
+     *
+     * @param string $attribute The attribute to get
+     * @param string $value The value to set
+     * @param string $tmpVarName Temporary variable used for store the embedded instance
+     * @param string|null $rawDataVarName The variable name which store raw database data
+     * @param class-string<ValueObjectInterface>|null $valueObjectClass The value object class name
+     * @param bool $allowWrappedValue Allow the value to be wrapped in value object
+     *
+     * @return string
+     *
+     * @throws HydratorGenerationException When the property is not accessible
+     */
+    public function fullSetter(string $attribute, string $value, string $tmpVarName = '$__owner', ?string $rawDataVarName = null, ?string $valueObjectClass = null, bool $allowWrappedValue = false): string
     {
         return $this->code->lines([
             $this->getEmbedded($tmpVarName, true, $rawDataVarName),
-            $this->setter($tmpVarName, $attribute, $value)
+            $this->valueObjectSetter($tmpVarName, $attribute, $value, $valueObjectClass, $allowWrappedValue)
         ]);
     }
 
@@ -164,14 +193,14 @@ PHP;
      * @param string $parent
      * @param string $target
      * @param bool $instantiate
-     * @param string $rawDataVarName
+     * @param string|null $rawDataVarName
      * @param bool $nillable
      *
      * @return string
      *
      * @throws HydratorGenerationException
      */
-    private function recursiveGetEmbedded($parent, $target, $instantiate = true, $rawDataVarName = null, &$nillable = false)
+    private function recursiveGetEmbedded(string $parent, string $target, bool $instantiate = true, ?string $rawDataVarName = null, bool &$nillable = false): string
     {
         $accessor = '';
         $lastVar = $parent;
@@ -206,13 +235,13 @@ PHP;
      * @param string $parent The parent (owner) var name
      * @param string $target The target var name
      * @param bool $instantiate Instantiate the object if null ?
-     * @param string $rawDataVarName The database raw data var name
+     * @param string|null $rawDataVarName The database raw data var name
      *
      * @return string
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    private function getOrInstantiate($parent, $target, $instantiate, $rawDataVarName)
+    private function getOrInstantiate(string $parent, string $target, bool $instantiate, ?string $rawDataVarName): string
     {
         $accessorsSwitch = [];
 
@@ -276,7 +305,7 @@ PHP;
      *
      * @return ClassAccessor[]
      */
-    private function ownerAccessors()
+    private function ownerAccessors(): array
     {
         if ($this->parentAccessor instanceof EmbeddedAccessor) {
             return $this->parentAccessor->accessors;
@@ -290,7 +319,7 @@ PHP;
      *
      * @return bool
      */
-    private function nillable()
+    private function nillable(): bool
     {
         if ($this->embedded->isPolymorph()) {
             return true;

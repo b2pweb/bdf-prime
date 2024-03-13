@@ -20,3 +20,4 @@ require_once __DIR__. '/cross_connection_sequence.php';
 require_once __DIR__.'/entity_with_custom_nullable_type.php';
 require_once __DIR__.'/null_relation_inheritance.php';
 require_once __DIR__.'/json_entities.php';
+require_once __DIR__.'/entity_with_value_object.php';
