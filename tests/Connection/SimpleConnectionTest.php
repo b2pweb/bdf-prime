@@ -482,7 +482,7 @@ class SimpleConnectionTest extends TestCase
     /**
      *
      */
-    public function test_close_should_call_listener()
+    public function test_close_should_call_listener_legacy()
     {
         $listener = $this->createMock(ConnectionClosedListenerInterface::class);
         $this->connection->getEventManager()->addEventListener(ConnectionClosedListenerInterface::EVENT_NAME, $listener);
@@ -490,6 +490,31 @@ class SimpleConnectionTest extends TestCase
         $listener->expects($this->once())->method('onConnectionClosed');
 
         $this->connection->close();
+    }
+
+    /**
+     *
+     */
+    public function test_close_should_call_listener()
+    {
+        $called = false;
+        $parameter = false;
+        $listener = function ($connection) use(&$called, &$parameter) {
+            $called = true;
+            $parameter = $connection;
+        };
+
+        $this->connection->addConnectionClosedListener($listener);
+        $this->connection->close();
+
+        $this->assertTrue($called);
+        $this->assertSame($this->connection, $parameter);
+
+        $called = false;
+        $this->connection->removeConnectionClosedListener($listener);
+
+        $this->connection->close();
+        $this->assertFalse($called);
     }
 
     /**

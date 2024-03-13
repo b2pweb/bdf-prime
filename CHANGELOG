@@ -13,10 +13,16 @@ v2.2.0
     * `Whereable::whereNull()`
     * `Whereable::whereNotNull()`
 * Change: Allow usage of entity class name to resolve relations, instead of relation name
+* Feat: Add `Bdf\Prime\Platform\PlatformSpecificOperationInterface` and `PlatformInterface::apply()` to allow changing the behavior on the platform
+* Change: Rework visitors to remove the use of deprecated doctrine visitor API
 
 BC Breaks
 * Change: `Bdf\Prime\Configuration` instances are not shared anymore between connections. So change of the default configuration during runtime will not affect already created connections.
 * Change: `Bdf\Prime\Query/Expression/Raw::__toString()` is now deprecated, and its constructor value will be cast to string.
+* Minimum version of doctrine/dbal is now 3.7
+* Deprecate: `Bdf\Prime\Platform\PlatformInterface::name()`. Use `PlatformInterface::apply()` instead.
+* Deprecate: `Bdf\Prime\Connection\ConnectionInterface::getEventManager()` and `Bdf\Prime\Connection\Event\ConnectionClosedListenerInterface`. Use `ConnectionInterface::addConnectionClosedListener()` and `ConnectionInterface::removeConnectionClosedListener()` instead.
+* Change: `Doctrine\DBAL\Schema\Column::getPlatformOptions()`/`setPlatformOptions()` is used instead of `getCustomSchemaOptions()`/`setCustomSchemaOptions()`, which can cause change on migration queries.
 
 v2.1.0
 ------

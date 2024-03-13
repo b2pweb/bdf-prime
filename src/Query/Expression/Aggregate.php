@@ -77,7 +77,7 @@ abstract class Aggregate implements ExpressionInterface
         return new class ($attribute) extends Aggregate {
             protected function expression(AbstractPlatform $platform, string $attribute): string
             {
-                return $platform->getMinExpression($attribute);
+                return 'MIN('.$attribute.')';
             }
         };
     }
@@ -94,7 +94,7 @@ abstract class Aggregate implements ExpressionInterface
         return new class ($attribute) extends Aggregate {
             protected function expression(AbstractPlatform $platform, string $attribute): string
             {
-                return $platform->getMaxExpression($attribute);
+                return 'MAX('.$attribute.')';
             }
         };
     }
@@ -111,7 +111,7 @@ abstract class Aggregate implements ExpressionInterface
         return new class ($attribute) extends Aggregate {
             protected function expression(AbstractPlatform $platform, string $attribute): string
             {
-                return $platform->getAvgExpression($attribute);
+                return 'AVG('.$attribute.')';
             }
         };
     }
@@ -128,7 +128,7 @@ abstract class Aggregate implements ExpressionInterface
         return new class ($attribute) extends Aggregate {
             protected function expression(AbstractPlatform $platform, string $attribute): string
             {
-                return $platform->getCountExpression($attribute);
+                return 'COUNT('.$attribute.')';
             }
         };
     }
@@ -145,7 +145,7 @@ abstract class Aggregate implements ExpressionInterface
         return new class ($attribute) extends Aggregate {
             protected function expression(AbstractPlatform $platform, string $attribute): string
             {
-                return $platform->getSumExpression($attribute);
+                return 'SUM('.$attribute.')';
             }
         };
     }

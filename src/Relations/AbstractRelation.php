@@ -246,6 +246,7 @@ abstract class AbstractRelation implements RelationInterface
      */
     public function clearInfo($entity): void
     {
+        /** @psalm-suppress DeprecatedMethod */
         $this->relationInfo->clear($entity);
     }
 
@@ -357,6 +358,7 @@ abstract class AbstractRelation implements RelationInterface
         if ($relation !== null) {
             $this->relationInfo->markAsLoaded($entity);
         } else {
+            /** @psalm-suppress DeprecatedMethod */
             $this->relationInfo->clear($entity);
         }
     }

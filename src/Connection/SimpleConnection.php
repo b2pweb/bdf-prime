@@ -38,6 +38,8 @@ use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 
+use function spl_object_id;
+
 /**
  * Connection
  *
@@ -71,6 +73,14 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      * @var QueryFactoryInterface
      */
     private $factory;
+
+    /**
+     * List of listeners to call when the connection is closed,
+     * indexed by the listener object id
+     *
+     * @var array<int, Closure(ConnectionInterface):void>
+     */
+    private array $onConnectionClosedListeners = [];
 
     /**
      * SimpleConnection constructor.
@@ -168,6 +178,28 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
         }
 
         return $this->platform;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param Closure(ConnectionInterface):void $listener
+     */
+    public function addConnectionClosedListener(Closure $listener): void
+    {
+        $id = spl_object_id($listener);
+
+        $this->onConnectionClosedListeners[$id] = $listener;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeConnectionClosedListener(Closure $listener): void
+    {
+        $id = spl_object_id($listener);
+
+        unset($this->onConnectionClosedListeners[$id]);
     }
 
     /**
@@ -399,18 +431,29 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
 
     /**
      * {@inheritdoc}
+     *
+     * @psalm-suppress DeprecatedProperty
+     * @psalm-suppress DeprecatedClass
      */
     public function close(): void
     {
         parent::close();
 
+        // To remove in 3.0
         $this->_eventManager->dispatchEvent(ConnectionClosedListenerInterface::EVENT_NAME);
+
+        foreach ($this->onConnectionClosedListeners as $listener) {
+            $listener($this);
+        }
     }
 
     /**
      * Setup the logger by setting the connection
      *
      * @return void
+     * @psalm-suppress DeprecatedMethod
+     * @psalm-suppress DeprecatedClass
+     * @todo remove on prime 3.0
      */
     protected function prepareLogger(): void
     {

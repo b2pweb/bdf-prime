@@ -40,6 +40,8 @@ final class ArrayResultSet extends ArrayIterator implements ResultSetInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @psalm-suppress DeprecatedConstant
      */
     public function fetchMode($mode, $options = null)
     {

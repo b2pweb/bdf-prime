@@ -460,7 +460,7 @@ class Prime
 
         if ($logger = static::$config['logger'] ?? null) {
             if ($logger instanceof SQLLogger) {
-                /** @psalm-suppress InternalMethod */
+                /** @psalm-suppress DeprecatedMethod */
                 $configuration->setSQLLogger($logger);
             } elseif ($logger instanceof LoggerInterface) {
                 $configuration->setMiddlewares([new LoggerMiddleware($logger)]);

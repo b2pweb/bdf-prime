@@ -54,6 +54,7 @@ final class AndFilter implements IteratorAggregate, Countable, ArrayAccess
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->filters[$offset];

@@ -6,11 +6,14 @@ use Doctrine\DBAL\Schema\ForeignKeyConstraint;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\Visitor\AbstractVisitor;
+use Doctrine\DBAL\Types\Type;
 
 /**
  * Create a Graphviz output of a Schema.
  *
  * @package Bdf\Prime\Schema\Visitor
+ * @psalm-suppress DeprecatedClass
+ * @psalm-suppress DeprecatedInterface
  */
 class Graphviz extends AbstractVisitor
 {
@@ -20,12 +23,38 @@ class Graphviz extends AbstractVisitor
     protected $output = '';
 
     /**
+     * Parse the schema and create to build the graphviz output
+     *
+     * @param Schema $schema
+     * @return void
+     *
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    public function onSchema(Schema $schema): void
+    {
+        $this->acceptSchema($schema);
+
+        foreach ($schema->getTables() as $table) {
+            $this->onTable($table);
+        }
+    }
+
+    private function onTable(Table $table): void
+    {
+        $this->acceptTable($table);
+
+        foreach ($table->getForeignKeys() as $foreignKey) {
+            $this->acceptForeignKey($table, $foreignKey);
+        }
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function acceptForeignKey(Table $localTable, ForeignKeyConstraint $fkConstraint)
     {
         $this->output .= $this->createNodeRelation(
-            $fkConstraint->getLocalTableName().':col'.current($fkConstraint->getLocalColumns()).':se',
+            $localTable->getName().':col'.current($fkConstraint->getLocalColumns()).':se',
             $fkConstraint->getForeignTableName().':col'.current($fkConstraint->getForeignColumns()).':se',
             [
                 'dir'       => 'back',
@@ -81,7 +110,7 @@ class Graphviz extends AbstractVisitor
         foreach ($table->getColumns() as $column) {
             $columnName = $column->getName();
 
-            if ($table->hasPrimaryKey() && in_array($column->getName(), $table->getPrimaryKey()->getColumns())) {
+            if (($pk = $table->getPrimaryKey()) && in_array($column->getName(), $pk->getColumns())) {
                 $columnName = '<b>'.$columnName.'</b>';
             }
 
@@ -91,7 +120,7 @@ class Graphviz extends AbstractVisitor
                     . $columnName
                 . '</td>'
                 . '<td border="0" align="left">'
-                    . '<font point-size="10">'.lcfirst($column->getType()->getName()).'</font>'
+                    . '<font point-size="10">'.lcfirst(Type::lookupName($column->getType())).'</font>'
                 . '</td>'
             . '</tr>';
         }

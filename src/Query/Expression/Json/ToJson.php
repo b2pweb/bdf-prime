@@ -2,11 +2,16 @@
 
 namespace Bdf\Prime\Query\Expression\Json;
 
+use Bdf\Prime\Platform\Sql\SqlPlatform;
 use Bdf\Prime\Query\CompilableClause as Q;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
+use Bdf\Prime\Query\Expression\AbstractPlatformSpecificExpression;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
+use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MariaDBPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use LogicException;
 
 use function array_is_list;
@@ -24,7 +29,7 @@ use function sprintf;
 /**
  * Expression for convert a value to json
  */
-final class ToJson implements ExpressionInterface
+final class ToJson extends AbstractPlatformSpecificExpression
 {
     /**
      * @var mixed|ExpressionInterface
@@ -42,34 +47,14 @@ final class ToJson implements ExpressionInterface
     /**
      * {@inheritdoc}
      */
-    public function build(Q $query, object $compiler): string
+    protected function buildForSqlite(Q $query, CompilerInterface $compiler, SqlPlatform $platform, SqlitePlatform $grammar): string
     {
-        if (!$compiler instanceof QuoteCompilerInterface || !$compiler instanceof CompilerInterface) {
+        if (!$compiler instanceof QuoteCompilerInterface) {
             throw new LogicException('ToJson expression is not supported by the current compiler');
         }
 
-        $dbms = $compiler->platform()->name();
+        $value = $this->value;
 
-        switch ($dbms) {
-            case 'sqlite':
-                return $this->buildSqliteExpression($query, $compiler, $this->value);
-
-            case 'mysql':
-                return $this->buildMysqlExpression($query, $compiler, $this->value);
-
-            default:
-                return $this->buildDefaultExpression($query, $compiler, $this->value);
-        }
-    }
-
-    /**
-     * @param QuoteCompilerInterface&CompilerInterface $compiler
-     * @param mixed|ExpressionInterface $value
-     *
-     * @return string
-     */
-    private function buildSqliteExpression(Q $query, $compiler, $value): string
-    {
         if ($value instanceof ExpressionInterface) {
             $value = $value->build($query, $compiler);
         } else {
@@ -80,32 +65,38 @@ final class ToJson implements ExpressionInterface
     }
 
     /**
-     * @param QuoteCompilerInterface&CompilerInterface $compiler
-     * @param mixed|ExpressionInterface $value
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    private function buildMysqlExpression(Q $query, CompilerInterface $compiler, $value)
+    protected function buildForMySql(Q $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractMySQLPlatform $grammar): string
     {
+        if (!$compiler instanceof QuoteCompilerInterface) {
+            throw new LogicException('ToJson expression is not supported by the current compiler');
+        }
+
+        $value = $this->value;
+
         if ($value instanceof ExpressionInterface) {
             $value = $value->build($query, $compiler);
         } else {
             $value = $compiler->quote(json_encode($value));
         }
 
-        $function = $compiler->platform()->grammar() instanceof MariaDBPlatform ? 'JSON_COMPACT(%s)' : 'CAST(%s AS JSON)';
+        $function = $grammar instanceof MariaDBPlatform ? 'JSON_COMPACT(%s)' : 'CAST(%s AS JSON)';
 
         return sprintf($function, (string) $value);
     }
 
     /**
-     * @param QuoteCompilerInterface&CompilerInterface $compiler
-     * @param mixed|ExpressionInterface $value
-     *
-     * @return string
+     * {@inheritdoc}
      */
-    private function buildDefaultExpression(Q $query, $compiler, $value)
+    protected function buildForGenericSql(Q $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractPlatform $grammar): string
     {
+        if (!$compiler instanceof QuoteCompilerInterface) {
+            throw new LogicException('ToJson expression is not supported by the current compiler');
+        }
+
+        $value = $this->value;
+
         if (!$value instanceof ExpressionInterface) {
             return $this->convertValue($compiler, $value);
         }
@@ -120,12 +111,12 @@ final class ToJson implements ExpressionInterface
      * - array list will be converted to JSON_ARRAY(...)
      * - array and object will be converted to JSON_OBJECT(...)
      *
-     * @param QuoteCompilerInterface&CompilerInterface $compiler
+     * @param QuoteCompilerInterface $compiler
      * @param mixed $value
      *
      * @return string
      */
-    private function convertValue($compiler, $value): string
+    private function convertValue(QuoteCompilerInterface $compiler, $value): string
     {
         if (is_string($value)) {
             return (string) $compiler->quote($value);

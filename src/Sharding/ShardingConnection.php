@@ -438,6 +438,8 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
 
     /**
      * {@inheritdoc}
+     *
+     * @psalm-suppress DeprecatedMethod
      */
     public function getWrappedConnection()
     {

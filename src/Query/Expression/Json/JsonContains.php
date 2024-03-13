@@ -2,13 +2,16 @@
 
 namespace Bdf\Prime\Query\Expression\Json;
 
+use Bdf\Prime\Platform\Sql\SqlPlatform;
 use Bdf\Prime\Query\CompilableClause as Q;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
+use Bdf\Prime\Query\Expression\AbstractPlatformSpecificExpression;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use InvalidArgumentException;
 use LogicException;
-
 use phpDocumentor\Reflection\Types\Scalar;
 
 use function get_debug_type;
@@ -26,7 +29,7 @@ use function json_encode;
  *     $query->whereRaw(new JsonContains(new JsonExtract('json_field', '$.tags', false), 'value')); // Search from a nested field "tags". Note that the value is not unquoted
  * </code>
  */
-final class JsonContains implements ExpressionInterface
+final class JsonContains extends AbstractPlatformSpecificExpression
 {
     /**
      * @var string|ExpressionInterface
@@ -55,26 +58,41 @@ final class JsonContains implements ExpressionInterface
     /**
      * {@inheritdoc}
      */
-    public function build(Q $query, object $compiler): string
+    protected function buildForSqlite(Q $query, CompilerInterface $compiler, SqlPlatform $platform, SqlitePlatform $grammar): string
     {
-        if (!$compiler instanceof QuoteCompilerInterface || !$compiler instanceof CompilerInterface) {
+        if (!$compiler instanceof QuoteCompilerInterface) {
             throw new LogicException('JsonContains expression is not supported by the current compiler');
         }
 
-        $target = $this->target instanceof ExpressionInterface
+        return self::getSqliteExpression(
+            $compiler,
+            $this->target($query, $compiler),
+            $this->candidate
+        );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildForGenericSql(Q $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractPlatform $grammar): string
+    {
+        if (!$compiler instanceof QuoteCompilerInterface) {
+            throw new LogicException('JsonContains expression is not supported by the current compiler');
+        }
+
+        return self::getDefaultExpression(
+            $compiler,
+            $this->target($query, $compiler),
+            $this->candidate
+        );
+    }
+
+    private function target(Q $query, QuoteCompilerInterface $compiler): string
+    {
+        return $this->target instanceof ExpressionInterface
             ? $this->target->build($query, $compiler)
             : $compiler->quoteIdentifier($query, $query->preprocessor()->field($this->target))
         ;
-
-        $dbms = $compiler->platform()->name();
-
-        switch ($dbms) {
-            case 'sqlite':
-                return self::getSqliteExpression($compiler, $target, $this->candidate);
-
-            default:
-                return self::getDefaultExpression($compiler, $target, $this->candidate);
-        }
     }
 
     /**
@@ -98,7 +116,7 @@ final class JsonContains implements ExpressionInterface
      *
      * @return string
      */
-    private static function getDefaultExpression(CompilerInterface $compiler, string $target, $candidate): string
+    private static function getDefaultExpression(QuoteCompilerInterface $compiler, string $target, $candidate): string
     {
         $candidate = $compiler->quote(json_encode($candidate));
 

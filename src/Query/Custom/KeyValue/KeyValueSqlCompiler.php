@@ -182,12 +182,12 @@ class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInter
         }
 
         switch ($function) {
-            case 'avg'  :      return $this->platform()->grammar()->getAvgExpression($column).' AS aggregate';
-            case 'count':      return $this->platform()->grammar()->getCountExpression($column).' AS aggregate';
-            case 'max'  :      return $this->platform()->grammar()->getMaxExpression($column).' AS aggregate';
-            case 'min'  :      return $this->platform()->grammar()->getMinExpression($column).' AS aggregate';
-            case 'pagination': return $this->platform()->grammar()->getCountExpression($column).' AS aggregate';
-            case 'sum'  :      return $this->platform()->grammar()->getSumExpression($column).' AS aggregate';
+            case 'avg'  :      return "AVG($column) AS aggregate";
+            case 'count':      return "COUNT($column) AS aggregate";
+            case 'max'  :      return "MAX($column) AS aggregate";
+            case 'min'  :      return "MIN($column) AS aggregate";
+            case 'pagination': return "COUNT($column) AS aggregate";
+            case 'sum'  :      return "SUM($column) AS aggregate";
 
             default:
                 $method = 'get'.ucfirst($function).'Expression';
@@ -246,16 +246,7 @@ class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInter
         }
 
         if (!isset($query->statements['limit'])) {
-            switch ($this->platform()->name()) {
-                case 'sqlite':
-                    return ' LIMIT -1 OFFSET '.$query->statements['offset'];
-
-                case 'mysql':
-                    return ' LIMIT 18446744073709551615 OFFSET '.$query->statements['offset'];
-
-                default:
-                    return ' OFFSET '.$query->statements['offset'];
-            }
+            return $this->platform()->apply(new OffsetExpression($query->statements['offset']));
         }
 
         // Use prepared only for pagination
