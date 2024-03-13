@@ -6,6 +6,7 @@ use Bdf\Prime\Bench\HydratorGeneration;
 use Bdf\Prime\Customer;
 use Bdf\Prime\CustomerCriteria;
 use Bdf\Prime\CustomerMapper;
+use Bdf\Prime\CustomerPack;
 use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Entity\Hydrator\HydratorGeneratedInterface;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
@@ -15,11 +16,15 @@ use Bdf\Prime\IdGenerators\GuidGenerator;
 use Bdf\Prime\IdGenerators\NullGenerator;
 use Bdf\Prime\IdGenerators\TableGenerator;
 use Bdf\Prime\Mapper\Info\MapperInfo;
+use Bdf\Prime\Pack;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
 use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\TestEmbeddedEntity;
 use Bdf\Prime\TestEntity;
 use Bdf\Prime\TestEntityMapper;
+use Bdf\Prime\User;
 use Doctrine\DBAL\Exception\NotNullConstraintViolationException;
 use PHPUnit\Framework\TestCase;
 
@@ -131,6 +136,125 @@ class MapperTest extends TestCase
 
         $mapper->setAllowUnknownAttribute(true);
         $this->assertTrue($mapper->allowUnknownAttribute());
+    }
+
+    public function test_relation()
+    {
+        $mapper = new CustomerMapper(Prime::service(), Customer::class);
+        $mapper->build();
+
+        $this->assertEquals([
+            'name' => 'users',
+            'type' => 'hasMany',
+            'localKey' => 'id',
+            'entity' => User::class,
+            'distantKey' => 'customer.id',
+            'detached' => true,
+        ], $mapper->relation('users'));
+
+        $this->assertEquals([
+            'name' => 'users',
+            'type' => 'hasMany',
+            'localKey' => 'id',
+            'entity' => User::class,
+            'distantKey' => 'customer.id',
+            'detached' => true,
+        ], $mapper->relation(User::class, 'users'));
+
+        $this->assertEquals([
+            'name' => 'webUsers',
+            'type' => 'hasMany',
+            'localKey' => 'id',
+            'entity' => User::class,
+            'distantKey' => 'customer.id',
+            'detached' => true,
+            'constraints' => ['faction.domain' => 'user'],
+        ], $mapper->relation(User::class, 'webUsers'));
+
+        $this->assertEquals([
+            'name' => 'packs',
+            'type' => 'belongsToMany',
+            'localKey' => 'id',
+            'entity' => Pack::class,
+            'distantKey' => 'id',
+            'through' => CustomerPack::class,
+            'throughLocal' => 'customerId',
+            'throughDistant' => 'packId',
+        ], $mapper->relation(Pack::class));
+    }
+
+    public function test_relation_legacy()
+    {
+        $mapper = new LegacyMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
+
+        $this->assertEquals([
+            'type' => 'hasOne',
+            'entity' => TestEmbeddedEntity::class,
+            'localKey' => 'foreign.id',
+            'distantKey' => 'id',
+            'name' => 'foreign',
+        ], $mapper->relation('foreign'));
+
+        $this->assertEquals([
+            'type' => 'hasOne',
+            'entity' => TestEmbeddedEntity::class,
+            'localKey' => 'foreign.id',
+            'distantKey' => 'id',
+            'name' => 'foreign',
+        ], $mapper->relation(TestEmbeddedEntity::class));
+
+        $this->assertEquals([
+            'type' => 'hasOne',
+            'entity' => TestEmbeddedEntity::class,
+            'localKey' => 'foreign.id',
+            'distantKey' => 'id',
+            'name' => 'foreign',
+        ], $mapper->relation(TestEmbeddedEntity::class, 'foreign'));
+    }
+
+    public function test_relation_not_found()
+    {
+        $this->expectException(RelationNotFoundException::class);
+        $this->expectExceptionMessage('Relation "not_found" is not set in Bdf\Prime\Customer');
+
+        $mapper = new CustomerMapper(Prime::service(), Customer::class);
+        $mapper->build();
+
+        $mapper->relation('not_found');
+    }
+
+    public function test_relation_class_ambiguous()
+    {
+        $this->expectException(RelationNotFoundException::class);
+        $this->expectExceptionMessage('Multiple relations found for class "Bdf\Prime\User" in Bdf\Prime\Customer. Please specify the relation name (available relations: users, webUsers)');
+
+        $mapper = new CustomerMapper(Prime::service(), Customer::class);
+        $mapper->build();
+
+        $mapper->relation(User::class);
+    }
+
+    public function test_relation_class_ambiguous_not_match_with_name()
+    {
+        $this->expectException(RelationNotFoundException::class);
+        $this->expectExceptionMessage('Relation "location" is not set in Bdf\Prime\Customer or does not match the given class "Bdf\Prime\User"');
+
+        $mapper = new CustomerMapper(Prime::service(), Customer::class);
+        $mapper->build();
+
+        $mapper->relation(User::class, 'location');
+    }
+
+    public function test_relation_with_class_invalid_name()
+    {
+        $this->expectException(RelationNotFoundException::class);
+        $this->expectExceptionMessage('Relation "not_found" is not set in Bdf\Prime\Customer or does not match the given class "Bdf\Prime\User"');
+
+        $mapper = new CustomerMapper(Prime::service(), Customer::class);
+        $mapper->build();
+
+        $mapper->relation(User::class, 'not_found');
     }
 
     /**
@@ -579,5 +703,53 @@ class MyCustomCriteria extends Criteria
         $this->add('name', 'foo' . $bar);
 
         return $this;
+    }
+}
+
+class LegacyMapper extends Mapper
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function schema(): array
+    {
+        return [
+            'connection' => 'test',
+            'database'   => 'test',
+            'table'      => 'test_',
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function fields(): iterable
+    {
+        return [
+            'id'          => ['type' => 'integer', 'primary' => Metadata::PK_AUTOINCREMENT],
+            'name'        => ['type' => 'string', 'length' => '255'],
+            'dateInsert'  => ['type' => 'datetime', 'alias' => 'date_insert', 'nillable' => true],
+            'foreign'     => [
+                'class'    => TestEmbeddedEntity::class,
+                'embedded' => [
+                    'id'    => ['type' => 'integer', 'alias' => 'foreign_key', 'nillable' => true],
+                ]
+            ],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function relations(): array
+    {
+        return [
+            'foreign' => [
+                'type'       => 'hasOne',
+                'entity'     => TestEmbeddedEntity::class,
+                'localKey'   => 'foreign.id',
+                'distantKey' => 'id',
+            ]
+        ];
     }
 }

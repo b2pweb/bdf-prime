@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Relations\Builder;
 
+use Bdf\Prime\Customer;
 use Bdf\Prime\Relations\DistantEntityForCustomRelation;
 use Bdf\Prime\Relations\EntityForeignIn;
 use Bdf\Prime\Relations\ForeignInRelation;
@@ -24,6 +25,7 @@ class RelationBuilderTest extends TestCase
                 ->belongsTo('Customer', 'customerId');
 
         $expected = [
+            'name' => 'customer',
             'type'          => 'belongsTo',
             'localKey'      => 'customerId',
             'entity'        => 'Customer',
@@ -31,6 +33,7 @@ class RelationBuilderTest extends TestCase
         ];
 
         $this->assertEquals(['customer' => $expected], $builder->relations());
+        $this->assertEquals(['Customer' => ['customer' => 'customer']], $builder->relationClassesToNames());
     }
 
     /**
@@ -44,6 +47,7 @@ class RelationBuilderTest extends TestCase
                 ->belongsTo('Customer::id_', 'customerId');
 
         $expected = [
+            'name' => 'customer',
             'type'          => 'belongsTo',
             'localKey'      => 'customerId',
             'entity'        => 'Customer',
@@ -51,6 +55,7 @@ class RelationBuilderTest extends TestCase
         ];
 
         $this->assertEquals(['customer' => $expected], $builder->relations());
+        $this->assertEquals(['Customer' => ['customer' => 'customer']], $builder->relationClassesToNames());
     }
 
     /**
@@ -64,6 +69,7 @@ class RelationBuilderTest extends TestCase
                 ->hasOne('Contact::customerId');
 
         $expected = [
+            'name' => 'contact',
             'type'          => 'hasOne',
             'localKey'      => 'id',
             'entity'        => 'Contact',
@@ -71,6 +77,7 @@ class RelationBuilderTest extends TestCase
         ];
 
         $this->assertEquals(['contact' => $expected], $builder->relations());
+        $this->assertEquals(['Contact' => ['contact' => 'contact']], $builder->relationClassesToNames());
     }
 
     /**
@@ -84,6 +91,7 @@ class RelationBuilderTest extends TestCase
             ->hasOne('Contact::customerId', 'id_');
 
         $expected = [
+            'name' => 'contact',
             'type'          => 'hasOne',
             'localKey'      => 'id_',
             'entity'        => 'Contact',
@@ -91,6 +99,7 @@ class RelationBuilderTest extends TestCase
         ];
 
         $this->assertEquals(['contact' => $expected], $builder->relations());
+        $this->assertEquals(['Contact' => ['contact' => 'contact']], $builder->relationClassesToNames());
     }
 
     /**
@@ -104,6 +113,7 @@ class RelationBuilderTest extends TestCase
                 ->hasMany('Document::customerId');
 
         $expected = [
+            'name' => 'documents',
             'type'          => 'hasMany',
             'localKey'      => 'id',
             'entity'        => 'Document',
@@ -111,6 +121,7 @@ class RelationBuilderTest extends TestCase
         ];
 
         $this->assertEquals(['documents' => $expected], $builder->relations());
+        $this->assertEquals(['Document' => ['documents' => 'documents']], $builder->relationClassesToNames());
     }
 
     /**
@@ -124,6 +135,7 @@ class RelationBuilderTest extends TestCase
                 ->hasMany('Document::customerId', 'id_');
 
         $expected = [
+            'name' => 'documents',
             'type'          => 'hasMany',
             'localKey'      => 'id_',
             'entity'        => 'Document',
@@ -131,6 +143,7 @@ class RelationBuilderTest extends TestCase
         ];
 
         $this->assertEquals(['documents' => $expected], $builder->relations());
+        $this->assertEquals(['Document' => ['documents' => 'documents']], $builder->relationClassesToNames());
     }
 
     /**
@@ -145,6 +158,7 @@ class RelationBuilderTest extends TestCase
                 ->through('CustomerPack', 'customerId', 'packId');
 
         $expected = [
+            'name' => 'packs',
             'type'              => 'belongsToMany',
             'localKey'          => 'id',
             'entity'            => 'Pack',
@@ -155,6 +169,7 @@ class RelationBuilderTest extends TestCase
         ];
 
         $this->assertEquals(['packs' => $expected], $builder->relations());
+        $this->assertEquals(['Pack' => ['packs' => 'packs']], $builder->relationClassesToNames());
     }
 
     /**
@@ -168,6 +183,7 @@ class RelationBuilderTest extends TestCase
                 ->belongsToMany('Pack', 'id_');
 
         $expected = [
+            'name' => 'packs',
             'type'              => 'belongsToMany',
             'localKey'          => 'id_',
             'entity'            => 'Pack',
@@ -175,6 +191,7 @@ class RelationBuilderTest extends TestCase
         ];
 
         $this->assertEquals(['packs' => $expected], $builder->relations());
+        $this->assertEquals(['Pack' => ['packs' => 'packs']], $builder->relationClassesToNames());
     }
 
     /**
@@ -188,6 +205,7 @@ class RelationBuilderTest extends TestCase
                 ->belongsToMany('Pack::foreign', 'id_');
 
         $expected = [
+            'name' => 'packs',
             'type'              => 'belongsToMany',
             'localKey'          => 'id_',
             'entity'            => 'Pack',
@@ -195,6 +213,7 @@ class RelationBuilderTest extends TestCase
         ];
 
         $this->assertEquals(['packs' => $expected], $builder->relations());
+        $this->assertEquals(['Pack' => ['packs' => 'packs']], $builder->relationClassesToNames());
     }
 
     /**
@@ -214,6 +233,7 @@ class RelationBuilderTest extends TestCase
                 ]);
 
         $expected = [
+            'name' => 'uploader',
             'type'              => 'morphTo',
             'localKey'          => 'uploaderId',
             'discriminator'     => 'uploaderType',
@@ -240,6 +260,7 @@ class RelationBuilderTest extends TestCase
             ->morphOne('Document::uploaderId', 'uploaderType=user');
 
         $expected = [
+            'name' => 'uploader',
             'type'               => 'hasOne',
             'localKey'           => 'id',
             'entity'             => 'Document',
@@ -249,6 +270,7 @@ class RelationBuilderTest extends TestCase
         ];
 
         $this->assertEquals(['uploader' => $expected], $builder->relations());
+        $this->assertEquals(['Document' => ['uploader' => 'uploader']], $builder->relationClassesToNames());
     }
 
     /**
@@ -262,6 +284,7 @@ class RelationBuilderTest extends TestCase
             ->morphMany('Document::uploaderId', 'uploaderType=user');
 
         $expected = [
+            'name' => 'uploader',
             'type'               => 'hasMany',
             'localKey'           => 'id',
             'entity'             => 'Document',
@@ -284,6 +307,7 @@ class RelationBuilderTest extends TestCase
                 ->inherit('targetId');
 
         $expected = [
+            'name' => 'target',
             'type'     => 'byInheritance',
             'localKey' => 'targetId',
         ];
@@ -308,6 +332,7 @@ class RelationBuilderTest extends TestCase
             ->belongsTo('Target', 'targetId');
 
         $expected = [
+            'name' => 'target',
             'type'     => 'belongsTo',
             'localKey' => 'targetId',
             'entity' => 'Target',
@@ -317,6 +342,7 @@ class RelationBuilderTest extends TestCase
         ];
 
         $this->assertEquals(['target' => $expected], $builder->relations());
+        $this->assertEquals(['Target' => ['target' => 'target']], $builder->relationClassesToNames());
     }
 
     /**
@@ -330,6 +356,7 @@ class RelationBuilderTest extends TestCase
             ->custom(MyCustomRelation::class, ['keys' => ['l1' => 'd1', 'l2' => 'l1'], 'entity' => DistantEntityForCustomRelation::class]);
 
         $expected = [
+            'name' => 'target',
             'type'          => 'custom',
             'relationClass' => MyCustomRelation::class,
             'entity'        => DistantEntityForCustomRelation::class,
@@ -337,6 +364,7 @@ class RelationBuilderTest extends TestCase
         ];
 
         $this->assertEquals(['target' => $expected], $builder->relations());
+        $this->assertEquals([DistantEntityForCustomRelation::class => ['target' => 'target']], $builder->relationClassesToNames());
     }
 
     /**
@@ -349,7 +377,8 @@ class RelationBuilderTest extends TestCase
         $builder->on('target')->null();
 
         $expected = [
-            'type'          => 'null',
+            'name' => 'target',
+            'type' => 'null',
         ];
 
         $this->assertEquals(['target' => $expected], $builder->relations());
@@ -368,6 +397,7 @@ class RelationBuilderTest extends TestCase
         ;
 
         $expected = [
+            'name' => 'target',
             'type'          => 'custom',
             'relationClass' => ForeignInRelation::class,
             'entity'        => EntityForeignIn::class,
@@ -378,6 +408,7 @@ class RelationBuilderTest extends TestCase
 
         $builder->entity(EntityForeignIn::class.'::pk');
         $this->assertEquals('pk', $builder->relations()['target']['distantKey']);
+        $this->assertEquals([EntityForeignIn::class => ['target' => 'target']], $builder->relationClassesToNames());
     }
 
     /**
@@ -393,6 +424,7 @@ class RelationBuilderTest extends TestCase
         ;
 
         $expected = [
+            'name' => 'target',
             'type'          => 'custom',
             'relationClass' => ForeignInRelation::class,
             'localKeys'     => ['k1', 'k2']
@@ -527,5 +559,17 @@ class RelationBuilderTest extends TestCase
         $builder->on('relation1')->hasMany('Entity1::distant')->wrapAs('collection');
 
         $this->assertEquals('collection', $builder['relation1']['wrapper']);
+    }
+    /**
+     *
+     */
+    public function test_relationClassesToNames_with_duplicate()
+    {
+        $builder = new RelationBuilder();
+
+        $builder->on('customer')->belongsTo(Customer::class, 'customerId');
+        $builder->on('owner')->belongsTo(Customer::class, 'ownerId');
+
+        $this->assertEquals([Customer::class => ['customer' => 'customer', 'owner' => 'owner']], $builder->relationClassesToNames());
     }
 }

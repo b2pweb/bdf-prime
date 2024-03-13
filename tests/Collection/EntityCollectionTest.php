@@ -139,6 +139,23 @@ class EntityCollectionTest extends TestCase
     /**
      *
      */
+    public function test_load_with_relation_class()
+    {
+        $collection = new EntityCollection(
+            User::repository(),
+            User::all()
+        );
+
+        $collection->load(Customer::class);
+
+        $this->assertSameEntity($this->pack()->get('customer'), $collection->get(0)->customer);
+        $this->assertSameEntity($this->pack()->get('customer2'), $collection->get(1)->customer);
+        $this->assertSameEntity($this->pack()->get('customer3'), $collection->get(2)->customer);
+    }
+
+    /**
+     *
+     */
     public function test_refresh()
     {
         $collection = new EntityCollection(
@@ -183,6 +200,30 @@ class EntityCollectionTest extends TestCase
     /**
      *
      */
+    public function test_link_with_relation_class_name()
+    {
+        $collection = new EntityCollection(
+            Customer::repository(),
+            Customer::all()
+        );
+
+        $users = $collection->link(User::class, 'users')->all();
+
+        $this->assertEntities([
+            $this->pack()->get('user'),
+            $this->pack()->get('user2'),
+            $this->pack()->get('user3'),
+        ], $users);
+
+        $this->assertEntities([
+            $this->pack()->get('user2'),
+            $this->pack()->get('user3'),
+        ], $collection->link(User::class, 'users')->where('name', ':like', 'User%')->all());
+    }
+
+    /**
+     *
+     */
     public function test_link_belongsToMany()
     {
         $collection = new EntityCollection(
@@ -201,7 +242,7 @@ class EntityCollectionTest extends TestCase
             $this->pack()->get('pack1'),
             $this->pack()->get('pack2'),
             $this->pack()->get('pack3'),
-        ], $collection->link('packs')->distinct()->all());
+        ], $collection->link(Pack::class)->distinct()->all());
 
         $this->assertEntities([
             $this->pack()->get('pack2'),

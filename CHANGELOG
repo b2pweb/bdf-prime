@@ -12,6 +12,7 @@ v2.2.0
     * `Whereable::orWhere()` on first parameter (column)
     * `Whereable::whereNull()`
     * `Whereable::whereNotNull()`
+* Change: Allow usage of entity class name to resolve relations, instead of relation name
 * Feat: Add `Bdf\Prime\Platform\PlatformSpecificOperationInterface` and `PlatformInterface::apply()` to allow changing the behavior on the platform
 * Change: Rework visitors to remove the use of deprecated doctrine visitor API
 

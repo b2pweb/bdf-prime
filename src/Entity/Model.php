@@ -226,7 +226,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * If a relation is already loaded, the entity will be kept
      * You can force loading using reload()
      *
-     * @param string|array $relations
+     * @param string|class-string|array<string|class-string> $relations Relations to load. Can be the relation class, or the relation name
      *
      * @return $this
      * @throws PrimeException
@@ -244,7 +244,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * For loading entity relations
      *
-     * @param string|array $relations
+     * @param string|class-string|array<string|class-string> $relations Relations to load. Can be the relation class, or the relation name
      *
      * @return $this
      * @throws PrimeException
@@ -258,15 +258,28 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     }
 
     /**
-     * Load entity relations
+     * Get the relation with the current entity
      *
-     * @param string $relation
+     * <code>
+     *     // Get the user relation by class name
+     *     $customer->relation(User::class)->where('name', ':like', 'John%')->all();
      *
-     * @return EntityRelation<static, object>
+     *     // When a relation is ambiguous, you can specify the relation name
+     *     $customer->relation(User::class, 'activeUsers')->where('name', ':like', 'John%')->all();
+     *
+     *     // Or directly by relation name (but it's not recommended, because it's not type safe)
+     *     $customer->relation('activeUsers')->where('name', ':like', 'John%')->all();
+     * </code>
+     *
+     * @param class-string<R>|string $relationClass The relation class name, or the relation name
+     * @param string|null $relationName The relation name, to specify if there is multiple relations of the same class
+     *
+     * @return EntityRelation<static, R>
+     * @template R as object
      */
-    public function relation(string $relation): EntityRelation
+    public function relation(string $relationClass, ?string $relationName = null): EntityRelation
     {
-        return static::repository()->onRelation($relation, $this);
+        return static::repository()->onRelation($relationClass, $this, $relationName);
     }
 
     /**

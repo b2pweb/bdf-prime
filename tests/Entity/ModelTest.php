@@ -7,6 +7,7 @@ use Bdf\Prime\Customer;
 use Bdf\Prime\Folder;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
 use Bdf\Prime\Right;
 use Bdf\Prime\TestFile;
 use Bdf\Prime\User;
@@ -494,6 +495,33 @@ class ModelTest extends TestCase
     /**
      *
      */
+    public function test_load_relation_with_relation_class()
+    {
+        $customer = Customer::entity([
+            'id' => 1,
+            'name' => 'customer',
+            'roles' => []
+        ]);
+        $customer->insert();
+
+        User::entity([
+            'id' => 1,
+            'name' => 'user',
+            'roles' => [],
+            'customer' => $customer
+        ])->insert();
+
+
+        $user = User::get(1);
+        $this->assertEquals(null, $user->customer->name);
+
+        $user->load(Customer::class);
+        $this->assertEquals('customer', $user->customer->name);
+    }
+
+    /**
+     *
+     */
     public function test_load_already_load_should_not_reload()
     {
         $customer = Customer::entity([
@@ -515,6 +543,34 @@ class ModelTest extends TestCase
 
         $loadedCustomer = $user->customer;
         $user->load('customer');
+
+        $this->assertSame($loadedCustomer, $user->customer);
+    }
+
+    /**
+     *
+     */
+    public function test_load_by_relation_class_already_load_should_not_reload()
+    {
+        $customer = Customer::entity([
+            'id' => 1,
+            'name' => 'customer',
+            'roles' => []
+        ]);
+        $customer->insert();
+
+        User::entity([
+            'id' => 1,
+            'name' => 'user',
+            'roles' => [],
+            'customer' => $customer
+        ])->insert();
+
+        /** @var User $user */
+        $user = User::with(Customer::class)->findById(1);
+
+        $loadedCustomer = $user->customer;
+        $user->load(Customer::class);
 
         $this->assertSame($loadedCustomer, $user->customer);
     }
@@ -552,6 +608,40 @@ class ModelTest extends TestCase
         $this->assertNotSame($loadedCustomer, $user->customer);
         $this->assertEquals('new name', $user->customer->name);
     }
+
+    /**
+     *
+     */
+    public function test_reload_by_relation_class()
+    {
+        $customer = Customer::entity([
+            'id' => 1,
+            'name' => 'customer',
+            'roles' => []
+        ]);
+        $customer->insert();
+
+        User::entity([
+            'id' => 1,
+            'name' => 'user',
+            'roles' => [],
+            'customer' => $customer
+        ])->insert();
+
+
+        $user = User::get(1);
+
+        $user->reload(Customer::class);
+        $this->assertEquals('customer', $user->customer->name);
+        $loadedCustomer = $user->customer;
+
+        $customer->name = 'new name';
+        $customer->save();
+
+        $user->reload(Customer::class);
+        $this->assertNotSame($loadedCustomer, $user->customer);
+        $this->assertEquals('new name', $user->customer->name);
+    }
     
     /**
      *
@@ -574,6 +664,76 @@ class ModelTest extends TestCase
         
         $customer = $user->relation('customer')->first();
         $this->assertEquals('customer', $customer->name);
+    }
+
+    /**
+     *
+     */
+    public function test_on_relation_by_relation_class()
+    {
+        $customer = Customer::entity([
+            'id' => 1,
+            'name' => 'customer',
+            'roles' => []
+        ]);
+        $user = new User([
+            'id' => 1,
+            'name' => 'user',
+            'roles' => [],
+            'customer' => $customer
+        ]);
+        $customer->insert();
+        $user->insert();
+
+        $customer = $user->relation(Customer::class)->query()->first();
+        $this->assertEquals('customer', $customer->name);
+    }
+
+    /**
+     *
+     */
+    public function test_on_relation_by_relation_class_ambiguous()
+    {
+        $this->expectException(RelationNotFoundException::class);
+        $this->expectExceptionMessage('Multiple relations found for class "Bdf\Prime\User" in Bdf\Prime\Customer. Please specify the relation name (available relations: users, webUsers)');
+
+        $customer = new Customer([
+            'id' => 1,
+            'name' => 'customer',
+            'roles' => []
+        ]);
+        $user = new User([
+            'id' => 1,
+            'name' => 'user',
+            'roles' => [],
+            'customer' => $customer
+        ]);
+        $customer->insert();
+        $user->insert();
+
+        $customer->relation(User::class)->query()->all();
+    }
+
+    /**
+     *
+     */
+    public function test_on_relation_by_relation_class_and_relation_name()
+    {
+        $customer = new Customer([
+            'id' => 1,
+            'name' => 'customer',
+            'roles' => []
+        ]);
+        $user = new User([
+            'id' => 1,
+            'name' => 'user',
+            'roles' => [],
+            'customer' => $customer
+        ]);
+        $customer->insert();
+        $user->insert();
+
+        $this->assertEquals([$user], $customer->relation(User::class, 'users')->query()->with(Customer::class)->all());
     }
 
     /**
