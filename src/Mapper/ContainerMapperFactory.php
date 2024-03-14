@@ -5,6 +5,7 @@ namespace Bdf\Prime\Mapper;
 use Bdf\Prime\Cache\CacheInterface;
 use Bdf\Prime\Mapper\NameResolver\ResolverInterface;
 use Bdf\Prime\ServiceLocator;
+use Psr\Clock\ClockInterface;
 use Psr\Container\ContainerInterface;
 use Psr\SimpleCache\CacheInterface as Psr16CacheInterface;
 
@@ -18,9 +19,9 @@ final class ContainerMapperFactory extends MapperFactory
 {
     private ContainerInterface $container;
 
-    public function __construct(ContainerInterface $container, ResolverInterface $nameResolver = null, Psr16CacheInterface $metadataCache = null, CacheInterface $resultCache = null)
+    public function __construct(ContainerInterface $container, ?ResolverInterface $nameResolver = null, ?Psr16CacheInterface $metadataCache = null, ?CacheInterface $resultCache = null, ?ClockInterface $clock = null)
     {
-        parent::__construct($nameResolver, $metadataCache, $resultCache);
+        parent::__construct($nameResolver, $metadataCache, $resultCache, $clock);
 
         $this->container = $container;
     }
