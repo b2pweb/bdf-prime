@@ -3,11 +3,13 @@
 namespace Bdf\Prime\Mapper;
 
 use Bdf\Prime\Cache\CacheInterface;
+use Bdf\Prime\Clock\NativeClock;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
 use Bdf\Prime\Entity\Hydrator\MapperHydratorInterface;
 use Bdf\Prime\Mapper\NameResolver\ResolverInterface;
 use Bdf\Prime\Mapper\NameResolver\SuffixResolver;
 use Bdf\Prime\ServiceLocator;
+use Psr\Clock\ClockInterface;
 use Psr\SimpleCache\CacheInterface as Psr16CacheInterface;
 
 use function is_subclass_of;
@@ -22,17 +24,19 @@ abstract class AbstractMapperFactory implements MapperFactoryInterface
     private ResolverInterface $nameResolver;
     private ?Psr16CacheInterface $metadataCache;
     private ?CacheInterface $resultCache;
+    private ?ClockInterface $clock;
 
     /**
      * @param ResolverInterface|null $nameResolver
      * @param Psr16CacheInterface|null $metadataCache
      * @param CacheInterface|null $resultCache
      */
-    public function __construct(ResolverInterface $nameResolver = null, Psr16CacheInterface $metadataCache = null, CacheInterface $resultCache = null)
+    public function __construct(?ResolverInterface $nameResolver = null, ?Psr16CacheInterface $metadataCache = null, ?CacheInterface $resultCache = null, ?ClockInterface $clock = null)
     {
         $this->nameResolver = $nameResolver ?? new SuffixResolver();
         $this->metadataCache = $metadataCache;
         $this->resultCache = $resultCache;
+        $this->clock = $clock ?? NativeClock::instance();
     }
 
     /**
@@ -80,6 +84,7 @@ abstract class AbstractMapperFactory implements MapperFactoryInterface
 
         $mapper->setEntityClass($entityClass);
         $mapper->setHydrator($hydrator);
+        $mapper->setClock($this->clock);
 
         if ($metadata) {
             $mapper->setMetadata($metadata);

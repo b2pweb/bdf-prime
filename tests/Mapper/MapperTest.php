@@ -2,7 +2,10 @@
 
 namespace Bdf\Prime\Mapper;
 
+use _files\TestClock;
+use Bdf\Prime\Behaviors\Behavior;
 use Bdf\Prime\Bench\HydratorGeneration;
+use Bdf\Prime\Clock\ClockAwareInterface;
 use Bdf\Prime\Customer;
 use Bdf\Prime\CustomerCriteria;
 use Bdf\Prime\CustomerMapper;
@@ -12,6 +15,8 @@ use Bdf\Prime\Entity\Hydrator\HydratorGeneratedInterface;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
 use Bdf\Prime\Entity\Hydrator\MapperHydratorInterface;
 use Bdf\Prime\Exception\DBALException;
+use Bdf\Prime\IdGenerators\AbstractGenerator;
+use Bdf\Prime\IdGenerators\GeneratorInterface;
 use Bdf\Prime\IdGenerators\GuidGenerator;
 use Bdf\Prime\IdGenerators\NullGenerator;
 use Bdf\Prime\IdGenerators\TableGenerator;
@@ -27,6 +32,7 @@ use Bdf\Prime\TestEntityMapper;
 use Bdf\Prime\User;
 use Doctrine\DBAL\Exception\NotNullConstraintViolationException;
 use PHPUnit\Framework\TestCase;
+use Psr\Clock\ClockInterface;
 
 /**
  *
@@ -336,6 +342,78 @@ class MapperTest extends TestCase
         $mapper->setGenerator(new \Bdf\Prime\IdGenerators\GuidGenerator($mapper));
         
         $this->assertInstanceOf(GuidGenerator::class, $mapper->generator());
+    }
+
+    /**
+     *
+     */
+    public function test_set_generator_clock_aware()
+    {
+        $generator = new class extends AbstractGenerator implements ClockAwareInterface {
+            public $clock;
+
+            public function setClock(ClockInterface $clock): void
+            {
+                $this->clock = $clock;
+            }
+        };
+
+        $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->setClock($clock = new TestClock());
+        $mapper->build();
+        $mapper->setGenerator($generator);
+
+        $this->assertSame($generator, $mapper->generator());
+        $this->assertSame($clock, $generator->clock);
+    }
+
+    /**
+     *
+     */
+    public function test_set_generator_clockaware_without_clock()
+    {
+        $generator = new class extends AbstractGenerator implements ClockAwareInterface {
+            public $clock;
+
+            public function setClock(ClockInterface $clock): void
+            {
+                $this->clock = $clock;
+            }
+        };
+
+        $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
+        $mapper->setGenerator($generator);
+
+        $this->assertSame($generator, $mapper->generator());
+        $this->assertNull($generator->clock);
+    }
+
+    /**
+     *
+     */
+    public function test_set_generator_classname_clock_aware()
+    {
+        $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->setClock($clock = new TestClock());
+        $mapper->build();
+        $mapper->setGenerator(MyClockAwareGenerator::class);
+
+        $this->assertInstanceOf(MyClockAwareGenerator::class, $mapper->generator());
+        $this->assertSame($clock, $mapper->generator()->clock);
+    }
+
+    /**
+     *
+     */
+    public function test_set_generator_classname_clock_aware_without_clock()
+    {
+        $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
+        $mapper->setGenerator(MyClockAwareGenerator::class);
+
+        $this->assertInstanceOf(MyClockAwareGenerator::class, $mapper->generator());
+        $this->assertNull($mapper->generator()->clock);
     }
 
     /**
@@ -684,6 +762,16 @@ class MapperTest extends TestCase
         $this->assertSame(CustomerCriteria::class, get_class($mapper->criteria()));
     }
 
+    public function test_with_clockaware_behavior()
+    {
+        $mapper = new MapperWithClockAwareBehavior(Prime::service(), TestEntity::class);
+        $this->assertNull($mapper->behaviors()[0]->clock);
+
+        $mapper = new MapperWithClockAwareBehavior(Prime::service(), TestEntity::class);
+        $mapper->setClock($clock = new TestClock());
+        $this->assertSame($clock, $mapper->behaviors()[0]->clock);
+    }
+
     /**
      * @return HydratorGeneratedInterface[]
      */
@@ -750,6 +838,36 @@ class LegacyMapper extends Mapper
                 'localKey'   => 'foreign.id',
                 'distantKey' => 'id',
             ]
+        ];
+    }
+}
+
+class MyClockAwareGenerator extends AbstractGenerator implements ClockAwareInterface
+{
+    public $clock;
+
+    public function setClock(ClockInterface $clock): void
+    {
+        $this->clock = $clock;
+    }
+}
+
+class MyClockAwareBehavior extends Behavior implements ClockAwareInterface
+{
+    public $clock;
+
+    public function setClock(ClockInterface $clock): void
+    {
+        $this->clock = $clock;
+    }
+}
+
+class MapperWithClockAwareBehavior extends TestEntityMapper
+{
+    public function getDefinedBehaviors(): array
+    {
+        return [
+            new MyClockAwareBehavior(),
         ];
     }
 }
