@@ -122,6 +122,20 @@ class WalkerTest extends TestCase
     /**
      * @dataProvider provideStrategies
      */
+    public function test_iterator_with_projection($strategy)
+    {
+        $entities = $this->insertEntities(15);
+
+        $walker = new Walker(TestEntity::builder()->select(['id', 'name']), 3);
+        $walker->setStrategy($this->$strategy());
+
+        $actual = iterator_to_array(new Walker(TestEntity::builder()->order('id', 'DESC')->select(['id', 'name'])));
+        $this->assertEquals(array_reverse($entities), $actual);
+    }
+
+    /**
+     * @dataProvider provideStrategies
+     */
     public function test_getters($strategy)
     {
         $entities = $this->insertEntities(15);
@@ -193,6 +207,20 @@ class WalkerTest extends TestCase
         $this->expectExceptionMessage('KeyWalkStrategy is not supported by this query');
 
         $walker = new Walker(TestEntity::builder(), 3, 3);
+        $walker->setStrategy(new KeyWalkStrategy(new MapperPrimaryKey(TestEntity::mapper())));
+
+        iterator_to_array($walker);
+    }
+
+    /**
+     *
+     */
+    public function test_unsupported_missing_projection_key_for_key_walk_strategy()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('KeyWalkStrategy is not supported by this query');
+
+        $walker = new Walker(TestEntity::builder()->select('name', 'foreign'));
         $walker->setStrategy(new KeyWalkStrategy(new MapperPrimaryKey(TestEntity::mapper())));
 
         iterator_to_array($walker);
