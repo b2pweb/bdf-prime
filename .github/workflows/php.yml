@@ -58,8 +58,7 @@ jobs:
     # Docs: https://getcomposer.org/doc/articles/scripts.md
 
     - name: Run test suite
-      #run: composer run-script tests
-      run: vendor/bin/phpunit --debug
+      run: composer run-script tests
 
   analysis:
     name: Analysis
