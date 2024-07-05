@@ -61,7 +61,7 @@ jobs:
       run: composer run-script tests
 
     - name: Enable debug session
-      if: runner.debug == '1'
+      if: ${{ failure() && runner.debug == '1' }}
       uses: lhotari/action-upterm@v1
       with:
         limit-access-to-actor: true
