@@ -10,6 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         php-versions: ['7.4', '8.0', '8.1', '8.2', '8.3']
     name: PHP ${{ matrix.php-versions }}
@@ -57,7 +58,8 @@ jobs:
     # Docs: https://getcomposer.org/doc/articles/scripts.md
 
     - name: Run test suite
-      run: composer run-script tests
+      #run: composer run-script tests
+      run: vendor/bin/phpunit --debug
 
   analysis:
     name: Analysis
