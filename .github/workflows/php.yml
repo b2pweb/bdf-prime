@@ -60,6 +60,13 @@ jobs:
     - name: Run test suite
       run: composer run-script tests
 
+    - name: Enable debug session
+      if: runner.debug == '1'
+      uses: lhotari/action-upterm@v1
+      with:
+        limit-access-to-actor: true
+        wait-timeout-minutes: 5
+
   analysis:
     name: Analysis
     runs-on: ubuntu-latest
