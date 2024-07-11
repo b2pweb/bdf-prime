@@ -134,20 +134,16 @@ class OrmPreprocessor implements PreprocessorInterface
                 $this->aliasResolver->setAllowUnknownAttribute($compilerQuery->isAllowUnknownAttribute());
             }
 
-            if ($clause->state()->needsCompile('from')) {
-                if ($needReset) {
-                    $this->aliasResolver->reset();
-                }
-
-                foreach ($compilerQuery->statements['tables'] as &$table) {
-                    $table['alias'] = $this->aliasResolver->registerMetadata($table['table'], $table['alias']);
-                }
+            if ($needReset) {
+                $this->aliasResolver->reset();
             }
 
-            if ($clause->state()->needsCompile('joins')) {
-                foreach ($compilerQuery->statements['joins'] as &$join) {
-                    $join['alias'] = $this->aliasResolver->registerMetadata($join['table'], $join['alias']);
-                }
+            foreach ($compilerQuery->statements['tables'] as &$table) {
+                $table['alias'] = $this->aliasResolver->registerMetadata($table['table'], $table['alias']);
+            }
+
+            foreach ($compilerQuery->statements['joins'] as &$join) {
+                $join['alias'] = $this->aliasResolver->registerMetadata($join['table'], $join['alias']);
             }
 
             return $compilerQuery;

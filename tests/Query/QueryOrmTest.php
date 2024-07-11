@@ -26,6 +26,7 @@ use Doctrine\DBAL\Cache\ArrayResult;
 use Doctrine\DBAL\Result;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Query\Pagination\EntityWithConstraint;
 
 /**
  *
@@ -1256,5 +1257,16 @@ class QueryOrmTest extends TestCase
         ], $this->query
             ->filter(fn (TestEntity $entity) => $entity->id === 42 && $entity->name === 'Robert')
             ->toCriteria());
+    }
+
+    /**
+     * @see FRAM-169
+     */
+    public function test_reuse_query_with_constraint_should_always_add_constraints()
+    {
+        $query = EntityWithConstraint::repository()->builder();
+
+        $this->assertEquals('SELECT t0.* FROM entity_with_constraint t0 WHERE t0.enabled = ?', $query->toSql());
+        $this->assertEquals('SELECT t0.* FROM entity_with_constraint t0 WHERE t0.name = ? AND (t0.enabled = ?)', $query->where('name', '')->toSql());
     }
 }
