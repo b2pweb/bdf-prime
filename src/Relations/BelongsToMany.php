@@ -300,10 +300,14 @@ class BelongsToMany extends Relation
             $throughEntities[$throughLocal][$throughDistant] = $throughDistant;
         }
 
-        $relations = $this->relationQuery($throughDistants, $constraints)
-            ->with($with)
-            ->without($without)
-            ->all();
+        if ($throughDistants !== []) {
+            $relations = $this->relationQuery($throughDistants, $constraints)
+                ->with($with)
+                ->without($without)
+                ->all();
+        } else {
+            $relations = [];
+        }
 
         return [
             'throughEntities' => $throughEntities,

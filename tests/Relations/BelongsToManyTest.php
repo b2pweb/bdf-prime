@@ -20,6 +20,7 @@ use Bdf\Prime\Project;
 use Bdf\Prime\ProjectIntegrator;
 use Bdf\Prime\Test\RepositoryAssertion;
 use Bdf\Prime\UserGroup;
+use Doctrine\DBAL\Logging\DebugStack;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -106,6 +107,29 @@ class BelongsToManyTest extends TestCase
 
         $this->assertEquals([$pack, $pack2], $customer->packs);
         $this->assertTrue($this->relation->isLoaded($customer));
+    }
+
+    /**
+     *
+     */
+    public function test_load_without_relation_should_not_execute_relation_query()
+    {
+        $customer = new Customer([
+            'id'            => '124',
+            'name'          => 'Customer2',
+        ]);
+        $this->getTestPack()->nonPersist($customer);
+
+        $this->prime()->connection('test')->getConfiguration()->setSQLLogger($logger = new DebugStack());
+        $customer->load('packs');
+
+        // @todo the load flag should be set to true, and relation property should be set to an empty array
+        //$this->assertSame([], $customer->packs);
+        //$this->assertTrue($this->relation->isLoaded($customer));
+
+        $this->assertCount(1, $logger->queries);
+        $this->assertEquals('SELECT customer_id as customerId, pack_id as packId FROM customer_pack_ WHERE customer_id = ?', $logger->queries[1]['sql']);
+        $this->assertEquals([1 => '124'], $logger->queries[1]['params']);
     }
 
     /**
