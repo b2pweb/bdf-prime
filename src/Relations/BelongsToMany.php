@@ -13,6 +13,9 @@ use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryInterface;
 
+use function array_diff_key;
+use function count;
+
 /**
  * BelongsToMany
  *
@@ -329,12 +332,19 @@ class BelongsToMany extends Relation
                 }
             }
 
-            if (empty($entities)) {
-                continue;
-            }
-
             foreach ($collection[$key] as $local) {
                 $this->setRelation($local, $entities);
+            }
+        }
+
+        // Some relations are missing : so we set an empty array
+        if (count($collection) > count($relations['throughEntities'])) {
+            $missing = array_diff_key($collection, $relations['throughEntities']);
+
+            foreach ($missing as $locals) {
+                foreach ($locals as $local) {
+                    $this->setRelation($local, []);
+                }
             }
         }
     }

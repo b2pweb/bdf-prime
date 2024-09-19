@@ -123,13 +123,59 @@ class BelongsToManyTest extends TestCase
         $this->prime()->connection('test')->getConfiguration()->setSQLLogger($logger = new DebugStack());
         $customer->load('packs');
 
-        // @todo the load flag should be set to true, and relation property should be set to an empty array
-        //$this->assertSame([], $customer->packs);
-        //$this->assertTrue($this->relation->isLoaded($customer));
+        $this->assertSame([], $customer->packs);
+        $this->assertTrue($this->relation->isLoaded($customer));
 
         $this->assertCount(1, $logger->queries);
         $this->assertEquals('SELECT customer_id as customerId, pack_id as packId FROM customer_pack_ WHERE customer_id = ?', $logger->queries[1]['sql']);
         $this->assertEquals([1 => '124'], $logger->queries[1]['params']);
+    }
+
+    /**
+     *
+     */
+    public function test_load_collection()
+    {
+        $this->getTestPack()->nonPersist([
+            $withoutPack = new Customer([
+                'id'            => '124',
+                'name'          => 'Without pack',
+            ]),
+            $withPacks = new Customer([
+                'id'            => '125',
+                'name'          => 'Without pack',
+            ]),
+            new CustomerPack([
+                'customerId' => '125',
+                'packId' => 1,
+            ]),
+            new CustomerPack([
+                'customerId' => '125',
+                'packId' => 4,
+            ]),
+        ]);
+
+        $customers = Customer::collection([
+            $this->getTestPack()->get('customer'),
+            $withoutPack,
+            $withPacks,
+        ]);
+        $customers->load('packs');
+
+        $this->assertTrue($this->relation->isLoaded($customers[0]));
+        $this->assertTrue($this->relation->isLoaded($customers[1]));
+        $this->assertTrue($this->relation->isLoaded($customers[2]));
+
+        $this->assertEquals([
+            $this->getTestPack()->get('pack-referencement'),
+            $this->getTestPack()->get('pack-classic'),
+        ], $customers[0]->packs);
+        $this->assertSame([], $customers[1]->packs);
+        $this->assertEquals([
+            $this->getTestPack()->get('pack-referencement'),
+            $this->getTestPack()->get('pack-empty2'),
+        ], $customers[2]->packs);
+        $this->assertSame($customers[0]->packs[0], $customers[2]->packs[0]);
     }
 
     /**
