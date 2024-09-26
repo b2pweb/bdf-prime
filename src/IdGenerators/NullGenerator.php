@@ -2,10 +2,14 @@
 
 namespace Bdf\Prime\IdGenerators;
 
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\ServiceLocator;
 
 /**
  * NullGenerator
+ *
+ * @template C as ConnectionInterface
+ * @extends AbstractGenerator<C>
  */
 class NullGenerator extends AbstractGenerator
 {

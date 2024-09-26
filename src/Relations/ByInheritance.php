@@ -45,6 +45,7 @@ class ByInheritance extends AbstractRelation
 
         $mapper = $local->mapper();
 
+        /** @psalm-suppress RedundantCondition */
         if (!$mapper instanceof SingleTableInheritanceMapper) {
             throw new LogicException('The mapper could not manage single table inheritance relation');
         }

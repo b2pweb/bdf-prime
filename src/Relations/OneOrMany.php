@@ -22,6 +22,8 @@ use function array_intersect_key;
  * @template R as object
  *
  * @extends Relation<L, R>
+ *
+ * @property RepositoryInterface<R> $distant
  */
 abstract class OneOrMany extends Relation
 {

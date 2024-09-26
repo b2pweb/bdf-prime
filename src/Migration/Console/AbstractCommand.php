@@ -26,7 +26,7 @@ abstract class AbstractCommand extends Command
     {
         $this->manager = $manager;
 
-        parent::__construct(static::$defaultName);
+        parent::__construct(static::$defaultName ?? null);
     }
 
     /**

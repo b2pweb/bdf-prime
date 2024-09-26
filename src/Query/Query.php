@@ -37,6 +37,25 @@ use Stringable;
  * @extends AbstractQuery<C, R>
  * @implements SqlQueryInterface<C, R>
  * @implements Paginable<R>
+ *
+ * @property array{
+ *     ignore: bool|null,
+ *     replace: bool|null,
+ *     values: array,
+ *     columns: array,
+ *     distinct: bool|null,
+ *     tables: array,
+ *     joins: array,
+ *     where: array,
+ *     groups: list<string>,
+ *     having: array,
+ *     orders: array,
+ *     limit: int|null,
+ *     offset: int|null,
+ *     aggregate: array|null,
+ *     lock: int|null,
+ *     ...
+ * } $statements
  */
 class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Stringable
 {

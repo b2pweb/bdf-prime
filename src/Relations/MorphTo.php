@@ -11,8 +11,15 @@ use Bdf\Prime\Query\ReadCommandInterface;
 use InvalidArgumentException;
 use LogicException;
 
+use function is_object;
+
 /**
  * MorphTo
+ *
+ * @template L as object
+ * @template R as object
+ *
+ * @extends BelongsTo<L, R>
  */
 class MorphTo extends BelongsTo
 {
@@ -91,7 +98,7 @@ class MorphTo extends BelongsTo
      */
     public function link($owner): ReadCommandInterface
     {
-        if (is_array($owner)) {
+        if (!is_object($owner)) {
             throw new InvalidArgumentException('MorphTo relation do not supports querying on collection');
         }
 
@@ -173,6 +180,7 @@ class MorphTo extends BelongsTo
      */
     protected function loadDistantFrom($entity): void
     {
+        /** @psalm-suppress InvalidArgument */
         $this->updateDiscriminatorValue($entity);
 
         $this->updateDistantInfos();
@@ -188,6 +196,7 @@ class MorphTo extends BelongsTo
         $infos = $this->map($this->discriminatorValue);
 
         if ($infos) {
+            /** @psalm-suppress InvalidPropertyAssignmentValue */
             $this->distant = $this->local->repository($infos['entity']);
             $this->distantKey = $infos['distantKey'];
             $this->setConstraints($infos['constraints'] ?? []);

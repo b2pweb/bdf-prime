@@ -36,6 +36,8 @@ use Bdf\Prime\Repository\RepositoryInterface;
  * @template R as object
  *
  * @extends Relation<L, R>
+ *
+ * @property EntityRepository<R> $distant
  */
 class BelongsToMany extends Relation
 {

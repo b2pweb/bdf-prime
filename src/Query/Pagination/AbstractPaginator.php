@@ -26,6 +26,7 @@ use IteratorAggregate;
  *
  * @template R as array|object
  * @implements PaginatorInterface<R>
+ * @implements IteratorAggregate<R>
  */
 abstract class AbstractPaginator extends PrimeSerializable implements PaginatorInterface, IteratorAggregate
 {
