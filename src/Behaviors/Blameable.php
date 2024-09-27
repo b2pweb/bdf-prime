@@ -160,7 +160,7 @@ class Blameable extends Behavior
     public function beforeUpdate($entity, RepositoryInterface $repository, $attributes): void
     {
         if ($attributes !== null) {
-            $attributes[] = $this->updatedBy['name'];
+            $attributes->append($this->updatedBy['name']);
         }
 
         $resolver = $this->userResolver;

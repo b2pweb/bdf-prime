@@ -148,7 +148,7 @@ final class Timestampable extends Behavior
     public function beforeUpdate($entity, RepositoryInterface $repository, $attributes): void
     {
         if ($attributes !== null) {
-            $attributes[] = $this->updatedAt['name'];
+            $attributes->append($this->updatedAt['name']);
         }
 
         $now = $this->createDate($this->updatedAt['name'], $repository);

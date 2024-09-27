@@ -136,6 +136,7 @@ final class NamedIndex implements IndexInterface
             return false;
         }
 
+        /** @psalm-suppress TypeDoesNotContainType */
         if (!is_string($name)) {
             return false;
         }

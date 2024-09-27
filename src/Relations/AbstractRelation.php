@@ -16,6 +16,8 @@ use Bdf\Prime\Relations\Info\NullRelationInfo;
 use Bdf\Prime\Relations\Info\RelationInfoInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 
+use function is_object;
+
 /**
  * Base class for define common methods for relations
  *
@@ -50,7 +52,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * The distant repository
      *
-     * @var RepositoryInterface<R>
+     * @var RepositoryInterface<R>|null
      */
     protected $distant;
 
@@ -384,6 +386,7 @@ abstract class AbstractRelation implements RelationInterface
             return $relation->all();
         }
 
+        /** @var R */
         return $relation;
     }
 
@@ -497,12 +500,13 @@ abstract class AbstractRelation implements RelationInterface
                 continue; // The owner has no relation : skip
             }
 
-            if (is_array($relationValue)) {
-                foreach ($relationValue as $entity) {
-                    $indexer->push($entity);
-                }
-            } else {
+            if (is_object($relationValue)) {
                 $indexer->push($relationValue);
+                continue;
+            }
+
+            foreach ($relationValue as $entity) {
+                $indexer->push($entity);
             }
         }
 

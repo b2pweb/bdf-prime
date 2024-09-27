@@ -4,7 +4,6 @@ namespace Bdf\Prime\Query\Expression;
 
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
-
 use Bdf\Prime\Types\TypeInterface;
 
 use function count;

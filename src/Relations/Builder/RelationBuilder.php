@@ -28,7 +28,8 @@ use IteratorAggregate;
  *     constraints?: array|callable,
  *     detached?: bool,
  *     saveStrategy?: int,
- *     wrapper?: string|callable
+ *     wrapper?: string|callable,
+ *     ...
  * }
  *
  * @implements ArrayAccess<string, RelationDefinition>

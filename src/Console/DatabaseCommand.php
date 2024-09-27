@@ -52,7 +52,7 @@ abstract class DatabaseCommand extends Command
         $this->registry = $registry;
         $this->connectionFactory = $connectionFactory;
 
-        parent::__construct(static::$defaultName);
+        parent::__construct(static::$defaultName ?? null);
     }
 
     /**
@@ -89,6 +89,7 @@ abstract class DatabaseCommand extends Command
 
             // Skip connections marked as "ignore" on configuration
             // Permit to declare SQLite connections, which do not supports database management
+            /** @psalm-suppress InvalidArrayOffset */
             if (!empty($parameters['ignore'])) {
                 $this->io->line('Connection <comment>%s</comment> is ignored.', $connectionName);
                 continue;

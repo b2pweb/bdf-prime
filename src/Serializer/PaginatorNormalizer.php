@@ -16,6 +16,8 @@ use Bdf\Serializer\Type\Type;
 
 /**
  * Class PaginatorNormalizer
+ *
+ * @implements NormalizerInterface<PaginatorInterface>
  */
 class PaginatorNormalizer implements NormalizerInterface, AutoRegisterInterface
 {

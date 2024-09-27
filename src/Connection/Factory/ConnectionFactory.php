@@ -55,7 +55,7 @@ class ConnectionFactory implements ConnectionFactoryInterface
     /**
      * Create the instance of the connection
      *
-     * @param array{wrapperClass?: class-string<T>} $parameters
+     * @param array{wrapperClass?: class-string<T>, ...} $parameters
      * @param Configuration|null $config
      * @param EventManager|null $eventManager The event manager, optional.
      *

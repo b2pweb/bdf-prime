@@ -18,6 +18,9 @@ use TypeError;
  * Base implementation for @see MapperHydratorInterface
  *
  * Prefer use generated hydrators on production
+ *
+ * @template E as object
+ * @implements MapperHydratorInterface<E>
  */
 class MapperHydrator implements MapperHydratorInterface
 {
