@@ -8,6 +8,9 @@ use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Query;
 use Bdf\Prime\Sharding\Extension\ShardPicker;
 
+use function array_sum;
+use function count;
+
 /**
  * ShardingQuery
  *
@@ -147,7 +150,7 @@ class ShardingQuery extends Query
     {
         $numbers = $this->aggregate(__FUNCTION__, $column);
 
-        return array_sum($numbers)/count($numbers);
+        return array_sum($numbers) / count($numbers);
     }
 
     /**

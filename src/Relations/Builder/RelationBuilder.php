@@ -29,7 +29,8 @@ use IteratorAggregate;
  *     constraints?: array|callable,
  *     detached?: bool,
  *     saveStrategy?: int,
- *     wrapper?: string|callable
+ *     wrapper?: string|callable,
+ *     ...
  * }
  *
  * @implements ArrayAccess<string, RelationDefinition>
@@ -308,12 +309,16 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      * </code>
      *
      * @param class-string<CustomRelationInterface> $relationClass The relation class name
-     * @param array $options The relation options
+     * @param array{entity?: class-string, ...array<string, mixed>} $options The relation options
      *
      * @return $this
      */
     public function custom(string $relationClass, array $options = []): self
     {
+        if ($this->current === null) {
+            throw new \LogicException('on() method must be called before adding a relation');
+        }
+
         $this->relations[$this->current] = ['name' => $this->current, 'type' => RelationInterface::CUSTOM, 'relationClass' => $relationClass] + $options;
 
         if ($entity = $options['entity'] ?? null) {
@@ -359,6 +364,10 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      */
     public function entity(string $entity): self
     {
+        if ($this->current === null) {
+            throw new \LogicException('on() method must be called before adding a relation');
+        }
+
         list($entity, $foreignKey) = Relation::parseEntity($entity);
 
         $this->relations[$this->current]['entity'] = $entity;
@@ -396,12 +405,16 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @param string $type      Type of relation
      * @param string $key
-     * @param array  $options
+     * @param array{entity?: class-string, ...array<string, mixed>}  $options
      *
      * @return $this
      */
     protected function add(string $type, string $key, array $options = []): self
     {
+        if ($this->current === null) {
+            throw new \LogicException('on() method must be called before adding a relation');
+        }
+
         if (($this->relations[$this->current]['type'] ?? null) === RelationInterface::BY_INHERITANCE) {
             // Inherit from previous relation configuration
             $this->relations[$this->current] = ['name' => $this->current, 'type' => $type, 'localKey' => $key] + $options + $this->relations[$this->current];

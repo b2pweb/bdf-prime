@@ -10,6 +10,8 @@ use IteratorAggregate;
 /**
  * Aggregation of query results
  * This class handle results of multiple shards query
+ *
+ * @implements IteratorAggregate<array<string, mixed>>
  */
 final class MultiResult implements IteratorAggregate, DriverResult
 {

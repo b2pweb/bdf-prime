@@ -400,6 +400,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      *
      * @return EntityRelation<E, R>
      * @template R as object
+     *
+     * @psalm-suppress InvalidReturnStatement
+     * @psalm-suppress InvalidReturnType
      */
     public function onRelation(string $relationClass, $entity, ?string $relationName = null): EntityRelation
     {

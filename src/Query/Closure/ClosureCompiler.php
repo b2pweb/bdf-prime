@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query\Closure;
 
 use Bdf\Prime\Query\Closure\Filter\AndFilter;
+use Bdf\Prime\Query\Closure\Filter\AtomicFilter;
 use Bdf\Prime\Query\Closure\Filter\OrFilter;
 use Bdf\Prime\Query\Contract\Whereable;
 use Bdf\Prime\Repository\RepositoryInterface;
@@ -16,9 +17,7 @@ use PhpParser\ParserFactory;
 use Psr\SimpleCache\CacheInterface;
 use ReflectionFunction;
 use ReflectionNamedType;
-
 use ReflectionType;
-
 use ReflectionUnionType;
 
 use function count;
@@ -217,11 +216,18 @@ final class ClosureCompiler
                 continue;
             }
 
-            $filters[] = [
-                $subFilters[0]->property,
-                $subFilters[0]->operator,
-                $subFilters[0]->value->get($reflection)
-            ];
+            $subFilter = $subFilters[0];
+
+            if ($subFilter instanceof AtomicFilter) {
+                $filters[] = [
+                    $subFilter->property,
+                    $subFilter->operator,
+                    $subFilter->value->get($reflection)
+                ];
+                continue;
+            }
+
+            $filters[] = [$this->normalizeOrFilters($reflection, $subFilter), null, null];
         }
 
         return new NestedFilters($filters, CompositeExpression::TYPE_OR);

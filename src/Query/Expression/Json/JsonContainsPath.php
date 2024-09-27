@@ -3,7 +3,7 @@
 namespace Bdf\Prime\Query\Expression\Json;
 
 use Bdf\Prime\Platform\Sql\SqlPlatform;
-use Bdf\Prime\Query\CompilableClause as Q;
+use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 use Bdf\Prime\Query\Expression\AbstractPlatformSpecificExpression;
@@ -20,6 +20,11 @@ use LogicException;
  * <code>
  *     $query->whereRaw(new JsonContainsPath('json_field', '$.bar')); // Search rows that contains has the "bar" field the json_field
  * </code>
+ *
+ * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\Contract\Compilable
+ * @template C as object
+ *
+ * @extends AbstractPlatformSpecificExpression<Q, C>
  */
 final class JsonContainsPath extends AbstractPlatformSpecificExpression
 {
@@ -39,7 +44,7 @@ final class JsonContainsPath extends AbstractPlatformSpecificExpression
         $this->path = $path;
     }
 
-    protected function buildForSqlite(Q $query, CompilerInterface $compiler, SqlPlatform $platform, SqlitePlatform $grammar): string
+    protected function buildForSqlite(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, SqlitePlatform $grammar): string
     {
         if (!$compiler instanceof QuoteCompilerInterface) {
             throw new LogicException('JsonContainsPath expression is not supported by the current compiler');
@@ -52,7 +57,7 @@ final class JsonContainsPath extends AbstractPlatformSpecificExpression
         );
     }
 
-    protected function buildForGenericSql(Q $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractPlatform $grammar): string
+    protected function buildForGenericSql(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractPlatform $grammar): string
     {
         if (!$compiler instanceof QuoteCompilerInterface) {
             throw new LogicException('JsonContainsPath expression is not supported by the current compiler');
@@ -71,7 +76,7 @@ final class JsonContainsPath extends AbstractPlatformSpecificExpression
      * @return string
      * @throws \Bdf\Prime\Exception\PrimeException
      */
-    private function target(Q $query, CompilerInterface $compiler)
+    private function target(CompilableClause $query, CompilerInterface $compiler)
     {
         return $this->target instanceof ExpressionInterface
             ? $this->target->build($query, $compiler)

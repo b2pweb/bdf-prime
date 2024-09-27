@@ -13,7 +13,7 @@ use Doctrine\DBAL\Platforms\SqlitePlatform;
  * Use {@see SqlPlatformOperationTrait} to implement this interface
  *
  * @template R
- * @implements PlatformSpecificOperationInterface<R>
+ * @extends PlatformSpecificOperationInterface<R>
  */
 interface SqlPlatformOperationInterface extends PlatformSpecificOperationInterface
 {

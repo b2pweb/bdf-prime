@@ -3,7 +3,7 @@
 namespace Bdf\Prime\Query\Expression\Json;
 
 use Bdf\Prime\Platform\Sql\SqlPlatform;
-use Bdf\Prime\Query\CompilableClause as Q;
+use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 use Bdf\Prime\Query\Expression\AbstractPlatformSpecificExpression;
@@ -28,6 +28,11 @@ use function json_encode;
  *     $query->whereRaw(new JsonContains('json_field', 'value')); // Search rows that contains the value "value" in the json_field
  *     $query->whereRaw(new JsonContains(new JsonExtract('json_field', '$.tags', false), 'value')); // Search from a nested field "tags". Note that the value is not unquoted
  * </code>
+ *
+ * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\Contract\Compilable
+ * @template C as object
+ *
+ * @extends AbstractPlatformSpecificExpression<Q, C>
  */
 final class JsonContains extends AbstractPlatformSpecificExpression
 {
@@ -58,7 +63,7 @@ final class JsonContains extends AbstractPlatformSpecificExpression
     /**
      * {@inheritdoc}
      */
-    protected function buildForSqlite(Q $query, CompilerInterface $compiler, SqlPlatform $platform, SqlitePlatform $grammar): string
+    protected function buildForSqlite(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, SqlitePlatform $grammar): string
     {
         if (!$compiler instanceof QuoteCompilerInterface) {
             throw new LogicException('JsonContains expression is not supported by the current compiler');
@@ -74,7 +79,7 @@ final class JsonContains extends AbstractPlatformSpecificExpression
     /**
      * {@inheritdoc}
      */
-    protected function buildForGenericSql(Q $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractPlatform $grammar): string
+    protected function buildForGenericSql(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractPlatform $grammar): string
     {
         if (!$compiler instanceof QuoteCompilerInterface) {
             throw new LogicException('JsonContains expression is not supported by the current compiler');
@@ -87,7 +92,7 @@ final class JsonContains extends AbstractPlatformSpecificExpression
         );
     }
 
-    private function target(Q $query, QuoteCompilerInterface $compiler): string
+    private function target(CompilableClause $query, QuoteCompilerInterface $compiler): string
     {
         return $this->target instanceof ExpressionInterface
             ? $this->target->build($query, $compiler)

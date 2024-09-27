@@ -33,7 +33,7 @@ use Bdf\Prime\Query\Contract\WriteOperation;
  * </code>
  *
  * @template E as object
- * @implements WriterInterface<E>
+ * @extends WriterInterface<E>
  */
 interface BufferedWriterInterface extends WriterInterface
 {

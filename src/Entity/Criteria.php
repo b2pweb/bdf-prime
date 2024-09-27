@@ -10,6 +10,11 @@ use Traversable;
 
 /**
  * Builder for entity criteria
+ *
+ * @psalm-consistent-constructor
+ *
+ * @implements ArrayAccess<string, mixed>
+ * @implements IteratorAggregate<string, mixed>
  */
 class Criteria implements ArrayAccess, IteratorAggregate
 {
@@ -45,7 +50,6 @@ class Criteria implements ArrayAccess, IteratorAggregate
      * Constructor
      *
      * @param array $filters
-     * @psalm-consistent-constructor
      */
     public function __construct(array $filters = [])
     {

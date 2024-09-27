@@ -14,6 +14,11 @@ use Bdf\Prime\Query\Expression\ExpressionInterface;
  *
  * @see JsonInsert for insert a value only if the field does not exist
  * @see JsonSet for perform upsert operation on the field
+ *
+ * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\Contract\Compilable
+ * @template C as object
+ *
+ * @extends JsonFunction<Q, C>
  */
 final class JsonReplace extends JsonFunction
 {

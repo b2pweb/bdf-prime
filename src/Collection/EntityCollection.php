@@ -59,9 +59,13 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
      */
     public function __construct(RepositoryInterface $repository, $storage = null)
     {
-        $this->repository = $repository;
+        if (!$storage instanceof CollectionInterface) {
+            /** @psalm-suppress InvalidArgument */
+            $storage = new ArrayCollection($storage);
+        }
 
-        $this->storage = $storage instanceof CollectionInterface ? $storage : new ArrayCollection($storage);
+        $this->repository = $repository;
+        $this->storage = $storage;
     }
 
     /**

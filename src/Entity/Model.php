@@ -276,6 +276,9 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      *
      * @return EntityRelation<static, R>
      * @template R as object
+     *
+     * @psalm-suppress InvalidReturnType
+     * @psalm-suppress InvalidReturnStatement
      */
     public function relation(string $relationClass, ?string $relationName = null): EntityRelation
     {

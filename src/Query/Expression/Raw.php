@@ -12,7 +12,9 @@ use function trigger_error;
  *
  * inject sql expression into query builder
  *
- * @package Bdf\Prime\Query\Expression
+ * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\Contract\Compilable
+ * @template C as object
+ * @implements ExpressionInterface<Q, C>
  * @final
  */
 class Raw implements ExpressionInterface

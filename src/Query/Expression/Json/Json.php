@@ -3,7 +3,7 @@
 namespace Bdf\Prime\Query\Expression\Json;
 
 use BadMethodCallException;
-use Bdf\Prime\Query\CompilableClause as Q;
+use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
 
 /**
@@ -40,6 +40,12 @@ use Bdf\Prime\Query\Expression\ExpressionInterface;
  *         ->update()
  *     ;
  * </code>
+ *
+ * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\Contract\Compilable
+ * @template C as object
+ *
+ * @implements ExpressionInterface<Q, C>
+ * @implements \ArrayAccess<array-key, Json>
  */
 final class Json implements ExpressionInterface, \ArrayAccess
 {
@@ -193,7 +199,7 @@ final class Json implements ExpressionInterface, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function build(Q $query, object $compiler): string
+    public function build(CompilableClause $query, object $compiler): string
     {
         return (new JsonExtract($this->field, $this->path, $this->unquote))->build($query, $compiler);
     }

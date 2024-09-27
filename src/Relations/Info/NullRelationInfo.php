@@ -4,6 +4,9 @@ namespace Bdf\Prime\Relations\Info;
 
 /**
  * Null object for storing relation information
+ *
+ * @template E as object
+ * @implements RelationInfoInterface<E>
  */
 final class NullRelationInfo implements RelationInfoInterface
 {

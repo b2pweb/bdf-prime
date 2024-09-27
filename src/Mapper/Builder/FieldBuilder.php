@@ -15,8 +15,8 @@ use IteratorAggregate;
  * FieldBuilder
  *
  * @psalm-type FieldDefinition = array{
- *     type: string,
- *     default: mixed,
+ *     type?: string,
+ *     default?: mixed,
  *     primary?: "autoincrement"|"sequence"|true,
  *     class?: class-string,
  *     embedded?: array<string, array>,
@@ -24,8 +24,8 @@ use IteratorAggregate;
  *     polymorph?: bool,
  *     discriminator_field?: string,
  *     discriminator_attribute?: string,
- *     length?: int,
- *     comment?: string,
+ *     length?: int|null,
+ *     comment?: string|null,
  *     alias?: string,
  *     precision?: int,
  *     scale?: int,
