@@ -123,13 +123,36 @@ class OrmPreprocessorTest extends TestCase
     /**
      *
      */
-    public function test_forSelect_already_compiled()
+    public function test_forSelect_with_constraints_should_add_constraints_only_on_returned_query()
     {
-        $selectQuery = $this->preprocessor->forSelect(Faction::where('userFaction.name', 'My name'));
-        $selectQuery->compiler()->compileSelect($selectQuery);
+        $query = Faction::where('userFaction.name', 'My name');
 
-        $this->assertNotSame($selectQuery, $this->preprocessor->forSelect($selectQuery));
-        $this->assertEquals($selectQuery, $this->preprocessor->forSelect($selectQuery));
+        $this->preprocessor->forSelect($query); // Double compilation to verify cache
+        $compiled = $this->preprocessor->forSelect($query);
+
+        $this->assertEquals(['nested' => [
+            [
+                'column' => '$t0.enabled',
+                'operator' => '=',
+                'value' => true,
+                'glue' => 'AND'
+            ]
+        ], 'glue' => 'AND'], $compiled->statement('where')[1]);
+
+        $this->assertCount(1, $query->statement('where'));
+    }
+
+    /**
+     *
+     */
+    public function test_forSelect_already_compiled_without_constraints_should_not_modify()
+    {
+        $baseQuery = User::where('customer.name', 'My name');
+
+        $selectQuery = $this->preprocessor->forSelect($baseQuery);
+
+        $this->assertNotSame($selectQuery, $baseQuery);
+        $this->assertEquals($selectQuery, $baseQuery);
     }
 
     /**
