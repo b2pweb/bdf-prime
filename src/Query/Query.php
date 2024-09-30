@@ -11,6 +11,7 @@ use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 use Bdf\Prime\Query\Compiler\SqlCompiler;
 use Bdf\Prime\Query\Contract\Compilable;
+use Bdf\Prime\Query\Contract\JitCompilable;
 use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
@@ -57,7 +58,7 @@ use Stringable;
  *     ...
  * } $statements
  */
-class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Stringable
+class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Stringable, JitCompilable
 {
     use EntityJoinTrait;
     /** @use PaginableTrait<R> */
@@ -112,6 +113,44 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     public function getBindings(): array
     {
         return $this->compiler()->getBindings($this);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supportsJitCompilation(): bool
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMetadata(): array
+    {
+        $metadata = [];
+
+        if ($this->wrapper) {
+            $metadata['wrapper'] = $this->wrapper;
+        }
+
+        if ($this->cacheKey) {
+            $metadata['cache_key'] = [
+                'key' => $this->cacheKey->isComputedKey() ? null : $this->cacheKey->key(),
+                'namespace' => $this->cacheKey->isComputedNamespace() ? null : $this->cacheKey->namespace(),
+                'lifetime' => $this->cacheKey->lifetime(),
+            ];
+        }
+
+        return $metadata;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtension(): ?object
+    {
+        return $this->extension;
     }
 
     /**

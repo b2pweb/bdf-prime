@@ -14,6 +14,7 @@ use Bdf\Prime\Exception\QueryExecutionException;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Platform\Sql\SqlPlatform;
 use Bdf\Prime\Query\CommandInterface;
+use Bdf\Prime\Query\Compiled\CompiledSqlQuery;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Compiler\SqlCompiler;
 use Bdf\Prime\Query\Contract\Compilable;
@@ -96,8 +97,13 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
         /** @psalm-suppress InternalMethod */
         parent::__construct($params, $driver, $config, $eventManager);
 
+        $this->factory = $this->createQueryFactory();
+    }
+
+    protected function createQueryFactory(): QueryFactoryInterface
+    {
         /** @psalm-suppress InvalidArgument */
-        $this->factory = new DefaultQueryFactory(
+        return new DefaultQueryFactory(
             $this,
             new SqlCompiler($this),
             [
@@ -107,7 +113,8 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
             [
                 KeyValueQueryInterface::class => KeyValueQuery::class,
                 InsertQueryInterface::class   => BulkInsertQuery::class,
-            ]
+            ],
+            CompiledSqlQuery::class
         );
     }
 

@@ -450,7 +450,8 @@ class Prime
         $mapperFactory = new MapperFactory(
             null,
             static::$config['metadataCache'] ?? null,
-            static::$config['resultCache'] ?? null
+            static::$config['resultCache'] ?? null,
+            static::$config['jit'] ?? null
         );
 
         static::$serviceLocator = new ServiceLocator(

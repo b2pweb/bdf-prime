@@ -45,13 +45,16 @@ use Bdf\Prime\Mapper\Mapper;
 final class RepositoryMethod
 {
     private ?string $name;
+    private bool $jit = false;
 
     /**
      * @param string|null $name The repository method name. If null, the actual method name will be used.
+     * @param bool $jit Enable the JIT compilation for this method. If true, the queries of this method will be compiled on the fly, if possible.
      */
-    public function __construct(?string $name = null)
+    public function __construct(?string $name = null, bool $jit = false)
     {
         $this->name = $name;
+        $this->jit = $jit;
     }
 
     /**
@@ -63,5 +66,16 @@ final class RepositoryMethod
     public function name(): ?string
     {
         return $this->name;
+    }
+
+    /**
+     * Check if the JIT compilation is enabled for this method
+     * If true, the queries of this method will be compiled on the fly, if possible
+     *
+     * @return bool
+     */
+    public function jit(): bool
+    {
+        return $this->jit;
     }
 }

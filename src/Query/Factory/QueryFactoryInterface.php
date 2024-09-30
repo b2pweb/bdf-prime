@@ -3,10 +3,13 @@
 namespace Bdf\Prime\Query\Factory;
 
 use Bdf\Prime\Query\CommandInterface;
+use Bdf\Prime\Query\Compiled\CompiledQueryInterface;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 
 /**
  * Factory type for create query objects
+ *
+ * @method CompiledQueryInterface compiled(mixed $query)
  */
 interface QueryFactoryInterface
 {
@@ -37,4 +40,14 @@ interface QueryFactoryInterface
      * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\Contract\Compilable&CommandInterface
      */
     public function compiler(string $query): object;
+
+    /**
+     * Create query object for manually compiled query
+     *
+     * @param mixed $query The query body, in the current database language. Must be a string for SQL databases
+     *
+     * @return CompiledQueryInterface
+     * @todo uncomment in prime 3.0
+     */
+    //public function compiled($query): CompiledQueryInterface;
 }

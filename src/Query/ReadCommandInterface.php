@@ -6,6 +6,7 @@ use Bdf\Prime\Collection\CollectionFactory;
 use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\Cachable;
+use Bdf\Prime\Query\Contract\Executable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
 
@@ -30,8 +31,9 @@ use Bdf\Prime\Query\Expression\ExpressionInterface;
  * @template R as object|array
  *
  * @extends CommandInterface<C>
+ * @extends Executable<R>
  */
-interface ReadCommandInterface extends CommandInterface, Cachable
+interface ReadCommandInterface extends CommandInterface, Cachable, Executable
 {
     /**
      * Register an object that can extends the Query methods.
