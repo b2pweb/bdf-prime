@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Mapper;
 
+use _files\TestClock;
 use Bdf\Prime\Entity\Hydrator\HydratorGeneratedInterface;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
 use Bdf\Prime\Mapper\NameResolver\CallbackResolver;
@@ -174,5 +175,16 @@ class MapperFactoryTest extends TestCase
         $factory = new MapperFactory();
         
         $this->assertInstanceOf('Bdf\Prime\TestEntityMapper', $factory->build(Prime::service(), 'Bdf\Prime\TestEntity'));
+    }
+
+    public function test_should_set_clock()
+    {
+        $factory = new MapperFactory(null, null, null, $clock = new TestClock());
+        $mapper = $factory->build(Prime::service(), TestEntity::class);
+
+        $r = new \ReflectionProperty(Mapper::class, 'clock');
+        $r->setAccessible(true);
+
+        $this->assertSame($clock, $r->getValue($mapper));
     }
 }

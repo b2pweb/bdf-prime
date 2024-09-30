@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use _files\TestClock;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Serializer\PaginatorNormalizer;
 use Bdf\Prime\Serializer\PrimeCollectionNormalizer;
@@ -62,7 +63,8 @@ trait PrimeTestCase
                     new ArrayType(),
                     'date_utc' => new DateTimeType('date_utc', 'Y-m-d H:i:s', \DateTimeImmutable::class, new \DateTimeZone('UTC')),
                     TypeInterface::TIMESTAMP => TimestampType::class,
-                ]
+                ],
+                'clock' => new TestClock(),
             ]);
 
             $serializer = SerializerBuilder::create()
@@ -86,6 +88,7 @@ trait PrimeTestCase
     {
         Prime::configure(null);
         Model::configure(null);
+        TestClock::reset();
     }
 
     /**
@@ -108,6 +111,7 @@ trait PrimeTestCase
     public function primeReset()
     {
         TestPack::pack()->clear();
+        TestClock::reset();
     }
 
     /**
@@ -116,5 +120,6 @@ trait PrimeTestCase
     public function primeStop()
     {
         TestPack::pack()->destroy();
+        TestClock::reset();
     }
 }

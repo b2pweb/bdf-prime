@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Behaviors;
 
+use _files\TestClock;
 use DateTime;
 use DateTimeImmutable;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
@@ -9,6 +10,7 @@ use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use DateTimeZone;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -24,6 +26,7 @@ class SoftdeleteableTest extends TestCase
     protected function setUp(): void
     {
         $this->primeStart();
+        $this->configurePrime();
     }
 
     /**
@@ -78,6 +81,22 @@ class SoftdeleteableTest extends TestCase
     /**
      *
      */
+    public function test_with_fixed_date_from_clock()
+    {
+        TestClock::set($date = new DateTimeImmutable('2018-01-01 00:00:00'));
+
+        $entity = new SoftDeleteableEntity('name');
+        $entity->insert();
+        $this->assertEquals(null, $entity->deletedAt);
+
+        $entity->delete();
+        $this->assertInstanceOf(DateTime::class, $entity->deletedAt);
+        $this->assertEqualsWithDelta($date, $entity->deletedAt, 1);
+    }
+
+    /**
+     *
+     */
     public function test_deleting_update_date_immutable()
     {
 
@@ -90,6 +109,23 @@ class SoftdeleteableTest extends TestCase
         $entity->delete();
         $this->assertInstanceOf(DateTimeImmutable::class, $entity->deletedAt);
         $this->assertEqualsWithDelta($now, $entity->deletedAt, 1);
+    }
+
+    /**
+     *
+     */
+    public function test_deleting_update_date_immutable_from_clock()
+    {
+        TestClock::set($date = new DateTimeImmutable('2018-01-01 00:00:00'));
+
+        $entity = new SoftDeleteableEntityImmut('name');
+        $entity->insert();
+        $this->assertEquals(null, $entity->deletedAt);
+
+
+        $entity->delete();
+        $this->assertInstanceOf(DateTimeImmutable::class, $entity->deletedAt);
+        $this->assertEqualsWithDelta($date, $entity->deletedAt, 1);
     }
 
     /**
