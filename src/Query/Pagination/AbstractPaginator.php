@@ -451,7 +451,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
     /**
      * {@inheritdoc}
      */
-    public function sort(callable $callback = null)
+    public function sort(?callable $callback = null)
     {
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);

@@ -48,9 +48,9 @@ abstract class AbstractGenerator implements GeneratorInterface
     protected $hasBeenErased = true;
 
     /**
-     * @param Mapper $mapper
+     * @param Mapper|null $mapper
      */
-    public function __construct(Mapper $mapper = null)
+    public function __construct(?Mapper $mapper = null)
     {
         // TODO: reference cyclique
         $this->mapper = $mapper;

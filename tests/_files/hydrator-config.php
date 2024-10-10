@@ -100,7 +100,7 @@ if (!class_exists(Hydrator_Bdf_Prime_TestEntity::class)) {
         /**
          * {@inheritdoc}
          */
-        final public function flatExtract($object, array $attributes = null): array
+        final public function flatExtract($object, ?array $attributes = null): array
         {
             if (empty($attributes)) {
                 $data = ['id' => ($object->id), 'name' => ($object->name), 'dateInsert' => ($object->dateInsert)];

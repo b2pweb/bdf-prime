@@ -77,7 +77,7 @@ trait CachableTrait
      *
      * @see Cachable::setCache()
      */
-    public function setCache(CacheInterface $cache = null)
+    public function setCache(?CacheInterface $cache = null)
     {
         $this->cache = $cache;
 

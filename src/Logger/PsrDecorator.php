@@ -30,7 +30,7 @@ class PsrDecorator implements SQLLogger, ConnectionAwareInterface
     /**
      * @param LoggerInterface|null $logger
      */
-    public function __construct(LoggerInterface $logger = null)
+    public function __construct(?LoggerInterface $logger = null)
     {
         $this->logger = $logger;
     }
@@ -48,7 +48,7 @@ class PsrDecorator implements SQLLogger, ConnectionAwareInterface
      *
      * {@inheritdoc}
      */
-    public function startQuery($sql, array $params = null, array $types = null)
+    public function startQuery($sql, ?array $params = null, ?array $types = null)
     {
         if ($this->logger === null) {
             return;

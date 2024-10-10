@@ -56,7 +56,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * @param C $connection
      * @param PreprocessorInterface|null $preprocessor
      */
-    public function __construct(ConnectionInterface $connection, PreprocessorInterface $preprocessor = null)
+    public function __construct(ConnectionInterface $connection, ?PreprocessorInterface $preprocessor = null)
     {
         parent::__construct($connection, $preprocessor ?: new DefaultPreprocessor());
 

@@ -19,7 +19,7 @@ class DateTimeType extends AbstractDateTimeType
         string $type = self::DATETIME,
         string $format = \DateTime::ATOM,
         string $className = \DateTime::class,
-        \DateTimeZone $timezone = null
+        ?\DateTimeZone $timezone = null
     ) {
         parent::__construct($type);
 

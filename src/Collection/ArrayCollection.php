@@ -306,7 +306,7 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
     /**
      * {@inheritdoc}
      */
-    public function sort(callable $callback = null)
+    public function sort(?callable $callback = null)
     {
         $items = $this->items;
         $callback ? uasort($items, $callback) : natcasesort($items);

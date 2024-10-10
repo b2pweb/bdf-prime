@@ -28,7 +28,7 @@ abstract class AbstractMapperFactory implements MapperFactoryInterface
      * @param Psr16CacheInterface|null $metadataCache
      * @param CacheInterface|null $resultCache
      */
-    public function __construct(ResolverInterface $nameResolver = null, Psr16CacheInterface $metadataCache = null, CacheInterface $resultCache = null)
+    public function __construct(?ResolverInterface $nameResolver = null, ?Psr16CacheInterface $metadataCache = null, ?CacheInterface $resultCache = null)
     {
         $this->nameResolver = $nameResolver ?? new SuffixResolver();
         $this->metadataCache = $metadataCache;

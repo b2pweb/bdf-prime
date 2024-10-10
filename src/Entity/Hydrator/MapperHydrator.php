@@ -60,7 +60,7 @@ class MapperHydrator implements MapperHydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function flatExtract($object, array $attributes = null): array
+    public function flatExtract($object, ?array $attributes = null): array
     {
         $values = [];
         $cache  = [];

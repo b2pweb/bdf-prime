@@ -440,7 +440,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function constraints(string $context = null): array
+    public function constraints(?string $context = null): array
     {
         if ($this->withoutConstraints === true) {
             $this->withoutConstraints = false;
@@ -669,7 +669,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function update($entity, array $attributes = null): int
+    public function update($entity, ?array $attributes = null): int
     {
         return $this->writer->update($entity, ['attributes' => $attributes]);
     }

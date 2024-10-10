@@ -81,7 +81,7 @@ interface ConnectionInterface
      *
      * @return ReadCommandInterface
      */
-    public function builder(PreprocessorInterface $preprocessor = null): ReadCommandInterface;
+    public function builder(?PreprocessorInterface $preprocessor = null): ReadCommandInterface;
 
     /**
      * Make a new query
@@ -93,7 +93,7 @@ interface ConnectionInterface
      *
      * @template Q as CommandInterface
      */
-    public function make(string $query, PreprocessorInterface $preprocessor = null): CommandInterface;
+    public function make(string $query, ?PreprocessorInterface $preprocessor = null): CommandInterface;
 
     /**
      * Get the query factory for this connection

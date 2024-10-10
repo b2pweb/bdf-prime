@@ -24,7 +24,7 @@ interface Cachable
      *
      * @return $this
      */
-    public function setCache(CacheInterface $cache = null);
+    public function setCache(?CacheInterface $cache = null);
 
     /**
      * Enable cache for this query

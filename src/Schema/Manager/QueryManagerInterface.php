@@ -41,7 +41,7 @@ interface QueryManagerInterface
      *
      * @return static The simulated new SchemaManager
      */
-    public function simulate(callable $operations = null);
+    public function simulate(?callable $operations = null);
 
     /**
      * Do operations into a transaction.

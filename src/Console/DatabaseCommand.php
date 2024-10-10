@@ -45,9 +45,9 @@ abstract class DatabaseCommand extends Command
      * DatabaseCommand constructor.
      *
      * @param ConnectionRegistryInterface $registry
-     * @param ConnectionFactoryInterface $connectionFactory
+     * @param ConnectionFactoryInterface|null $connectionFactory
      */
-    public function __construct(ConnectionRegistryInterface $registry, ConnectionFactoryInterface $connectionFactory = null)
+    public function __construct(ConnectionRegistryInterface $registry, ?ConnectionFactoryInterface $connectionFactory = null)
     {
         $this->registry = $registry;
         $this->connectionFactory = $connectionFactory;

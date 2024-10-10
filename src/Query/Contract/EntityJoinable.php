@@ -29,7 +29,7 @@ interface EntityJoinable extends Joinable, Whereable
      *
      * @throws LogicException  If alias is not set and $key is not a closure
      */
-    public function joinEntity(string $entity, $key, ?string $foreign = null, string $alias = null, string $type = self::INNER_JOIN);
+    public function joinEntity(string $entity, $key, ?string $foreign = null, ?string $alias = null, string $type = self::INNER_JOIN);
 
     /**
      * Creates and adds a join to the query.
@@ -41,7 +41,7 @@ interface EntityJoinable extends Joinable, Whereable
      *
      * @return $this This Query instance.
      */
-    public function leftJoinEntity(string $entity, $key, ?string $foreign = null, string $alias = null);
+    public function leftJoinEntity(string $entity, $key, ?string $foreign = null, ?string $alias = null);
 
     /**
      * Creates and adds a join to the query.
@@ -53,5 +53,5 @@ interface EntityJoinable extends Joinable, Whereable
      *
      * @return $this This Query instance.
      */
-    public function rightJoinEntity(string $entity, $key, ?string $foreign = null, string $alias = null);
+    public function rightJoinEntity(string $entity, $key, ?string $foreign = null, ?string $alias = null);
 }

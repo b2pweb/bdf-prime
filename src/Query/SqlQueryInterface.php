@@ -188,7 +188,7 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * @return string
      * @throws PrimeException
      */
-    public function quote($value, int $type = null): string;
+    public function quote($value, ?int $type = null): string;
 
     /**
      * Quote a identifier
