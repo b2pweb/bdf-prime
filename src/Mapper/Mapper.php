@@ -203,7 +203,7 @@ abstract class Mapper
      * @param MapperHydratorInterface<E>|null $hydrator
      * @param CacheInterface|null $resultCache
      */
-    public function __construct(ServiceLocator $serviceLocator, ?string $entityClass = null, ?Metadata $metadata = null, MapperHydratorInterface $hydrator = null, CacheInterface $resultCache = null)
+    public function __construct(ServiceLocator $serviceLocator, ?string $entityClass = null, ?Metadata $metadata = null, ?MapperHydratorInterface $hydrator = null, ?CacheInterface $resultCache = null)
     {
         $this->entityClass = $entityClass ?? stdClass::class;
         $this->metadata = $metadata;
@@ -583,7 +583,7 @@ abstract class Mapper
      * @return array
      * @final
      */
-    public function prepareToRepository($entity, array $attributes = null): array
+    public function prepareToRepository($entity, ?array $attributes = null): array
     {
         return $this->hydrator->flatExtract($entity, $attributes);
     }

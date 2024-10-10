@@ -53,7 +53,7 @@ final class <hydratorClassName> extends <normalizedEntityClassName> implements <
     /**
      * {@inheritdoc}
      */
-    final public function flatExtract($object, array $attributes = null): array
+    final public function flatExtract($object, ?array $attributes = null): array
     {
         <flatExtractBody>
     }

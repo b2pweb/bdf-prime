@@ -40,9 +40,9 @@ class ConnectionManager implements ConnectionRegistryInterface
     /**
      * Set default configuration
      *
-     * @param ConnectionRegistryInterface $registry
+     * @param ConnectionRegistryInterface|null $registry
      */
-    public function __construct(ConnectionRegistryInterface $registry = null)
+    public function __construct(?ConnectionRegistryInterface $registry = null)
     {
         $this->registry = $registry ?: new ConnectionRegistry();
     }
@@ -92,7 +92,7 @@ class ConnectionManager implements ConnectionRegistryInterface
     /**
      * {@inheritDoc}
      */
-    public function getConnection(string $name = null): ConnectionInterface
+    public function getConnection(?string $name = null): ConnectionInterface
     {
         if ($name === null) {
             $name = $this->defaultConnection;

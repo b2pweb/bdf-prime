@@ -24,7 +24,7 @@ interface QueryFactoryInterface
      *
      * @template Q as CommandInterface
      */
-    public function make(string $name, PreprocessorInterface $preprocessor = null): CommandInterface;
+    public function make(string $name, ?PreprocessorInterface $preprocessor = null): CommandInterface;
 
     /**
      * Get the compiler for the given query class

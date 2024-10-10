@@ -19,7 +19,7 @@ trait EntityJoinTrait
      *
      * @see EntityJoinable::joinEntity()
      */
-    public function joinEntity(string $entity, $key, ?string $foreign = null, string $alias = null, string $type = Joinable::INNER_JOIN)
+    public function joinEntity(string $entity, $key, ?string $foreign = null, ?string $alias = null, string $type = Joinable::INNER_JOIN)
     {
         if ($alias === null) {
             throw new LogicException('Alias is required for entity join "'.$entity.'"');
@@ -39,7 +39,7 @@ trait EntityJoinTrait
      *
      * @see EntityJoinable::leftJoinEntity()
      */
-    public function leftJoinEntity(string $entity, $key, ?string $foreign = null, string $alias = null)
+    public function leftJoinEntity(string $entity, $key, ?string $foreign = null, ?string $alias = null)
     {
         return $this->joinEntity($entity, $key, $foreign, $alias, Joinable::LEFT_JOIN);
     }
@@ -49,7 +49,7 @@ trait EntityJoinTrait
      *
      * @see EntityJoinable::rightJoinEntity()
      */
-    public function rightJoinEntity(string $entity, $key, ?string $foreign = null, string $alias = null)
+    public function rightJoinEntity(string $entity, $key, ?string $foreign = null, ?string $alias = null)
     {
         return $this->joinEntity($entity, $key, $foreign, $alias, Joinable::RIGHT_JOIN);
     }

@@ -106,7 +106,7 @@ class MigrationManager
      *
      * @return MigrationInterface[]
      */
-    public function getMigrations(string $stage = null): array
+    public function getMigrations(?string $stage = null): array
     {
         $migrations = $this->provider->all();
 
@@ -139,7 +139,7 @@ class MigrationManager
      * @return MigrationInterface[]
      * @throws PrimeException
      */
-    public function getDownMigrations(string $stage = null): array
+    public function getDownMigrations(?string $stage = null): array
     {
         $migrations = [];
 
@@ -235,7 +235,7 @@ class MigrationManager
      * @return bool
      * @throws PrimeException
      */
-    public function isOlder(string $version, string $baseVersion = null): bool
+    public function isOlder(string $version, ?string $baseVersion = null): bool
     {
         $baseVersion = $baseVersion ?: $this->getCurrentVersion();
 
@@ -250,7 +250,7 @@ class MigrationManager
      *
      * @return boolean
      */
-    public function hasMigration(string $version, string $stage = null): bool
+    public function hasMigration(string $version, ?string $stage = null): bool
     {
         return
             $this->provider->has($version)

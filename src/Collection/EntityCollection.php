@@ -501,7 +501,7 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
     /**
      * {@inheritdoc}
      */
-    public function sort(callable $callback = null)
+    public function sort(?callable $callback = null)
     {
         return new static($this->repository, $this->storage->sort($callback));
     }

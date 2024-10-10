@@ -68,7 +68,7 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
      * @param \Doctrine\DBAL\Configuration|null  $config       The configuration, optional.
      * @param \Doctrine\Common\EventManager|null $eventManager The event manager, optional.
      */
-    public function __construct(array $params, Driver $driver, Configuration $config = null, EventManager $eventManager = null)
+    public function __construct(array $params, Driver $driver, ?Configuration $config = null, ?EventManager $eventManager = null)
     {
         if (!isset($params['read'])) {
             throw new LogicException('Master/slave connection needs readable connection in parameters');
@@ -122,7 +122,7 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
     /**
      * {@inheritdoc}
      */
-    public function executeQuery(string $sql, array $params = [], $types = [], QueryCacheProfile $qcp = null): Result
+    public function executeQuery(string $sql, array $params = [], $types = [], ?QueryCacheProfile $qcp = null): Result
     {
         if ($this->getTransactionNestingLevel() <= 0 && $this->force !== true) {
             return $this->readConnection->executeQuery($sql, $params, $types, $qcp);

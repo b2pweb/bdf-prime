@@ -178,7 +178,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function update(array $attributes = null): int
+    public function update(?array $attributes = null): int
     {
         return static::repository()->update($this, $attributes);
     }

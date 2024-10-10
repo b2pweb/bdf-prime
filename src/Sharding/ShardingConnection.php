@@ -111,7 +111,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      * @param \Doctrine\DBAL\Configuration|null  $config       The configuration, optional.
      * @param \Doctrine\Common\EventManager|null $eventManager The event manager, optional.
      */
-    public function __construct(array $params, Driver $driver, Configuration $config = null, EventManager $eventManager = null)
+    public function __construct(array $params, Driver $driver, ?Configuration $config = null, ?EventManager $eventManager = null)
     {
         if (!isset($params['shard_connections'])) {
             throw new LogicException('Sharding connection needs "shard_connections" configuration in parameters');
@@ -307,7 +307,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function builder(PreprocessorInterface $preprocessor = null): ShardingQuery
+    public function builder(?PreprocessorInterface $preprocessor = null): ShardingQuery
     {
         return $this->factory()->make(ShardingQuery::class, $preprocessor);
     }
@@ -315,7 +315,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function executeQuery(string $sql, array $params = [], $types = [], QueryCacheProfile $qcp = null): Result
+    public function executeQuery(string $sql, array $params = [], $types = [], ?QueryCacheProfile $qcp = null): Result
     {
         if ($this->isUsingShard()) {
             return $this->getSelectedShard()->executeQuery($sql, $params, $types, $qcp);

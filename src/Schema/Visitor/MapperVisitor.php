@@ -108,7 +108,7 @@ class MapperVisitor extends AbstractVisitor
      * @param ResolverInterface|null $nameResolver
      * @param InflectorInterface|null $inflector
      */
-    public function __construct($connectionName = null, ResolverInterface $nameResolver = null, InflectorInterface $inflector = null)
+    public function __construct($connectionName = null, ?ResolverInterface $nameResolver = null, ?InflectorInterface $inflector = null)
     {
         $this->connectionName = $connectionName;
         $this->nameResolver = $nameResolver ?: new SuffixResolver();

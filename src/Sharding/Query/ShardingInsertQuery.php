@@ -72,9 +72,9 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
      * ShardingInsertQuery constructor.
      *
      * @param ShardingConnection $connection
-     * @param PreprocessorInterface $preprocessor
+     * @param PreprocessorInterface|null $preprocessor
      */
-    public function __construct(ShardingConnection $connection, PreprocessorInterface $preprocessor = null)
+    public function __construct(ShardingConnection $connection, ?PreprocessorInterface $preprocessor = null)
     {
         parent::__construct($preprocessor ?: new DefaultPreprocessor());
 
