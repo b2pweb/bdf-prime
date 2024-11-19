@@ -79,7 +79,7 @@ class ClassAccessor
      */
     public function getter($varName, $attribute)
     {
-        if ($this->isPropertyAccessible($attribute, setter: false)) {
+        if ($this->isPropertyAccessible($attribute, /*setter: */false)) {
             return $varName.'->'.$attribute;
         }
 
@@ -110,7 +110,7 @@ class ClassAccessor
             return $varName.'->set'.ucfirst($attribute).'('.$value.')';
         }
 
-        if ($this->isPropertyAccessible($attribute, setter: true)) {
+        if ($this->isPropertyAccessible($attribute, /*setter: */true)) {
             return $varName.'->'.$attribute.' = '.$value;
         }
 
