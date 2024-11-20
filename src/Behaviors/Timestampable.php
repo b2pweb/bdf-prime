@@ -3,6 +3,8 @@
 namespace Bdf\Prime\Behaviors;
 
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Repository\Event\BeforeInsert;
+use Bdf\Prime\Repository\Event\BeforeUpdate;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
@@ -123,15 +125,14 @@ final class Timestampable extends Behavior
      *
      * we set the new date created on the entity
      *
-     * @param E $entity
-     * @param RepositoryInterface<E> $repository
+     * @param BeforeInsert<E> $event
      *
      * @return void
      */
-    public function beforeInsert($entity, RepositoryInterface $repository): void
+    public function beforeInsert(BeforeInsert $event): void
     {
-        $now = $this->createDate($this->createdAt['name'], $repository);
-        $repository->mapper()->hydrateOne($entity, $this->createdAt['name'], $now);
+        $now = $this->createDate($this->createdAt['name'], $event->repository);
+        $event->repository->mapper()->hydrateOne($event->entity, $this->createdAt['name'], $now);
     }
 
     /**
@@ -139,20 +140,18 @@ final class Timestampable extends Behavior
      *
      * we set the new date updated on entity
      *
-     * @param E $entity
-     * @param RepositoryInterface<E> $repository
-     * @param null|\ArrayObject $attributes
+     * @param BeforeUpdate<E> $event
      *
      * @return void
      */
-    public function beforeUpdate($entity, RepositoryInterface $repository, $attributes): void
+    public function beforeUpdate(BeforeUpdate $event): void
     {
-        if ($attributes !== null) {
-            $attributes->append($this->updatedAt['name']);
+        if ($event->attributes !== null) {
+            $event->attributes->append($this->updatedAt['name']);
         }
 
-        $now = $this->createDate($this->updatedAt['name'], $repository);
-        $repository->mapper()->hydrateOne($entity, $this->updatedAt['name'], $now);
+        $now = $this->createDate($this->updatedAt['name'], $event->repository);
+        $event->repository->mapper()->hydrateOne($event->entity, $this->updatedAt['name'], $now);
     }
 
     /**

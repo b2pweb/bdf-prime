@@ -8,6 +8,16 @@ use Bdf\Prime\Folder;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
+use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\Event\AfterDelete;
+use Bdf\Prime\Repository\Event\AfterInsert;
+use Bdf\Prime\Repository\Event\AfterLoad;
+use Bdf\Prime\Repository\Event\AfterSave;
+use Bdf\Prime\Repository\Event\AfterUpdate;
+use Bdf\Prime\Repository\Event\BeforeDelete;
+use Bdf\Prime\Repository\Event\BeforeInsert;
+use Bdf\Prime\Repository\Event\BeforeSave;
+use Bdf\Prime\Repository\Event\BeforeUpdate;
 use Bdf\Prime\Right;
 use Bdf\Prime\TestFile;
 use Bdf\Prime\User;
@@ -400,6 +410,46 @@ class ModelTest extends TestCase
     /**
      *
      */
+    public function test_load_event_payload()
+    {
+        $event = 0;
+        $user = Admin::entity(['name' => 'test', 'roles' => []]);
+        $user->save();
+
+        Admin::loaded(function(AfterLoad $evt) use(&$event) {
+            $event++;
+
+            $this->assertInstanceOf(Admin::class, $evt->entity);
+            $this->assertSame(Admin::repository(), $evt->repository);
+        });
+        Admin::get(1);
+
+        $this->assertEquals(1, $event);
+    }
+
+    /**
+     *
+     */
+    public function test_load_event_legacy()
+    {
+        $event = 0;
+        $user = Admin::entity(['name' => 'test', 'roles' => []]);
+        $user->save();
+
+        Admin::loaded(function($entity, EntityRepository $repository) use(&$event) {
+            $event++;
+
+            $this->assertInstanceOf(Admin::class, $entity);
+            $this->assertSame(Admin::repository(), $repository);
+        });
+        Admin::get(1);
+
+        $this->assertEquals(1, $event);
+    }
+
+    /**
+     *
+     */
     public function test_save_event()
     {
         $event = 0;
@@ -413,7 +463,59 @@ class ModelTest extends TestCase
         $user->save();
         $this->assertEquals(2, $event);
     }
-    
+
+    /**
+     *
+     */
+    public function test_save_event_payload()
+    {
+        $event = 0;
+        $user = Admin::entity(['name' => 'test', 'roles' => []]);
+        $user->saving(function(BeforeSave $evt) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $evt->entity);
+            $this->assertSame(Admin::repository(), $evt->repository);
+            $this->assertTrue($evt->isNew);
+
+            $event++;
+        });
+        $user->saved(function(AfterSave $evt) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $evt->entity);
+            $this->assertSame(Admin::repository(), $evt->repository);
+            $this->assertTrue($evt->isNew);
+            $this->assertSame(1, $evt->affectedRows);
+
+            $event++;
+        });
+        $user->save();
+        $this->assertEquals(2, $event);
+    }
+
+    /**
+     *
+     */
+    public function test_save_event_legacy()
+    {
+        $event = 0;
+        $user = Admin::entity(['name' => 'test', 'roles' => []]);
+        $user->saving(function($entity, $repository, $isNew) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $entity);
+            $this->assertSame(Admin::repository(), $repository);
+            $this->assertTrue($isNew);
+
+            $event++;
+        });
+        $user->saved(function($entity, $repository, $count, $isNew) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $entity);
+            $this->assertSame(Admin::repository(), $repository);
+            $this->assertTrue($isNew);
+            $this->assertSame(1, $count);
+
+            $event++;
+        });
+        $user->save();
+        $this->assertEquals(2, $event);
+    }
+
     /**
      *
      */
@@ -425,6 +527,54 @@ class ModelTest extends TestCase
             $event++;
         });
         $user->inserted(function() use(&$event) {
+            $event++;
+        });
+        $user->insert();
+        $this->assertEquals(2, $event);
+    }
+
+    /**
+     *
+     */
+    public function test_insert_event_payload()
+    {
+        $event = 0;
+        $user = Admin::entity(['name' => 'test', 'roles' => []]);
+        $user->inserting(function(BeforeInsert $evt) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $evt->entity);
+            $this->assertSame(Admin::repository(), $evt->repository);
+
+            $event++;
+        });
+        $user->inserted(function(AfterInsert $evt) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $evt->entity);
+            $this->assertSame(Admin::repository(), $evt->repository);
+            $this->assertSame(1, $evt->affectedRows);
+
+            $event++;
+        });
+        $user->insert();
+        $this->assertEquals(2, $event);
+    }
+
+    /**
+     *
+     */
+    public function test_insert_event_legacy()
+    {
+        $event = 0;
+        $user = Admin::entity(['name' => 'test', 'roles' => []]);
+        $user->inserting(function($entity, $repository) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $entity);
+            $this->assertSame(Admin::repository(), $repository);
+
+            $event++;
+        });
+        $user->inserted(function($entity, $repository, $count) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $entity);
+            $this->assertSame(Admin::repository(), $repository);
+            $this->assertSame(1, $count);
+
             $event++;
         });
         $user->insert();
@@ -451,6 +601,56 @@ class ModelTest extends TestCase
     /**
      *
      */
+    public function test_update_event_payload()
+    {
+        $event = 0;
+        $user = Admin::entity(['name' => 'test', 'roles' => []]);
+        $user->updating(function(BeforeUpdate $evt) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $evt->entity);
+            $this->assertSame(Admin::repository(), $evt->repository);
+            $this->assertNull($evt->attributes);
+
+            $event++;
+        });
+        $user->updated(function(AfterUpdate $evt) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $evt->entity);
+            $this->assertSame(Admin::repository(), $evt->repository);
+            $this->assertSame(0, $evt->affectedRows);
+
+            $event++;
+        });
+        $user->update();
+        $this->assertEquals(2, $event);
+    }
+
+    /**
+     *
+     */
+    public function test_update_event_legacy()
+    {
+        $event = 0;
+        $user = Admin::entity(['name' => 'test', 'roles' => []]);
+        $user->updating(function($entity, $repository, $attributes) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $entity);
+            $this->assertSame(Admin::repository(), $repository);
+            $this->assertNull($attributes);
+
+            $event++;
+        });
+        $user->updated(function($entity, $repository, $count) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $entity);
+            $this->assertSame(Admin::repository(), $repository);
+            $this->assertSame(0, $count);
+
+            $event++;
+        });
+        $user->update();
+        $this->assertEquals(2, $event);
+    }
+
+    /**
+     *
+     */
     public function test_delete_event()
     {
         $event = 0;
@@ -459,6 +659,54 @@ class ModelTest extends TestCase
             $event++;
         });
         $user->deleted(function() use(&$event) {
+            $event++;
+        });
+        $user->delete();
+        $this->assertEquals(2, $event);
+    }
+
+    /**
+     *
+     */
+    public function test_delete_event_payload()
+    {
+        $event = 0;
+        $user = Admin::entity(['name' => 'test', 'roles' => []]);
+        $user->deleting(function(BeforeDelete $evt) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $evt->entity);
+            $this->assertSame(Admin::repository(), $evt->repository);
+
+            $event++;
+        });
+        $user->deleted(function(AfterDelete $evt) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $evt->entity);
+            $this->assertSame(Admin::repository(), $evt->repository);
+            $this->assertSame(0, $evt->affectedRows);
+
+            $event++;
+        });
+        $user->delete();
+        $this->assertEquals(2, $event);
+    }
+
+    /**
+     *
+     */
+    public function test_delete_event_legacy()
+    {
+        $event = 0;
+        $user = Admin::entity(['name' => 'test', 'roles' => []]);
+        $user->deleting(function($entity, $repository) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $entity);
+            $this->assertSame(Admin::repository(), $repository);
+
+            $event++;
+        });
+        $user->deleted(function($entity, $repository, $count) use(&$event) {
+            $this->assertInstanceOf(Admin::class, $entity);
+            $this->assertSame(Admin::repository(), $repository);
+            $this->assertSame(0, $count);
+
             $event++;
         });
         $user->delete();

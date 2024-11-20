@@ -9,6 +9,12 @@ use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\Event\AfterDelete;
+use Bdf\Prime\Repository\Event\AfterInsert;
+use Bdf\Prime\Repository\Event\AfterUpdate;
+use Bdf\Prime\Repository\Event\BeforeDelete;
+use Bdf\Prime\Repository\Event\BeforeInsert;
+use Bdf\Prime\Repository\Event\BeforeUpdate;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\ServiceLocator;
@@ -77,7 +83,7 @@ class Writer implements WriterInterface
             throw new LogicException('Repository "'.$repository->entityName().'" is read only. Cannot execute write query');
         }
 
-        if ($repository->notify(Events::PRE_INSERT, [$entity, $repository]) === false) {
+        if ($repository->notify(new BeforeInsert($entity, $repository)) === false) {
             return 0;
         }
 
@@ -90,7 +96,7 @@ class Writer implements WriterInterface
 
         $generator->postProcess($entity);
 
-        $repository->notify(Events::POST_INSERT, [$entity, $this->repository, $count]);
+        $repository->notify(new AfterInsert($entity, $this->repository, $count));
 
         return $count;
     }
@@ -108,7 +114,7 @@ class Writer implements WriterInterface
         /** @var EntityRepository<E> $this->repository */
         $attributes = isset($options['attributes']) ? new \ArrayObject($options['attributes']) : null;
 
-        if ($this->repository->notify(Events::PRE_UPDATE, [$entity, $this->repository, $attributes]) === false) {
+        if ($this->repository->notify(new BeforeUpdate($entity, $this->repository, $attributes)) === false) {
             return 0;
         }
 
@@ -127,7 +133,7 @@ class Writer implements WriterInterface
             ->update()
         ;
 
-        $this->repository->notify(Events::POST_UPDATE, [$entity, $this->repository, $count]);
+        $this->repository->notify(new AfterUpdate($entity, $this->repository, $count));
 
         return $count;
     }
@@ -143,13 +149,13 @@ class Writer implements WriterInterface
         }
 
         /** @var EntityRepository<E> $this->repository */
-        if ($this->repository->notify(Events::PRE_DELETE, [$entity, $this->repository]) === false) {
+        if ($this->repository->notify(new BeforeDelete($entity, $this->repository)) === false) {
             return 0;
         }
 
         $count = $this->deleteQuery()->where($this->repository->mapper()->primaryCriteria($entity))->delete();
 
-        $this->repository->notify(Events::POST_DELETE, [$entity, $this->repository, $count]);
+        $this->repository->notify(new AfterDelete($entity, $this->repository, $count));
 
         return $count;
     }
