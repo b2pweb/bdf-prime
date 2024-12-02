@@ -13,6 +13,8 @@ use Bdf\Prime\TestEntity;
 use Bdf\Prime\User;
 use Closure;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
+use PhpParser\Node\Scalar\Int_;
+use PhpParser\Node\Scalar\LNumber;
 use PHPUnit\Framework\TestCase;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
@@ -166,7 +168,12 @@ class ClosureCompilerTest extends TestCase
     public function test_invalid_left_operand_expression()
     {
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Invalid entity accessor Scalar_LNumber. Only properties and getters can be used in filters.');
+
+        if (!class_exists(Int_::class)) {
+            $this->expectExceptionMessage('Invalid entity accessor Scalar_LNumber. Only properties and getters can be used in filters.');
+        } else {
+            $this->expectExceptionMessage('Invalid entity accessor Scalar_Int. Only properties and getters can be used in filters.');
+        }
 
         $this->compiler(TestEntity::class)->compile(fn (TestEntity $entity) => 5 == $entity->id);
     }
