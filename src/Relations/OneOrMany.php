@@ -215,7 +215,7 @@ abstract class OneOrMany extends Relation
             $nb += $this->distant->saveAll($entity, $relations);
         }
 
-        return (int) $nb;
+        return $nb;
     }
 
     /**
@@ -240,7 +240,7 @@ abstract class OneOrMany extends Relation
             $nb += $this->distant->deleteAll($entity, $relations);
         }
 
-        return (int) $nb;
+        return $nb;
     }
 
     /**

@@ -339,7 +339,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
         $result = 0;
 
         foreach ($this->getSelectedShards() as $shard) {
-            $result += $shard->executeStatement($sql, $params, $types);
+            $result += (int) $shard->executeStatement($sql, $params, $types);
         }
 
         return $result;

@@ -112,7 +112,12 @@ final class ClosureCompiler
         $this->checkParameterType($parameter->getType());
 
         if (self::$parser === null) {
-            self::$parser = (new ParserFactory())->create(ParserFactory::ONLY_PHP7);
+            if (method_exists(ParserFactory::class, 'createForHostVersion')) {
+                self::$parser = (new ParserFactory())->createForHostVersion();
+            } else {
+                /** @psalm-suppress UndefinedConstant */
+                self::$parser = (new ParserFactory())->create(ParserFactory::ONLY_PHP7);
+            }
         }
 
         $ast = self::$parser->parse(file_get_contents($reflection->getFileName()));
