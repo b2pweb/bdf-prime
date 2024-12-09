@@ -286,6 +286,18 @@ class FieldBuilderTest extends TestCase
     /**
      *
      */
+    public function test_add_dummy()
+    {
+        $builder = new FieldBuilder();
+
+        $builder->dateTime('name')->dummy('?');
+
+        $this->assertSame('?', $builder['name']['phpOptions']['dummy']);
+    }
+
+    /**
+     *
+     */
     public function test_add_schema_options()
     {
         $builder = new FieldBuilder();

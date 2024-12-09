@@ -76,15 +76,16 @@ PHP;
      *
      * @param string $varName The object var name
      * @param string $attribute The attribute to get
+     * @param mixed $dummyValue The value to return if the property is null
      *
      * @return string
      *
      * @throws HydratorGenerationException When the attribute is not readable
      */
-    public function getter($varName, $attribute)
+    public function getter($varName, $attribute, $dummyValue = null)
     {
         if (count($this->accessors) === 1) {
-            $getter = $this->accessors[0]->getter($varName, $attribute);
+            $getter = $this->accessors[0]->getter($varName, $attribute, $dummyValue);
 
             return $this->nillable()
                 ? '('.$varName.' === null ? null : '.$getter.')'
@@ -95,7 +96,7 @@ PHP;
         $getter = '';
 
         foreach ($this->accessors as $accessor) {
-            $getter .= '('.$varName.' instanceof '.$this->code->className($accessor->className()).' ? '.$accessor->getter($varName, $attribute).' : ';
+            $getter .= '('.$varName.' instanceof '.$this->code->className($accessor->className()).' ? '.$accessor->getter($varName, $attribute, $dummyValue).' : ';
         }
 
         $getter .= 'null'.str_repeat(')', count($this->accessors));
@@ -112,13 +113,18 @@ PHP;
      * @param string $attribute The attribute to set
      * @param string $value The value to pass
      * @param bool $useSetterInPriority For use setter if exists (instead of direct property set)
+     * @param mixed $dummyValue Set the value to null if the database value is the dummy value
      *
      * @return string
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    public function setter($varName, $attribute, $value, $useSetterInPriority = true)
+    public function setter($varName, $attribute, $value, $useSetterInPriority = true, $dummyValue = null)
     {
+        if ($dummyValue !== null) {
+            $value = '('.$value.' === '.var_export($dummyValue, true).' ? null : '.$value.')';
+        }
+
         if (count($this->accessors) === 1) {
             $setter = $this->accessors[0]->setter($varName, $attribute, $value, $useSetterInPriority);
 
@@ -147,16 +153,17 @@ PHP;
      * @param string $value The value to set
      * @param string $tmpVarName Temporary variable used for store the embedded instance
      * @param string $rawDataVarName The variable name which store raw database data
+     * @param mixed $dummyValue Set the value to null if the database value is the dummy value
      *
      * @return string
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    public function fullSetter($attribute, $value, $tmpVarName = '$__owner', $rawDataVarName = null)
+    public function fullSetter($attribute, $value, $tmpVarName = '$__owner', $rawDataVarName = null, $dummyValue = null)
     {
         return $this->code->lines([
             $this->getEmbedded($tmpVarName, true, $rawDataVarName),
-            $this->setter($tmpVarName, $attribute, $value)
+            $this->setter($tmpVarName, $attribute, $value, true, $dummyValue)
         ]);
     }
 

@@ -82,6 +82,9 @@ class MapperHydrator implements MapperHydratorInterface
                 $value = $this->readFromAttribute($object, $metadata);
             }
 
+            // Use dummy value when the value is null
+            $value ??= ($metadata['phpOptions']['dummy'] ?? null);
+
             $values[$attribute] = $value;
         }
 
@@ -105,6 +108,13 @@ class MapperHydrator implements MapperHydratorInterface
             }
 
             $value = $types->get($metadata[$field]['type'])->fromDatabase($value, $metadata[$field]['phpOptions']);
+
+            if (
+                ($dummy = $metadata[$field]['phpOptions']['dummy'] ?? null) !== null
+                && $value === $dummy
+            ) {
+                $value = null;
+            }
 
             if (isset($metadata[$field]['embedded'])) {
                 $path = $metadata[$field]['embedded'];

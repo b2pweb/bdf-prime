@@ -496,7 +496,7 @@ PHP;
                 $accessor = $this->accessors->embedded($attribute->embedded());
                 $extractor = <<<PHP
 {$accessor->getEmbedded('$__embedded')}
-\$data['{$attribute->name()}'] = {$accessor->getter('$__embedded', $attribute->property())};
+\$data['{$attribute->name()}'] = {$accessor->getter('$__embedded', $attribute->property(), $attribute->dummyValue())};
 PHP;
 
                 if (!$attribute->isInitializedByDefault()) {
@@ -511,11 +511,11 @@ PHP;
 
                 $extractors[] = $extractor;
             } elseif ($attribute->isInitializedByDefault()) {
-                $simpleArray[] = "'{$attribute->name()}' => ({$this->accessor->getter('$object', $attribute->property())})";
+                $simpleArray[] = "'{$attribute->name()}' => ({$this->accessor->getter('$object', $attribute->property(), $attribute->dummyValue())})";
             } else {
                 $extractors[] = <<<PHP
 try {
-    \$data['{$attribute->name()}'] = {$this->accessor->getter('$object', $attribute->property())};
+    \$data['{$attribute->name()}'] = {$this->accessor->getter('$object', $attribute->property(), $attribute->dummyValue())};
 } catch (\Error \$e) {
     throw new \Bdf\Prime\Entity\Hydrator\Exception\UninitializedPropertyException('{$attribute->containerClassName()}', '{$attribute->property()}');
 }
@@ -551,10 +551,10 @@ PHP;
 
                 $code = <<<PHP
 {$accessor->getEmbedded('$__embedded')}
-\$data['{$attribute->name()}'] = {$accessor->getter('$__embedded', $attribute->property())};
+\$data['{$attribute->name()}'] = {$accessor->getter('$__embedded', $attribute->property(), $attribute->dummyValue())};
 PHP;
             } else {
-                $code = "\$data['{$attribute->name()}'] = {$this->accessor->getter('$object', $attribute->property())};";
+                $code = "\$data['{$attribute->name()}'] = {$this->accessor->getter('$object', $attribute->property(), $attribute->dummyValue())};";
             }
 
             $lines .= <<<PHP
@@ -633,21 +633,21 @@ PHP;
 
         if (!$attribute->isEmbedded()) {
             if ($attribute->isNullable()) {
-                return $out."\n".$this->accessor->setter('$object', $attribute->name(), $target, false).';';
+                return $out."\n".$this->accessor->setter('$object', $attribute->name(), $target, false, $attribute->dummyValue()).';';
             }
 
             return <<<PHP
 {$out}
 
 if ({$target} !== null) {
-    {$this->accessor->setter('$object', $attribute->name(), $target, false)};
+    {$this->accessor->setter('$object', $attribute->name(), $target, false, $attribute->dummyValue())};
 }
 PHP;
         }
 
         $accessor = $this->accessors
             ->embedded($attribute->embedded())
-            ->fullSetter($attribute->property(), $target, '$__embedded', '$data').';'
+            ->fullSetter($attribute->property(), $target, '$__embedded', '$data', $attribute->dummyValue()).';'
         ;
 
         if (!$attribute->isNullable()) {

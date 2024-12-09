@@ -136,6 +136,16 @@ class AttributeInfo
     }
 
     /**
+     * Get the configured dummy value to used when the attribute is null
+     *
+     * @return mixed
+     */
+    public function dummyValue()
+    {
+        return $this->metadata['phpOptions']['dummy'] ?? null;
+    }
+
+    /**
      * Get the ReflectionProperty instance for the current attribute
      *
      * @return ReflectionProperty

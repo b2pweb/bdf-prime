@@ -2,6 +2,8 @@
 
 namespace Bdf\Prime\Entity\Hydrator;
 
+use Bdf\Prime\EmbeddedDummyValue;
+use Bdf\Prime\EntityWithDummyValue;
 use DateTimeImmutable;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Admin;
@@ -1242,6 +1244,84 @@ EOL;
 
         $hydrator->hydrateOne($entity, 'embedded.location.city', 'my city');
         $this->assertEquals('my city', $entity->embedded()->location()->city);
+    }
+
+    public function test_dummy_value()
+    {
+        $mapper = EntityWithDummyValue::repository()->mapper();
+        $hydrator = $this->createGeneratedHydrator(EntityWithDummyValue::class);
+        $hydrator->setPrimeInstantiator(EntityWithDummyValue::locator()->instantiator());
+        $hydrator->setPrimeMetadata($mapper->metadata());
+
+        $this->assertSame([
+            'id' => 42,
+            'name' => '?',
+            'value' => -1,
+        ], $hydrator->flatExtract(new EntityWithDummyValue(['id' => 42])));
+        $this->assertSame(['name' => '?'], $hydrator->flatExtract(new EntityWithDummyValue(['id' => 42]), ['name' => 'name']));
+
+        $this->assertSame([
+            'id' => 42,
+            'name' => 'test',
+            'value' => 123,
+        ], $hydrator->flatExtract(new EntityWithDummyValue(['id' => 42, 'name' => 'test', 'value' => 123])));
+
+        $entity = new EntityWithDummyValue();
+        $hydrator->flatHydrate($entity, [
+            'id' => 42,
+            'name' => '?',
+            'value' => -1,
+        ], (new DummyPlatform())->types());
+
+        $this->assertSame(42, $entity->id);
+        $this->assertNull($entity->name);
+        $this->assertNull($entity->value);
+
+        $hydrator->flatHydrate($entity, [
+            'id' => 42,
+            'name' => 'test',
+            'value' => 41,
+        ], (new DummyPlatform())->types());
+
+        $this->assertSame(42, $entity->id);
+        $this->assertSame('test', $entity->name);
+        $this->assertSame(41, $entity->value);
+    }
+
+    public function test_dummy_value_embedded()
+    {
+        $mapper = EmbeddedDummyValue::repository()->mapper();
+        $hydrator = $this->createGeneratedHydrator(EmbeddedDummyValue::class);
+        $hydrator->setPrimeInstantiator(EmbeddedDummyValue::locator()->instantiator());
+        $hydrator->setPrimeMetadata($mapper->metadata());
+
+        $this->assertSame([
+            'id' => 42,
+            'embedded.id' => null,
+            'embedded.name' => '?',
+            'embedded.value' => -1,
+        ], $hydrator->flatExtract(new EmbeddedDummyValue(['id' => 42])));
+        $this->assertSame(['embedded.name' => '?'], $hydrator->flatExtract(new EmbeddedDummyValue(['id' => 42]), ['embedded.name' => 'name']));
+
+        $this->assertSame([
+            'id' => null,
+            'embedded.id' => 42,
+            'embedded.name' => 'test',
+            'embedded.value' => 123,
+        ], $hydrator->flatExtract(new EmbeddedDummyValue(['embedded' => new EntityWithDummyValue(['id' => 42, 'name' => 'test', 'value' => 123])])));
+
+        $entity = new EmbeddedDummyValue();
+        $hydrator->flatHydrate($entity, [
+            'id' => 42,
+            'embedded_id' => 1,
+            'embedded_name' => '?',
+            'embedded_value' => -1,
+        ], (new DummyPlatform())->types());
+
+        $this->assertSame(42, $entity->id);
+        $this->assertSame(1, $entity->embedded->id);
+        $this->assertNull($entity->embedded->name);
+        $this->assertNull($entity->embedded->value);
     }
 
     /**

@@ -542,4 +542,26 @@ class CRUDTest extends TestCase
         $this->assertEquals('SELECT t0.* FROM my_custom_nullable t0 WHERE t0.foo IN (?,?)', $query->toSql());
         $this->assertSame(['0', 'bar'], $query->getBindings());
     }
+
+    public function test_dummy_values()
+    {
+        $this->pack()->declareEntity(EntityWithDummyValue::class);
+
+        $entity = new EntityWithDummyValue();
+        $entity->insert();
+
+        $this->assertEquals($entity, EntityWithDummyValue::refresh($entity));
+
+        $this->assertSame(1, $entity->id);
+        $this->assertNull(EntityWithDummyValue::refresh($entity)->name);
+        $this->assertNull(EntityWithDummyValue::refresh($entity)->value);
+
+        $this->assertSame([['id' => 1, 'name' => '?', 'value' => -1]], EntityWithDummyValue::repository()->builder()->execute()->all());
+
+        $entity->name = 'foo';
+        $entity->value = 42;
+        $entity->update();
+        $this->assertEquals($entity, EntityWithDummyValue::refresh($entity));
+        $this->assertSame([['id' => 1, 'name' => 'foo', 'value' => 42]], EntityWithDummyValue::repository()->builder()->execute()->all());
+    }
 }

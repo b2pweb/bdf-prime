@@ -576,6 +576,22 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     }
 
     /**
+     * Define a value that will be used on database when a null occurs on php side.
+     *
+     * When writing to database, if the php is null, the dummy value will be used.
+     * When reading from database, if the database value is the dummy value, the php value will be null.
+     *
+     * This method allows to use null values without set the field as {@see FieldBuilder::nillable()}.
+     *
+     * @param mixed $value
+     * @return $this
+     */
+    public function dummy($value)
+    {
+        return $this->phpOptions('dummy', $value);
+    }
+
+    /**
      * Convert JSON objects are as associative arrays instead of stdClass.
      * By default this flag is enabled, and should be disabled manually by setting it to false.
      *

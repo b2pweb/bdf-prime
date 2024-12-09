@@ -72,20 +72,33 @@ class ClassAccessor
      *
      * @param string $varName The object var name
      * @param string $attribute The attribute to get
+     * @param mixed $dummyValue The value to return if the property is null
      *
      * @return string
      *
      * @throws HydratorGenerationException When the attribute is not readable
      */
-    public function getter($varName, $attribute)
+    public function getter($varName, $attribute, $dummyValue = null)
     {
         if ($this->isPropertyAccessible($attribute)) {
-            return $varName.'->'.$attribute;
+            $getter = $varName.'->'.$attribute;
+
+            if ($dummyValue === null) {
+                return $getter;
+            }
+
+            return '('.$getter.' ?? '.var_export($dummyValue, true).')';
         }
 
         foreach ([$attribute, 'get'.ucfirst($attribute)] as $method) {
             if (method_exists($this->className, $method)) {
-                return $varName.'->'.$method.'()';
+                $getter = $varName.'->'.$method.'()';
+
+                if ($dummyValue === null) {
+                    return $getter;
+                }
+
+                return '('.$getter.' ?? '.var_export($dummyValue, true).')';
             }
         }
 
@@ -99,13 +112,18 @@ class ClassAccessor
      * @param string $attribute The attribute to set
      * @param string $value The value to pass
      * @param bool $useSetterInPriority For use setter if exists (instead of direct property set)
+     * @param mixed $dummyValue Set the value to null if the database value is the dummy value
      *
      * @return string
      *
      * @throws HydratorGenerationException When the attribute is not accessible
      */
-    public function setter($varName, $attribute, $value, $useSetterInPriority = true)
+    public function setter($varName, $attribute, $value, $useSetterInPriority = true, $dummyValue = null)
     {
+        if ($dummyValue !== null) {
+            $value = '('.$value.' === '.var_export($dummyValue, true).' ? null : '.$value.')';
+        }
+
         if ($useSetterInPriority && method_exists($this->className, 'set'.ucfirst($attribute))) {
             return $varName.'->set'.ucfirst($attribute).'('.$value.')';
         }
