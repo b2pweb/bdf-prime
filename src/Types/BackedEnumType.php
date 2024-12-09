@@ -3,7 +3,6 @@
 namespace Bdf\Prime\Types;
 
 use BackedEnum;
-
 use LogicException;
 
 use function is_subclass_of;
