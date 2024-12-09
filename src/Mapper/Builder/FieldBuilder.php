@@ -4,12 +4,16 @@ namespace Bdf\Prime\Mapper\Builder;
 
 use ArrayAccess;
 use ArrayIterator;
+use BackedEnum;
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Platform\Sql\Types\SqlJsonType;
+use Bdf\Prime\Types\BackedEnumType;
 use Bdf\Prime\Types\TypeInterface;
 use Bdf\Prime\Types\TypesHelperInterface;
+use Bdf\Prime\Types\UnitEnumType;
 use Closure;
 use IteratorAggregate;
+use UnitEnum;
 
 /**
  * FieldBuilder
@@ -321,6 +325,69 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     public function arrayOfDateTime(string $name, ?array $default = null)
     {
         return $this->arrayOf($name, TypeInterface::DATETIME, $default);
+    }
+
+    /**
+     * Add an enum property, stored as string field on database, using the backed value
+     *
+     * Note: Enum constraint will not be used on database level. Invalid values will simply be ignored by the ORM.
+     *
+     * @param string $name The property name
+     * @param class-string<T> $enumClass The enum class name
+     * @param T|null $default The default value
+     *
+     * @return $this
+     *
+     * @template T as BackedEnum
+     *
+     * @see FieldBuilder::unitEnum() To store the enum name instead of the backed value.
+     * @see FieldBuilder::intEnum() For int enum.
+     */
+    public function stringEnum(string $name, string $enumClass, ?BackedEnum $default = null)
+    {
+        return $this->add($name, BackedEnumType::STRING_ENUM, $default)->phpClass($enumClass);
+    }
+
+    /**
+     * Add an enum property, stored as integer field on database, using the backed value
+     *
+     * Note: Enum constraint will not be used on database level. Invalid values will simply be ignored by the ORM.
+     *
+     * @param string $name The property name
+     * @param class-string<T> $enumClass The enum class name
+     * @param T|null $default The default value
+     *
+     * @return $this
+     *
+     * @template T as BackedEnum
+     *
+     * @see FieldBuilder::unitEnum() To store the enum name instead of the backed value.
+     * @see FieldBuilder::stringEnum() For string enum.
+     */
+    public function intEnum(string $name, string $enumClass, ?BackedEnum $default = null)
+    {
+        return $this->add($name, BackedEnumType::INT_ENUM, $default)->phpClass($enumClass);
+    }
+
+    /**
+     * Add an enum property, stored as string field on database, using the case name.
+     *
+     * Note: Enum constraint will not be used on database level. Invalid values will simply be ignored by the ORM.
+     *
+     * @param string $name The property name
+     * @param class-string<T> $enumClass The enum class name
+     * @param T|null $default The default value
+     *
+     * @return $this
+     *
+     * @template T as UnitEnum
+     *
+     * @see FieldBuilder::intEnum() For int enum.
+     * @see FieldBuilder::stringEnum() For string enum.
+     */
+    public function unitEnum(string $name, string $enumClass, ?UnitEnum $default = null)
+    {
+        return $this->add($name, UnitEnumType::UNIT_ENUM, $default)->phpClass($enumClass);
     }
 
     /**
