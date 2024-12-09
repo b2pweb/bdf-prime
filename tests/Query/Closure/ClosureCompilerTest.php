@@ -34,6 +34,12 @@ class ClosureCompilerTest extends TestCase
         $this->cache = null;
     }
 
+    protected function tearDown(): void
+    {
+        $this->primeStop();
+        $this->unsetPrime();
+    }
+
     public function test_compile_simple()
     {
         $value = 5;
