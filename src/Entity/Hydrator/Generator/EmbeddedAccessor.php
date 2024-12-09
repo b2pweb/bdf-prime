@@ -122,7 +122,7 @@ PHP;
     public function setter($varName, $attribute, $value, $useSetterInPriority = true, $dummyValue = null)
     {
         if ($dummyValue !== null) {
-            $value = '('.$value.' === '.var_export($dummyValue, true).' ? null : '.$value.')';
+            $value = '((string) '.$value.' === (string) '.var_export($dummyValue, true).' ? null : '.$value.')';
         }
 
         if (count($this->accessors) === 1) {

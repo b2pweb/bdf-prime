@@ -1277,6 +1277,17 @@ EOL;
         $this->assertNull($entity->name);
         $this->assertNull($entity->value);
 
+        $entity = new EntityWithDummyValue();
+        $hydrator->flatHydrate($entity, [
+            'id' => 42,
+            'name' => '?',
+            'value' => '-1',
+        ], (new DummyPlatform())->types());
+
+        $this->assertSame(42, $entity->id);
+        $this->assertNull($entity->name);
+        $this->assertNull($entity->value);
+
         $hydrator->flatHydrate($entity, [
             'id' => 42,
             'name' => 'test',

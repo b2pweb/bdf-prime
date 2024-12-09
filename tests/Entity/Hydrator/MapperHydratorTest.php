@@ -570,5 +570,17 @@ class MapperHydratorTest extends TestCase
         $this->assertSame(1, $entity->embedded->id);
         $this->assertNull($entity->embedded->name);
         $this->assertNull($entity->embedded->value);
+        $entity = new EmbeddedDummyValue();
+        $hydrator->flatHydrate($entity, [
+            'id' => 42,
+            'embedded_id' => 1,
+            'embedded_name' => '?',
+            'embedded_value' => '-1',
+        ], (new DummyPlatform())->types());
+
+        $this->assertSame(42, $entity->id);
+        $this->assertSame(1, $entity->embedded->id);
+        $this->assertNull($entity->embedded->name);
+        $this->assertNull($entity->embedded->value);
     }
 }

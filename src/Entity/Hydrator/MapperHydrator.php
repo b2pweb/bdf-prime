@@ -111,7 +111,7 @@ class MapperHydrator implements MapperHydratorInterface
 
             if (
                 ($dummy = $metadata[$field]['phpOptions']['dummy'] ?? null) !== null
-                && $value === $dummy
+                && (string) $value === (string) $dummy
             ) {
                 $value = null;
             }
