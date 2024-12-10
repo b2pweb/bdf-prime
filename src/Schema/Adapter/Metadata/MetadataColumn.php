@@ -48,7 +48,10 @@ final class MetadataColumn implements ColumnInterface
      */
     public function type(): PlatformTypeInterface
     {
-        return $this->types->native($this->metadata['type']);
+        return isset($this->metadata['storageType'])
+            ? $this->types->native($this->metadata['storageType'])
+            : $this->types->native($this->metadata['type'])
+        ;
     }
 
     /**
@@ -56,7 +59,7 @@ final class MetadataColumn implements ColumnInterface
      */
     public function defaultValue()
     {
-        return $this->type()->toDatabase($this->metadata['default']);
+        return $this->types->native($this->metadata['type'])->toDatabase($this->metadata['default']);
     }
 
     /**

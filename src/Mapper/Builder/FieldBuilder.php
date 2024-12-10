@@ -540,6 +540,25 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     }
 
     /**
+     * Define the actual type used to store the data.
+     *
+     * When provided, the schema manager will use this type instead of the default one,
+     * the default type will only be used to parse or normalize the value.
+     *
+     * @param string $type The type name. Should be a constant of TypeInterface.
+     *
+     * @return $this
+     *
+     * @see TypeInterface::* constants
+     */
+    public function storedAs(string $type)
+    {
+        $this->fields[$this->current]['storageType'] = $type;
+
+        return $this;
+    }
+
+    /**
      * Declare the column as JSON type instead of TEXT.
      *
      * @param bool $flag true to use native json type, false to use text type

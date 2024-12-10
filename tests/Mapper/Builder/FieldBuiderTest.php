@@ -4,6 +4,7 @@ namespace Bdf\Prime\Mapper\Builder;
 
 use Bdf\Prime\PolymorphSubA;
 use Bdf\Prime\PolymorphSubB;
+use Bdf\Prime\Types\TypeInterface;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -245,6 +246,18 @@ class FieldBuilderTest extends TestCase
 
         $this->assertSame(5, $builder['name']['precision']);
         $this->assertSame(2, $builder['name']['scale']);
+    }
+
+    /**
+     *
+     */
+    public function test_storedAs()
+    {
+        $builder = new FieldBuilder();
+
+        $builder->string('name')->storedAs(TypeInterface::JSON);
+
+        $this->assertSame('json', $builder['name']['storageType']);
     }
 
     /**

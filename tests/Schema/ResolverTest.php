@@ -4,6 +4,7 @@ namespace Bdf\Prime\Schema;
 
 use Bdf\Prime\CrossConnectionSequenceEntity;
 use Bdf\Prime\Customer;
+use Bdf\Prime\EntityWithCustomStorageType;
 use Bdf\Prime\EntityWithIndex;
 use Bdf\Prime\Faction;
 use Bdf\Prime\Prime;
@@ -236,5 +237,11 @@ class ResolverTest extends TestCase
         $resolver = EntityWithIndex::repository()->schema();
         $resolver->migrate();
         $this->assertEmpty($resolver->diff());
+    }
+
+    public function test_custom_storage_type()
+    {
+        $resolver = EntityWithCustomStorageType::repository()->schema();
+        $this->assertEquals(['CREATE TABLE entity_custom_storage_type (id DOUBLE PRECISION NOT NULL, name BLOB NOT NULL, value VARCHAR(32) NOT NULL, enabled INTEGER NOT NULL)'], $resolver->diff());
     }
 }
