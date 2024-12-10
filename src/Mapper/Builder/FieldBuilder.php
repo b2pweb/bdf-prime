@@ -36,7 +36,8 @@ use IteratorAggregate;
  *     phpOptions?: array,
  *     customSchemaOptions?: array,
  *     platformOptions?: array,
- *     columnDefinition?: string
+ *     columnDefinition?: string,
+ *     storageType?: string
  * }
  *
  * @implements IteratorAggregate<string, FieldDefinition>
