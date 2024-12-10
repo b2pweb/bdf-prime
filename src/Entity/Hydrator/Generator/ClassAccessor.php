@@ -112,18 +112,13 @@ class ClassAccessor
      * @param string $attribute The attribute to set
      * @param string $value The value to pass
      * @param bool $useSetterInPriority For use setter if exists (instead of direct property set)
-     * @param mixed $dummyValue Set the value to null if the database value is the dummy value
      *
      * @return string
      *
      * @throws HydratorGenerationException When the attribute is not accessible
      */
-    public function setter($varName, $attribute, $value, $useSetterInPriority = true, $dummyValue = null)
+    public function setter($varName, $attribute, $value, $useSetterInPriority = true)
     {
-        if ($dummyValue !== null) {
-            $value = '('.$value.' === '.var_export($dummyValue, true).' ? null : '.$value.')';
-        }
-
         if ($useSetterInPriority && method_exists($this->className, 'set'.ucfirst($attribute))) {
             return $varName.'->set'.ucfirst($attribute).'('.$value.')';
         }

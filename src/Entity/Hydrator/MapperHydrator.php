@@ -107,14 +107,14 @@ class MapperHydrator implements MapperHydratorInterface
                 continue;
             }
 
-            $value = $types->get($metadata[$field]['type'])->fromDatabase($value, $metadata[$field]['phpOptions']);
-
             if (
                 ($dummy = $metadata[$field]['phpOptions']['dummy'] ?? null) !== null
                 && (string) $value === (string) $dummy
             ) {
                 $value = null;
             }
+
+            $value = $types->get($metadata[$field]['type'])->fromDatabase($value, $metadata[$field]['phpOptions']);
 
             if (isset($metadata[$field]['embedded'])) {
                 $path = $metadata[$field]['embedded'];

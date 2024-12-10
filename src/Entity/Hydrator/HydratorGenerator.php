@@ -629,25 +629,32 @@ PHP;
         }
 
         $target = "\$value";
-        $out = $target.' = '.$types->generateFromDatabase($attribute->type(), '$data[\''.$attribute->field().'\']', $options);
+        $dbValue = "\$data['{$attribute->field()}']";
+
+        if ($attribute->dummyValue() !== null) {
+            $dummyValue = var_export($attribute->dummyValue(), true);
+            $dbValue = "((string) $dbValue === (string) $dummyValue) ? null : $dbValue";
+        }
+
+        $out = $target.' = '.$types->generateFromDatabase($attribute->type(), $dbValue, $options);
 
         if (!$attribute->isEmbedded()) {
             if ($attribute->isNullable()) {
-                return $out."\n".$this->accessor->setter('$object', $attribute->name(), $target, false, $attribute->dummyValue()).';';
+                return $out."\n".$this->accessor->setter('$object', $attribute->name(), $target, false).';';
             }
 
             return <<<PHP
 {$out}
 
 if ({$target} !== null) {
-    {$this->accessor->setter('$object', $attribute->name(), $target, false, $attribute->dummyValue())};
+    {$this->accessor->setter('$object', $attribute->name(), $target, false)};
 }
 PHP;
         }
 
         $accessor = $this->accessors
             ->embedded($attribute->embedded())
-            ->fullSetter($attribute->property(), $target, '$__embedded', '$data', $attribute->dummyValue()).';'
+            ->fullSetter($attribute->property(), $target, '$__embedded', '$data').';'
         ;
 
         if (!$attribute->isNullable()) {

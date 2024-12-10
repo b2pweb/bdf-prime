@@ -555,13 +555,15 @@ class CRUDTest extends TestCase
         $this->assertSame(1, $entity->id);
         $this->assertNull(EntityWithDummyValue::refresh($entity)->name);
         $this->assertNull(EntityWithDummyValue::refresh($entity)->value);
+        $this->assertNull(EntityWithDummyValue::refresh($entity)->valid);
 
-        $this->assertEquals([['id' => 1, 'name' => '?', 'value' => -1]], EntityWithDummyValue::repository()->builder()->execute()->all());
+        $this->assertEquals([['id' => 1, 'name' => '?', 'value' => -1, 'valid' => -1]], EntityWithDummyValue::repository()->builder()->execute()->all());
 
         $entity->name = 'foo';
         $entity->value = 42;
+        $entity->valid = true;
         $entity->update();
         $this->assertEquals($entity, EntityWithDummyValue::refresh($entity));
-        $this->assertEquals([['id' => 1, 'name' => 'foo', 'value' => 42]], EntityWithDummyValue::repository()->builder()->execute()->all());
+        $this->assertEquals([['id' => 1, 'name' => 'foo', 'value' => 42, 'valid' => 1]], EntityWithDummyValue::repository()->builder()->execute()->all());
     }
 }

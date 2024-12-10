@@ -13,6 +13,7 @@ class EntityWithDummyValue extends Model
     public ?int $id = null;
     public ?string $name = null;
     public ?int $value = null;
+    public ?bool $valid = null;
 
     public function __construct(array $data = [])
     {
@@ -42,6 +43,7 @@ class EntityWithDummyValueMapper extends Mapper
             ->integer('id')->autoincrement()
             ->string('name')->dummy('?')
             ->integer('value')->dummy(-1)
+            ->boolean('valid')->dummy(-1)
         ;
     }
 }

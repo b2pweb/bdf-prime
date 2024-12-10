@@ -1257,6 +1257,7 @@ EOL;
             'id' => 42,
             'name' => '?',
             'value' => -1,
+            'valid' => -1,
         ], $hydrator->flatExtract(new EntityWithDummyValue(['id' => 42])));
         $this->assertSame(['name' => '?'], $hydrator->flatExtract(new EntityWithDummyValue(['id' => 42]), ['name' => 'name']));
 
@@ -1264,39 +1265,46 @@ EOL;
             'id' => 42,
             'name' => 'test',
             'value' => 123,
-        ], $hydrator->flatExtract(new EntityWithDummyValue(['id' => 42, 'name' => 'test', 'value' => 123])));
+            'valid' => false,
+        ], $hydrator->flatExtract(new EntityWithDummyValue(['id' => 42, 'name' => 'test', 'value' => 123, 'valid' => false])));
 
         $entity = new EntityWithDummyValue();
         $hydrator->flatHydrate($entity, [
             'id' => 42,
             'name' => '?',
             'value' => -1,
+            'valid' => -1,
         ], (new DummyPlatform())->types());
 
         $this->assertSame(42, $entity->id);
         $this->assertNull($entity->name);
         $this->assertNull($entity->value);
+        $this->assertNull($entity->valid);
 
         $entity = new EntityWithDummyValue();
         $hydrator->flatHydrate($entity, [
             'id' => 42,
             'name' => '?',
             'value' => '-1',
+            'valid' => '-1',
         ], (new DummyPlatform())->types());
 
         $this->assertSame(42, $entity->id);
         $this->assertNull($entity->name);
         $this->assertNull($entity->value);
+        $this->assertNull($entity->valid);
 
         $hydrator->flatHydrate($entity, [
             'id' => 42,
             'name' => 'test',
             'value' => 41,
+            'valid' => 1,
         ], (new DummyPlatform())->types());
 
         $this->assertSame(42, $entity->id);
         $this->assertSame('test', $entity->name);
         $this->assertSame(41, $entity->value);
+        $this->assertTrue($entity->valid);
     }
 
     public function test_dummy_value_embedded()
