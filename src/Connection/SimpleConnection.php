@@ -38,6 +38,8 @@ use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 
+use function spl_object_id;
+
 /**
  * Connection
  *
@@ -73,6 +75,14 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     private $factory;
 
     /**
+     * List of listeners to call when the connection is closed,
+     * indexed by the listener object id
+     *
+     * @var array<int, Closure(ConnectionInterface):void>
+     */
+    private array $onConnectionClosedListeners = [];
+
+    /**
      * SimpleConnection constructor.
      *
      * @param array $params
@@ -81,7 +91,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      * @param EventManager|null $eventManager
      * @throws DoctrineDBALException
      */
-    public function __construct(array $params, Driver $driver, Configuration $config = null, EventManager $eventManager = null)
+    public function __construct(array $params, Driver $driver, ?Configuration $config = null, ?EventManager $eventManager = null)
     {
         /** @psalm-suppress InternalMethod */
         parent::__construct($params, $driver, $config, $eventManager);
@@ -172,6 +182,28 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
 
     /**
      * {@inheritdoc}
+     *
+     * @param Closure(ConnectionInterface):void $listener
+     */
+    public function addConnectionClosedListener(Closure $listener): void
+    {
+        $id = spl_object_id($listener);
+
+        $this->onConnectionClosedListeners[$id] = $listener;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function removeConnectionClosedListener(Closure $listener): void
+    {
+        $id = spl_object_id($listener);
+
+        unset($this->onConnectionClosedListeners[$id]);
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function fromDatabase($value, $type, array $fieldOptions = [])
     {
@@ -189,7 +221,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function builder(PreprocessorInterface $preprocessor = null): Query
+    public function builder(?PreprocessorInterface $preprocessor = null): Query
     {
         return $this->factory->make(Query::class, $preprocessor);
     }
@@ -197,7 +229,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function make(string $query, PreprocessorInterface $preprocessor = null): CommandInterface
+    public function make(string $query, ?PreprocessorInterface $preprocessor = null): CommandInterface
     {
         return $this->factory->make($query, $preprocessor);
     }
@@ -253,7 +285,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function executeQuery(string $sql, array $params = [], $types = [], QueryCacheProfile $qcp = null): Result
+    public function executeQuery(string $sql, array $params = [], $types = [], ?QueryCacheProfile $qcp = null): Result
     {
         $this->prepareLogger();
 
@@ -399,18 +431,29 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
 
     /**
      * {@inheritdoc}
+     *
+     * @psalm-suppress DeprecatedProperty
+     * @psalm-suppress DeprecatedClass
      */
     public function close(): void
     {
         parent::close();
 
+        // To remove in 3.0
         $this->_eventManager->dispatchEvent(ConnectionClosedListenerInterface::EVENT_NAME);
+
+        foreach ($this->onConnectionClosedListeners as $listener) {
+            $listener($this);
+        }
     }
 
     /**
      * Setup the logger by setting the connection
      *
      * @return void
+     * @psalm-suppress DeprecatedMethod
+     * @psalm-suppress DeprecatedClass
+     * @todo remove on prime 3.0
      */
     protected function prepareLogger(): void
     {

@@ -57,6 +57,7 @@ class Paginator extends AbstractPaginator implements IteratorAggregate, Paginato
         parent::loadCollection();
 
         if (!($this->collection instanceof CollectionInterface)) {
+            /** @psalm-suppress NoValue */
             $this->collection = new ArrayCollection($this->collection);
         }
     }

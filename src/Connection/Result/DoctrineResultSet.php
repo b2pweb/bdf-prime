@@ -93,6 +93,8 @@ final class DoctrineResultSet implements ResultSetInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @psalm-suppress DeprecatedConstant
      */
     public function fetchMode($mode, $options = null)
     {

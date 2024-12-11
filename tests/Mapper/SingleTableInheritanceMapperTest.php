@@ -249,6 +249,7 @@ class SingleTableInheritanceMapperTest extends TestCase
         $mapper->setMapperFactory(Prime::service()->mappers());
 
         $expected = [
+            'name' => 'target',
             'type'      => Relation::BY_INHERITANCE,
             'localKey'  => 'targetId',
         ];

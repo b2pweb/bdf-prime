@@ -6,6 +6,7 @@ use Bdf\Prime\Platform\PlatformTypeInterface;
 use Bdf\Prime\Schema\ColumnInterface;
 use Bdf\Prime\Types\TypesRegistryInterface;
 use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Types\Type;
 
 /**
  * Adapt doctrine column to prime column
@@ -50,7 +51,7 @@ final class DoctrineColumn implements ColumnInterface
      */
     public function type(): PlatformTypeInterface
     {
-        return $this->types->get($this->column->getType()->getName());
+        return $this->types->get(Type::lookupName($this->column->getType()));
     }
 
     /**
@@ -130,7 +131,7 @@ final class DoctrineColumn implements ColumnInterface
      */
     public function options(): array
     {
-        return $this->column->getCustomSchemaOptions();
+        return $this->column->getPlatformOptions();
     }
 
     /**
@@ -138,6 +139,6 @@ final class DoctrineColumn implements ColumnInterface
      */
     public function option(string $name)
     {
-        return $this->column->getCustomSchemaOption($name);
+        return $this->column->getPlatformOption($name);
     }
 }

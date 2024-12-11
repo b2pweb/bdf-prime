@@ -4,13 +4,14 @@ namespace Bdf\Prime\Schema;
 
 use Doctrine\DBAL\Schema\Comparator as BaseComparator;
 use Doctrine\DBAL\Schema\Table as BaseTable;
+use Doctrine\DBAL\Schema\TableDiff;
 
 /**
  * Schema comparator
  *
  * @package Bdf\Prime\Schema
  *
- * @deprecated since 1.3 Use Prime comparators instead
+ * @internal Use {@see SchemaManager::diff()} instead
  */
 class Comparator extends BaseComparator
 {
@@ -36,11 +37,11 @@ class Comparator extends BaseComparator
     /**
      * {@inheritdoc}
      */
-    public function diffTable(BaseTable $fromTable, BaseTable $toTable)
+    public function compareTables(BaseTable $fromTable, BaseTable $toTable): TableDiff
     {
-        $diff = parent::diffTable($fromTable, $toTable);
+        $diff = parent::compareTables($fromTable, $toTable);
 
-        if ($diff && !$this->listDropColumn) {
+        if (!$this->listDropColumn) {
             /** @psalm-suppress InternalProperty */
             $diff->removedColumns = [];
         }

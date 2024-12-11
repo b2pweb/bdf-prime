@@ -13,6 +13,9 @@ use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryInterface;
 
+use function array_diff_key;
+use function count;
+
 /**
  * BelongsToMany
  *
@@ -36,6 +39,8 @@ use Bdf\Prime\Repository\RepositoryInterface;
  * @template R as object
  *
  * @extends Relation<L, R>
+ *
+ * @property EntityRepository<R> $distant
  */
 class BelongsToMany extends Relation
 {
@@ -300,10 +305,14 @@ class BelongsToMany extends Relation
             $throughEntities[$throughLocal][$throughDistant] = $throughDistant;
         }
 
-        $relations = $this->relationQuery($throughDistants, $constraints)
-            ->with($with)
-            ->without($without)
-            ->all();
+        if ($throughDistants !== []) {
+            $relations = $this->relationQuery($throughDistants, $constraints)
+                ->with($with)
+                ->without($without)
+                ->all();
+        } else {
+            $relations = [];
+        }
 
         return [
             'throughEntities' => $throughEntities,
@@ -325,12 +334,19 @@ class BelongsToMany extends Relation
                 }
             }
 
-            if (empty($entities)) {
-                continue;
-            }
-
             foreach ($collection[$key] as $local) {
                 $this->setRelation($local, $entities);
+            }
+        }
+
+        // Some relations are missing : so we set an empty array
+        if (count($collection) > count($relations['throughEntities'])) {
+            $missing = array_diff_key($collection, $relations['throughEntities']);
+
+            foreach ($missing as $locals) {
+                foreach ($locals as $local) {
+                    $this->setRelation($local, []);
+                }
             }
         }
     }

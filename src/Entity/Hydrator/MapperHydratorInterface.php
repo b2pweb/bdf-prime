@@ -51,7 +51,7 @@ interface MapperHydratorInterface
      *
      * @throws UninitializedPropertyException When unititialized properties are tried to be extracted
      */
-    public function flatExtract($object, array $attributes = null): array;
+    public function flatExtract($object, ?array $attributes = null): array;
 
     /**
      * Hydrate the entity from a single-dimension array.

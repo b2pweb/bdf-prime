@@ -112,13 +112,25 @@ interface RepositoryInterface
     /**
      * Get defined relation
      *
-     * Build object relation defined by user
+     * <code>
+     *     // Get a relation by its class name
+     *     $repository->relation(TestEntity::class)->link($entity)->all();
      *
-     * @param string $relationName
+     *     // When the class name is ambiguous, use the relation name as second argument
+     *     $repository->relation(TestEntity::class, 'foreign')->link($entity)->all();
      *
-     * @return RelationInterface<E, object>
+     *     // It can also be used as first argument, but it looses the type safety
+     *     $repository->relation('foreign')->link($entity)->all();
+     * </code>
+     *
+     * @param class-string<R>|string $relationClass The relation class name, or the relation name
+     * @param string|null $relationName The relation name if the there is multiple relation on the same class
+     *
+     * @return RelationInterface<E, R>
+     *
+     * @template R as object
      */
-    public function relation(string $relationName): RelationInterface;
+    public function relation(string $relationClass/*, ?string $relationName = null*/): RelationInterface;
 
     /**
      * Get the repository constraints

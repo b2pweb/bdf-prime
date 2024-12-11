@@ -1188,7 +1188,7 @@ class ConfigurableEntityPrinter extends Printer
         $code = parent::printClass($class, $namespace);
 
         // Reformat property docblock : nette will generate property doc on single line
-        return preg_replace('#^( *)/\*\*(.*)\s+\*/$#m', "$1/**\n$1 *$2\n$1 */", $code);
+        return preg_replace('#^( *)/\*\*(.*)\s+\*/$#m', "$1/**\n$1 *$2\n$1 */", $code) ?? $code;
     }
 }
 

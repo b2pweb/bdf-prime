@@ -9,6 +9,8 @@ use Bdf\Prime\Relations\Relation;
  * SingleTableInheritanceMapper
  *
  * @package Bdf\Prime\Mapper
+ * @template E as object
+ * @extends Mapper<E>
  */
 abstract class SingleTableInheritanceMapper extends Mapper implements MapperFactoryAwareInterface
 {
@@ -47,12 +49,12 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
     /**
      * {@inheritdoc}
      */
-    public function relation(string $relationName): array
+    public function relation(string $relationClass, ?string $relationName = null): array
     {
-        $relation = parent::relation($relationName);
+        $relation = parent::relation($relationClass, $relationName);
 
         if ($this->isDiscriminatedMapper() && $relation['type'] == Relation::BY_INHERITANCE) {
-            throw new \RuntimeException('Relation type not allowed from relation "' . $relationName . '" in ' . $this->getEntityClass());
+            throw new \RuntimeException('Relation type not allowed from relation "' . ($relationName ?? $relationClass) . '" in ' . $this->getEntityClass());
         }
 
         return $relation;
@@ -127,7 +129,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      *
      * @param mixed $value
      *
-     * @return Mapper
+     * @return Mapper<E>
      * @psalm-suppress InvalidNullableReturnType
      * @final
      */

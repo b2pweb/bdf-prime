@@ -154,6 +154,7 @@ class QueryRepositoryExtension extends QueryCompatExtension
      */
     public function getOrFail(ReadCommandInterface $query, $id, $attributes = null)
     {
+        /** @psalm-suppress DeprecatedMethod */
         $entity = $this->get($query, $id, $attributes);
 
         if ($entity !== null) {
@@ -175,6 +176,7 @@ class QueryRepositoryExtension extends QueryCompatExtension
      */
     public function getOrNew(ReadCommandInterface $query, $id, $attributes = null)
     {
+        /** @psalm-suppress DeprecatedMethod */
         $entity = $this->get($query, $id, $attributes);
 
         if ($entity !== null) {
@@ -464,6 +466,7 @@ class QueryRepositoryExtension extends QueryCompatExtension
             if (!isset($statement['nested'])) {
                 $statements[] = $statement;
             } else {
+                /** @psalm-suppress InvalidOperand */
                 $statements = [...$statements, ...$statement['nested']];
             }
         }

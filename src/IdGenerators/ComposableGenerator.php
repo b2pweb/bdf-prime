@@ -7,6 +7,9 @@ use Bdf\Prime\ServiceLocator;
 
 /**
  * ComposableGenerator
+ *
+ * @template C as ConnectionInterface
+ * @implements GeneratorInterface<C>
  */
 class ComposableGenerator implements GeneratorInterface
 {

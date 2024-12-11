@@ -8,6 +8,8 @@ use Bdf\Prime\Relations\AbstractRelation;
 use Bdf\Prime\Relations\RelationInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 
+use function is_object;
+
 /**
  * Adds foreign key accessor helpers for relations based on single foreign key
  *
@@ -15,6 +17,8 @@ use Bdf\Prime\Repository\RepositoryInterface;
  *
  * @template L as object
  * @template R as object
+ *
+ * @api
  */
 trait ForeignKeyRelation
 {
@@ -61,7 +65,7 @@ trait ForeignKeyRelation
     {
         $mapper = $this->localRepository()->mapper();
 
-        if (!is_array($entity)) {
+        if (is_object($entity)) {
             return $mapper->extractOne($entity, $this->localKey);
         }
 

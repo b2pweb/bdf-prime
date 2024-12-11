@@ -2,8 +2,6 @@
 
 namespace Bdf\Prime\Query\Expression;
 
-use Bdf\Prime\Query\Compiler\CompilerInterface;
-
 /**
  * AbstractExpressionTransformer
  */

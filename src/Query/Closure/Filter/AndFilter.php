@@ -6,13 +6,13 @@ use ArrayAccess;
 use BadMethodCallException;
 use Countable;
 use Generator;
-
 use IteratorAggregate;
 
 use function array_push;
 
 /**
  * @implements IteratorAggregate<int, AtomicFilter|OrFilter>
+ * @implements ArrayAccess<int, AtomicFilter|OrFilter>
  */
 final class AndFilter implements IteratorAggregate, Countable, ArrayAccess
 {
@@ -54,6 +54,7 @@ final class AndFilter implements IteratorAggregate, Countable, ArrayAccess
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->filters[$offset];

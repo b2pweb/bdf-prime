@@ -21,7 +21,7 @@ class SqlDateTimeType extends AbstractSqlDateTimeType
         PlatformInterface $platform,
         $name = self::DATETIME,
         string $className = \DateTime::class,
-        \DateTimeZone $timezone = null
+        ?\DateTimeZone $timezone = null
     ) {
         parent::__construct($platform, $name);
 

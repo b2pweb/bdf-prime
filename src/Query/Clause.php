@@ -233,6 +233,7 @@ class Clause implements ClauseInterface
     public function buildNested(string $statement, callable $callback, string $type = CompositeExpression::TYPE_AND)
     {
         $statements = $this->statements;
+        /** @var array<string, mixed> $this->statements */
         $this->statements = [];
 
         $callback($this);

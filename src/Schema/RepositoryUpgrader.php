@@ -42,7 +42,7 @@ class RepositoryUpgrader implements StructureUpgraderInterface
      * @param Metadata $metadata The entity metadata
      * @param SchemaManagerInterface|null $schema If given, force using this schema manager instead of resolving using the configured connection name
      */
-    public function __construct(ServiceLocator $service, Metadata $metadata, SchemaManagerInterface $schema = null)
+    public function __construct(ServiceLocator $service, Metadata $metadata, ?SchemaManagerInterface $schema = null)
     {
         $this->service  = $service;
         $this->metadata = $metadata;

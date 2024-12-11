@@ -37,6 +37,8 @@ use Closure;
 use Doctrine\Common\EventSubscriber;
 use Exception;
 
+use function method_exists;
+
 /**
  * Db repository
  *
@@ -57,6 +59,8 @@ use Exception;
  * @method E getOrFail(mixed $key)
  * @method E getOrNew(mixed $key)
  * @method QueryInterface<ConnectionInterface, E> filter(Closure $filter)
+ *
+ * @psalm-suppress DeprecatedInterface
  */
 class EntityRepository implements RepositoryInterface, EventSubscriber, ConnectionClosedListenerInterface, RepositoryEventsSubscriberInterface
 {
@@ -115,6 +119,11 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     protected $connection;
 
+    /**
+     * @var Closure(ConnectionInterface):void
+     */
+    private Closure $onCloseListener;
+
 
     /**
      * Constructor
@@ -128,6 +137,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
         $this->resultCache = $cache;
         $this->mapper = $mapper;
         $this->serviceLocator = $serviceLocator;
+        $this->onCloseListener = fn (ConnectionInterface $connection) => $this->reset();
 
         $this->collectionFactory = CollectionFactory::forRepository($this);
         $this->queries = new RepositoryQueryFactory($this, $cache, $serviceLocator->mappers()->getMetadataCache());
@@ -255,7 +265,13 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
         if ($this->connection === null) {
             //Repository query factory load the connection on its constructor. Use lazy to let the connection being loaded as late as possible.
             $this->connection = $this->serviceLocator->connection($this->mapper->metadata()->connection);
-            $this->connection->getEventManager()->addEventSubscriber($this);
+
+            if (method_exists($this->connection, 'addConnectionClosedListener')) {
+                $this->connection->addConnectionClosedListener($this->onCloseListener);
+            } else {
+                /** @psalm-suppress DeprecatedMethod */
+                $this->connection->getEventManager()->addEventSubscriber($this);
+            }
         }
 
         return $this->connection;
@@ -378,26 +394,37 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * Get a entity relation wrapper linked to the entity
      *
-     * @param string $relationName
+     * @param class-string<R>|string $relationClass The relation class name, or the relation name
+     * @param string|null $relationName The relation name if the there is multiple relation on the same class
      * @param E $entity
      *
-     * @return EntityRelation<E, object>
+     * @return EntityRelation<E, R>
+     * @template R as object
+     *
+     * @psalm-suppress InvalidReturnStatement
+     * @psalm-suppress InvalidReturnType
      */
-    public function onRelation(string $relationName, $entity): EntityRelation
+    public function onRelation(string $relationClass, $entity, ?string $relationName = null): EntityRelation
     {
-        return new EntityRelation($entity, $this->relation($relationName));
+        return new EntityRelation($entity, $this->relation($relationClass, $relationName));
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @psalm-suppress InvalidReturnType
+     * @psalm-suppress InvalidReturnStatement
      */
-    public function relation(string $relationName): RelationInterface
+    public function relation(string $relationClass, ?string $relationName = null): RelationInterface
     {
-        if (!isset($this->relations[$relationName])) {
-            $this->relations[$relationName] = Relation::make($this, $relationName, $this->mapper->relation($relationName));
+        if ($relation = $this->relations[$relationName ?? $relationClass] ?? null) {
+            return $relation;
         }
 
-        return $this->relations[$relationName];
+        $metadata = $this->mapper->relation($relationClass, $relationName);
+        $relationName = $metadata['name'];
+
+        return ($this->relations[$relationName] ??= Relation::make($this, $relationName, $metadata));
     }
 
     /**
@@ -441,7 +468,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     /**
      * {@inheritdoc}
      */
-    public function constraints(string $context = null): array
+    public function constraints(?string $context = null): array
     {
         if ($this->withoutConstraints === true) {
             $this->withoutConstraints = false;
@@ -670,7 +697,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function update($entity, array $attributes = null): int
+    public function update($entity, ?array $attributes = null): int
     {
         return $this->writer->update($entity, ['attributes' => $attributes]);
     }
@@ -988,9 +1015,12 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
 
     /**
      * {@inheritdoc}
+     *
+     * @deprecated Since 2.2, will be removed in 3.0.
      */
     public function getSubscribedEvents()
     {
+        /** @psalm-suppress DeprecatedClass */
         return [ConnectionClosedListenerInterface::EVENT_NAME];
     }
 
@@ -1019,7 +1049,13 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     public function destroy(): void
     {
         if ($this->connection !== null) {
-            $this->connection->getEventManager()->removeEventSubscriber($this);
+            if (method_exists($this->connection, 'removeConnectionClosedListener')) {
+                $this->connection->removeConnectionClosedListener($this->onCloseListener);
+            } else {
+                /** @psalm-suppress DeprecatedMethod */
+                $this->connection->getEventManager()->removeEventSubscriber($this);
+            }
+
             $this->connection = null;
         }
 
@@ -1068,7 +1104,13 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     private function reset(): void
     {
         if ($this->connection !== null) {
-            $this->connection->getEventManager()->removeEventSubscriber($this);
+            if (method_exists($this->connection, 'removeConnectionClosedListener')) {
+                $this->connection->removeConnectionClosedListener($this->onCloseListener);
+            } else {
+                /** @psalm-suppress DeprecatedMethod */
+                $this->connection->getEventManager()->removeEventSubscriber($this);
+            }
+
             $this->connection = null;
         }
 

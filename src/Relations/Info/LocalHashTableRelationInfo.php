@@ -4,6 +4,9 @@ namespace Bdf\Prime\Relations\Info;
 
 /**
  * Store loading information into an array, using WeakMap for identify entities
+ *
+ * @template E as object
+ * @implements RelationInfoInterface<E>
  */
 final class LocalHashTableRelationInfo implements RelationInfoInterface
 {

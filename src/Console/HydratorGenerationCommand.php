@@ -45,9 +45,9 @@ class HydratorGenerationCommand extends Command
      * HydratorGenerationCommand constructor.
      *
      * @param ServiceLocator $locator
-     * @param string $loaderFile
+     * @param string|null $loaderFile
      */
-    public function __construct(ServiceLocator $locator, string $loaderFile = null)
+    public function __construct(ServiceLocator $locator, ?string $loaderFile = null)
     {
         $this->locator = $locator;
         $this->loaderFile = $loaderFile;

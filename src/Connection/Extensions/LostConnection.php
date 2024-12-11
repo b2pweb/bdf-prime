@@ -35,6 +35,7 @@ trait LostConnection
         'Packets out of order. Expected',
         'Adaptive Server connection failed',
         'Communication link failure',
+        'The client was disconnected by the server because of inactivity.',
     ];
 
     /**

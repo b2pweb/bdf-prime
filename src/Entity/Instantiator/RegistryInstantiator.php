@@ -22,7 +22,7 @@ class RegistryInstantiator implements InstantiatorInterface
      *
      * @param null|InstantiatorInterface $defaultInstantiator
      */
-    public function __construct(InstantiatorInterface $defaultInstantiator = null)
+    public function __construct(?InstantiatorInterface $defaultInstantiator = null)
     {
         $this->defaultInstantiator = $defaultInstantiator;
     }

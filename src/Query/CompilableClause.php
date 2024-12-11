@@ -34,7 +34,7 @@ class CompilableClause extends Clause implements CompilableClauseInterface
      * @param PreprocessorInterface $preprocessor
      * @param CompilerState|null $state
      */
-    public function __construct(PreprocessorInterface $preprocessor, CompilerState $state = null)
+    public function __construct(PreprocessorInterface $preprocessor, ?CompilerState $state = null)
     {
         $this->preprocessor = $preprocessor;
         $this->compilerState = $state ?: new CompilerState();
