@@ -14,10 +14,12 @@ use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\SqlQueryInterface;
 use Bdf\Prime\Types\TypeInterface;
 use Doctrine\DBAL\LockMode;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use UnexpectedValueException;
 
 use function is_string;
+use function sprintf;
 
 /**
  * Base compiler for SQL queries
@@ -74,7 +76,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
         $query->state()->currentPart = 0;
 
         if ($query->statements['ignore'] && $this->platform()->grammar()->getReservedKeywordsList()->isKeyword('IGNORE')) {
-            if ($this->platform()->grammar()->getName() === 'sqlite') {
+            if ($this->platform()->grammar() instanceof SqlitePlatform) {
                 $insert = 'INSERT OR IGNORE INTO ';
             } else {
                 $insert = 'INSERT IGNORE INTO ';
@@ -400,12 +402,12 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
         }
 
         switch ($function) {
-            case 'avg'  :      return $this->platform()->grammar()->getAvgExpression($column).' AS aggregate';
-            case 'count':      return $this->platform()->grammar()->getCountExpression($column).' AS aggregate';
-            case 'max'  :      return $this->platform()->grammar()->getMaxExpression($column).' AS aggregate';
-            case 'min'  :      return $this->platform()->grammar()->getMinExpression($column).' AS aggregate';
-            case 'pagination': return $this->platform()->grammar()->getCountExpression($column).' AS aggregate';
-            case 'sum'  :      return $this->platform()->grammar()->getSumExpression($column).' AS aggregate';
+            case 'avg'  :      return "AVG($column) AS aggregate";
+            case 'count':      return "COUNT($column) AS aggregate";
+            case 'max'  :      return "MAX($column) AS aggregate";
+            case 'min'  :      return "MIN($column) AS aggregate";
+            case 'pagination': return "COUNT($column) AS aggregate";
+            case 'sum'  :      return "SUM($column) AS aggregate";
 
             default:
                 $method = 'get'.ucfirst($function).'Expression';
@@ -721,7 +723,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
             case 'in':
             case ':in':
                 if (empty($value)) {
-                    return $this->platform()->grammar()->getIsNullExpression($this->compileLeftExpression($query, $column));
+                    return $this->compileLeftExpression($query, $column) . ' IS NULL';
                 }
                 return $this->compileInExpression($query, $value, $column, 'IN', $converted);
 
@@ -729,27 +731,39 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
             case '!in':
             case ':notin':
                 if (empty($value)) {
-                    return $this->platform()->grammar()->getIsNotNullExpression($this->compileLeftExpression($query, $column));
+                    return $this->compileLeftExpression($query, $column) . ' IS NOT NULL';
                 }
                 return $this->compileInExpression($query, $value, $column, 'NOT IN', $converted);
 
             case 'between':
             case ':between':
                 if (is_array($value)) {
-                    return $this->platform()->grammar()->getBetweenExpression($this->compileLeftExpression($query, $column), $this->compileExpressionValue($query, $value[0], $converted), $this->compileExpressionValue($query, $value[1], $converted));
+                    return sprintf(
+                        '%s BETWEEN %s AND %s',
+                        $this->compileLeftExpression($query, $column),
+                        $this->compileExpressionValue($query, $value[0], $converted),
+                        $this->compileExpressionValue($query, $value[1], $converted)
+                    );
                 }
-                return $this->platform()->grammar()->getBetweenExpression($this->compileLeftExpression($query, $column), '0', $this->compileExpressionValue($query, $value, $converted));
+
+                // @todo deprecate ?
+                return sprintf(
+                    '%s BETWEEN %s AND %s',
+                    $this->compileLeftExpression($query, $column),
+                    '0',
+                    $this->compileExpressionValue($query, $value, $converted)
+                );
 
             case '!between':
             case ':notbetween':
-                return $this->platform()->grammar()->getNotExpression($this->compileExpression($query, $column, ':between', $value, $converted));
+                return 'NOT(' . $this->compileExpression($query, $column, ':between', $value, $converted). ')';
 
             case '<>':
             case '!=':
             case ':ne':
             case ':not':
                 if (is_null($value)) {
-                    return $this->platform()->grammar()->getIsNotNullExpression($this->compileLeftExpression($query, $column));
+                    return $this->compileLeftExpression($query, $column) . ' IS NOT NULL';
                 }
                 if (is_array($value)) {
                     return $this->compileExpression($query, $column, ':notin', $value, $converted);
@@ -759,7 +773,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
             case '=':
             case ':eq':
                 if (is_null($value)) {
-                    return $this->platform()->grammar()->getIsNullExpression($this->compileLeftExpression($query, $column));
+                    return $this->compileLeftExpression($query, $column) . ' IS NULL';
                 }
                 if (is_array($value)) {
                     return $this->compileExpression($query, $column, ':in', $value, $converted);

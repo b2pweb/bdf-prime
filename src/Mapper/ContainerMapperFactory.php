@@ -18,7 +18,7 @@ final class ContainerMapperFactory extends MapperFactory
 {
     private ContainerInterface $container;
 
-    public function __construct(ContainerInterface $container, ResolverInterface $nameResolver = null, Psr16CacheInterface $metadataCache = null, CacheInterface $resultCache = null)
+    public function __construct(ContainerInterface $container, ?ResolverInterface $nameResolver = null, ?Psr16CacheInterface $metadataCache = null, ?CacheInterface $resultCache = null)
     {
         parent::__construct($nameResolver, $metadataCache, $resultCache);
 

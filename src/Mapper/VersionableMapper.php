@@ -11,6 +11,9 @@ use Bdf\Prime\Mapper\Builder\FieldBuilder;
  * Mapper utilisé par le Behavior Versionable
  *
  * @package Bdf\Prime\Mapper
+ *
+ * @template E as object
+ * @extends Mapper<E>
  */
 abstract class VersionableMapper extends Mapper
 {

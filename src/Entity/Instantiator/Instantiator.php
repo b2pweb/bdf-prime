@@ -18,7 +18,7 @@ class Instantiator implements InstantiatorInterface
      *
      * @param DoctrineInstantiatorInterface|null $instantiator
      */
-    public function __construct(DoctrineInstantiatorInterface $instantiator = null)
+    public function __construct(?DoctrineInstantiatorInterface $instantiator = null)
     {
         $this->instantiator = $instantiator ?: new DoctrineInstantiator();
     }

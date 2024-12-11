@@ -22,6 +22,8 @@ use function array_intersect_key;
  * @template R as object
  *
  * @extends Relation<L, R>
+ *
+ * @property RepositoryInterface<R> $distant
  */
 abstract class OneOrMany extends Relation
 {
@@ -213,7 +215,7 @@ abstract class OneOrMany extends Relation
             $nb += $this->distant->saveAll($entity, $relations);
         }
 
-        return (int) $nb;
+        return $nb;
     }
 
     /**
@@ -238,7 +240,7 @@ abstract class OneOrMany extends Relation
             $nb += $this->distant->deleteAll($entity, $relations);
         }
 
-        return (int) $nb;
+        return $nb;
     }
 
     /**

@@ -4,6 +4,9 @@ namespace Bdf\Prime\Entity\Hydrator;
 
 /**
  * Interface for generated hydrators
+ *
+ * @template E as object
+ * @extends MapperHydratorInterface<E>
  */
 interface HydratorGeneratedInterface extends HydratorInterface, MapperHydratorInterface
 {

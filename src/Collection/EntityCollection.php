@@ -59,9 +59,13 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
      */
     public function __construct(RepositoryInterface $repository, $storage = null)
     {
-        $this->repository = $repository;
+        if (!$storage instanceof CollectionInterface) {
+            /** @psalm-suppress InvalidArgument */
+            $storage = new ArrayCollection($storage);
+        }
 
-        $this->storage = $storage instanceof CollectionInterface ? $storage : new ArrayCollection($storage);
+        $this->repository = $repository;
+        $this->storage = $storage;
     }
 
     /**
@@ -96,24 +100,29 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
      *
      * <code>
      * // Perform query on customer.customerPack.pack
-     * $customer->relation('packs')
+     * $customer->relation(CustomerPack::class)
      *     ->wrapAs('collection')
      *     ->all()
-     *     ->link('pack')
+     *     ->link(Pack::class)
      *     ->where(...)
      *     ->all()
      * ;
      * </code>
      *
-     * @param string $relation The relation name
+     * @param class-string<R>|string $relationClass The relation class, or the relation name
+     * @param string|null $relationName The relation name, if ambiguous
      *
-     * @return QueryInterface
+     * @return QueryInterface<ConnectionInterface, R>
+     *
+     * @template R as object
      * @fixme Works with Polymorph
+     *
+     * @psalm-suppress TooManyArguments - @todo to remove in prime 3.0: RepositoryInterface::relation() has only 1 declared parameter for bc break
      */
-    public function link($relation)
+    public function link(string $relationClass, ?string $relationName = null)
     {
         return $this->repository
-            ->relation($relation)
+            ->relation($relationClass, $relationName)
             ->link($this->all())
         ;
     }
@@ -492,7 +501,7 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
     /**
      * {@inheritdoc}
      */
-    public function sort(callable $callback = null)
+    public function sort(?callable $callback = null)
     {
         return new static($this->repository, $this->storage->sort($callback));
     }

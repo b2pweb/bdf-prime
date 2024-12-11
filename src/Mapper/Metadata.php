@@ -48,13 +48,15 @@ use stdClass;
  *     class_map?: array<string, class-string>,
  *     hints?: array<class-string, int|null>,
  *     discriminator_field?: string,
- *     discriminator_attribute?: string
+ *     discriminator_attribute?: string,
+ *     polymorph?: bool
  * }
  *
  * @psalm-type IndexMetadata = array{
  *     fields:array<string, array<string, string>>,
- *     unique?: bool
- * }&array<string, string>
+ *     unique?: bool,
+ *     ...array<string, string>
+ * }
  *
  * @psalm-import-type FieldDefinition from \Bdf\Prime\Mapper\Builder\FieldBuilder
  * @psalm-import-type RelationDefinition from RelationBuilder

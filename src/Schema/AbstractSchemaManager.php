@@ -184,7 +184,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function simulate(callable $operations = null)
+    public function simulate(?callable $operations = null)
     {
         $newSchema = clone $this;
         $newSchema->autoFlush = false;

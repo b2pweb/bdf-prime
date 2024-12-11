@@ -68,7 +68,7 @@ class ServiceLocator
      * @param MapperFactory|null $mapperFactory
      * @param InstantiatorInterface|null $instantiator
      */
-    public function __construct(ConnectionManager $connectionManager = null, MapperFactoryInterface $mapperFactory = null, InstantiatorInterface $instantiator = null)
+    public function __construct(?ConnectionManager $connectionManager = null, ?MapperFactoryInterface $mapperFactory = null, ?InstantiatorInterface $instantiator = null)
     {
         $this->connectionManager = $connectionManager ?: new ConnectionManager();
         $this->mapperFactory = $mapperFactory ?: new MapperFactory();

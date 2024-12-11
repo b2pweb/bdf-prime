@@ -173,7 +173,7 @@ interface CollectionInterface extends Countable, ArrayAccess, Traversable
      * @param  callable|null  $callback
      * @return self<E>
      */
-    public function sort(callable $callback = null);
+    public function sort(?callable $callback = null);
 
     /**
      * Export entity's properties in array

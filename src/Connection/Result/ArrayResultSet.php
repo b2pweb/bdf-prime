@@ -17,6 +17,7 @@ use Bdf\Prime\Exception\DBALException;
  *
  * @template T
  * @implements ResultSetInterface<T>
+ * @extends ArrayIterator<int, T|false>
  */
 final class ArrayResultSet extends ArrayIterator implements ResultSetInterface
 {
@@ -32,6 +33,7 @@ final class ArrayResultSet extends ArrayIterator implements ResultSetInterface
      */
     public function __construct($array = [], $flags = 0)
     {
+        /** @psalm-suppress InvalidArgument */
         parent::__construct($array, $flags);
 
         /** @var ArrayResultSet<array<string, mixed>> $this */
@@ -40,6 +42,8 @@ final class ArrayResultSet extends ArrayIterator implements ResultSetInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @psalm-suppress DeprecatedConstant
      */
     public function fetchMode($mode, $options = null)
     {

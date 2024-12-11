@@ -42,7 +42,7 @@ class MapperVisitorTest extends TestCase
     /**
      *
      */
-    public function test_functionnal()
+    public function test_functional_legacy()
     {
         $connection = $this->prime()->connection();
         $schemaManager = $connection->schema();
@@ -53,6 +53,24 @@ class MapperVisitorTest extends TestCase
 
         $visitor = new MapperVisitor($connection->getName());
         $schema->visit($visitor);
+
+        $this->assertEquals($this->getExpectedDocumentMapper(), $visitor->getOutput());
+    }
+
+    /**
+     *
+     */
+    public function test_functional_new()
+    {
+        $connection = $this->prime()->connection();
+        $schemaManager = $connection->schema();
+
+        $schema = $schemaManager->schema(
+            $schemaManager->load('document_')
+        );
+
+        $visitor = new MapperVisitor($connection->getName());
+        $visitor->onSchema($schema);
 
         $this->assertEquals($this->getExpectedDocumentMapper(), $visitor->getOutput());
     }

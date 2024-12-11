@@ -175,7 +175,7 @@ class AbstractSchemaManagerTest extends TestCase
         $this->assertEquals([
             'CREATE TEMPORARY TABLE __temp__test_ AS SELECT id, name, foreign_key, date_insert FROM test_',
             'DROP TABLE test_',
-            'CREATE TABLE test_ (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(255) NOT NULL, foreign_key INTEGER DEFAULT NULL, date_insert DATETIME DEFAULT NULL)',
+            'CREATE TABLE test_ (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, name VARCHAR(255) NOT NULL COLLATE "BINARY", foreign_key INTEGER DEFAULT NULL, date_insert DATETIME DEFAULT NULL)',
             'INSERT INTO test_ (id, name, foreign_key, date_insert) SELECT id, name, foreign_key, date_insert FROM __temp__test_',
             'DROP TABLE __temp__test_',
         ], $schema->rollbackQueries());

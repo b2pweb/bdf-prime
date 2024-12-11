@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Bench;
 
 use Bdf\Prime\Platform\PlatformInterface;
+use Bdf\Prime\Platform\PlatformSpecificOperationInterface;
 use Bdf\Prime\Platform\PlatformTypesInterface;
 use Bdf\Prime\Platform\Sql\SqlPlatform;
 use Bdf\Prime\Types\ArrayType;
@@ -45,5 +46,13 @@ class DummyPlatform implements PlatformInterface
     public function grammar()
     {
         return $this->platform->grammar();
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function apply(PlatformSpecificOperationInterface $operation)
+    {
+        return $this->platform->apply($operation);
     }
 }

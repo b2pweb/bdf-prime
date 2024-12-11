@@ -6,6 +6,11 @@ use Bdf\Prime\Repository\RepositoryInterface;
 
 /**
  * Base type for define custom relations
+ *
+ * @template L as object
+ * @template R as object
+ *
+ * @extends RelationInterface<L, R>
  */
 interface CustomRelationInterface extends RelationInterface
 {

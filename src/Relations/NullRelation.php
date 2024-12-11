@@ -13,13 +13,21 @@ use Bdf\Prime\Repository\RepositoryInterface;
  *
  * All relation operation will be disabled, and do nothing
  * This relation can be used as placeholder on a relation of sub-mapper of {@see SingleTableInheritanceMapper}
+ *
+ * @template L as object
+ * @template R as object
+ *
+ * @implements RelationInterface<L, R>
  */
 final class NullRelation implements RelationInterface
 {
+    /**
+     * @var RepositoryInterface<L>
+     */
     private RepositoryInterface $repository;
 
     /**
-     * @param RepositoryInterface $repository
+     * @param RepositoryInterface<L> $repository
      */
     public function __construct(RepositoryInterface $repository)
     {

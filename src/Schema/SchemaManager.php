@@ -6,10 +6,10 @@ use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\Schema\Adapter\Doctrine\DoctrineTable as PrimeTableAdapter;
 use Bdf\Prime\Schema\Transformer\Doctrine\TableTransformer;
 use Doctrine\DBAL\Exception as DoctrineDBALException;
+use Doctrine\DBAL\Schema\AbstractSchemaManager as DoctrineSchemaManager;
 use Doctrine\DBAL\Schema\Schema as DoctrineSchema;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\SchemaDiff as DoctrineSchemaDiff;
-use Doctrine\DBAL\Schema\TableDiff as DoctrineTableDiff;
 use Doctrine\DBAL\Schema\Table as DoctrineTable;
 
 /**
@@ -25,17 +25,15 @@ class SchemaManager extends AbstractSchemaManager
      *
      * @var array
      */
-    private $queries = [];
-
+    private array $queries = [];
+    private ?DoctrineSchemaManager $doctrineManager = null;
 
     /**
      * Get the doctrine schema manager
-     *
-     * @return \Doctrine\DBAL\Schema\AbstractSchemaManager
      */
-    public function getDoctrineManager()
+    public function getDoctrineManager(): DoctrineSchemaManager
     {
-        return $this->connection->getSchemaManager();
+        return $this->doctrineManager ??= $this->connection->createSchemaManager();
     }
 
     /**
@@ -111,7 +109,7 @@ class SchemaManager extends AbstractSchemaManager
      */
     public function loadSchema()
     {
-        return $this->getDoctrineManager()->createSchema();
+        return $this->getDoctrineManager()->introspectSchema();
     }
 
     /**
@@ -193,19 +191,13 @@ class SchemaManager extends AbstractSchemaManager
         try {
             $manager = $this->getDoctrineManager();
 
-            $foreignKeys = [];
-
-            if ($this->platform->grammar()->supportsForeignKeyConstraints()) {
-                $foreignKeys = $manager->listTableForeignKeys($name);
-            }
-
             return new PrimeTableAdapter(
                 new DoctrineTable(
                     $name,
                     $manager->listTableColumns($name),
                     $manager->listTableIndexes($name),
                     [],
-                    $foreignKeys
+                    $manager->listTableForeignKeys($name)
                 ),
                 $this->connection->platform()->types()
             );
@@ -258,7 +250,7 @@ class SchemaManager extends AbstractSchemaManager
         $comparator = new Comparator();
         $comparator->setListDropColumn($this->useDrop);
 
-        return $comparator->compare(
+        return $comparator->compareSchemas(
             $this->schema($old),
             $this->schema($new)
         );
@@ -269,21 +261,13 @@ class SchemaManager extends AbstractSchemaManager
      */
     public function rename(string $from, string $to)
     {
-        /** @psalm-suppress InternalMethod */
-        $diff = new DoctrineTableDiff($from);
-        $diff->newName = $to;
-
         try {
             if ($this->generateRollback) {
-                /** @psalm-suppress InternalMethod */
-                $rollbackDiff = new DoctrineTableDiff($to);
-                $rollbackDiff->newName = $from;
-
-                $this->pushRollback($this->platform->grammar()->getAlterTableSQL($rollbackDiff));
+                $this->pushRollback($this->platform->grammar()->getRenameTableSQL($to, $from));
             }
 
             return $this->push(
-                $this->platform->grammar()->getAlterTableSQL($diff)
+                $this->platform->grammar()->getRenameTableSQL($from, $to)
             );
         } catch (DoctrineDBALException $e) {
             /** @psalm-suppress InvalidScalarArgument */
@@ -296,7 +280,9 @@ class SchemaManager extends AbstractSchemaManager
      */
     public function push($queries)
     {
-        if ($queries instanceof DoctrineSchema || $queries instanceof DoctrineSchemaDiff) {
+        if ($queries instanceof DoctrineSchemaDiff) {
+            $queries = $this->platform->grammar()->getAlterSchemaSQL($queries);
+        } elseif ($queries instanceof DoctrineSchema) {
             $queries = $queries->toSql($this->platform->grammar());
         }
 

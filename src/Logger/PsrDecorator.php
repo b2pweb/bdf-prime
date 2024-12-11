@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
  *
  * @deprecated Since Prime 2.2. Use middleware instead.
  * @see \Bdf\Prime\Connection\Middleware\LoggerMiddleware for the replacement
+ * @psalm-suppress DeprecatedInterface
  */
 class PsrDecorator implements SQLLogger, ConnectionAwareInterface
 {
@@ -33,7 +34,7 @@ class PsrDecorator implements SQLLogger, ConnectionAwareInterface
     /**
      * @param LoggerInterface|null $logger
      */
-    public function __construct(LoggerInterface $logger = null)
+    public function __construct(?LoggerInterface $logger = null)
     {
         $this->logger = $logger;
     }
@@ -51,7 +52,7 @@ class PsrDecorator implements SQLLogger, ConnectionAwareInterface
      *
      * {@inheritdoc}
      */
-    public function startQuery($sql, array $params = null, array $types = null)
+    public function startQuery($sql, ?array $params = null, ?array $types = null)
     {
         if ($this->logger === null) {
             return;

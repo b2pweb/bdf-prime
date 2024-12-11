@@ -464,7 +464,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function sort(callable $callback = null)
+    public function sort(?callable $callback = null)
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }

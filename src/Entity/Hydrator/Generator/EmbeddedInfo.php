@@ -126,6 +126,7 @@ class EmbeddedInfo
     {
         $classes = $this->classes();
 
+        /** @var string */
         return reset($classes);
     }
 

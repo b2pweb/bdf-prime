@@ -73,7 +73,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
      * @param C $connection
      * @param PreprocessorInterface|null $preprocessor
      */
-    public function __construct(ConnectionInterface $connection, PreprocessorInterface $preprocessor = null)
+    public function __construct(ConnectionInterface $connection, ?PreprocessorInterface $preprocessor = null)
     {
         parent::__construct($preprocessor ?: new DefaultPreprocessor(), new CompilerState());
 

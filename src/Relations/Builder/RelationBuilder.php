@@ -13,6 +13,7 @@ use IteratorAggregate;
  * RelationBuilder
  *
  * @psalm-type RelationDefinition = array{
+ *     name: string,
  *     type: string,
  *     localKey: string,
  *     entity?: class-string,
@@ -28,7 +29,8 @@ use IteratorAggregate;
  *     constraints?: array|callable,
  *     detached?: bool,
  *     saveStrategy?: int,
- *     wrapper?: string|callable
+ *     wrapper?: string|callable,
+ *     ...
  * }
  *
  * @implements ArrayAccess<string, RelationDefinition>
@@ -53,6 +55,13 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      */
     private ?string $current = null;
 
+    /**
+     * Mapping of the relation classes to their names
+     *
+     * @var array<class-string, array<string, string>>
+     */
+    private array $relationClassesToNames = [];
+
 
     /**
      * Get all defined relations
@@ -62,6 +71,16 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     public function relations(): array
     {
         return $this->relations;
+    }
+
+    /**
+     * Mapping of the relation classes to their names
+     *
+     * @return array<class-string, array<string, string>>
+     */
+    public function relationClassesToNames(): array
+    {
+        return $this->relationClassesToNames;
     }
 
     /**
@@ -290,13 +309,21 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      * </code>
      *
      * @param class-string<CustomRelationInterface> $relationClass The relation class name
-     * @param array $options The relation options
+     * @param array{entity?: class-string, ...array<string, mixed>} $options The relation options
      *
      * @return $this
      */
     public function custom(string $relationClass, array $options = []): self
     {
-        $this->relations[$this->current] = ['type' => RelationInterface::CUSTOM, 'relationClass' => $relationClass] + $options;
+        if ($this->current === null) {
+            throw new \LogicException('on() method must be called before adding a relation');
+        }
+
+        $this->relations[$this->current] = ['name' => $this->current, 'type' => RelationInterface::CUSTOM, 'relationClass' => $relationClass] + $options;
+
+        if ($entity = $options['entity'] ?? null) {
+            $this->relationClassesToNames[$entity][$this->current] = $this->current;
+        }
 
         return $this;
     }
@@ -309,7 +336,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      */
     public function null(): self
     {
-        $this->relations[$this->current] = ['type' => RelationInterface::NULL];
+        $this->relations[$this->current] = ['name' => $this->current, 'type' => RelationInterface::NULL];
 
         return $this;
     }
@@ -337,10 +364,16 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      */
     public function entity(string $entity): self
     {
+        if ($this->current === null) {
+            throw new \LogicException('on() method must be called before adding a relation');
+        }
+
         list($entity, $foreignKey) = Relation::parseEntity($entity);
 
         $this->relations[$this->current]['entity'] = $entity;
         $this->relations[$this->current]['distantKey'] = $foreignKey;
+
+        $this->relationClassesToNames[$entity][$this->current] = $this->current;
 
         return $this;
     }
@@ -372,17 +405,25 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @param string $type      Type of relation
      * @param string $key
-     * @param array  $options
+     * @param array{entity?: class-string, ...array<string, mixed>}  $options
      *
      * @return $this
      */
     protected function add(string $type, string $key, array $options = []): self
     {
+        if ($this->current === null) {
+            throw new \LogicException('on() method must be called before adding a relation');
+        }
+
         if (($this->relations[$this->current]['type'] ?? null) === RelationInterface::BY_INHERITANCE) {
             // Inherit from previous relation configuration
-            $this->relations[$this->current] = ['type' => $type, 'localKey' => $key] + $options + $this->relations[$this->current];
+            $this->relations[$this->current] = ['name' => $this->current, 'type' => $type, 'localKey' => $key] + $options + $this->relations[$this->current];
         } else {
-            $this->relations[$this->current] = ['type' => $type, 'localKey' => $key] + $options;
+            $this->relations[$this->current] = ['name' => $this->current, 'type' => $type, 'localKey' => $key] + $options;
+        }
+
+        if ($entity = $options['entity'] ?? null) {
+            $this->relationClassesToNames[$entity][$this->current] = $this->current;
         }
 
         return $this;

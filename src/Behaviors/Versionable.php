@@ -106,7 +106,7 @@ class Versionable extends Behavior
     public function beforeUpdate($entity, RepositoryInterface $repository, $attributes): void
     {
         if ($attributes !== null) {
-            $attributes[] = self::COLUMN_NAME;
+            $attributes->append(self::COLUMN_NAME);
         }
 
         $this->incrementVersion($entity, $repository);
