@@ -13,6 +13,7 @@ use function method_exists;
  *
  * @psalm-immutable
  * @implements ValueObjectInterface<string>
+ * @psalm-consistent-constructor
  */
 class BaseString implements ValueObjectInterface
 {
@@ -26,7 +27,6 @@ class BaseString implements ValueObjectInterface
 
     /**
      * @param string $value The primitive value
-     * @psalm-consistent-constructor
      */
     protected function __construct(string $value)
     {

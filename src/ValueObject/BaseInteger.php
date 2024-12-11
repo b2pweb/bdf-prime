@@ -11,6 +11,7 @@ use function is_scalar;
  *
  * @psalm-immutable
  * @implements ValueObjectInterface<int>
+ * @psalm-consistent-constructor
  */
 class BaseInteger implements ValueObjectInterface
 {
@@ -24,7 +25,6 @@ class BaseInteger implements ValueObjectInterface
 
     /**
      * @param int $value The primitive value
-     * @psalm-consistent-constructor
      */
     protected function __construct(int $value)
     {

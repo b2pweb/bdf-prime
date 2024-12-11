@@ -37,7 +37,8 @@ use IteratorAggregate;
  *     phpOptions?: array,
  *     customSchemaOptions?: array,
  *     platformOptions?: array,
- *     columnDefinition?: string
+ *     columnDefinition?: string,
+ *     valueObject?: class-string<ValueObjectInterface>
  * }
  *
  * @implements IteratorAggregate<string, FieldDefinition>
