@@ -43,10 +43,13 @@ final class ExplainReporter
             $class = $trace['class'] ?? null;
 
             // Ignore prime and doctrine calls
-            if ($class && (
-                str_starts_with($class, 'Bdf\Prime')
-                || str_starts_with($class, 'Doctrine\\')
-            )) {
+            if (
+                $i < 1
+                || $class && (
+                    str_starts_with($class, 'Bdf\Prime')
+                    || str_starts_with($class, 'Doctrine\\')
+                )
+            ) {
                 continue;
             }
 

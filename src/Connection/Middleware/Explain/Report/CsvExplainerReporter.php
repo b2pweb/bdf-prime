@@ -3,7 +3,6 @@
 namespace Bdf\Prime\Connection\Middleware\Explain\Report;
 
 use Bdf\Prime\Connection\Middleware\Explain\ExplainResult;
-
 use RuntimeException;
 
 use function count;

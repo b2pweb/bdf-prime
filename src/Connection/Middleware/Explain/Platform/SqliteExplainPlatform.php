@@ -6,14 +6,11 @@ use Bdf\Prime\Connection\Middleware\Explain\ExplainResult;
 use Bdf\Prime\Connection\Middleware\Explain\ExplainStep;
 use Bdf\Prime\Connection\Middleware\Explain\QueryType;
 use Doctrine\DBAL\Driver\Result;
-
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 
 use function explode;
 use function in_array;
-use function preg_match;
 use function stripos;
 use function strpos;
 use function strrchr;
