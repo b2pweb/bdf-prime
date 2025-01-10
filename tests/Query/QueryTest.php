@@ -12,6 +12,8 @@ use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\SqlCompiler;
 use Bdf\Prime\Query\Contract\Compilable;
+use Bdf\Prime\Query\Criteria\CriteriaInterface;
+use Bdf\Prime\Query\Criteria\FilterEntry;
 use Bdf\Prime\Query\Expression\Attribute;
 use Bdf\Prime\Query\Expression\Like;
 use Bdf\Prime\Query\Expression\Now;
@@ -20,6 +22,7 @@ use Bdf\Prime\Query\Factory\QueryFactoryInterface;
 use Doctrine\DBAL\Cache\ArrayResult;
 use Doctrine\DBAL\Result;
 use PHPUnit\Framework\TestCase;
+use Traversable;
 
 /**
  *
@@ -1911,5 +1914,129 @@ class QueryTest extends TestCase
         ], $result);
 
         $this->assertSame('SELECT name FROM test_ GROUP BY name HAVING COUNT(*) > ?', $query->toSql());
+    }
+
+    public function test_where_filter_entry()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'jean'
+        ]);
+        $this->push([
+            'id'   => 2,
+            'name' => 'george'
+        ]);
+        $this->push([
+            'id'   => 3,
+            'name' => 'robert'
+        ]);
+
+        $query = $this->query();
+        $result = $query->where([
+            'id' => new FilterEntry('id', '>', 1),
+            'name' => new FilterEntry('name', ':like', 'r%'),
+        ])->all();
+
+        $this->assertEquals([
+            [
+                'id' => 3,
+                'name' => 'robert',
+                'date_insert' => null,
+            ],
+        ], $result);
+
+        $this->assertSame('SELECT * FROM test_ WHERE id > ? AND name LIKE ?', $query->toSql());
+    }
+
+    public function test_where_nested_criteria()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'jean'
+        ]);
+        $this->push([
+            'id'   => 2,
+            'name' => 'george'
+        ]);
+        $this->push([
+            'id'   => 3,
+            'name' => 'robert'
+        ]);
+
+        $criteria = new class implements CriteriaInterface {
+            public function separator(): ?string
+            {
+                return 'OR';
+            }
+
+            public function getIterator()
+            {
+                yield 'id >' => 1;
+                yield 'name :like' => 'j%';
+            }
+        };
+
+        $query = $this->query();
+        $result = $query->where([
+            'nested' => $criteria,
+            'name' => new FilterEntry(new Attribute('name', 'length(%s)'), '<', 5),
+        ])->all();
+
+        $this->assertEquals([
+            [
+                'id' => 1,
+                'name' => 'jean',
+                'date_insert' => null,
+            ],
+        ], $result);
+
+        $this->assertSame('SELECT * FROM test_ WHERE (id > ? OR name LIKE ?) AND length(name) < ?', $query->toSql());
+    }
+
+    public function test_where_with_criteria_should_take_the_separator_if_defined()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'jean'
+        ]);
+        $this->push([
+            'id'   => 2,
+            'name' => 'george'
+        ]);
+        $this->push([
+            'id'   => 3,
+            'name' => 'robert'
+        ]);
+
+        $criteria = new class implements CriteriaInterface {
+            public function separator(): ?string
+            {
+                return 'OR';
+            }
+
+            public function getIterator()
+            {
+                yield 'id >' => 2;
+                yield 'name :like' => 'j%';
+            }
+        };
+
+        $query = $this->query();
+        $result = $query->where($criteria)->all();
+
+        $this->assertEquals([
+            [
+                'id' => 1,
+                'name' => 'jean',
+                'date_insert' => null,
+            ],
+            [
+                'id' => 3,
+                'name' => 'robert',
+                'date_insert' => null,
+            ],
+        ], $result);
+
+        $this->assertSame('SELECT * FROM test_ WHERE id > ? OR name LIKE ?', $query->toSql());
     }
 }
