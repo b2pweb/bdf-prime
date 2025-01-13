@@ -34,5 +34,8 @@
     <testsuite name="PHP 8.0 compatiblity">
       <directory suffix="Test.php" phpVersion="8.0.0" phpVersionOperator="&gt;=">tests/Php80</directory>
     </testsuite>
+    <testsuite name="PHP 8.1 compatiblity">
+      <directory suffix="Test.php" phpVersion="8.1.0" phpVersionOperator="&gt;=">tests/Php81</directory>
+    </testsuite>
   </testsuites>
 </phpunit>
