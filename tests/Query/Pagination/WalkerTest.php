@@ -2,6 +2,9 @@
 
 namespace Query\Pagination;
 
+use Bdf\Prime\Entity\Model;
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Pagination\Walker;
 use Bdf\Prime\Query\Pagination\WalkStrategy\KeyWalkStrategy;
@@ -337,6 +340,44 @@ class WalkerTest extends TestCase
         $this->assertCount(3, iterator_to_array($walker));
     }
 
+    /**
+     *
+     */
+    public function test_key_walk_strategy_with_constraint()
+    {
+        EntityWithConstraint::repository()->schema()->migrate();
+
+        $entities = [
+            new EntityWithConstraint(['name' => 'foo1', 'enabled' => true]),
+            new EntityWithConstraint(['name' => 'foo2', 'enabled' => false]),
+            new EntityWithConstraint(['name' => 'foo3', 'enabled' => false]),
+            new EntityWithConstraint(['name' => 'foo4', 'enabled' => true]),
+            new EntityWithConstraint(['name' => 'foo5', 'enabled' => true]),
+            new EntityWithConstraint(['name' => 'foo6', 'enabled' => true]),
+            new EntityWithConstraint(['name' => 'foo7', 'enabled' => false]),
+        ];
+
+        foreach ($entities as $entity) {
+            $entity->insert();
+        }
+
+        $this->queries->queries = [];
+
+        $walker = new Walker(EntityWithConstraint::builder(), 4);
+        $walker->setStrategy(new KeyWalkStrategy(new MapperPrimaryKey(EntityWithConstraint::mapper())));
+
+        $this->assertCount(4, iterator_to_array($walker));
+
+        $queries = array_values($this->queries->queries);
+        $this->assertCount(2, $queries);
+
+        $this->assertSame('SELECT t0.* FROM entity_with_constraint t0 WHERE t0.enabled = ? ORDER BY t0.id ASC LIMIT 4', $queries[0]['sql']);
+        $this->assertSame([1], $queries[0]['params']);
+
+        $this->assertSame('SELECT t0.* FROM entity_with_constraint t0 WHERE t0.id > ? AND (t0.enabled = ?) ORDER BY t0.id ASC LIMIT 4', $queries[1]['sql']);
+        $this->assertSame([6, 1], $queries[1]['params']);
+    }
+
     private function insertEntities(int $count): array
     {
         $entities = [];
@@ -351,5 +392,45 @@ class WalkerTest extends TestCase
         $this->queries->queries = [];
 
         return $entities;
+    }
+}
+
+class EntityWithConstraint extends Model
+{
+    public $id;
+    public $name;
+    public $enabled = true;
+
+    public function __construct(array $data = [])
+    {
+        $this->import($data);
+    }
+}
+
+class EntityWithConstraintMapper extends Mapper
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function schema(): array
+    {
+        return [
+            'table' => 'entity_with_constraint',
+            'connection' => 'test',
+        ];
+    }
+
+    public function buildFields(FieldBuilder $builder): void
+    {
+        $builder
+            ->integer('id')->autoincrement()
+            ->string('name')
+            ->boolean('enabled')
+        ;
+    }
+
+    public function customConstraints(): array
+    {
+        return ['enabled' => true];
     }
 }
