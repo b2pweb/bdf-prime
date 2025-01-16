@@ -4,16 +4,19 @@ namespace Bdf\Prime\Query\Pagination\WalkStrategy;
 
 use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Connection\ConnectionInterface;
-use Bdf\Prime\Query\Clause;
-use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Contract\Limitable;
 use Bdf\Prime\Query\Contract\Orderable;
+use Bdf\Prime\Query\Contract\Projectionable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\Whereable;
 use Bdf\Prime\Query\ReadCommandInterface;
 use InvalidArgumentException;
 
+use function is_string;
 use function method_exists;
+use function str_contains;
+use function strrchr;
+use function substr;
 
 /**
  * Walk strategy using a primary key (or any unique key) as cursor
@@ -119,9 +122,58 @@ final class KeyWalkStrategy implements WalkStrategyInterface
             return false;
         }
 
+        if ($query instanceof Projectionable && !self::checkColumns($query, $key)) {
+            return false;
+        }
+
         $orders = $query->getOrders();
 
         return empty($orders) || (count($orders) === 1 && isset($orders[$key]));
+    }
+
+    /**
+     * Check if the walk key is present in the projection (e.g. SELECT clause in SQL)
+     *
+     * This method return false only if a projection is defined, and the key is not found.
+     * In case of no projection, wildcard, or unknown projection, the method return true.
+     *
+     * So, even if this method returns true, the key may be missed.
+     *
+     * @param ReadCommandInterface $query The query to walk on
+     * @param string $key The walk key
+     *
+     * @return bool If false, the key is missing from the projection.
+     */
+    private static function checkColumns(ReadCommandInterface $query, string $key): bool
+    {
+        $columns = $query->statement('columns');
+
+        // No projection defined: we consider that all columns are selected, so the key should be present in the result
+        if (!$columns) {
+            return true;
+        }
+
+        /** @var array{column?: mixed, alias?: mixed} $column */
+        foreach ($columns as $column) {
+            $columnName = $column['alias'] ?? $column['column'] ?? null;
+
+            // Doesn't follow ProjectionableTrait format or an expression is used,
+            // so cannot check if the key is present
+            if (!is_string($columnName)) {
+                return true;
+            }
+
+            // Remove table prefix
+            if (str_contains($columnName, '.')) {
+                $columnName = substr(strrchr($columnName, '.'), 1);
+            }
+
+            if ($columnName === $key || $columnName === '*') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
