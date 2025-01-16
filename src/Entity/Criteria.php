@@ -4,6 +4,7 @@ namespace Bdf\Prime\Entity;
 
 use ArrayAccess;
 use Bdf\Prime\Query\Contract\Orderable;
+use Bdf\Prime\Query\Criteria\CriteriaInterface;
 use Exception;
 use IteratorAggregate;
 use Traversable;
@@ -16,7 +17,7 @@ use Traversable;
  * @implements ArrayAccess<string, mixed>
  * @implements IteratorAggregate<string, mixed>
  */
-class Criteria implements ArrayAccess, IteratorAggregate
+class Criteria implements ArrayAccess, CriteriaInterface
 {
     /**
      * Critères injectés vers le dépot d'entity
@@ -54,6 +55,14 @@ class Criteria implements ArrayAccess, IteratorAggregate
     public function __construct(array $filters = [])
     {
         $this->import($filters);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function separator(): ?string
+    {
+        return null;
     }
 
     /**

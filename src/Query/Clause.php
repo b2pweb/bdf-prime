@@ -133,14 +133,20 @@ class Clause implements ClauseInterface
                     $this->customFilters[$key]($this, $value);
                 } elseif ($value instanceof CriteriaInterface) {
                     // Embedded criteria
-                    $statements = $this->statements;
-                    $this->statements = [];
+                    $statements = $this->statements[$statement];
+                    $this->statements[$statement] = [];
                     $this->buildClause($statement, $value);
-                    $parts[] = [
-                        'nested'  => $this->statements[$statement],
-                        'glue'    => $glue,
-                    ];
-                    $this->statements = $statements;
+
+                    $filters = $this->statements[$statement];
+
+                    if ($filters) {
+                        $parts[] = [
+                            'nested' => $filters,
+                            'glue' => $glue,
+                        ];
+                    }
+
+                    $this->statements[$statement] = $statements;
                 } elseif ($value instanceof FilterEntry) {
                     $parts[] = [
                         'column'    => $value->field,
