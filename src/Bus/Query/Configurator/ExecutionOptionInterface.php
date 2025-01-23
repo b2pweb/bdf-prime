@@ -1,6 +1,8 @@
 <?php
 
-namespace Bdf\Prime\Bus;
+namespace Bdf\Prime\Bus\Query\Configurator;
+
+use Bdf\Prime\Bus\Query\Execution\QueryExecutionMethodInterface;
 
 /**
  * Base type for attributes that can be used to define execution options

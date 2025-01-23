@@ -5,8 +5,6 @@ namespace Bdf\Prime\Entity;
 use ArrayAccess;
 use Bdf\Prime\Query\Contract\Orderable;
 use Bdf\Prime\Query\Criteria\CriteriaInterface;
-use Exception;
-use IteratorAggregate;
 use Traversable;
 
 /**
@@ -15,7 +13,6 @@ use Traversable;
  * @psalm-consistent-constructor
  *
  * @implements ArrayAccess<string, mixed>
- * @implements IteratorAggregate<string, mixed>
  */
 class Criteria implements ArrayAccess, CriteriaInterface
 {

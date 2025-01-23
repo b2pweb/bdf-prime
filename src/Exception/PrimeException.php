@@ -7,6 +7,4 @@ use Throwable;
 /**
  * Base prime exception
  */
-interface PrimeException extends Throwable
-{
-}
+interface PrimeException extends Throwable {}

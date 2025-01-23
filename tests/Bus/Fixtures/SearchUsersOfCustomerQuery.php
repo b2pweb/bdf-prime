@@ -2,8 +2,8 @@
 
 namespace Bus\Fixtures;
 
-use Bdf\Prime\Bus\FromRelation;
-use Bdf\Prime\Bus\PrimeQuery;
+use Bdf\Prime\Bus\Query\FromRelation;
+use Bdf\Prime\Bus\Query\PrimeQuery;
 use Bdf\Prime\Customer;
 use Bdf\Prime\Query\Criteria\StartsWithCriterion;
 

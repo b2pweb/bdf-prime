@@ -1,6 +1,6 @@
 <?php
 
-namespace Bdf\Prime\Bus;
+namespace Bdf\Prime\Bus\Query\ReturnType;
 
 use TypeError;
 

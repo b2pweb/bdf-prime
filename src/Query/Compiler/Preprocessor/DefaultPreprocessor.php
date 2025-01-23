@@ -81,7 +81,5 @@ class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function clear(): void
-    {
-    }
+    public function clear(): void {}
 }

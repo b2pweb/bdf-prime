@@ -1,6 +1,8 @@
 <?php
 
-namespace Bdf\Prime\Bus;
+namespace Bdf\Prime\Bus\Query;
+
+use Bdf\Prime\Bus\Query\ReturnType\ReturnTypeInterface;
 
 /**
  * Base type for perform prime query from a bus

@@ -1,8 +1,12 @@
 <?php
 
-namespace Bdf\Prime\Bus;
+namespace Bdf\Prime\Bus\Query;
 
 use Attribute;
+use Bdf\Prime\Bus\Query\Configurator\From;
+use Bdf\Prime\Bus\Query\Execution\QueryExecutionMethod;
+use Bdf\Prime\Bus\Query\Execution\QueryExecutionMethodInterface;
+use Bdf\Prime\Bus\Query\ReturnType\ReturnTypeInterface;
 use Bdf\Prime\Query\Criteria\Criterion;
 use Bdf\Prime\Relations\EntityRelation;
 
@@ -14,7 +18,7 @@ use Bdf\Prime\Relations\EntityRelation;
  *
  * Usage:
  * ```php
- * // Define a query to get the first entity of MyEntity mathing the criteria
+ * // Define a query to get the first entity of MyEntity matching the criteria
  * #[PrimeQuery(MyEntity::class, method: QueryExecutionMethod::First)]
  * class MyQuery
  * {
@@ -76,6 +80,5 @@ final class PrimeQuery
          * and instantiate it in the attribute.
          */
         public readonly QueryExecutionMethodInterface $method = QueryExecutionMethod::All,
-    ) {
-    }
+    ) {}
 }

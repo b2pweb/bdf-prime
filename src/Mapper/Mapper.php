@@ -884,9 +884,7 @@ abstract class Mapper
      *
      * @param IndexBuilder $builder
      */
-    public function buildIndexes(IndexBuilder $builder): void
-    {
-    }
+    public function buildIndexes(IndexBuilder $builder): void {}
 
     /**
      * Repository extension

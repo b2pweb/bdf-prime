@@ -1,14 +1,18 @@
 <?php
 
-namespace Bdf\Prime\Bus;
+namespace Bdf\Prime\Bus\Query\ReturnType;
+
+use Bdf\Prime\Bus\Query\Execution\QueryExecutionMethod;
 
 /**
  * Represents a return type of array of entities
  *
  * @template T as object
  * @implements ReturnTypeInterface<array<T>>
+ *
+ * @see QueryExecutionMethod::All Should be used when this return type is used
  */
-final class ArrayReturnType implements ReturnTypeInterface
+final class ArrayType implements ReturnTypeInterface
 {
     public function __construct(
         /**
@@ -16,9 +20,8 @@ final class ArrayReturnType implements ReturnTypeInterface
          *
          * @var class-string<T>
          */
-        public readonly string $class,
-    ) {
-    }
+        private readonly string $class,
+    ) {}
 
     /**
      * {@inheritdoc}

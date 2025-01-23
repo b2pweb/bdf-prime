@@ -1,9 +1,11 @@
 <?php
 
-namespace Bdf\Prime\Bus;
+namespace Bdf\Prime\Bus\Query\Execution;
 
 use Bdf\Prime\Exception\EntityNotFoundException;
+use Bdf\Prime\Query\Contract\Aggregatable;
 use Bdf\Prime\Query\Contract\Paginable;
+use Bdf\Prime\Query\Query;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
 
@@ -47,10 +49,16 @@ enum QueryExecutionMethod implements QueryExecutionMethodInterface
     case FirstOrNew;
 
     /**
+     * Perform {@see Aggregatable::count()}, to get the number of results that would be returned
+     */
+    case Count;
+
+    /**
      * {@inheritdoc}
      */
     public function execute(ReadCommandInterface $query, array $options = []): mixed
     {
+        /** @var Query $query */
         return match ($this) {
             self::All => $query->all(),
             self::Walk => $query->walk($options['limit'] ?? null, $options['page'] ?? null),
@@ -58,6 +66,7 @@ enum QueryExecutionMethod implements QueryExecutionMethodInterface
             self::First => $query->first(),
             self::FirstOrFail => $query->firstOrFail(),
             self::FirstOrNew => $query->firstOrNew(),
+            self::Count => $query->count(),
         };
     }
 }

@@ -29,9 +29,7 @@ class CollectionFactory
     /**
      * Cannot instantiate externally
      */
-    protected function __construct()
-    {
-    }
+    protected function __construct() {}
 
     /**
      * Register a new wrapper alias for @see Query::wrapAs()

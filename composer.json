@@ -17,6 +17,7 @@
     "psr-4": {
       "Php74\\": "tests/Php74",
       "Php81\\": "tests/Php81",
+      "Bus\\Fixtures\\": "tests/Bus/Fixtures",
       "StaticAnalysis\\": "tests/StaticAnalysis"
     },
     "classmap": [

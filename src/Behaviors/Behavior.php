@@ -16,16 +16,12 @@ class Behavior implements BehaviorInterface
     /**
      * {@inheritdoc}
      */
-    public function changeSchema(FieldBuilder $builder): void
-    {
-    }
+    public function changeSchema(FieldBuilder $builder): void {}
 
     /**
      * {@inheritdoc}
      */
-    public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
-    {
-    }
+    public function subscribe(RepositoryEventsSubscriberInterface $notifier): void {}
 
     /**
      * {@inheritdoc}

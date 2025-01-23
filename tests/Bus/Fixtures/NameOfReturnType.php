@@ -2,7 +2,7 @@
 
 namespace Bus\Fixtures;
 
-use Bdf\Prime\Bus\ReturnTypeInterface;
+use Bdf\Prime\Bus\Query\ReturnType\ReturnTypeInterface;
 
 /**
  * @implements ReturnTypeInterface<string>

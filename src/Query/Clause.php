@@ -137,6 +137,7 @@ class Clause implements ClauseInterface
                     $this->statements[$statement] = [];
                     $this->buildClause($statement, $value);
 
+                    /** @var array $filters */
                     $filters = $this->statements[$statement];
 
                     if ($filters) {

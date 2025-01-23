@@ -2,7 +2,7 @@
 
 namespace Bus\Fixtures;
 
-use Bdf\Prime\Bus\PrimeQuery;
+use Bdf\Prime\Bus\Query\PrimeQuery;
 use Bdf\Prime\Query\Criteria\StartsWithCriterion;
 use Bdf\Prime\User;
 

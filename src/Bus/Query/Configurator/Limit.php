@@ -1,6 +1,6 @@
 <?php
 
-namespace Bdf\Prime\Bus;
+namespace Bdf\Prime\Bus\Query\Configurator;
 
 use Attribute;
 use Bdf\Prime\Query\Contract\Limitable;
@@ -42,6 +42,8 @@ use Bdf\Prime\Query\ReadCommandInterface;
  *
  * @see Limitable::limit()
  * @see Limitable::offset()
+ *
+ * @see Offset To define the number of rows to skip, configured by the property value
  */
 #[Attribute(Attribute::TARGET_CLASS | Attribute::TARGET_PROPERTY)]
 final class Limit implements PropertyQueryConfiguratorInterface, GlobalQueryConfiguratorInterface, ExecutionOptionInterface
@@ -64,11 +66,12 @@ final class Limit implements PropertyQueryConfiguratorInterface, GlobalQueryConf
          * The behavior is the same when the attribute is placed on the query DTO class or on a property.
          * The property value is never used for the offset.
          *
+         * Note: offset is not supported by the paginator. Use {@see Page} instead.
+         *
          * @var non-negative-int|null
          */
         public readonly ?int $offset = null,
-    ) {
-    }
+    ) {}
 
     /**
      * {@inheritdoc}
@@ -89,6 +92,7 @@ final class Limit implements PropertyQueryConfiguratorInterface, GlobalQueryConf
      */
     public function configureQueryForDto(ReadCommandInterface $query, object $dto): ReadCommandInterface
     {
+        /** @var Limitable&ReadCommandInterface $query */
         if ($this->limit !== null) {
             $query->limit($this->limit);
         }
@@ -105,6 +109,7 @@ final class Limit implements PropertyQueryConfiguratorInterface, GlobalQueryConf
      */
     public function configureQueryForProperty(ReadCommandInterface $query, mixed $propertyValue): ReadCommandInterface
     {
+        /** @var Limitable&ReadCommandInterface $query */
         $query->limit($propertyValue ?? $this->limit);
 
         if ($this->offset !== null) {

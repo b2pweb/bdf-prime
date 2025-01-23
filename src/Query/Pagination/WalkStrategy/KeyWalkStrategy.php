@@ -151,6 +151,7 @@ final class KeyWalkStrategy implements WalkStrategyInterface
         $query = $cursor->query;
         $asc = $query->getOrders()[$this->key->name()] === Orderable::ORDER_ASC;
 
+        /** @psalm-suppress NullIterator $cursor->entities cannot be null here */
         foreach ($cursor->entities as $entity) {
             $key = $this->key->get(is_array($entity) ? end($entity) : $entity);
             $gt = $key > $lastKey;

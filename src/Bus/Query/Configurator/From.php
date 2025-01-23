@@ -1,6 +1,6 @@
 <?php
 
-namespace Bdf\Prime\Bus;
+namespace Bdf\Prime\Bus\Query\Configurator;
 
 use Attribute;
 use Bdf\Prime\Query\QueryInterface;
@@ -30,15 +30,14 @@ final class From implements GlobalQueryConfiguratorInterface
         /**
          * The table name to select from
          */
-        public string $table,
+        public readonly string $table,
 
         /**
          * The table name alias on the query.
          * If null no alias will be used.
          */
-        public ?string $alias = null,
-    ) {
-    }
+        public readonly ?string $alias = null,
+    ) {}
 
     /**
      * {@inheritdoc}

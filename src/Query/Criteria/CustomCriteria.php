@@ -2,11 +2,7 @@
 
 namespace Bdf\Prime\Query\Criteria;
 
-use ReflectionAttribute;
-use ReflectionClass;
 use Traversable;
-
-use function is_string;
 
 /**
  * Base class for define a custom criteria using attributes on properties
@@ -64,40 +60,14 @@ abstract class CustomCriteria implements CriteriaInterface
      */
     protected const /*?string*/ SEPARATOR = null;
 
-    /**
-     * Cache the map of criteria for each class
-     * The key is the criteria class name, and the value is a map of property name to Criterion instance
-     *
-     * @var array<class-string, array<string, Criterion>>
-     */
-    private static array $loadedCriteria = [];
+    private static ?AttributeCriteriaLoader $loader = null;
 
     /**
      * {@inheritdoc}
      */
     public function getIterator(): Traversable
     {
-        foreach ($this->criterionByProperty() as $property => $criterion) {
-            $value = $this->$property ?? null;
-
-            if ($value === null && $criterion->skipNull) {
-                continue;
-            }
-
-            $field = $criterion->field($property);
-            $value = $criterion->value($value);
-
-            if (is_string($field)) {
-                if ($criterion->operator !== null) {
-                    $field .= ' ' . $criterion->operator;
-                }
-
-                yield $field => $value;
-                continue;
-            }
-
-            yield $property => new FilterEntry($field, $criterion->operator ?? '=', $value);
-        }
+        return $this->loader()->criteria($this, $this->loadCriteria());
     }
 
     /**
@@ -116,23 +86,11 @@ abstract class CustomCriteria implements CriteriaInterface
      */
     protected function loadCriteria(): array
     {
-        $criteria = [];
-
-        foreach ((new ReflectionClass(static::class))->getProperties() as $property) {
-            foreach ($property->getAttributes(Criterion::class, ReflectionAttribute::IS_INSTANCEOF) as $attribute) {
-                $criteria[$property->getName()] = $attribute->newInstance();
-                break; // Keep only the first attribute
-            }
-        }
-
-        return $criteria;
+        return $this->loader()->load(static::class);
     }
 
-    /**
-     * @return array<string, Criterion>
-     */
-    private function criterionByProperty(): array
+    private function loader(): AttributeCriteriaLoader
     {
-        return self::$loadedCriteria[static::class] ??= $this->loadCriteria();
+        return self::$loader ??= new AttributeCriteriaLoader();
     }
 }

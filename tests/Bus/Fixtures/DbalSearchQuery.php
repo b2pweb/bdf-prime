@@ -2,9 +2,9 @@
 
 namespace Bus\Fixtures;
 
-use Bdf\Prime\Bus\From;
-use Bdf\Prime\Bus\PrimeQuery;
-use Bdf\Prime\Bus\QueryExecutionMethod;
+use Bdf\Prime\Bus\Query\Configurator\From;
+use Bdf\Prime\Bus\Query\Execution\QueryExecutionMethod;
+use Bdf\Prime\Bus\Query\PrimeQuery;
 use Bdf\Prime\Query\Criteria\Criterion;
 
 #[
