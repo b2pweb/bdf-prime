@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Bus\Query;
 
+use Bdf\Prime\Bus\Command\PrimeCommandBusInterface;
 use Bdf\Prime\Bus\Query\ReturnType\ReturnTypeInterface;
 
 /**
@@ -15,6 +16,8 @@ use Bdf\Prime\Bus\Query\ReturnType\ReturnTypeInterface;
  *
  * Queries DTOs should not contain any logic, and should be immutable. If you want to add logic to a query execution,
  * define a custom query handler for the query class.
+ *
+ * @see PrimeCommandBusInterface For perform write operations
  */
 interface PrimeQueryBusInterface
 {
