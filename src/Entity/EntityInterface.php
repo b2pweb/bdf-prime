@@ -7,6 +7,4 @@ namespace Bdf\Prime\Entity;
  *
  * @todo Remove me or find me a purpose.
  */
-interface EntityInterface
-{
-}
+interface EntityInterface {}

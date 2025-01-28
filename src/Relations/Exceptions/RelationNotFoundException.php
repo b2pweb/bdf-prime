@@ -8,6 +8,4 @@ use RuntimeException;
 /**
  * RelationNotFoundException
  */
-class RelationNotFoundException extends RuntimeException implements PrimeException
-{
-}
+class RelationNotFoundException extends RuntimeException implements PrimeException {}

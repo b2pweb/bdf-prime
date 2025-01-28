@@ -9,6 +9,4 @@ use Attribute;
  * The method will execute a query which can cause modifications
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-class WriteOperation
-{
-}
+class WriteOperation {}

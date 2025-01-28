@@ -7,6 +7,4 @@ use Bdf\Prime\Exception\PrimeException;
 /**
  * Base exception for prime hydrator
  */
-interface HydratorException extends PrimeException
-{
-}
+interface HydratorException extends PrimeException {}

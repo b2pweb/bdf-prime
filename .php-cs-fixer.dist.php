@@ -11,6 +11,7 @@ return (new PhpCsFixer\Config())
         //'@Symfony' => true,
         'array_syntax' => ['syntax' => 'short'],
         'declare_strict_types' => false,
+        'single_line_empty_body' => true,
     ])
     ->setFinder($finder)
     ->setCacheFile('.php-cs-fixer.cache') // forward compatibility with 3.x line

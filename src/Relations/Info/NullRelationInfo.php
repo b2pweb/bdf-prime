@@ -23,16 +23,12 @@ final class NullRelationInfo implements RelationInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function clear($entity): void
-    {
-    }
+    public function clear($entity): void {}
 
     /**
      * {@inheritdoc}
      */
-    public function markAsLoaded($entity): void
-    {
-    }
+    public function markAsLoaded($entity): void {}
 
     /**
      * @return NullRelationInfo

@@ -312,9 +312,7 @@ class MapperVisitor extends AbstractVisitor
     /**
      * {@inheritdoc}
      */
-    public function acceptSequence(Sequence $sequence)
-    {
-    }
+    public function acceptSequence(Sequence $sequence) {}
 
     /**
      * Get mappers output

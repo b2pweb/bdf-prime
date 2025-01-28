@@ -7,6 +7,4 @@ use LogicException;
 /**
  * Exception for Query building
  */
-class QueryBuildingException extends LogicException implements PrimeException
-{
-}
+class QueryBuildingException extends LogicException implements PrimeException {}

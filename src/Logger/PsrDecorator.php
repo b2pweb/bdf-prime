@@ -74,9 +74,7 @@ class PsrDecorator implements SQLLogger, ConnectionAwareInterface
      *
      * {@inheritdoc}
      */
-    public function stopQuery()
-    {
-    }
+    public function stopQuery() {}
 
     /**
      * Get the type name of the type

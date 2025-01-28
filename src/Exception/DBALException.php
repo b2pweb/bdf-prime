@@ -7,6 +7,4 @@ use RuntimeException;
 /**
  * @package Bdf\Prime\Exception
  */
-class DBALException extends RuntimeException implements PrimeException
-{
-}
+class DBALException extends RuntimeException implements PrimeException {}

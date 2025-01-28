@@ -9,6 +9,4 @@ use Attribute;
  * The method will execute a query without perform change on database
  */
 #[Attribute(Attribute::TARGET_METHOD)]
-class ReadOperation
-{
-}
+class ReadOperation {}
