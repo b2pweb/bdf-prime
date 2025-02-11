@@ -62,6 +62,26 @@ class HasOneTest extends TestCase
         $this->primeStop();
     }
 
+    public function test_localKeyProperty()
+    {
+        $relation = Customer::repository()->relation('location');
+        $this->assertSame('id', $relation->localKeyProperty());
+    }
+
+    public function test_loadByForeignKeys()
+    {
+        $relation = Customer::repository()->relation('location');
+        $entities = $relation->loadByForeignKeys(['123', '321']);
+
+        $this->assertEquals([
+            '123' => new Location([
+                'id'      => '123',
+                'address' => '1 rue chez toi',
+                'city'    => 'MAISON',
+            ]),
+        ], $entities);
+    }
+
     /**
      *
      */

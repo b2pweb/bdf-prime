@@ -107,6 +107,28 @@ class BelongsToTest extends TestCase
     protected function tearDown(): void
     {
         $this->primeStop();
+        $this->unsetPrime();
+    }
+
+    public function test_localKeyProperty()
+    {
+        $relation = User::repository()->relation('customer');
+        $this->assertSame('customer.id', $relation->localKeyProperty());
+    }
+
+    public function test_loadByForeignKeys()
+    {
+        $repository = Prime::repository(User::class);
+        $customer = $this->getTestPack()->get('customer');
+        $customer2 = $this->getTestPack()->get('customer2');
+
+        $relation = $repository->relation('customer');
+        $customers = $relation->loadByForeignKeys([$customer->id, $customer2->id, 404]);
+
+        $this->assertEquals([
+            $customer->id => $customer,
+            $customer2->id => $customer2,
+        ], $customers);
     }
 
     /**

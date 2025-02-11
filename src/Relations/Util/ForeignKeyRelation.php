@@ -54,6 +54,14 @@ trait ForeignKeyRelation
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function localKeyProperty(): ?string
+    {
+        return $this->localKey;
+    }
+
+    /**
      * Get the local key value from an entity
      * If an array is given, get array of key value
      *

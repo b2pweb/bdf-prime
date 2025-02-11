@@ -88,6 +88,20 @@ class MorphToTest extends TestCase
         $this->primeStop();
     }
 
+    public function test_localKeyProperty()
+    {
+        $relation = Document::repository()->relation('uploader');
+        $this->assertSame('uploaderId', $relation->localKeyProperty());
+    }
+
+    public function test_loadByForeignKeys()
+    {
+        $this->expectException(\BadMethodCallException::class);
+
+        $relation = Document::repository()->relation('uploader');
+        $relation->loadByForeignKeys(['10', '321']);
+    }
+
     /**
      * 
      */

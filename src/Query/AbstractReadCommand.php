@@ -6,11 +6,13 @@ use Bdf\Prime\Collection\CollectionFactory;
 use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
-use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\CompilerState;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
+use Bdf\Prime\Query\Contract\Projectionable;
 use Bdf\Prime\Query\Extension\CachableTrait;
 use Bdf\Prime\Query\Extension\ExecutableTrait;
+use Bdf\Prime\Record\RecordHydratorInterface;
+use Bdf\Prime\Record\SimpleRecordHydrator;
 
 /**
  * Abstract class for read operations
@@ -68,6 +70,9 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
      * @var object
      */
     protected $extension;
+
+    protected ?string $recordClassName = null;
+    protected ?RecordHydratorInterface $recordHydrator = null;
 
 
     /**
@@ -155,6 +160,41 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
 
     /**
      * {@inheritdoc}
+     */
+    public function setRecordHydrator(RecordHydratorInterface $hydrator): void
+    {
+        $this->recordHydrator = $hydrator;
+    }
+
+    /**
+     * Get the current record hydrator, and create {@see SimpleRecordHydrator} if not set
+     */
+    protected function recordHydrator(): RecordHydratorInterface
+    {
+        return ($this->recordHydrator ??= SimpleRecordHydrator::instance());
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @psalm-suppress InvalidReturnType
+     * @psalm-suppress InvalidReturnStatement
+     */
+    public function as(string $recordClassName)
+    {
+        $this->recordClassName = $recordClassName;
+
+        $projection = $this->recordHydrator()->projection($recordClassName);
+
+        if ($projection !== null && $this instanceof Projectionable) {
+            $this->project($projection);
+        }
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
      *
      * @return array|CollectionInterface
      */
@@ -172,11 +212,25 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
             $proceed = $data->all();
         }
 
-        if ($this->wrapper !== null) {
-            return $this->collectionFactory()->wrap($proceed, $this->wrapper);
+        if ($recordClassName = $this->recordClassName) {
+            $hydrated = [];
+            $recordManager = $this->recordHydrator();
+            $platform = $this->connection->platform();
+
+            foreach ($recordManager->prepare($recordClassName, $proceed) as $row) {
+                $hydrated[] = $recordManager->instantiate($recordClassName, $row, $platform);
+            }
+
+            $hydrated = $recordManager->finalize($recordClassName, $hydrated);
+        } else {
+            $hydrated = $proceed;
         }
 
-        return $proceed;
+        if ($this->wrapper !== null) {
+            return $this->collectionFactory()->wrap($hydrated, $this->wrapper);
+        }
+
+        return $hydrated;
     }
 
     /**

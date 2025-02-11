@@ -38,6 +38,25 @@ class HasMany extends OneOrMany
     /**
      * {@inheritdoc}
      */
+    public function loadByForeignKeys(array $keys): array
+    {
+        $loaded = parent::loadByForeignKeys($keys);
+
+        if (count($keys) === count($loaded)) {
+            return $loaded;
+        }
+
+        // Provide empty array for missing keys
+        foreach ($keys as $key) {
+            $loaded[$key] ??= [];
+        }
+
+        return $loaded;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function relationQuery($keys, $constraints): ReadCommandInterface
     {
         // Constraints can be on relation attributes : builder must be used
