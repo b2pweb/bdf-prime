@@ -30,7 +30,8 @@ final class RelationLoader
          * The database field name storing the foreign key of the relation
          */
         public readonly string $foreignKeyField,
-    ) {}
+    ) {
+    }
 
     /**
      * Perform loading of relation, and attach the loaded entities to the rows

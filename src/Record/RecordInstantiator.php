@@ -32,7 +32,8 @@ final class RecordInstantiator
          * @var array<string, Field>
          */
         public readonly array $fields,
-    ) {}
+    ) {
+    }
 
     public function projection(): array
     {

@@ -83,7 +83,8 @@ final class Field
          * If this value is a string, it will be used as alias for the projection.
          */
         public readonly string|false|null $projection = null,
-    ) {}
+    ) {
+    }
 
     /**
      * Cast the database value to the parameter type.

@@ -160,5 +160,6 @@ final class EntityRecordInstantiator
          * @var array<string, RelationLoader>
          */
         public readonly array $relations,
-    ) {}
+    ) {
+    }
 }

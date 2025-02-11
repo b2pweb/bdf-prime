@@ -32,5 +32,6 @@ final class LoadRelation
          * Can be the relation class name if not ambiguous
          */
         public readonly string $relation,
-    ) {}
+    ) {
+    }
 }
