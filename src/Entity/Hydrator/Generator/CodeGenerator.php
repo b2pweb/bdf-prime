@@ -241,6 +241,7 @@ PHP;
      */
     public function generate($template, array $placeholders)
     {
+        /** @var string $file */
         $file = file_get_contents($template);
 
         foreach ($placeholders as $name => $code) {
