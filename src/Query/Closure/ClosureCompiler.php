@@ -82,7 +82,7 @@ final class ClosureCompiler
     private function load(ReflectionFunction $reflection): AndFilter
     {
         if ($this->cache) {
-            $key = 'prime.closure.' . md5($reflection->getFileName() . $reflection->getStartLine());
+            $key = 'prime.closure.' . md5($reflection->getFileName() . (string) $reflection->getStartLine());
 
             if ($filters = $this->cache->get($key)) {
                 return $filters;
