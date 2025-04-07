@@ -56,9 +56,9 @@
     "symfony/http-kernel": "~4.3|~5.0|~6.0|~7.0",
     "symfony/phpunit-bridge": "~4.3|~5.0|~6.0|~7.0",
     "symfony/validator": "~4.3|~5.0|~6.0|~7.0",
-    "vimeo/psalm": "~5.26",
+    "vimeo/psalm": "~5.26 | ~6.0",
     "phpbench/phpbench": "^1.2",
-    "nikic/php-parser": "^4.15"
+    "nikic/php-parser": "^4.15 | ~5.0"
   },
   "scripts": {
     "tests": "phpunit",

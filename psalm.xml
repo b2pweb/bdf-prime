@@ -2,6 +2,9 @@
 <psalm
     errorLevel="4"
     resolveFromConfigFile="true"
+    findUnusedCode="false"
+    ignoreInternalFunctionFalseReturn="true"
+    ignoreInternalFunctionNullReturn="true"
     phpVersion="8.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns="https://getpsalm.org/schema/config"
