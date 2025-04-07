@@ -1882,4 +1882,34 @@ class QueryTest extends TestCase
             ],
         ], $result);
     }
+
+    public function test_having_with_expression()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'jean'
+        ]);
+        $this->push([
+            'id'   => 2,
+            'name' => 'jean'
+        ]);
+        $this->push([
+            'id'   => 3,
+            'name' => 'robert'
+        ]);
+
+        $query = $this->query();
+        $result = $query
+            ->select('name')
+            ->group('name')
+            ->having(new Raw('COUNT(*)'), '>', 1)
+            ->all()
+        ;
+
+        $this->assertEquals([
+            ['name' => 'jean'],
+        ], $result);
+
+        $this->assertSame('SELECT name FROM test_ GROUP BY name HAVING COUNT(*) > ?', $query->toSql());
+    }
 }
