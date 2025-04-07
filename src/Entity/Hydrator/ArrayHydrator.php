@@ -102,7 +102,7 @@ class ArrayHydrator implements HydratorInterface
         if ($entityClass !== stdClass::class) {
             // Bind to access private properties
             // Note: ignore stdClass because all its fields are public
-            $hydrator = Closure::bind($hydrator, null, $entityClass);
+            $hydrator = Closure::bind($hydrator, null, $entityClass) ?? $hydrator;
         }
 
         return $this->hydratorsCache[$entityClass] = $hydrator;

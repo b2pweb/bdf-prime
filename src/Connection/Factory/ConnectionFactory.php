@@ -61,8 +61,7 @@ class ConnectionFactory implements ConnectionFactoryInterface
     /**
      * Create the instance of the connection
      *
-     * @param array{wrapperClass?: class-string<T>} $parameters
-     * @param Configuration $config
+     * @param array{wrapperClass?: class-string<T>, ...} $parameters
      * @param EventManager|null $eventManager The event manager, optional.
      *
      * @return ConnectionInterface
@@ -70,7 +69,7 @@ class ConnectionFactory implements ConnectionFactoryInterface
      *
      * @template T as ConnectionInterface
      */
-    private function createConnection(array $parameters, Configuration $config, EventManager $eventManager = null): ConnectionInterface
+    private function createConnection(array $parameters, Configuration $config, ?EventManager $eventManager = null): ConnectionInterface
     {
         // Set the custom driver class + wrapper
         if (isset($parameters['driver']) && isset(self::$driversMap[$parameters['driver']])) {

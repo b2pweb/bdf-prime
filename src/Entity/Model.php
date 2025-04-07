@@ -178,7 +178,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function update(array $attributes = null): int
+    public function update(?array $attributes = null): int
     {
         return static::repository()->update($this, $attributes);
     }
@@ -276,6 +276,9 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      *
      * @return EntityRelation<static, R>
      * @template R as object
+     *
+     * @psalm-suppress InvalidReturnType
+     * @psalm-suppress InvalidReturnStatement
      */
     public function relation(string $relationClass, ?string $relationName = null): EntityRelation
     {

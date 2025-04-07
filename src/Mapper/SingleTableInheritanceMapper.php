@@ -9,6 +9,8 @@ use Bdf\Prime\Relations\Relation;
  * SingleTableInheritanceMapper
  *
  * @package Bdf\Prime\Mapper
+ * @template E as object
+ * @extends Mapper<E>
  */
 abstract class SingleTableInheritanceMapper extends Mapper implements MapperFactoryAwareInterface
 {
@@ -127,7 +129,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      *
      * @param mixed $value
      *
-     * @return Mapper
+     * @return Mapper<E>
      * @psalm-suppress InvalidNullableReturnType
      * @final
      */

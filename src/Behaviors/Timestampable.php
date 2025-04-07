@@ -165,7 +165,7 @@ final class Timestampable extends Behavior implements ClockAwareInterface
     public function beforeUpdate($entity, RepositoryInterface $repository, $attributes): void
     {
         if ($attributes !== null) {
-            $attributes[] = $this->updatedAt['name'];
+            $attributes->append($this->updatedAt['name']);
         }
 
         $now = $this->createDate($this->updatedAt['name'], $repository);

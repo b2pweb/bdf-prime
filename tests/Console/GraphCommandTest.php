@@ -56,18 +56,19 @@ class GraphCommandTest extends TestCase
         $lines = explode(PHP_EOL, $tester->getDisplay(true));
         $id = substr($lines[0], 9, 40);
 
-        $this->assertEquals(<<<OUT
-digraph "$id" {
-graph [fontname="helvetica", fontsize=12];
-node [fontname="helvetica", fontsize=12];
-edge [fontname="helvetica", fontsize=12];
-address [label=<<table cellspacing="2" border="1" align="left" bgcolor="#eeeeec"><tr><td border="0" colspan="2" align="center" bgcolor="#fcaf3e">address</td></tr><tr><td border="0" align="left"><b>id</b></td><td border="0" align="left"><font point-size="10">integer</font></td></tr><tr><td border="0" align="left">street</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">number</td><td border="0" align="left"><font point-size="10">integer</font></td></tr><tr><td border="0" align="left">city</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">zipCode</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">country</td><td border="0" align="left"><font point-size="10">string</font></td></tr></table>> shape=plaintext ]
-person [label=<<table cellspacing="2" border="1" align="left" bgcolor="#eeeeec"><tr><td border="0" colspan="2" align="center" bgcolor="#fcaf3e">person</td></tr><tr><td border="0" align="left"><b>id</b></td><td border="0" align="left"><font point-size="10">integer</font></td></tr><tr><td border="0" align="left">firstName</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">lastName</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">address_id</td><td border="0" align="left"><font point-size="10">integer</font></td></tr></table>> shape=plaintext ]
-}
-
-OUT
- , implode(PHP_EOL, $lines)
-);
+        $this->assertEqualsCanonicalizing(
+            [
+                'digraph "'.$id.'" {',
+                'graph [fontname="helvetica", fontsize=12];',
+                'node [fontname="helvetica", fontsize=12];',
+                'edge [fontname="helvetica", fontsize=12];',
+                'address [label=<<table cellspacing="2" border="1" align="left" bgcolor="#eeeeec"><tr><td border="0" colspan="2" align="center" bgcolor="#fcaf3e">address</td></tr><tr><td border="0" align="left"><b>id</b></td><td border="0" align="left"><font point-size="10">integer</font></td></tr><tr><td border="0" align="left">street</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">number</td><td border="0" align="left"><font point-size="10">integer</font></td></tr><tr><td border="0" align="left">city</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">zipCode</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">country</td><td border="0" align="left"><font point-size="10">string</font></td></tr></table>> shape=plaintext ]',
+                'person [label=<<table cellspacing="2" border="1" align="left" bgcolor="#eeeeec"><tr><td border="0" colspan="2" align="center" bgcolor="#fcaf3e">person</td></tr><tr><td border="0" align="left"><b>id</b></td><td border="0" align="left"><font point-size="10">integer</font></td></tr><tr><td border="0" align="left">firstName</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">lastName</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">address_id</td><td border="0" align="left"><font point-size="10">integer</font></td></tr></table>> shape=plaintext ]',
+                '}',
+                '',
+            ],
+            $lines
+        );
     }
 
     /**
@@ -86,16 +87,17 @@ OUT
         $lines = file($out);
         $id = substr($lines[0], 9, 40);
 
-        $this->assertEquals(<<<OUT
-digraph "$id" {
-graph [fontname="helvetica", fontsize=12];
-node [fontname="helvetica", fontsize=12];
-edge [fontname="helvetica", fontsize=12];
-address [label=<<table cellspacing="2" border="1" align="left" bgcolor="#eeeeec"><tr><td border="0" colspan="2" align="center" bgcolor="#fcaf3e">address</td></tr><tr><td border="0" align="left"><b>id</b></td><td border="0" align="left"><font point-size="10">integer</font></td></tr><tr><td border="0" align="left">street</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">number</td><td border="0" align="left"><font point-size="10">integer</font></td></tr><tr><td border="0" align="left">city</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">zipCode</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">country</td><td border="0" align="left"><font point-size="10">string</font></td></tr></table>> shape=plaintext ]
-person [label=<<table cellspacing="2" border="1" align="left" bgcolor="#eeeeec"><tr><td border="0" colspan="2" align="center" bgcolor="#fcaf3e">person</td></tr><tr><td border="0" align="left"><b>id</b></td><td border="0" align="left"><font point-size="10">integer</font></td></tr><tr><td border="0" align="left">firstName</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">lastName</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">address_id</td><td border="0" align="left"><font point-size="10">integer</font></td></tr></table>> shape=plaintext ]
-}
-OUT
- , implode($lines)
-);
+        $this->assertEqualsCanonicalizing(
+            [
+                'digraph "'.$id.'" {'."\n",
+                'graph [fontname="helvetica", fontsize=12];'."\n",
+                'node [fontname="helvetica", fontsize=12];'."\n",
+                'edge [fontname="helvetica", fontsize=12];'."\n",
+                'address [label=<<table cellspacing="2" border="1" align="left" bgcolor="#eeeeec"><tr><td border="0" colspan="2" align="center" bgcolor="#fcaf3e">address</td></tr><tr><td border="0" align="left"><b>id</b></td><td border="0" align="left"><font point-size="10">integer</font></td></tr><tr><td border="0" align="left">street</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">number</td><td border="0" align="left"><font point-size="10">integer</font></td></tr><tr><td border="0" align="left">city</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">zipCode</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">country</td><td border="0" align="left"><font point-size="10">string</font></td></tr></table>> shape=plaintext ]'."\n",
+                'person [label=<<table cellspacing="2" border="1" align="left" bgcolor="#eeeeec"><tr><td border="0" colspan="2" align="center" bgcolor="#fcaf3e">person</td></tr><tr><td border="0" align="left"><b>id</b></td><td border="0" align="left"><font point-size="10">integer</font></td></tr><tr><td border="0" align="left">firstName</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">lastName</td><td border="0" align="left"><font point-size="10">string</font></td></tr><tr><td border="0" align="left">address_id</td><td border="0" align="left"><font point-size="10">integer</font></td></tr></table>> shape=plaintext ]'."\n",
+                '}',
+            ],
+            $lines
+        );
     }
 }

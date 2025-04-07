@@ -86,7 +86,7 @@ class DefaultQueryFactory implements QueryFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function make(string $name, PreprocessorInterface $preprocessor = null): CommandInterface
+    public function make(string $name, ?PreprocessorInterface $preprocessor = null): CommandInterface
     {
         $query = $this->alias[$name] ?? $name;
 

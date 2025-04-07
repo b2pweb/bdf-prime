@@ -466,6 +466,7 @@ class QueryRepositoryExtension extends QueryCompatExtension
             if (!isset($statement['nested'])) {
                 $statements[] = $statement;
             } else {
+                /** @psalm-suppress InvalidOperand */
                 $statements = [...$statements, ...$statement['nested']];
             }
         }

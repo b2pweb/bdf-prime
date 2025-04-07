@@ -7,6 +7,7 @@ namespace Bdf\Prime\Connection\Result;
  * Will return only the modified rows count
  *
  * @psalm-immutable
+ * @implements ResultSetInterface<never>
  */
 final class UpdateResultSet extends \EmptyIterator implements ResultSetInterface
 {

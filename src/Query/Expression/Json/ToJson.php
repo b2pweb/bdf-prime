@@ -3,7 +3,7 @@
 namespace Bdf\Prime\Query\Expression\Json;
 
 use Bdf\Prime\Platform\Sql\SqlPlatform;
-use Bdf\Prime\Query\CompilableClause as Q;
+use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 use Bdf\Prime\Query\Expression\AbstractPlatformSpecificExpression;
@@ -28,6 +28,11 @@ use function sprintf;
 
 /**
  * Expression for convert a value to json
+ *
+ * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\Contract\Compilable
+ * @template C as object
+ *
+ * @extends AbstractPlatformSpecificExpression<Q, C>
  */
 final class ToJson extends AbstractPlatformSpecificExpression
 {
@@ -47,7 +52,7 @@ final class ToJson extends AbstractPlatformSpecificExpression
     /**
      * {@inheritdoc}
      */
-    protected function buildForSqlite(Q $query, CompilerInterface $compiler, SqlPlatform $platform, SqlitePlatform $grammar): string
+    protected function buildForSqlite(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, SqlitePlatform $grammar): string
     {
         if (!$compiler instanceof QuoteCompilerInterface) {
             throw new LogicException('ToJson expression is not supported by the current compiler');
@@ -67,7 +72,7 @@ final class ToJson extends AbstractPlatformSpecificExpression
     /**
      * {@inheritdoc}
      */
-    protected function buildForMySql(Q $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractMySQLPlatform $grammar): string
+    protected function buildForMySql(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractMySQLPlatform $grammar): string
     {
         if (!$compiler instanceof QuoteCompilerInterface) {
             throw new LogicException('ToJson expression is not supported by the current compiler');
@@ -89,7 +94,7 @@ final class ToJson extends AbstractPlatformSpecificExpression
     /**
      * {@inheritdoc}
      */
-    protected function buildForGenericSql(Q $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractPlatform $grammar): string
+    protected function buildForGenericSql(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractPlatform $grammar): string
     {
         if (!$compiler instanceof QuoteCompilerInterface) {
             throw new LogicException('ToJson expression is not supported by the current compiler');

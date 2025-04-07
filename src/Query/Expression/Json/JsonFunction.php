@@ -2,7 +2,7 @@
 
 namespace Bdf\Prime\Query\Expression\Json;
 
-use Bdf\Prime\Query\CompilableClause as Q;
+use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
@@ -15,6 +15,11 @@ use function implode;
  * The call must take as first parameter the JSON document (can be an attribute or any SQL expression), and the other parameters are the arguments.
  *
  * Note: It's advised to use a subclass of this class for each function, to avoid errors on the arguments count.
+ *
+ * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\Contract\Compilable
+ * @template C as object
+ *
+ * @implements ExpressionInterface<Q, C>
  */
 class JsonFunction implements ExpressionInterface
 {
@@ -45,7 +50,7 @@ class JsonFunction implements ExpressionInterface
     /**
      * {@inheritdoc}
      */
-    final public function build(Q $query, object $compiler): string
+    final public function build(CompilableClause $query, object $compiler): string
     {
         if (!$compiler instanceof QuoteCompilerInterface || !$compiler instanceof CompilerInterface) {
             throw new LogicException(static::class . ' expression is not supported by the current compiler');

@@ -104,7 +104,7 @@ class HydratorGeneratorTest extends TestCase
         $this->assertStringContainsString('public function setPrimeMetadata(Metadata $metadata): void', $code);
         $this->assertStringContainsString('public function hydrate($object, array $data): void', $code);
         $this->assertStringContainsString('public function extract($object, array $attributes = []): array', $code);
-        $this->assertStringContainsString('public function flatExtract($object, array $attributes = null): array', $code);
+        $this->assertStringContainsString('public function flatExtract($object, ?array $attributes = null): array', $code);
         $this->assertStringContainsString('public function flatHydrate($object, array $data, PlatformTypesInterface $types): void', $code);
         $this->assertStringContainsString('public function extractOne($object, string $attribute)', $code);
         $this->assertStringContainsString('public function hydrateOne($object, string $attribute, $value): void', $code);

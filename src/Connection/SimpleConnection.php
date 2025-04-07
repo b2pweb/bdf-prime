@@ -91,7 +91,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      * @param EventManager|null $eventManager
      * @throws DoctrineDBALException
      */
-    public function __construct(array $params, Driver $driver, Configuration $config = null, EventManager $eventManager = null)
+    public function __construct(array $params, Driver $driver, ?Configuration $config = null, ?EventManager $eventManager = null)
     {
         /** @psalm-suppress InternalMethod */
         parent::__construct($params, $driver, $config, $eventManager);
@@ -221,7 +221,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function builder(PreprocessorInterface $preprocessor = null): Query
+    public function builder(?PreprocessorInterface $preprocessor = null): Query
     {
         return $this->factory->make(Query::class, $preprocessor);
     }
@@ -229,7 +229,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function make(string $query, PreprocessorInterface $preprocessor = null): CommandInterface
+    public function make(string $query, ?PreprocessorInterface $preprocessor = null): CommandInterface
     {
         return $this->factory->make($query, $preprocessor);
     }
@@ -285,7 +285,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function executeQuery(string $sql, array $params = [], $types = [], QueryCacheProfile $qcp = null): Result
+    public function executeQuery(string $sql, array $params = [], $types = [], ?QueryCacheProfile $qcp = null): Result
     {
         $this->prepareLogger();
 

@@ -73,9 +73,9 @@ class MapperInfo
      * Constructor
      *
      * @param Mapper $mapper
-     * @param TypesRegistryInterface $typesRegistry
+     * @param TypesRegistryInterface|null $typesRegistry
      */
-    public function __construct(Mapper $mapper, TypesRegistryInterface $typesRegistry = null)
+    public function __construct(Mapper $mapper, ?TypesRegistryInterface $typesRegistry = null)
     {
         $this->mapper = $mapper;
         $this->metadata = $mapper->metadata();

@@ -12,7 +12,6 @@ use Bdf\Prime\ServiceLocator;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
-
 use LogicException;
 
 use function get_class;
@@ -65,6 +64,7 @@ class TableGenerator extends AbstractGenerator
             throw new LogicException('The platform ' . get_class($platform) . ' does not support the method apply().');
         }
 
+        /** @psalm-suppress MissingTemplateParam */
         return $platform->apply(new class ($connection, $table, $column) implements SqlPlatformOperationInterface {
             use SqlPlatformOperationTrait;
 

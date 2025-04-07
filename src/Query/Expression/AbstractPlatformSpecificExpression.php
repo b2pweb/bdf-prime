@@ -7,12 +7,11 @@ use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Platform\Sql\SqlPlatform;
 use Bdf\Prime\Platform\Sql\SqlPlatformOperationInterface;
 use Bdf\Prime\Platform\Sql\SqlPlatformOperationTrait;
-use Bdf\Prime\Query\CompilableClause as Q;
+use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
-
 use LogicException;
 
 use function get_class;
@@ -21,19 +20,26 @@ use function get_class;
  * Base class for generate a SQL expression depending on the platform
  * To generate a platform specific expression, extends this class and implements the buildForXXX() methods
  *
+ * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\Contract\Compilable
+ * @template C as object
+ *
+ * @implements ExpressionInterface<Q, C>
  * @implements SqlPlatformOperationInterface<string>
  */
 abstract class AbstractPlatformSpecificExpression implements ExpressionInterface, SqlPlatformOperationInterface
 {
     use SqlPlatformOperationTrait;
 
-    private Q $query;
+    /**
+     * @var Q
+     */
+    private CompilableClause $query;
     private CompilerInterface $compiler;
 
     /**
      * {@inheritdoc}
      */
-    final public function build(Q $query, object $compiler)
+    final public function build(CompilableClause $query, object $compiler)
     {
         // @todo create a dedicated interface for platform() getter ?
         if (!$compiler instanceof CompilerInterface) {
@@ -63,7 +69,7 @@ abstract class AbstractPlatformSpecificExpression implements ExpressionInterface
      *
      * @return string
      */
-    protected function buildForMySql(Q $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractMySQLPlatform $grammar): string
+    protected function buildForMySql(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractMySQLPlatform $grammar): string
     {
         return $this->buildForGenericSql($query, $compiler, $platform, $grammar);
     }
@@ -78,7 +84,7 @@ abstract class AbstractPlatformSpecificExpression implements ExpressionInterface
      *
      * @return string
      */
-    protected function buildForSqlite(Q $query, CompilerInterface $compiler, SqlPlatform $platform, SqlitePlatform $grammar): string
+    protected function buildForSqlite(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, SqlitePlatform $grammar): string
     {
         return $this->buildForGenericSql($query, $compiler, $platform, $grammar);
     }
@@ -93,7 +99,7 @@ abstract class AbstractPlatformSpecificExpression implements ExpressionInterface
      *
      * @return string
      */
-    protected function buildForGenericSql(Q $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractPlatform $grammar): string
+    protected function buildForGenericSql(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, AbstractPlatform $grammar): string
     {
         return $this->buildForUnknownPlatform($query, $compiler, $platform, $grammar);
     }
@@ -108,7 +114,7 @@ abstract class AbstractPlatformSpecificExpression implements ExpressionInterface
      *
      * @return string
      */
-    protected function buildForUnknownPlatform(Q $query, CompilerInterface $compiler, PlatformInterface $platform, object $grammar): string
+    protected function buildForUnknownPlatform(CompilableClause $query, CompilerInterface $compiler, PlatformInterface $platform, object $grammar): string
     {
         throw new BadMethodCallException('The expression ' . static::class . ' is not supported by the platform ' . get_class($platform));
     }

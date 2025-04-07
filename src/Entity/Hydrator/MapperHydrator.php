@@ -18,6 +18,9 @@ use TypeError;
  * Base implementation for @see MapperHydratorInterface
  *
  * Prefer use generated hydrators on production
+ *
+ * @template E as object
+ * @implements MapperHydratorInterface<E>
  */
 class MapperHydrator implements MapperHydratorInterface
 {
@@ -57,7 +60,7 @@ class MapperHydrator implements MapperHydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function flatExtract($object, array $attributes = null): array
+    public function flatExtract($object, ?array $attributes = null): array
     {
         $values = [];
         $cache  = [];
