@@ -11,13 +11,9 @@ use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
-
-use DateTime;
 use Psr\Clock\ClockInterface;
 
 use function is_string;
-use function is_subclass_of;
-use function method_exists;
 
 /**
  * Softdeleteable

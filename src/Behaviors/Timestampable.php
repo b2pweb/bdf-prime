@@ -9,7 +9,6 @@ use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
-
 use Psr\Clock\ClockInterface;
 
 use function is_string;
