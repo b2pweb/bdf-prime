@@ -6,6 +6,8 @@
     xsi:schemaLocation="https://getpsalm.org/schema/config ../../vendor/vimeo/psalm/config.xsd"
     autoloader="vendor/autoload.php"
     resolveFromConfigFile="false"
+    findUnusedCode="false"
+    ensureOverrideAttribute="false"
 >
     <projectFiles>
         <directory name="tests/StaticAnalysis" />
