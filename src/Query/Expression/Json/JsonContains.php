@@ -111,7 +111,7 @@ final class JsonContains extends AbstractPlatformSpecificExpression
     {
         $candidate = is_string($candidate) ? $compiler->quote($candidate) : $candidate;
 
-        return $candidate . ' IN (SELECT atom FROM json_each(' . $target . '))';
+        return (string) $candidate . ' IN (SELECT atom FROM json_each(' . $target . '))';
     }
 
     /**
@@ -125,6 +125,6 @@ final class JsonContains extends AbstractPlatformSpecificExpression
     {
         $candidate = $compiler->quote(json_encode($candidate));
 
-        return 'JSON_CONTAINS(' . $target . ', ' . $candidate . ')';
+        return 'JSON_CONTAINS(' . $target . ', ' . (string) $candidate . ')';
     }
 }

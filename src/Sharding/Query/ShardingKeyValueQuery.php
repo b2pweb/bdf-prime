@@ -171,7 +171,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     {
         $results = $this->aggregate(__FUNCTION__, $column);
 
-        return (float) array_sum($results) / count($results);
+        return (float) array_sum($results) / (float) count($results);
     }
 
     /**
