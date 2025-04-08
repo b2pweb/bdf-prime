@@ -2,12 +2,18 @@
 
 namespace Bdf\Prime\Behaviors;
 
+use Bdf\Prime\Clock\ClockAwareInterface;
+use Bdf\Prime\Clock\Converter;
+use Bdf\Prime\Clock\NativeClock;
 use Bdf\Prime\Events;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
+use Psr\Clock\ClockInterface;
+
+use function is_string;
 
 /**
  * Softdeleteable
@@ -19,22 +25,26 @@ use Bdf\Prime\Types\TypeInterface;
  * @template E as object
  * @implements BehaviorInterface<E>
  */
-class SoftDeleteable implements BehaviorInterface
+class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
 {
     /**
      * The deleted at info.
      * Contains keys 'name' and 'alias'
      *
-     * @var array
+     * @var array{name: string, alias?: string}
+     * @private
      */
-    protected $deleted;
+    protected array $deleted;
 
     /**
      * The property type
      *
      * @var string
+     * @private
      */
-    protected $type;
+    protected string $type;
+
+    private ClockInterface $clock;
 
     /**
      * Softdeleteable constructor.
@@ -46,10 +56,19 @@ class SoftDeleteable implements BehaviorInterface
      * @param bool|string|array $deleted
      * @param string            $type
      */
-    public function __construct($deleted = true, $type = TypeInterface::DATETIME)
+    public function __construct($deleted = true, string $type = TypeInterface::DATETIME)
     {
         $this->type = $type;
         $this->deleted = $this->getFieldInfos($deleted);
+        $this->clock = NativeClock::instance();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setClock(ClockInterface $clock): void
+    {
+        $this->clock = $clock;
     }
 
     /**
@@ -57,7 +76,7 @@ class SoftDeleteable implements BehaviorInterface
      *
      * @param bool|string|array{0:string,1:string} $field
      *
-     * @return array
+     * @return array{name: string, alias?: string}
      */
     private function getFieldInfos($field): array
     {
@@ -127,13 +146,16 @@ class SoftDeleteable implements BehaviorInterface
      */
     private function createDate(string $name, RepositoryInterface $repository)
     {
+        $date = $this->clock->now();
+
         if ($this->type === TypeInterface::BIGINT) {
-            return time();
+            return $date->getTimestamp();
         }
 
         /** @psalm-suppress UndefinedInterfaceMethod */
         $className = $repository->mapper()->info()->property($name)->phpType();
-        return new $className();
+
+        return Converter::castToClass($date, $className);
     }
 
     /**

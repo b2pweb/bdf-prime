@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use _files\TestClock;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Serializer\PaginatorNormalizer;
 use Bdf\Prime\Serializer\PrimeCollectionNormalizer;
@@ -67,7 +68,8 @@ trait PrimeTestCase
                     UnitEnumType::UNIT_ENUM => UnitEnumType::class,
                     BackedEnumType::STRING_ENUM => BackedEnumType::class,
                     BackedEnumType::INT_ENUM => BackedEnumType::class,
-                ]
+                ],
+                'clock' => new TestClock(),
             ]);
 
             $serializer = SerializerBuilder::create()
@@ -91,6 +93,7 @@ trait PrimeTestCase
     {
         Prime::configure(null);
         Model::configure(null);
+        TestClock::reset();
     }
 
     /**
@@ -113,6 +116,7 @@ trait PrimeTestCase
     public function primeReset()
     {
         TestPack::pack()->clear();
+        TestClock::reset();
     }
 
     /**
@@ -121,5 +125,6 @@ trait PrimeTestCase
     public function primeStop()
     {
         TestPack::pack()->destroy();
+        TestClock::reset();
     }
 }
