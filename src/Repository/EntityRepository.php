@@ -3,7 +3,6 @@
 namespace Bdf\Prime\Repository;
 
 use BadMethodCallException;
-use Bdf\Event\EventNotifier;
 use Bdf\Prime\Cache\CacheInterface;
 use Bdf\Prime\Collection\CollectionFactory;
 use Bdf\Prime\Collection\CollectionInterface;
@@ -14,11 +13,9 @@ use Bdf\Prime\Connection\Event\ConnectionClosedListenerInterface;
 use Bdf\Prime\Connection\TransactionManagerInterface;
 use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Events;
-use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
-use Bdf\Prime\Query\Closure\ClosureCompiler;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
@@ -27,6 +24,17 @@ use Bdf\Prime\Query\QueryRepositoryExtension;
 use Bdf\Prime\Relations\EntityRelation;
 use Bdf\Prime\Relations\Relation;
 use Bdf\Prime\Relations\RelationInterface;
+use Bdf\Prime\Repository\Event\AfterDelete;
+use Bdf\Prime\Repository\Event\AfterInsert;
+use Bdf\Prime\Repository\Event\AfterLoad;
+use Bdf\Prime\Repository\Event\AfterSave;
+use Bdf\Prime\Repository\Event\AfterUpdate;
+use Bdf\Prime\Repository\Event\BeforeDelete;
+use Bdf\Prime\Repository\Event\BeforeInsert;
+use Bdf\Prime\Repository\Event\BeforeSave;
+use Bdf\Prime\Repository\Event\BeforeUpdate;
+use Bdf\Prime\Repository\Event\EventNotifierTrait;
+use Bdf\Prime\Repository\Event\RepositoryEventInterface;
 use Bdf\Prime\Repository\Write\Writer;
 use Bdf\Prime\Repository\Write\WriterInterface;
 use Bdf\Prime\Schema\NullStructureUpgrader;
@@ -64,7 +72,7 @@ use function method_exists;
  */
 class EntityRepository implements RepositoryInterface, EventSubscriber, ConnectionClosedListenerInterface, RepositoryEventsSubscriberInterface
 {
-    use EventNotifier;
+    use EventNotifierTrait;
 
     /**
      * @var Mapper<E>
@@ -609,7 +617,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     {
         $isNew = $this->isNew($entity);
 
-        if ($this->notify(Events::PRE_SAVE, [$entity, $this, $isNew]) === false) {
+        if ($this->notify(new BeforeSave($entity, $this, $isNew)) === false) {
             return 0;
         }
 
@@ -622,7 +630,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
             $count = $this->update($entity);
         }
 
-        $this->notify(Events::POST_SAVE, [$entity, $this, $count, $isNew]);
+        $this->notify(new AfterSave($entity, $this, $count, $isNew));
 
         return $count;
     }
@@ -779,10 +787,12 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function loaded(callable $listener, bool $once = false)
     {
+        $eventName = $this->isLegacyListener($listener) ? Events::POST_LOAD : AfterLoad::class;
+
         if ($once) {
-            $this->once(Events::POST_LOAD, $listener);
+            $this->once($eventName, $listener);
         } else {
-            $this->listen(Events::POST_LOAD, $listener);
+            $this->listen($eventName, $listener);
         }
 
         return $this;
@@ -793,10 +803,12 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function saving(callable $listener, bool $once = false)
     {
+        $eventName = $this->isLegacyListener($listener) ? Events::PRE_SAVE : BeforeSave::class;
+
         if ($once) {
-            $this->once(Events::PRE_SAVE, $listener);
+            $this->once($eventName, $listener);
         } else {
-            $this->listen(Events::PRE_SAVE, $listener);
+            $this->listen($eventName, $listener);
         }
 
         return $this;
@@ -807,10 +819,12 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function saved(callable $listener, bool $once = false)
     {
+        $eventName = $this->isLegacyListener($listener) ? Events::POST_SAVE : AfterSave::class;
+
         if ($once) {
-            $this->once(Events::POST_SAVE, $listener);
+            $this->once($eventName, $listener);
         } else {
-            $this->listen(Events::POST_SAVE, $listener);
+            $this->listen($eventName, $listener);
         }
 
         return $this;
@@ -821,10 +835,12 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function inserting(callable $listener, bool $once = false)
     {
+        $eventName = $this->isLegacyListener($listener) ? Events::PRE_INSERT : BeforeInsert::class;
+
         if ($once) {
-            $this->once(Events::PRE_INSERT, $listener);
+            $this->once($eventName, $listener);
         } else {
-            $this->listen(Events::PRE_INSERT, $listener);
+            $this->listen($eventName, $listener);
         }
 
         return $this;
@@ -835,10 +851,12 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function inserted(callable $listener, bool $once = false)
     {
+        $eventName = $this->isLegacyListener($listener) ? Events::POST_INSERT : AfterInsert::class;
+
         if ($once) {
-            $this->once(Events::POST_INSERT, $listener);
+            $this->once($eventName, $listener);
         } else {
-            $this->listen(Events::POST_INSERT, $listener);
+            $this->listen($eventName, $listener);
         }
 
         return $this;
@@ -849,10 +867,12 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function updating(callable $listener, bool $once = false)
     {
+        $eventName = $this->isLegacyListener($listener) ? Events::PRE_UPDATE : BeforeUpdate::class;
+
         if ($once) {
-            $this->once(Events::PRE_UPDATE, $listener);
+            $this->once($eventName, $listener);
         } else {
-            $this->listen(Events::PRE_UPDATE, $listener);
+            $this->listen($eventName, $listener);
         }
 
         return $this;
@@ -863,10 +883,12 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function updated(callable $listener, bool $once = false)
     {
+        $eventName = $this->isLegacyListener($listener) ? Events::POST_UPDATE : AfterUpdate::class;
+
         if ($once) {
-            $this->once(Events::POST_UPDATE, $listener);
+            $this->once($eventName, $listener);
         } else {
-            $this->listen(Events::POST_UPDATE, $listener);
+            $this->listen($eventName, $listener);
         }
 
         return $this;
@@ -877,10 +899,12 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function deleting(callable $listener, bool $once = false)
     {
+        $eventName = $this->isLegacyListener($listener) ? Events::PRE_DELETE : BeforeDelete::class;
+
         if ($once) {
-            $this->once(Events::PRE_DELETE, $listener);
+            $this->once($eventName, $listener);
         } else {
-            $this->listen(Events::PRE_DELETE, $listener);
+            $this->listen($eventName, $listener);
         }
 
         return $this;
@@ -891,13 +915,47 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function deleted(callable $listener, bool $once = false)
     {
+        $eventName = $this->isLegacyListener($listener) ? Events::POST_DELETE : AfterDelete::class;
+
         if ($once) {
-            $this->once(Events::POST_DELETE, $listener);
+            $this->once($eventName, $listener);
         } else {
-            $this->listen(Events::POST_DELETE, $listener);
+            $this->listen($eventName, $listener);
         }
 
         return $this;
+    }
+
+    /**
+     * Check if the given listener is a legacy listener
+     * This method should be removed in 3.0, when the legacy event system will be removed
+     */
+    private function isLegacyListener(callable $listener): bool
+    {
+        if (is_array($listener)) {
+            $reflection = new \ReflectionMethod($listener[0], $listener[1]);
+        } else {
+            $reflection = new \ReflectionFunction($listener);
+        }
+
+        $argsCount = $reflection->getNumberOfParameters();
+
+        // Doesn't take any parameters: can be used in both legacy and new event system
+        // So we consider it as a new event listener
+        if ($argsCount === 0) {
+            return false;
+        }
+
+        // New listeners takes only the event object as parameter
+        // So if the listener takes more than one parameter, it's a legacy listener
+        if ($argsCount > 1) {
+            return true;
+        }
+
+        $argType = $reflection->getParameters()[0]->getType();
+
+        // Consider the listener as new only if the parameter is typehinted with the event class
+        return !$argType instanceof \ReflectionNamedType || !is_subclass_of($argType->getName(), RepositoryEventInterface::class);
     }
 
     /**

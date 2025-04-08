@@ -8,6 +8,8 @@ use Bdf\Prime\Clock\NativeClock;
 use Bdf\Prime\Events;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\Event\AfterDelete;
+use Bdf\Prime\Repository\Event\BeforeDelete;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
@@ -113,13 +115,16 @@ class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
      *
      * We stop the before delete event and update the deleted at date.
      *
-     * @param E $entity
-     * @param EntityRepository<E> $repository
+     * @param BeforeDelete<E> $event
      *
      * @return bool
      */
-    public function beforeDelete($entity, EntityRepository $repository): bool
+    public function beforeDelete(BeforeDelete $event): bool
     {
+        /** @var EntityRepository<E> $repository */
+        $repository = $event->repository;
+        $entity = $event->entity;
+
         // If the current delete is without constraints, we skip the soft delete management
         if ($repository->isWithoutConstraints()) {
             return true;
@@ -130,7 +135,7 @@ class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
         $repository->mapper()->hydrateOne($entity, $this->deleted['name'], $now);
         $count = $repository->update($entity, [$this->deleted['name']]);
 
-        $repository->notify(Events::POST_DELETE, [$entity, $repository, $count]);
+        $repository->notify(new AfterDelete($entity, $repository, $count));
 
         // Returns false to skip the delete management
         return false;

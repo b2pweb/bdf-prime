@@ -9,6 +9,15 @@ use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Relations\EntityRelation;
 use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\Event\AfterDelete;
+use Bdf\Prime\Repository\Event\AfterInsert;
+use Bdf\Prime\Repository\Event\AfterLoad;
+use Bdf\Prime\Repository\Event\AfterSave;
+use Bdf\Prime\Repository\Event\AfterUpdate;
+use Bdf\Prime\Repository\Event\BeforeDelete;
+use Bdf\Prime\Repository\Event\BeforeInsert;
+use Bdf\Prime\Repository\Event\BeforeSave;
+use Bdf\Prime\Repository\Event\BeforeUpdate;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Serializer\Metadata\Builder\ClassMetadataBuilder;
@@ -326,7 +335,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post load event
      *
-     * @param callable(static,RepositoryInterface<static>):(bool|null) $listener
+     * @param callable(AfterLoad<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -339,7 +348,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register pre save event
      *
-     * @param callable(static,RepositoryInterface<static>,bool):(bool|null) $listener
+     * @param callable(BeforeSave<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -352,7 +361,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post save event
      *
-     * @param callable(static,RepositoryInterface<static>,int,bool):(bool|null) $listener
+     * @param callable(AfterSave<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -365,7 +374,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post insert event
      *
-     * @param callable(static,RepositoryInterface<static>):(bool|null) $listener
+     * @param callable(BeforeInsert<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -378,7 +387,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post insert event
      *
-     * @param callable(static,RepositoryInterface<static>,int):(bool|null) $listener
+     * @param callable(AfterInsert<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -391,7 +400,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post update event
      *
-     * @param callable(static,RepositoryInterface<static>,\ArrayObject<int,string>):(bool|null) $listener
+     * @param callable(BeforeUpdate<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -404,7 +413,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post update event
      *
-     * @param callable(static,RepositoryInterface<static>,int):(bool|null) $listener
+     * @param callable(AfterUpdate<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -417,7 +426,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post delete event
      *
-     * @param callable(static,RepositoryInterface<static>):(bool|null) $listener
+     * @param callable(BeforeDelete<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -430,7 +439,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post delete event
      *
-     * @param callable(static,RepositoryInterface<static>,int):(bool|null) $listener
+     * @param callable(AfterDelete<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>

@@ -17,6 +17,7 @@ use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\Whereable;
 use Bdf\Prime\Relations\Relation;
 use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\Event\AfterLoad;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Closure;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
@@ -502,9 +503,9 @@ class QueryRepositoryExtension extends QueryCompatExtension
      */
     public function processEntities(ResultSetInterface $data)
     {
-        /** @var EntityRepository $repository */
+        /** @var EntityRepository<E> $repository */
         $repository = $this->repository;
-        $hasLoadEvent = $repository->hasListeners(Events::POST_LOAD);
+        $hasLoadEvent = $repository->hasListeners(AfterLoad::class);
 
         // Save into local vars to ensure that value will not be changed during execution
         $withRelations = $this->withRelations;
@@ -530,7 +531,7 @@ class QueryRepositoryExtension extends QueryCompatExtension
             $entities->push($entity = $this->mapper->prepareFromRepository($result, $repository->connection()->platform()));
 
             if ($hasLoadEvent) {
-                $repository->notify(Events::POST_LOAD, [$entity, $repository]);
+                $repository->notify(new AfterLoad($entity, $repository));
             }
         }
 
