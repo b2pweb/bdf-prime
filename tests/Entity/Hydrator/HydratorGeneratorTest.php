@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Entity\Hydrator;
 
+use Bdf\Prime\EntityWithVirtualProperty;
 use DateTimeImmutable;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Admin;
@@ -32,6 +33,8 @@ use Bdf\Prime\TestFile;
 use Bdf\Prime\User;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\DateTime;
+
+require_once __DIR__ .'/../_files/entity_with_virtual_property.php';
 
 /**
  *
@@ -1242,6 +1245,47 @@ EOL;
 
         $hydrator->hydrateOne($entity, 'embedded.location.city', 'my city');
         $this->assertEquals('my city', $entity->embedded()->location()->city);
+    }
+
+    public function test_with_virtual_property()
+    {
+        $hydrator = $this->createGeneratedHydrator(EntityWithVirtualProperty::class);
+        $types = (new DummyPlatform())->types();
+
+        $o = new EntityWithVirtualProperty();
+        $hydrator->flatHydrate($o, [
+            'id' => 42,
+            'name' => 'foo',
+        ], $types);
+
+        $this->assertSame(42, $o->id);
+        $this->assertNull($o->name);
+
+        try {
+            $hydrator->hydrateOne($o, 'name', 'bar');
+            $this->fail('Should raise an exception');
+        } catch (FieldNotDeclaredException $e) {
+            $this->assertSame('The field "name" is not declared for the entity Bdf\Prime\EntityWithVirtualProperty', $e->getMessage());
+        }
+        $this->assertNull($o->name);
+
+        $hydrator->hydrate($o, [
+            'id' => 42,
+            'name' => 'foo',
+        ]);
+        $this->assertNull($o->name);
+
+        $o->name = 'test';
+
+        $this->assertSame('test', $hydrator->extractOne($o, 'name'));
+        $this->assertSame([
+            'id' => 42,
+            'name' => 'test',
+        ], $hydrator->flatExtract($o));
+        $this->assertSame([
+            'id' => 42,
+            'name' => 'test',
+        ], $hydrator->extract($o));
     }
 
     /**
