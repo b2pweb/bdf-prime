@@ -4,6 +4,7 @@ namespace Bdf\Prime\Mapper;
 
 use Bdf\Prime\Behaviors\BehaviorInterface;
 use Bdf\Prime\Cache\CacheInterface;
+use Bdf\Prime\Clock\ClockAwareInterface;
 use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
 use Bdf\Prime\Entity\Hydrator\MapperHydratorInterface;
@@ -31,6 +32,7 @@ use Bdf\Serializer\PropertyAccessor\PropertyAccessorInterface;
 use Bdf\Serializer\PropertyAccessor\ReflectionAccessor;
 use Closure;
 use LogicException;
+use Psr\Clock\ClockInterface;
 use ReflectionAttribute;
 use ReflectionObject;
 use stdClass;
@@ -55,7 +57,7 @@ use function sprintf;
  * @psalm-import-type FieldDefinition from FieldBuilder
  * @psalm-import-type RelationDefinition from RelationBuilder
  */
-abstract class Mapper
+abstract class Mapper implements ClockAwareInterface
 {
     /**
      * Enable/Disable query result cache on repository
@@ -192,7 +194,7 @@ abstract class Mapper
      * @var array<string, callable(\Bdf\Prime\Repository\RepositoryInterface<E>,mixed...):mixed>|null
      */
     private ?array $queries = null;
-
+    private ?ClockInterface $clock = null;
 
     /**
      * Mapper constructor
@@ -399,6 +401,10 @@ abstract class Mapper
             throw new LogicException('Trying to set an invalid generator in "' . get_class($this) . '"');
         }
 
+        if ($this->clock && $generator instanceof ClockAwareInterface) {
+            $generator->setClock($this->clock);
+        }
+
         $this->generator = $generator;
     }
 
@@ -410,20 +416,30 @@ abstract class Mapper
      */
     public function generator(): GeneratorInterface
     {
-        if ($this->generator === null) {
-            if ($this->metadata->isAutoIncrementPrimaryKey()) {
-                $this->generator = new AutoIncrementGenerator($this);
-            } elseif ($this->metadata->isSequencePrimaryKey()) {
-                $this->generator = new TableGenerator($this);
-            } else {
-                $this->generator = new NullGenerator();
-            }
-        } elseif (is_string($this->generator)) {
-            $className = $this->generator;
-            $this->generator = new $className($this);
+        $generator = $this->generator;
+
+        if ($generator instanceof GeneratorInterface) {
+            return $generator;
         }
 
-        return $this->generator;
+        if ($generator === null) {
+            if ($this->metadata->isAutoIncrementPrimaryKey()) {
+                $generator = new AutoIncrementGenerator($this);
+            } elseif ($this->metadata->isSequencePrimaryKey()) {
+                $generator = new TableGenerator($this);
+            } else {
+                $generator = new NullGenerator();
+            }
+        } elseif (is_string($generator)) {
+            $className = $generator;
+            $generator = new $className($this);
+        }
+
+        if ($this->clock && $generator instanceof ClockAwareInterface) {
+            $generator->setClock($this->clock);
+        }
+
+        return $this->generator = $generator;
     }
 
     /**
@@ -454,6 +470,14 @@ abstract class Mapper
         }
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    final public function setClock(ClockInterface $clock): void
+    {
+        $this->clock = $clock;
     }
 
     /**
@@ -1008,7 +1032,23 @@ abstract class Mapper
      */
     final public function behaviors(): array
     {
-        return $this->behaviors ??= $this->getDefinedBehaviors();
+        $behaviors = $this->behaviors;
+
+        if ($behaviors !== null) {
+            return $behaviors;
+        }
+
+        $behaviors = $this->getDefinedBehaviors();
+
+        if ($this->clock) {
+            foreach ($behaviors as $behavior) {
+                if ($behavior instanceof ClockAwareInterface) {
+                    $behavior->setClock($this->clock);
+                }
+            }
+        }
+
+        return $this->behaviors = $behaviors;
     }
 
     /**
