@@ -16,6 +16,7 @@
   "autoload-dev": {
     "psr-4": {
       "Php74\\": "tests/Php74",
+      "Php81\\": "tests/Php81",
       "Php84\\": "tests/Php84",
       "StaticAnalysis\\": "tests/StaticAnalysis"
     },
