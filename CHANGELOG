@@ -20,6 +20,20 @@ v2.2.0
     * Change: `Bdf\Prime\Repository\EntityRepository::listen()` can take the event class name as parameter, and the listener as second parameter. The listener should take the event object as parameter.
     * Change: use `Bdf\Prime\Repository\Event\EventNotifierTrait` instead of `Bdf\Event\EventNotifier` on repository
     * Add: introduce event classes on package `Bdf\prime\Repository\Event`
+* Feat: Handle PHP 8.1 enums :
+    * Add `Bdf\Prime\Types\BackedEnumType` to handle enums with backing values
+    * Add `Bdf\Prime\Types\UnitEnumType` to handle enums using name
+* Feat: Handle virtual property on model (i.e. property hook with getter)
+    * Add `Bdf\Prime\Mapper\Builder\FieldBuilder::virtual()` to define a virtual property, with associated metadata field
+    * Handle virtual property on default and generated hydrator
+* Feat: Handle proxy relation
+    * Add `Bdf\Prime\Relations\EntityRelation::proxy()` to create a proxy relation entity
+* Feat: Handle asymmetric visibility on hydrators
+* Feat: Use PSR-20 ClockInterface on behavior to create date
+    * Introduce `Bdf\Prime\Clock\ClockAwareInterface` to implements on behavior or id generator to use the clock
+    * Default implementation `Bdf\Prime\Clock\NativeClock` is provided
+    * Add $clock constructor parameter on `MapperFactory` (4th parameter) and `ContainerMapperFactory` (5th parameter) to define the clock
+    * Use the `ClockInterface` on `Bdf\Prime\Behaviors\Timestampable` and `Bdf\Prime\Behaviors\SoftDeleteable`
 
 BC Breaks
 * Change: `Bdf\Prime\Configuration` instances are not shared anymore between connections. So change of the default configuration during runtime will not affect already created connections.

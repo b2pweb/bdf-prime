@@ -114,6 +114,15 @@ class AttributeInfo
     }
 
     /**
+     * Does the current field is virtual ?
+     * If true, the field will not be used for generate the hydrator
+     */
+    public function virtual(): bool
+    {
+        return $this->metadata['virtual'] ?? false;
+    }
+
+    /**
      * Get the class name of the entity which contains the given attribute
      *
      * @return class-string

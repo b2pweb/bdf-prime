@@ -21,7 +21,7 @@ use Ramsey\Uuid\Type\Time;
 /**
  * @extends Mapper<Person>
  */
-class PersonMapper extends Mapper
+final class PersonMapper extends Mapper
 {
     /**
      * {@inheritdoc}

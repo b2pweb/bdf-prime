@@ -2,11 +2,15 @@
 
 namespace Bdf\Prime\Platform;
 
+use BackedEnum;
 use Bdf\Prime\Exception\TypeException;
+use Bdf\Prime\Types\BackedEnumType;
 use Bdf\Prime\Types\FacadeTypeInterface;
 use Bdf\Prime\Types\TypeInterface;
 use Bdf\Prime\Types\TypesRegistry;
 use Bdf\Prime\Types\TypesRegistryInterface;
+use Bdf\Prime\Types\UnitEnumType;
+use UnitEnum;
 
 /**
  * Manage types of platform
@@ -22,6 +26,8 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
      */
     private $interfaceTypes = [
         \DateTimeInterface::class => TypeInterface::DATETIME,
+        BackedEnum::class => BackedEnumType::STRING_ENUM,
+        UnitEnum::class => UnitEnumType::UNIT_ENUM,
     ];
 
     /**

@@ -16,6 +16,8 @@
   "autoload-dev": {
     "psr-4": {
       "Php74\\": "tests/Php74",
+      "Php81\\": "tests/Php81",
+      "Php84\\": "tests/Php84",
       "StaticAnalysis\\": "tests/StaticAnalysis"
     },
     "classmap": [
@@ -43,7 +45,8 @@
     "ramsey/uuid": "^4.2",
     "symfony/polyfill-php80": "~1.16",
     "benmorel/weakmap-polyfill": "^0.3.0",
-    "nette/php-generator": "~3.6|~4.0"
+    "nette/php-generator": "~3.6|~4.0",
+    "psr/clock": "^1.0"
   },
   "require-dev": {
     "b2pweb/bdf-phpunit": "~1.0",

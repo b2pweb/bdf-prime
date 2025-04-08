@@ -25,6 +25,7 @@ class MapperAttributesTest extends TestCase
     protected function tearDown(): void
     {
         $this->primeStop();
+        $this->unsetPrime();
     }
 
     public function test_readonly()
