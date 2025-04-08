@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Behaviors;
 
+use _files\TestClock;
 use DateTime;
 use DateTimeImmutable;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
@@ -78,6 +79,22 @@ class TimestampableTest extends TestCase
     /**
      *
      */
+    public function test_inserting_date_from_clock()
+    {
+        TestClock::set($date = new DateTimeImmutable('2018-01-01 14:26:12'));
+
+        $entity = new TimestampableEntity('name');
+
+        $entity->insert();
+
+        $this->assertEquals($date, $entity->dateInsert);
+        $this->assertEquals(null, $entity->updatedAt);
+        $this->assertInstanceOf(DateTime::class, $entity->dateInsert);
+    }
+
+    /**
+     *
+     */
     public function test_update()
     {
         $entity = new TimestampableEntity('name');
@@ -88,6 +105,23 @@ class TimestampableTest extends TestCase
 
         $this->assertEquals(null, $entity->dateInsert);
         $this->assertEqualsWithDelta($now, $entity->updatedAt, 1);
+        $this->assertInstanceOf(DateTimeImmutable::class, $entity->updatedAt);
+    }
+
+    /**
+     *
+     */
+    public function test_update_date_from_clock()
+    {
+        TestClock::set($date = new DateTimeImmutable('2018-01-01 14:26:12'));
+
+        $entity = new TimestampableEntity('name');
+
+        $entity->id = 1;
+        $entity->update();
+
+        $this->assertEquals(null, $entity->dateInsert);
+        $this->assertEquals($date, $entity->updatedAt);
         $this->assertInstanceOf(DateTimeImmutable::class, $entity->updatedAt);
     }
 
@@ -109,6 +143,27 @@ class TimestampableTest extends TestCase
         $entity = TimestampableEntity::repository()->refresh($entity);
 
         $this->assertEqualsWithDelta($now, $entity->updatedAt, 1);
+        $this->assertInstanceOf(DateTimeImmutable::class, $entity->updatedAt);
+    }
+
+    /**
+     *
+     */
+    public function test_update_property_from_clock()
+    {
+        TestClock::set($date = new DateTimeImmutable('2018-01-01 14:26:12'));
+
+        $entity = new TimestampableEntity('name');
+        $entity->id = 1;
+        $entity->insert();
+        $entity->update(['name']);
+
+        $this->assertEquals($date, $entity->updatedAt, 1);
+        $this->assertInstanceOf(DateTimeImmutable::class, $entity->updatedAt);
+
+        $entity = TimestampableEntity::repository()->refresh($entity);
+
+        $this->assertEquals($date, $entity->updatedAt, 1);
         $this->assertInstanceOf(DateTimeImmutable::class, $entity->updatedAt);
     }
 }
