@@ -38,7 +38,10 @@ use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
 
+use Throwable;
+
 use function spl_object_id;
+use function trigger_error;
 
 /**
  * Connection
@@ -427,6 +430,84 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
         $this->prepareLogger();
 
         return parent::rollBack() ?? true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isTransactionActive(): bool
+    {
+        return parent::isTransactionActive();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isNestedTransactionEnabled(): bool
+    {
+        return $this->getNestTransactionsWithSavepoints();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function useNestedTransaction(bool $flag = true): bool
+    {
+        $currentState = $this->getNestTransactionsWithSavepoints();
+
+        if ($flag !== $currentState) {
+            $this->setNestTransactionsWithSavepoints($flag);
+        }
+
+        return $currentState;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function inTransaction(callable $task)
+    {
+        $newTransaction = $this->isNestedTransactionEnabled() || !$this->isTransactionActive();
+
+        if ($newTransaction) {
+            $this->beginTransaction();
+        }
+
+        try {
+            $result = $task();
+
+            if ($result === false) {
+                @trigger_error('Returning false from a transaction task to rollback is deprecated since Prime 2.3, use an exception instead', E_USER_DEPRECATED);
+                $this->rollBack(); // This statement is invalid when no new transaction is started, but we keep this behavior for backward compatibility
+                $newTransaction = false;
+            }
+
+            if ($newTransaction) {
+                $this->commit();
+            }
+
+            return $result;
+        } catch (Throwable $e) {
+            if ($newTransaction) {
+                $this->rollBack();
+            }
+
+            throw $e;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function inNestedTransaction(callable $task)
+    {
+        $nestedState = $this->useNestedTransaction();
+
+        try {
+            return $this->inTransaction($task);
+        } finally {
+            $this->useNestedTransaction($nestedState);
+        }
     }
 
     /**

@@ -20,7 +20,7 @@ class JsonSetTest extends TestCase
 
         $this->primeStart();
 
-        $this->prime()->connections()->declareConnection('mariadb', MYSQL_CONNECTION_DSN.'?serverVersion=mariadb-11.0.1');
+        $this->prime()->connections()->declareConnection('mariadb', MYSQL_CONNECTION_DSN.'?serverVersion=11.0.1-mariadb');
         $this->prime()->connections()->declareConnection('mysql', MYSQL_CONNECTION_DSN.'?serverVersion=11.0.1');
     }
 
