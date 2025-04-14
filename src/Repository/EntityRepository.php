@@ -332,7 +332,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
         }
 
         if (method_exists($connection, 'inTransaction')) {
-             return $connection->inTransaction(fn () => $work($this));
+            return $connection->inTransaction(fn () => $work($this));
         }
 
         // @todo remove in prime 3.0

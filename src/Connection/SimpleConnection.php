@@ -37,7 +37,6 @@ use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Doctrine\DBAL\Exception\DriverException;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
-
 use Throwable;
 
 use function spl_object_id;
