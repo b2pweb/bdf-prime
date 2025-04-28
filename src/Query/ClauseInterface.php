@@ -83,7 +83,7 @@ interface ClauseInterface
      * </code>
      *
      * @param string $statement
-     * @param string|array<string,mixed>|ExpressionInterface $expression The restriction predicates.
+     * @param string|iterable<string,mixed>|ExpressionInterface $expression The restriction predicates.
      * @param string|null|mixed $operator
      * @param mixed $value
      * @param string $type

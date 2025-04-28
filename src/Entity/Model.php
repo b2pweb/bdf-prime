@@ -6,6 +6,7 @@ use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\PrimeSerializable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Relations\EntityRelation;
 use Bdf\Prime\Repository\EntityRepository;
@@ -42,8 +43,8 @@ use Bdf\Serializer\Metadata\Builder\ClassMetadataBuilder;
  * @method static static findByIdOrFail(mixed $key)
  * @method static static|null findOne(array $criteria, ?array $attributes = null)
  *
- * @method static QueryInterface where(string|array|callable $column, mixed|null $operator = null, mixed $value = null)
- * @psalm-method static EntityQuery where(string|array|callable $column, mixed|null $operator = null, mixed $value = null)
+ * @method static QueryInterface where(string|iterable|callable|ExpressionInterface $column, mixed|null $operator = null, mixed $value = null)
+ * @psalm-method static EntityQuery where(string|iterable|callable|ExpressionInterface $column, mixed|null $operator = null, mixed $value = null)
  * @method static QueryInterface with(string|array $relations)
  * @psalm-method static EntityQuery with(string|array $relations)
  * @method static QueryInterface by(string $attribute, bool $combine = false)
