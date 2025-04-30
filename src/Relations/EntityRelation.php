@@ -2,11 +2,16 @@
 
 namespace Bdf\Prime\Relations;
 
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
+use Bdf\Prime\Query\Query;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
+use Bdf\Prime\Sharding\ShardingQuery;
+use Doctrine\DBAL\Connection;
 use Error;
 use ReflectionClass;
 use ReflectionException;
@@ -229,13 +234,26 @@ class EntityRelation
      *
      * <code>
      * $entity->relation('foo')->where(['foo' => 'bar'])->get();
+     *
+     * // You can specify the required query type
+     * $entity->relation('foo')->query(KeyValueQuery::class)->where('foo', 'bar'])->get();
      * </code>
      *
-     * @return ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>
+     * @param null|class-string<Q> $queryClass The query type to create. If null, the default query type will be used
+     *
+     * @return QueryInterface<\Bdf\Prime\Connection\ConnectionInterface, R>
+     * @psalm-return (Q is null ? QueryInterface<ConnectionInterface, R> : (
+     *                 Q is Query ? Query<ConnectionInterface&Connection, R> : (
+     *                 Q is KeyValueQuery ? KeyValueQuery<ConnectionInterface, R> : (
+     *                 Q is ShardingQuery ? ShardingQuery<R> : (
+     *                 QueryInterface<ConnectionInterface, R>)))))
+     *
+     * @template Q as ReadCommandInterface
      */
-    public function query(): ReadCommandInterface
+    public function query(?string $queryClass = null): ReadCommandInterface
     {
-        return $this->relation->link($this->owner);
+        /** @psalm-suppress TooManyArguments */
+        return $this->relation->link($this->owner, $queryClass);
     }
 
     /**

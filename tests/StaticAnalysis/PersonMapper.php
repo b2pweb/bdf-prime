@@ -12,6 +12,7 @@ use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\Whereable;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Relations\Builder\RelationBuilder;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\Event\BeforeInsert;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
@@ -44,6 +45,7 @@ final class PersonMapper extends Mapper
             ->string('firstName')->alias('first_name')
             ->string('lastName')->alias('last_name')
             ->dateTime('birthDate')->alias('birth_date')->nillable()
+            ->integer('addressId')->alias('address_id')->nillable()
         ;
     }
 
@@ -126,5 +128,16 @@ final class PersonMapper extends Mapper
         $ts = new Timestampable();
 
         return [$ts];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildRelations(RelationBuilder $builder): void
+    {
+        $builder->on('address')
+            ->belongsTo(Address::class, 'addressId')
+            ->detached()
+        ;
     }
 }

@@ -18,9 +18,12 @@ use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
+use Bdf\Prime\Query\Query;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\QueryRepositoryExtension;
+use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Relations\EntityRelation;
 use Bdf\Prime\Relations\Relation;
 use Bdf\Prime\Relations\RelationInterface;
@@ -41,8 +44,10 @@ use Bdf\Prime\Schema\NullStructureUpgrader;
 use Bdf\Prime\Schema\RepositoryUpgrader;
 use Bdf\Prime\Schema\StructureUpgraderInterface;
 use Bdf\Prime\ServiceLocator;
+use Bdf\Prime\Sharding\ShardingQuery;
 use Closure;
 use Doctrine\Common\EventSubscriber;
+use Doctrine\DBAL\Connection;
 use Exception;
 
 use function method_exists;
@@ -527,6 +532,25 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     public function builder()
     {
         return $this->queries->builder();
+    }
+
+    /**
+     * Get query builder of the given type
+     *
+     * @param null|class-string<Q> $queryClass The query type to create. If null, the default query type will be used
+     *
+     * @return QueryInterface<ConnectionInterface, E>
+     * @psalm-return (Q is null ? QueryInterface<ConnectionInterface, E> : (
+     *                Q is Query ? Query<ConnectionInterface&Connection, E> : (
+     *                Q is KeyValueQuery ? KeyValueQuery<ConnectionInterface, E> : (
+     *                Q is ShardingQuery ? ShardingQuery<E> : (
+     *                QueryInterface<ConnectionInterface, E>)))))
+     *
+     * @template Q as ReadCommandInterface
+     */
+    public function query(?string $queryClass = null): ReadCommandInterface
+    {
+        return $queryClass ? $this->queries->make($queryClass) : $this->queries->builder();
     }
 
     /**

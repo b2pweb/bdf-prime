@@ -32,6 +32,7 @@ use Bdf\Prime\Sharding\ShardingConnection;
 class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterface
 {
     use CachableTrait;
+    /** @use ExecutableTrait<R> */
     use ExecutableTrait;
     use ShardPicker;
 
