@@ -42,6 +42,7 @@ use function sprintf;
  * @psalm-method int count()
  *
  * @mixin ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>
+ * @psalm-no-seal-methods
  */
 class EntityRelation
 {

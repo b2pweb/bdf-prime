@@ -91,7 +91,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
      */
     public function select($columns = null)
     {
-        return $this->select($columns);
+        return $this->project($columns);
     }
 
     /**
