@@ -106,6 +106,8 @@ class MapperHydrator implements MapperHydratorInterface
         ];
 
         foreach ($data as $field => $value) {
+            $fieldMetadata = $metadata[$field] ?? null;
+
             if (!isset($fieldMetadata) || !empty($fieldMetadata['virtual'])) {
                 continue;
             }
