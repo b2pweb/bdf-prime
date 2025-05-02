@@ -70,6 +70,7 @@ use function trigger_error;
  * @method QueryInterface<ConnectionInterface, E> filter(Closure $filter)
  *
  * @psalm-suppress DeprecatedInterface
+ * @psalm-no-seal-methods
  */
 class EntityRepository implements RepositoryInterface, EventSubscriber, ConnectionClosedListenerInterface, RepositoryEventsSubscriberInterface
 {

@@ -6,7 +6,6 @@ use BadMethodCallException;
 use Bdf\Prime\Collection\Indexer\EntityIndexer;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
-use Bdf\Prime\Events;
 use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Exception\QueryBuildingException;

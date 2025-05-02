@@ -25,6 +25,7 @@ use Psr\SimpleCache\CacheInterface as Psr16Cache;
  *
  * @template E as object
  * @mixin QueryInterface<ConnectionInterface, E>
+ * @psalm-no-seal-methods
  */
 class RepositoryQueryFactory
 {
@@ -161,7 +162,7 @@ class RepositoryQueryFactory
      * $queries->findById(['key1' => 1, 'key2' => 5]);
      * </code>
      *
-     * @param array|string $id The entity PK. Use an array for composite PK
+     * @param array|mixed $id The entity PK. Use an array for composite PK
      *
      * @return E|null The entity or null if not found
      * @throws PrimeException When query fail
