@@ -80,7 +80,7 @@ class ClassAccessor
      */
     public function getter($varName, $attribute, $dummyValue = null)
     {
-        if ($this->isPropertyAccessible($attribute)) {
+        if ($this->isPropertyAccessible($attribute, /*setter: */false)) {
             $getter = $varName.'->'.$attribute;
 
             if ($dummyValue === null) {
@@ -123,7 +123,7 @@ class ClassAccessor
             return $varName.'->set'.ucfirst($attribute).'('.$value.')';
         }
 
-        if ($this->isPropertyAccessible($attribute)) {
+        if ($this->isPropertyAccessible($attribute, /*setter: */true)) {
             return $varName.'->'.$attribute.' = '.$value;
         }
 
@@ -143,7 +143,7 @@ class ClassAccessor
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    public function isPropertyAccessible($prop)
+    public function isPropertyAccessible($prop, bool $setter = true)
     {
         try {
             $propertyReflection = $this->reflection->getProperty($prop);
@@ -152,7 +152,13 @@ class ClassAccessor
                 return false;
             }
 
-            if ($propertyReflection->isPublic()) {
+            /** @psalm-suppress RedundantCondition */
+            if ($setter && method_exists($propertyReflection, 'isPrivateSet') && $propertyReflection->isPrivateSet()) {
+                return false;
+            }
+
+            /** @psalm-suppress TypeDoesNotContainType */
+            if ($propertyReflection->isPublic() && (!$setter || !method_exists($propertyReflection, 'isProtectedSet') || !$propertyReflection->isProtectedSet())) {
                 return true;
             }
 

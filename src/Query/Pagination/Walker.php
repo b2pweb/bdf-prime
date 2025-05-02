@@ -259,6 +259,8 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
      * SPL - Iterator
      *
      * {@inheritdoc}
+     *
+     * @return R
      */
     #[\ReturnTypeWillChange]
     public function current()

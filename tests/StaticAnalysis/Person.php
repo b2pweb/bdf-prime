@@ -6,6 +6,7 @@ use Bdf\Prime\Entity\Model;
 
 /**
  * @psalm-suppress PropertyNotSetInConstructor
+ * @api
  */
 class Person extends Model
 {

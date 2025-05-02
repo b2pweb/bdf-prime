@@ -4,6 +4,9 @@ namespace StaticAnalysis;
 
 use Bdf\Prime\Entity\Model;
 
+/**
+ * @api
+ */
 class Address extends Model
 {
     public ?string $address = null;

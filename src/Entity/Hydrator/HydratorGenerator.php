@@ -215,6 +215,10 @@ class HydratorGenerator
         $out = '';
 
         foreach ($this->resolver->rootAttributes() as $attribute) {
+            if ($attribute->virtual()) {
+                continue;
+            }
+
             $out .= <<<PHP
 if (array_key_exists('{$attribute->name()}', \$data)) {
 {$this->code->indent($this->generateAttributeHydrate($attribute), 1)}
@@ -594,7 +598,9 @@ PHP;
         }
 
         foreach ($this->resolver->attributes() as $attribute) {
-            $set[$attribute->field()] = $this->generateAttributeFlatHydrate($attribute, $relationKeys, $types);
+            if (!$attribute->virtual()) {
+                $set[$attribute->field()] = $this->generateAttributeFlatHydrate($attribute, $relationKeys, $types);
+            }
         }
 
         foreach ($set as $field => $declaration) {
@@ -764,7 +770,9 @@ PHP;
         $cases = [];
 
         foreach ($this->resolver->attributes() as $attribute) {
-            $cases[$attribute->name()] = $this->generateHydrateOneCaseAttribute($attribute);
+            if (!$attribute->virtual()) {
+                $cases[$attribute->name()] = $this->generateHydrateOneCaseAttribute($attribute);
+            }
         }
 
         foreach ($this->resolver->embeddeds() as $embedded) {

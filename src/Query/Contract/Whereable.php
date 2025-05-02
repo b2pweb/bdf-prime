@@ -31,7 +31,7 @@ interface Whereable
      *         })
      * </code>
      *
-     * @param string|array<string,mixed>|callable(static):void|ExpressionInterface $column The restriction predicates.
+     * @param string|iterable<string,mixed>|callable(static):void|ExpressionInterface $column The restriction predicates.
      * @param string|mixed|null $operator The comparison operator, or the value is you want to use "=" operator
      * @param mixed $value
      *
@@ -76,7 +76,7 @@ interface Whereable
      *         ->orWhere('u.id', 2);
      * </code>
      *
-     * @param string|array<string,mixed>|callable(static):void|ExpressionInterface $column The restriction predicates.
+     * @param string|iterable<string,mixed>|callable(static):void|ExpressionInterface $column The restriction predicates.
      * @param string|mixed|null $operator The comparison operator, or the value is you want to use "=" operator
      * @param mixed $value
      *

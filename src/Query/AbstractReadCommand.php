@@ -19,6 +19,7 @@ use Bdf\Prime\Query\Extension\ExecutableTrait;
  * @template R as object|array
  *
  * @implements ReadCommandInterface<C, R>
+ * @psalm-no-seal-methods
  */
 abstract class AbstractReadCommand extends CompilableClause implements ReadCommandInterface
 {
