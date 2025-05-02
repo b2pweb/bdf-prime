@@ -529,7 +529,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
     {
         $entities = $this->recordManager->finalize($recordClass, $entities);
 
-        /** @var EntityRepository $repository */
+        /** @var EntityRepository<E> $repository */
         $repository = $this->repository;
         $hasLoadEvent = $repository->hasListeners(AfterLoad::class);
 
@@ -558,6 +558,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
             }
         }
 
+        /** @var E $entity */
         foreach ($entities as $entity) {
             $indexer->push($entity);
 
