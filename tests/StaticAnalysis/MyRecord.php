@@ -2,7 +2,7 @@
 
 namespace StaticAnalysis;
 
-class MyRecord
+final class MyRecord
 {
     public function __construct(
         public readonly int $id,
