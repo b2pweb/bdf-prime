@@ -46,6 +46,7 @@ use Bdf\Prime\Query\Expression\ExpressionInterface;
  *
  * @implements ExpressionInterface<Q, C>
  * @implements \ArrayAccess<array-key, Json>
+ * @psalm-no-seal-properties
  */
 final class Json implements ExpressionInterface, \ArrayAccess
 {

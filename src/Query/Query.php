@@ -14,6 +14,7 @@ use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Bdf\Prime\Query\Expression\Raw;
 use Bdf\Prime\Query\Extension\EntityJoinTrait;
 use Bdf\Prime\Query\Extension\LimitableTrait;
@@ -520,8 +521,9 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
 
     /**
      * {@inheritdoc}
+     * @todo change column type hint on prime 3.0
      */
-    public function havingNull(string $column, string $type = CompositeExpression::TYPE_AND)
+    public function havingNull(/*string|ExpressionInterface*/ $column, string $type = CompositeExpression::TYPE_AND)
     {
         $this->compilerState->invalidate('having');
 
@@ -530,8 +532,9 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
 
     /**
      * {@inheritdoc}
+     * @todo change column type hint on prime 3.0
      */
-    public function havingNotNull(string $column, string $type = CompositeExpression::TYPE_AND)
+    public function havingNotNull(/*string|ExpressionInterface*/ $column, string $type = CompositeExpression::TYPE_AND)
     {
         $this->compilerState->invalidate('having');
 
@@ -540,16 +543,18 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
 
     /**
      * {@inheritdoc}
+     * @todo change column type hint on prime 3.0
      */
-    public function orHavingNull(string $column)
+    public function orHavingNull(/*string|ExpressionInterface*/ $column)
     {
         return $this->havingNull($column, CompositeExpression::TYPE_OR);
     }
 
     /**
      * {@inheritdoc}
+     * @todo change column type hint on prime 3.0
      */
-    public function orHavingNotNull(string $column)
+    public function orHavingNotNull(/*string|ExpressionInterface*/ $column)
     {
         return $this->havingNotNull($column, CompositeExpression::TYPE_OR);
     }
