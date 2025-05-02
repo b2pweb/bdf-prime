@@ -30,7 +30,8 @@ use stdClass;
  *     unsigned?: bool,
  *     unique?: bool|string,
  *     class?: class-string,
- *     storageType?: string
+ *     storageType?: string,
+ *     virtual?: bool
  * }
  *
  * @psalm-type SequenceMetadata = array{

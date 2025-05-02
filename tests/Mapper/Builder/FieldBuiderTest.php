@@ -381,6 +381,7 @@ class FieldBuilderTest extends TestCase
             ['unsigned'],
             ['unique'],
             ['fixed'],
+            ['virtual'],
         ];
     }
     

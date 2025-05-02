@@ -2,17 +2,20 @@
 
 namespace Bdf\Prime;
 
+use _files\TestClock;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Serializer\PaginatorNormalizer;
 use Bdf\Prime\Serializer\PrimeCollectionNormalizer;
 use Bdf\Prime\Test\TestPack;
 use Bdf\Prime\Types\ArrayObjectType;
 use Bdf\Prime\Types\ArrayType;
+use Bdf\Prime\Types\BackedEnumType;
 use Bdf\Prime\Types\DateTimeType;
 use Bdf\Prime\Types\JsonType;
 use Bdf\Prime\Types\ObjectType;
 use Bdf\Prime\Types\TimestampType;
 use Bdf\Prime\Types\TypeInterface;
+use Bdf\Prime\Types\UnitEnumType;
 use Bdf\Serializer\Normalizer\ObjectNormalizer;
 use Bdf\Serializer\SerializerBuilder;
 
@@ -62,7 +65,11 @@ trait PrimeTestCase
                     new ArrayType(),
                     'date_utc' => new DateTimeType('date_utc', 'Y-m-d H:i:s', \DateTimeImmutable::class, new \DateTimeZone('UTC')),
                     TypeInterface::TIMESTAMP => TimestampType::class,
-                ]
+                    UnitEnumType::UNIT_ENUM => UnitEnumType::class,
+                    BackedEnumType::STRING_ENUM => BackedEnumType::class,
+                    BackedEnumType::INT_ENUM => BackedEnumType::class,
+                ],
+                'clock' => new TestClock(),
             ]);
 
             $serializer = SerializerBuilder::create()
@@ -86,6 +93,7 @@ trait PrimeTestCase
     {
         Prime::configure(null);
         Model::configure(null);
+        TestClock::reset();
     }
 
     /**
@@ -108,6 +116,7 @@ trait PrimeTestCase
     public function primeReset()
     {
         TestPack::pack()->clear();
+        TestClock::reset();
     }
 
     /**
@@ -116,5 +125,6 @@ trait PrimeTestCase
     public function primeStop()
     {
         TestPack::pack()->destroy();
+        TestClock::reset();
     }
 }

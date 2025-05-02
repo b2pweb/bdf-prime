@@ -2,10 +2,18 @@
 
 namespace Bdf\Prime\Behaviors;
 
+use Bdf\Prime\Clock\ClockAwareInterface;
+use Bdf\Prime\Clock\Converter;
+use Bdf\Prime\Clock\NativeClock;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Repository\Event\BeforeInsert;
+use Bdf\Prime\Repository\Event\BeforeUpdate;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
+use Psr\Clock\ClockInterface;
+
+use function is_string;
 
 /**
  * Timestampable
@@ -15,30 +23,31 @@ use Bdf\Prime\Types\TypeInterface;
  * @template E as object
  * @extends Behavior<E>
  */
-final class Timestampable extends Behavior
+final class Timestampable extends Behavior implements ClockAwareInterface
 {
     /**
      * The created at info.
      * Contains keys 'name' and 'alias'
      *
-     * @var array
+     * @var array{name: string, alias?: string}|null
      */
-    private $createdAt;
+    private ?array $createdAt;
 
     /**
      * The updated at info.
      * Contains keys 'name' and 'alias'
      *
-     * @var array
+     * @var array{name: string, alias?: string}|null
      */
-    private $updatedAt;
+    private ?array $updatedAt;
 
     /**
      * The property type
      *
      * @var string
      */
-    private $type;
+    private string $type;
+    private ClockInterface $clock;
 
     /**
      * Timestampable constructor.
@@ -53,8 +62,9 @@ final class Timestampable extends Behavior
      * @param bool|string|array $updatedAt
      * @param string            $type
      */
-    public function __construct($createdAt = true, $updatedAt = true, $type = TypeInterface::DATETIME)
+    public function __construct($createdAt = true, $updatedAt = true, string $type = TypeInterface::DATETIME)
     {
+        $this->clock = NativeClock::instance();
         $this->type = $type;
 
         $this->createdAt = $this->getFieldInfos($createdAt, [
@@ -69,12 +79,20 @@ final class Timestampable extends Behavior
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setClock(ClockInterface $clock): void
+    {
+        $this->clock = $clock;
+    }
+
+    /**
      * Get the field infos from option
      *
      * @param bool|string|array{0:string,1:string} $field
-     * @param array $default
+     * @param array{name: string, alias: string} $default
      *
-     * @return null|array
+     * @return null|array{name: string, alias?: string}
      */
     private function getFieldInfos($field, array $default): ?array
     {
@@ -123,15 +141,14 @@ final class Timestampable extends Behavior
      *
      * we set the new date created on the entity
      *
-     * @param E $entity
-     * @param RepositoryInterface<E> $repository
+     * @param BeforeInsert<E> $event
      *
      * @return void
      */
-    public function beforeInsert($entity, RepositoryInterface $repository): void
+    public function beforeInsert(BeforeInsert $event): void
     {
-        $now = $this->createDate($this->createdAt['name'], $repository);
-        $repository->mapper()->hydrateOne($entity, $this->createdAt['name'], $now);
+        $now = $this->createDate($this->createdAt['name'], $event->repository);
+        $event->repository->mapper()->hydrateOne($event->entity, $this->createdAt['name'], $now);
     }
 
     /**
@@ -139,20 +156,18 @@ final class Timestampable extends Behavior
      *
      * we set the new date updated on entity
      *
-     * @param E $entity
-     * @param RepositoryInterface<E> $repository
-     * @param null|\ArrayObject $attributes
+     * @param BeforeUpdate<E> $event
      *
      * @return void
      */
-    public function beforeUpdate($entity, RepositoryInterface $repository, $attributes): void
+    public function beforeUpdate(BeforeUpdate $event): void
     {
-        if ($attributes !== null) {
-            $attributes->append($this->updatedAt['name']);
+        if ($event->attributes !== null) {
+            $event->attributes->append($this->updatedAt['name']);
         }
 
-        $now = $this->createDate($this->updatedAt['name'], $repository);
-        $repository->mapper()->hydrateOne($entity, $this->updatedAt['name'], $now);
+        $now = $this->createDate($this->updatedAt['name'], $event->repository);
+        $event->repository->mapper()->hydrateOne($event->entity, $this->updatedAt['name'], $now);
     }
 
     /**
@@ -165,13 +180,15 @@ final class Timestampable extends Behavior
      */
     private function createDate(string $name, RepositoryInterface $repository)
     {
+        $date = $this->clock->now();
+
         if ($this->type === TypeInterface::BIGINT) {
-            return time();
+            return $date->getTimestamp();
         }
 
         /** @psalm-suppress UndefinedInterfaceMethod */
         $className = $repository->mapper()->info()->property($name)->phpType();
-        return new $className();
+        return Converter::castToClass($date, $className);
     }
 
     /**

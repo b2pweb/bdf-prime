@@ -13,6 +13,7 @@ use Bdf\Prime\Query\Contract\Whereable;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\Event\BeforeInsert;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Ramsey\Uuid\Type\Time;
@@ -20,7 +21,7 @@ use Ramsey\Uuid\Type\Time;
 /**
  * @extends Mapper<Person>
  */
-class PersonMapper extends Mapper
+final class PersonMapper extends Mapper
 {
     /**
      * {@inheritdoc}
@@ -111,8 +112,8 @@ class PersonMapper extends Mapper
      */
     public function customEvents(RepositoryEventsSubscriberInterface $notifier): void
     {
-        $notifier->inserting(function (Person $person): bool {
-            return $person->getBrithDate() > new \DateTime();
+        $notifier->inserting(function (BeforeInsert $event): bool {
+            return $event->entity->getBrithDate() > new \DateTime();
         });
     }
 

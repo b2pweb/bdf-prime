@@ -150,7 +150,7 @@ class ShardingQuery extends Query
     {
         $numbers = $this->aggregate(__FUNCTION__, $column);
 
-        return array_sum($numbers) / count($numbers);
+        return (float) array_sum($numbers) / (float) count($numbers);
     }
 
     /**
