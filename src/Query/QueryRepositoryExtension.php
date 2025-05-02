@@ -15,8 +15,8 @@ use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Query\Closure\ClosureCompiler;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\Whereable;
-use Bdf\Prime\Record\RepositoryRecordHydrator;
 use Bdf\Prime\Record\RecordHydratorInterface;
+use Bdf\Prime\Record\RepositoryRecordHydrator;
 use Bdf\Prime\Relations\Relation;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\Event\AfterLoad;
@@ -531,7 +531,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
 
         /** @var EntityRepository $repository */
         $repository = $this->repository;
-        $hasLoadEvent = $repository->hasListeners(Events::POST_LOAD);
+        $hasLoadEvent = $repository->hasListeners(AfterLoad::class);
 
         // Save into local vars to ensure that value will not be changed during execution
         $withRelations = $this->withRelations;
@@ -562,7 +562,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
             $indexer->push($entity);
 
             if ($hasLoadEvent) {
-                $repository->notify(Events::POST_LOAD, [$entity, $repository]);
+                $repository->notify(new AfterLoad($entity, $repository));
             }
         }
 
