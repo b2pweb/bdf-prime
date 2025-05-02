@@ -93,7 +93,7 @@ final class JsonContainsPath extends AbstractPlatformSpecificExpression
      */
     private static function getSqliteExpression(QuoteCompilerInterface $compiler, string $target, string $path): string
     {
-        return $compiler->quote($path) . ' IN (SELECT fullkey FROM json_tree(' . $target . '))';
+        return (string) $compiler->quote($path) . ' IN (SELECT fullkey FROM json_tree(' . $target . '))';
     }
 
     /**
@@ -105,6 +105,6 @@ final class JsonContainsPath extends AbstractPlatformSpecificExpression
      */
     private static function getDefaultExpression(CompilerInterface $compiler, string $target, string $path): string
     {
-        return 'JSON_CONTAINS_PATH(' . $target . ', "all", ' . $compiler->quote($path) . ')';
+        return 'JSON_CONTAINS_PATH(' . $target . ', "all", ' . (string) $compiler->quote($path) . ')';
     }
 }

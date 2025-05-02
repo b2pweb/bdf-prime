@@ -28,6 +28,7 @@
       <exclude>tests/Php74</exclude>
       <exclude>tests/Php80</exclude>
       <exclude>tests/Php81</exclude>
+      <exclude>tests/Php84</exclude>
     </testsuite>
     <testsuite name="PHP 7.4 compatiblity">
       <directory suffix="Test.php" phpVersion="7.4.0" phpVersionOperator="&gt;=">tests/Php74</directory>
@@ -37,6 +38,9 @@
     </testsuite>
     <testsuite name="PHP 8.1 compatiblity">
       <directory suffix="Test.php" phpVersion="8.1.0" phpVersionOperator="&gt;=">tests/Php81</directory>
+    </testsuite>
+    <testsuite name="PHP 8.4 compatiblity">
+      <directory suffix="Test.php" phpVersion="8.3.999" phpVersionOperator="&gt;=">tests/Php84</directory>
     </testsuite>
   </testsuites>
 </phpunit>

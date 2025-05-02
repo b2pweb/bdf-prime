@@ -17,7 +17,7 @@ interface RepositoryEventsSubscriberInterface
      * - The loaded entity
      * - The repository
      *
-     * @param callable(E,RepositoryInterface<E>):(bool|null) $listener
+     * @param callable(Event\AfterLoad<E>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return $this
@@ -35,7 +35,7 @@ interface RepositoryEventsSubscriberInterface
      *
      * The listener may return false to cancel saving
      *
-     * @param callable(E,RepositoryInterface<E>,bool):(bool|null) $listener
+     * @param callable(Event\BeforeSave<E>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return $this
@@ -52,7 +52,7 @@ interface RepositoryEventsSubscriberInterface
      * - The affected entity count (should be 1)
      * - A boolean indicating if the entity is new or not
      *
-     * @param callable(E,RepositoryInterface<E>,int,bool):(bool|null) $listener
+     * @param callable(Event\AfterSave<E>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return $this
@@ -69,7 +69,7 @@ interface RepositoryEventsSubscriberInterface
      *
      * The listener may return false to cancel insertion
      *
-     * @param callable(E,RepositoryInterface<E>):(bool|null) $listener
+     * @param callable(Event\BeforeInsert<E>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return $this
@@ -85,7 +85,7 @@ interface RepositoryEventsSubscriberInterface
      * - The repository
      * - The affected entity count (should be 1)
      *
-     * @param callable(E,RepositoryInterface<E>,int):(bool|null) $listener
+     * @param callable(Event\AfterInsert<E>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return $this
@@ -103,7 +103,7 @@ interface RepositoryEventsSubscriberInterface
      *
      * The listener may return false to cancel update
      *
-     * @param callable(E,RepositoryInterface<E>,\ArrayObject<int,string>):(bool|null) $listener
+     * @param callable(Event\BeforeUpdate<E>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return $this
@@ -119,7 +119,7 @@ interface RepositoryEventsSubscriberInterface
      * - The repository
      * - The affected entity count (should be 1)
      *
-     * @param callable(E,RepositoryInterface<E>,int):(bool|null) $listener
+     * @param callable(Event\AfterUpdate<E>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return $this
@@ -136,7 +136,7 @@ interface RepositoryEventsSubscriberInterface
      *
      * The listener may return false to cancel deletion
      *
-     * @param callable(E,RepositoryInterface<E>):(bool|null) $listener
+     * @param callable(Event\BeforeDelete<E>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return $this
@@ -152,7 +152,7 @@ interface RepositoryEventsSubscriberInterface
      * - The repository
      * - The affected entity count (should be 1)
      *
-     * @param callable(E,RepositoryInterface<E>,int):(bool|null) $listener
+     * @param callable(Event\AfterDelete<E>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return $this

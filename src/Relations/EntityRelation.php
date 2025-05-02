@@ -7,6 +7,11 @@ use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
+use Error;
+use ReflectionClass;
+use ReflectionException;
+
+use function sprintf;
 
 /**
  * EntityRelation
@@ -32,6 +37,7 @@ use Bdf\Prime\Query\ReadCommandInterface;
  * @psalm-method int count()
  *
  * @mixin ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>
+ * @psalm-no-seal-methods
  */
 class EntityRelation
 {
@@ -59,6 +65,31 @@ class EntityRelation
     {
         $this->owner    = $owner;
         $this->relation = $relation;
+    }
+
+    /**
+     * Create a new proxy instance for the relation entity
+     *
+     * This method must be called only for single entity relation (BelongsTo, HasOne),
+     * otherwise it will only return the first entity of the relation.
+     *
+     * The relation query will be executed only when a property or method is accessed.
+     * In any case, it will behave like a normal entity instance.
+     *
+     * @return R
+     *
+     * @throws PrimeException
+     * @throws ReflectionException
+     */
+    public function proxy(): object
+    {
+        $r = new ReflectionClass($this->relation->relationRepository()->entityClass());
+
+        if (!method_exists($r, 'newLazyProxy')) {
+            throw new Error(sprintf('Cannot use method %s: PHP 8.4 is required for create a proxy object.', __METHOD__));
+        }
+
+        return $r->newLazyProxy(fn () => $this->query()->first());
     }
 
     /**
