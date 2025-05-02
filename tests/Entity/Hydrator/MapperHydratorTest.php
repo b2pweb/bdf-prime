@@ -8,6 +8,7 @@ use Bdf\Prime\Country;
 use Bdf\Prime\Customer;
 use Bdf\Prime\Document;
 use Bdf\Prime\Entity\Hydrator\Exception\FieldNotDeclaredException;
+use Bdf\Prime\EntityWithVirtualProperty;
 use Bdf\Prime\Location;
 use Bdf\Prime\Name;
 use Bdf\Prime\PersonId;
@@ -25,6 +26,8 @@ use Bdf\Prime\TestEntityMapper;
 use Bdf\Prime\ZipCode;
 use DateTime;
 use PHPUnit\Framework\TestCase;
+
+require_once __DIR__ .'/../_files/entity_with_virtual_property.php';
 
 /**
  *
@@ -567,5 +570,39 @@ class MapperHydratorTest extends TestCase
 
         $hydrator->hydrateOne($entity, 'address.street', null);
         $this->assertNull($entity->address->street);
+    }
+
+    public function test_with_virtual_property()
+    {
+        $mapper = EntityWithVirtualProperty::repository()->mapper();
+        $hydrator = new MapperHydrator();
+        $hydrator->setPrimeInstantiator(EntityWithVirtualProperty::locator()->instantiator());
+        $hydrator->setPrimeMetadata($mapper->metadata());
+        $types = (new DummyPlatform())->types();
+
+        $o = new EntityWithVirtualProperty();
+        $hydrator->flatHydrate($o, [
+            'id' => 42,
+            'name' => 'foo',
+        ], $types);
+
+        $this->assertSame(42, $o->id);
+        $this->assertNull($o->name);
+
+        try {
+            $hydrator->hydrateOne($o, 'name', 'bar');
+            $this->fail('Should raise an exception');
+        } catch (FieldNotDeclaredException $e) {
+            $this->assertSame('The field "name" is not declared for the entity Bdf\Prime\EntityWithVirtualProperty', $e->getMessage());
+        }
+        $this->assertNull($o->name);
+
+        $o->name = 'test';
+
+        $this->assertSame('test', $hydrator->extractOne($o, 'name'));
+        $this->assertSame([
+            'id' => 42,
+            'name' => 'test',
+        ], $hydrator->flatExtract($o));
     }
 }

@@ -3,6 +3,11 @@
 namespace Bdf\Prime\Behaviors;
 
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Repository\Event\AfterDelete;
+use Bdf\Prime\Repository\Event\AfterInsert;
+use Bdf\Prime\Repository\Event\AfterUpdate;
+use Bdf\Prime\Repository\Event\BeforeInsert;
+use Bdf\Prime\Repository\Event\BeforeUpdate;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 
@@ -64,14 +69,13 @@ class Versionable extends Behavior
      *
      * we increment version number on entity
      *
-     * @param E $entity
-     * @param RepositoryInterface<E> $repository
+     * @param BeforeInsert<E> $event
      *
      * @return void
      */
-    public function beforeInsert($entity, RepositoryInterface $repository): void
+    public function beforeInsert(BeforeInsert $event): void
     {
-        $this->incrementVersion($entity, $repository);
+        $this->incrementVersion($event->entity, $event->repository);
     }
 
     /**
@@ -79,16 +83,14 @@ class Versionable extends Behavior
      *
      * we historicize entity
      *
-     * @param E $entity
-     * @param RepositoryInterface<E> $repository
-     * @param int $count
+     * @param AfterInsert<E> $event
      *
      * @return void
      */
-    public function afterInsert($entity, RepositoryInterface $repository, int $count): void
+    public function afterInsert(AfterInsert $event): void
     {
-        if ($count != 0) {
-            $this->insertVersion($entity, $repository);
+        if ($event->affectedRows != 0) {
+            $this->insertVersion($event->entity, $event->repository);
         }
     }
 
@@ -97,19 +99,17 @@ class Versionable extends Behavior
      *
      * we increment version number on entity
      *
-     * @param E $entity
-     * @param RepositoryInterface<E> $repository
-     * @param null|\ArrayObject $attributes
+     * @param BeforeUpdate<E> $event
      *
      * @return void
      */
-    public function beforeUpdate($entity, RepositoryInterface $repository, $attributes): void
+    public function beforeUpdate(BeforeUpdate $event): void
     {
-        if ($attributes !== null) {
-            $attributes->append(self::COLUMN_NAME);
+        if ($event->attributes !== null) {
+            $event->attributes->append(self::COLUMN_NAME);
         }
 
-        $this->incrementVersion($entity, $repository);
+        $this->incrementVersion($event->entity, $event->repository);
     }
 
     /**
@@ -117,29 +117,28 @@ class Versionable extends Behavior
      *
      * we historicize entity
      *
-     * @param E $entity
-     * @param RepositoryInterface<E> $repository
-     * @param int $count
+     * @param AfterUpdate<E> $event
      *
      * @return void
      */
-    public function afterUpdate($entity, RepositoryInterface $repository, int $count): void
+    public function afterUpdate(AfterUpdate $event): void
     {
-        if ($count != 0) {
-            $this->insertVersion($entity, $repository);
+        if ($event->affectedRows != 0) {
+            $this->insertVersion($event->entity, $event->repository);
         }
     }
 
     /**
      * Remove entity versions
      *
-     * @param E $entity
-     * @param RepositoryInterface<E> $repository
+     * @param AfterDelete<E> $event
      *
      * @return void
      */
-    public function deleteAllVersions($entity, RepositoryInterface $repository): void
+    public function deleteAllVersions(AfterDelete $event): void
     {
+        $entity = $event->entity;
+        $repository = $event->repository;
         $queries = $repository->repository($this->versionClass)->queries();
         $criteria = $repository->mapper()->primaryCriteria($entity);
 

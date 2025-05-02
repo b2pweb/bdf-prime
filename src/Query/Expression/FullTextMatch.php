@@ -55,7 +55,7 @@ class FullTextMatch implements ExpressionInterface
      */
     public function build(CompilableClause $query, object $compiler)
     {
-        $sql = 'MATCH('.$compiler->quoteIdentifier($query, $query->preprocessor()->field($this->search)).' AGAINST('.$compiler->quote($this->value).')';
+        $sql = 'MATCH('.$compiler->quoteIdentifier($query, $query->preprocessor()->field($this->search)).' AGAINST('.(string) $compiler->quote($this->value).')';
 
         if ($this->booleanMode) {
             $sql .= ' IN BOOLEAN MODE)';

@@ -106,9 +106,7 @@ class MapperHydrator implements MapperHydratorInterface
         ];
 
         foreach ($data as $field => $value) {
-            $fieldMetadata = $metadata[$field] ?? null;
-
-            if (!isset($fieldMetadata)) {
+            if (!isset($fieldMetadata) || !empty($fieldMetadata['virtual'])) {
                 continue;
             }
 
@@ -201,7 +199,7 @@ class MapperHydrator implements MapperHydratorInterface
     {
         $attributeMetadata = $this->metadata->attributes[$attribute] ?? null;
 
-        if ($attributeMetadata === null) {
+        if ($attributeMetadata === null || !empty($attributeMetadata['virtual'])) {
             if (!isset($this->metadata->embeddeds[$attribute])) {
                 throw new FieldNotDeclaredException($this->metadata->entityClass, $attribute);
             }

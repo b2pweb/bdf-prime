@@ -33,6 +33,7 @@ use stdClass;
  *     unique?: bool|string,
  *     class?: class-string,
  *     valueObject?: class-string<ValueObjectInterface>,
+ *     virtual?: bool
  * }
  *
  * @psalm-type SequenceMetadata = array{

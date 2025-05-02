@@ -2,6 +2,9 @@
 
 namespace Bdf\Prime\Entity\Hydrator;
 
+use Bdf\Prime\EntityWithVirtualProperty;
+use DateTimeImmutable;
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Admin;
 use Bdf\Prime\ArrayHydratorTestEntity;
 use Bdf\Prime\ArrayHydratorTestEntity2;
@@ -19,7 +22,6 @@ use Bdf\Prime\Entity\Hydrator\Exception\HydratorGenerationException;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Folder;
 use Bdf\Prime\Location;
-use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Name;
 use Bdf\Prime\PersonId;
@@ -42,6 +44,8 @@ use Bdf\Prime\ZipCode;
 use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Validator\Constraints\DateTime;
+
+require_once __DIR__ .'/../_files/entity_with_virtual_property.php';
 
 /**
  *
@@ -1411,7 +1415,7 @@ EOL;
         );
 
         $this->assertStringContainsString(
-<<<'PHP'
+            <<<'PHP'
         if (array_key_exists('address_street', $data)) {
             $value = $typestring->fromDatabase($data['address_street']);
             { //START accessor for address
@@ -1434,7 +1438,7 @@ PHP
         );
 
         $this->assertStringContainsString(
-<<<'PHP'
+            <<<'PHP'
         if (array_key_exists('id', $data)) {
             $value = $typeinteger->fromDatabase($data['id']);
             $object->id = (($__tmp7d0596c36891967f3bb9d994b4a97c19 = $value) !== null ? \Bdf\Prime\PersonId::from($__tmp7d0596c36891967f3bb9d994b4a97c19) : $__tmp7d0596c36891967f3bb9d994b4a97c19);
@@ -1444,7 +1448,7 @@ PHP
         );
 
         $this->assertStringContainsString(
-<<<'PHP'
+            <<<'PHP'
             case 'id':
                 return (($__tmp21cbdc47b952809cabb7cfc01d270fbf = $object->id) instanceof \Bdf\Prime\PersonId ? $__tmp21cbdc47b952809cabb7cfc01d270fbf->value() : $__tmp21cbdc47b952809cabb7cfc01d270fbf);
 PHP
@@ -1452,7 +1456,7 @@ PHP
         );
 
         $this->assertStringContainsString(
-<<<'PHP'
+            <<<'PHP'
             case 'address.street':
                 { //START accessor for address
                     try {
@@ -1473,7 +1477,7 @@ PHP
         );
 
         $this->assertStringContainsString(
-<<<'PHP'
+            <<<'PHP'
             case 'id':
                 try {
                     $object->id = (($__tmp7d0596c36891967f3bb9d994b4a97c19 = $value) !== null && !$__tmp7d0596c36891967f3bb9d994b4a97c19 instanceof \Bdf\Prime\PersonId ? \Bdf\Prime\PersonId::from($__tmp7d0596c36891967f3bb9d994b4a97c19) : $__tmp7d0596c36891967f3bb9d994b4a97c19);
@@ -1486,7 +1490,7 @@ PHP
         );
 
         $this->assertStringContainsString(
-<<<'PHP'
+            <<<'PHP'
             case 'address.street':
                 try {
                     { //START accessor for address
@@ -1510,6 +1514,47 @@ PHP
 PHP
             , $code
         );
+    }
+
+    public function test_with_virtual_property()
+    {
+        $hydrator = $this->createGeneratedHydrator(EntityWithVirtualProperty::class);
+        $types = (new DummyPlatform())->types();
+
+        $o = new EntityWithVirtualProperty();
+        $hydrator->flatHydrate($o, [
+            'id' => 42,
+            'name' => 'foo',
+        ], $types);
+
+        $this->assertSame(42, $o->id);
+        $this->assertNull($o->name);
+
+        try {
+            $hydrator->hydrateOne($o, 'name', 'bar');
+            $this->fail('Should raise an exception');
+        } catch (FieldNotDeclaredException $e) {
+            $this->assertSame('The field "name" is not declared for the entity Bdf\Prime\EntityWithVirtualProperty', $e->getMessage());
+        }
+        $this->assertNull($o->name);
+
+        $hydrator->hydrate($o, [
+            'id' => 42,
+            'name' => 'foo',
+        ]);
+        $this->assertNull($o->name);
+
+        $o->name = 'test';
+
+        $this->assertSame('test', $hydrator->extractOne($o, 'name'));
+        $this->assertSame([
+            'id' => 42,
+            'name' => 'test',
+        ], $hydrator->flatExtract($o));
+        $this->assertSame([
+            'id' => 42,
+            'name' => 'test',
+        ], $hydrator->extract($o));
     }
 
     /**
