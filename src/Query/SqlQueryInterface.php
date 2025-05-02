@@ -9,6 +9,7 @@ use Bdf\Prime\Query\Contract\Joinable;
 use Bdf\Prime\Query\Contract\Limitable;
 use Bdf\Prime\Query\Contract\Lockable;
 use Bdf\Prime\Query\Contract\Orderable;
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Bdf\Prime\Query\Expression\Raw;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
@@ -65,7 +66,7 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * Specifies a restriction over the groups of the query.
      * Replaces any previous having restrictions, if any.
      *
-     * @param string|array<string,mixed>|callable(static):void $column The restriction predicates.
+     * @param string|iterable<string,mixed>|callable(static):void|ExpressionInterface $column The restriction predicates.
      * @param string|mixed|null $operator The comparison operator, or the value is you want to use "=" operator
      * @param mixed $value
      *
@@ -79,7 +80,7 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * Adds a restriction over the groups of the query, forming a logical
      * disjunction with any existing having restrictions.
      *
-     * @param string|array<string,mixed>|callable(static):void $column The restriction predicates.
+     * @param string|iterable<string,mixed>|callable(static):void|ExpressionInterface $column The restriction predicates.
      * @param string|mixed|null $operator The comparison operator, or the value is you want to use "=" operator
      * @param mixed $value
      *
@@ -92,40 +93,52 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
     /**
      * Add having IS NULL expression
      *
-     * @param string $column
+     * @param string|ExpressionInterface $column
      * @param string $type
      *
      * @return $this This Query instance.
+     *
+     * @psalm-suppress MismatchingDocblockParamType
+     * @todo change column type hint on prime 3.0
      */
-    public function havingNull(string $column, string $type = CompositeExpression::TYPE_AND);
+    public function havingNull(string/*|ExpressionInterface*/ $column, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add having IS NOT NULL expression
      *
-     * @param string $column
+     * @param string|ExpressionInterface $column
      * @param string $type
      *
      * @return $this This Query instance.
+     *
+     * @psalm-suppress MismatchingDocblockParamType
+     * @todo change column type hint on prime 3.0
      */
-    public function havingNotNull(string $column, string $type = CompositeExpression::TYPE_AND);
+    public function havingNotNull(string/*|ExpressionInterface*/ $column, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add OR having IS NULL expression
      *
-     * @param string $column
+     * @param string|ExpressionInterface $column
      *
      * @return $this This Query instance.
+     *
+     * @psalm-suppress MismatchingDocblockParamType
+     * @todo change column type hint on prime 3.0
      */
-    public function orHavingNull(string $column);
+    public function orHavingNull(string/*|ExpressionInterface*/ $column);
 
     /**
      * Add OR having IS NOT NULL expression
      *
-     * @param string $column
+     * @param string|ExpressionInterface $column
      *
      * @return $this This Query instance.
+     *
+     * @psalm-suppress MismatchingDocblockParamType
+     * @todo change column type hint on prime 3.0
      */
-    public function orHavingNotNull(string $column);
+    public function orHavingNotNull(string/*|ExpressionInterface*/ $column);
 
     /**
      * Add having SQL expression

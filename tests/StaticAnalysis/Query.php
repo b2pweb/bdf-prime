@@ -6,7 +6,7 @@ use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Relations\EntityRelation;
 
-class Query
+final class Query
 {
     public function getFromRepository(): void
     {

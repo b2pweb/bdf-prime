@@ -6,9 +6,19 @@ use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\PrimeSerializable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Relations\EntityRelation;
 use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\Event\AfterDelete;
+use Bdf\Prime\Repository\Event\AfterInsert;
+use Bdf\Prime\Repository\Event\AfterLoad;
+use Bdf\Prime\Repository\Event\AfterSave;
+use Bdf\Prime\Repository\Event\AfterUpdate;
+use Bdf\Prime\Repository\Event\BeforeDelete;
+use Bdf\Prime\Repository\Event\BeforeInsert;
+use Bdf\Prime\Repository\Event\BeforeSave;
+use Bdf\Prime\Repository\Event\BeforeUpdate;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Serializer\Metadata\Builder\ClassMetadataBuilder;
@@ -33,8 +43,8 @@ use Bdf\Serializer\Metadata\Builder\ClassMetadataBuilder;
  * @method static static findByIdOrFail(mixed $key)
  * @method static static|null findOne(array $criteria, ?array $attributes = null)
  *
- * @method static QueryInterface where(string|array|callable $column, mixed|null $operator = null, mixed $value = null)
- * @psalm-method static EntityQuery where(string|array|callable $column, mixed|null $operator = null, mixed $value = null)
+ * @method static QueryInterface where(string|iterable|callable|ExpressionInterface $column, mixed|null $operator = null, mixed $value = null)
+ * @psalm-method static EntityQuery where(string|iterable|callable|ExpressionInterface $column, mixed|null $operator = null, mixed $value = null)
  * @method static QueryInterface with(string|array $relations)
  * @psalm-method static EntityQuery with(string|array $relations)
  * @method static QueryInterface by(string $attribute, bool $combine = false)
@@ -326,7 +336,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post load event
      *
-     * @param callable(static,RepositoryInterface<static>):(bool|null) $listener
+     * @param callable(AfterLoad<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -339,7 +349,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register pre save event
      *
-     * @param callable(static,RepositoryInterface<static>,bool):(bool|null) $listener
+     * @param callable(BeforeSave<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -352,7 +362,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post save event
      *
-     * @param callable(static,RepositoryInterface<static>,int,bool):(bool|null) $listener
+     * @param callable(AfterSave<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -365,7 +375,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post insert event
      *
-     * @param callable(static,RepositoryInterface<static>):(bool|null) $listener
+     * @param callable(BeforeInsert<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -378,7 +388,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post insert event
      *
-     * @param callable(static,RepositoryInterface<static>,int):(bool|null) $listener
+     * @param callable(AfterInsert<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -391,7 +401,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post update event
      *
-     * @param callable(static,RepositoryInterface<static>,\ArrayObject<int,string>):(bool|null) $listener
+     * @param callable(BeforeUpdate<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -404,7 +414,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post update event
      *
-     * @param callable(static,RepositoryInterface<static>,int):(bool|null) $listener
+     * @param callable(AfterUpdate<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -417,7 +427,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post delete event
      *
-     * @param callable(static,RepositoryInterface<static>):(bool|null) $listener
+     * @param callable(BeforeDelete<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>
@@ -430,7 +440,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     /**
      * Register post delete event
      *
-     * @param callable(static,RepositoryInterface<static>,int):(bool|null) $listener
+     * @param callable(AfterDelete<static>):(bool|null) $listener
      * @param bool $once Register on event once
      *
      * @return EntityRepository<static>

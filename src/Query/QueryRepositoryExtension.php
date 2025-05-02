@@ -6,7 +6,6 @@ use BadMethodCallException;
 use Bdf\Prime\Collection\Indexer\EntityIndexer;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
-use Bdf\Prime\Events;
 use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Exception\QueryBuildingException;
@@ -20,6 +19,7 @@ use Bdf\Prime\Record\RepositoryRecordHydrator;
 use Bdf\Prime\Record\RecordHydratorInterface;
 use Bdf\Prime\Relations\Relation;
 use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\Event\AfterLoad;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Closure;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
@@ -599,9 +599,9 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
     {
         @trigger_error('QueryRepositoryExtension::processEntities() is deprecated since 2.3 replaced by RecordHydratorInterface.', E_USER_DEPRECATED);
 
-        /** @var EntityRepository $repository */
+        /** @var EntityRepository<E> $repository */
         $repository = $this->repository;
-        $hasLoadEvent = $repository->hasListeners(Events::POST_LOAD);
+        $hasLoadEvent = $repository->hasListeners(AfterLoad::class);
 
         // Save into local vars to ensure that value will not be changed during execution
         $withRelations = $this->withRelations;
@@ -627,7 +627,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
             $entities->push($entity = $this->mapper->prepareFromRepository($result, $repository->connection()->platform()));
 
             if ($hasLoadEvent) {
-                $repository->notify(Events::POST_LOAD, [$entity, $repository]);
+                $repository->notify(new AfterLoad($entity, $repository));
             }
         }
 

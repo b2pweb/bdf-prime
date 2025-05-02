@@ -29,7 +29,8 @@ use stdClass;
  *     nillable?: bool,
  *     unsigned?: bool,
  *     unique?: bool|string,
- *     class?: class-string
+ *     class?: class-string,
+ *     virtual?: bool
  * }
  *
  * @psalm-type SequenceMetadata = array{

@@ -16,6 +16,7 @@ use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Query;
 use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
+use Bdf\Prime\Repository\Event\AfterLoad;
 use Bdf\Prime\Right;
 use Bdf\Prime\Test\RepositoryAssertion;
 use Bdf\Prime\TestEntity;
@@ -490,17 +491,40 @@ class EntityRepositoryTest extends TestCase
         
         $repository = Prime::repository('Bdf\Prime\TestEntity');
         
-        $repository->once(Events::POST_LOAD, function($entity) use(&$eventTrigered) {
+        $repository->loaded(function(AfterLoad $event) use(&$eventTrigered) {
             $eventTrigered = true;
-            $this->assertEquals(1, $entity->id);
-        });
+            $this->assertEquals(1, $event->entity->id);
+        }, true);
         
-        $this->assertTrue($repository->hasListeners(Events::POST_LOAD), 'has load listener');
+        $this->assertTrue($repository->hasListeners(AfterLoad::class), 'has load listener');
         
         $repository->findOne([
             'id' => 1,
         ]);
         
+        $this->assertTrue($eventTrigered, 'event has trigered');
+    }
+
+    /**
+     *
+     */
+    public function test_load_event_legacy()
+    {
+        $eventTrigered = false;
+
+        $repository = Prime::repository('Bdf\Prime\TestEntity');
+
+        $repository->once(Events::POST_LOAD, function($entity) use(&$eventTrigered) {
+            $eventTrigered = true;
+            $this->assertEquals(1, $entity->id);
+        });
+
+        $this->assertTrue($repository->hasListeners(Events::POST_LOAD), 'has load listener');
+
+        $repository->findOne([
+            'id' => 1,
+        ]);
+
         $this->assertTrue($eventTrigered, 'event has trigered');
     }
 

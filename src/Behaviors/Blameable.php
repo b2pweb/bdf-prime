@@ -3,6 +3,8 @@
 namespace Bdf\Prime\Behaviors;
 
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
+use Bdf\Prime\Repository\Event\BeforeInsert;
+use Bdf\Prime\Repository\Event\BeforeUpdate;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
@@ -135,15 +137,14 @@ class Blameable extends Behavior
      *
      * we set the user that created the entity
      *
-     * @param E $entity
-     * @param RepositoryInterface<E> $repository
+     * @param BeforeInsert<E> $event
      *
      * @return void
      */
-    public function beforeInsert($entity, RepositoryInterface $repository): void
+    public function beforeInsert(BeforeInsert $event): void
     {
         $resolver = $this->userResolver;
-        $repository->mapper()->hydrateOne($entity, $this->createdBy['name'], $resolver());
+        $event->repository->mapper()->hydrateOne($event->entity, $this->createdBy['name'], $resolver());
     }
 
     /**
@@ -151,20 +152,18 @@ class Blameable extends Behavior
      *
      * we set the user that updated the entity
      *
-     * @param E $entity
-     * @param RepositoryInterface<E> $repository
-     * @param null|\ArrayObject $attributes
+     * @param BeforeUpdate<E> $event
      *
      * @return void
      */
-    public function beforeUpdate($entity, RepositoryInterface $repository, $attributes): void
+    public function beforeUpdate(BeforeUpdate $event): void
     {
-        if ($attributes !== null) {
-            $attributes->append($this->updatedBy['name']);
+        if ($event->attributes !== null) {
+            $event->attributes->append($this->updatedBy['name']);
         }
 
         $resolver = $this->userResolver;
-        $repository->mapper()->hydrateOne($entity, $this->updatedBy['name'], $resolver());
+        $event->repository->mapper()->hydrateOne($event->entity, $this->updatedBy['name'], $resolver());
     }
 
     /**

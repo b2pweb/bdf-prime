@@ -6,6 +6,8 @@ use Bdf\Prime\Events;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Repository\EntityRepository;
+use Bdf\Prime\Repository\Event\AfterDelete;
+use Bdf\Prime\Repository\Event\BeforeDelete;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 
@@ -37,27 +39,27 @@ use Bdf\Prime\Repository\RepositoryInterface;
 class BufferedWriter implements BufferedWriterInterface
 {
     /**
-     * @var RepositoryInterface&RepositoryEventsSubscriberInterface
+     * @var RepositoryInterface<E>&RepositoryEventsSubscriberInterface
      */
     private $repository;
 
     /**
-     * @var WriterInterface
+     * @var WriterInterface<E>
      */
     private $writer;
 
     /**
-     * @var array
+     * @var array<list{E, array}>
      */
     private $insert = [];
 
     /**
-     * @var array
+     * @var array<list{E, array}>
      */
     private $update = [];
 
     /**
-     * @var array
+     * @var array<list{E, array}>
      */
     private $delete = [];
 
@@ -65,8 +67,8 @@ class BufferedWriter implements BufferedWriterInterface
     /**
      * BufferedWriter constructor.
      *
-     * @param RepositoryEventsSubscriberInterface&RepositoryInterface $repository The owner repository where operation should be performed
-     * @param WriterInterface|null $writer The base writer. If not provided, will use the repository writer
+     * @param RepositoryEventsSubscriberInterface&RepositoryInterface<E> $repository The owner repository where operation should be performed
+     * @param WriterInterface<E>|null $writer The base writer. If not provided, will use the repository writer
      */
     public function __construct(RepositoryInterface $repository, ?WriterInterface $writer = null)
     {
@@ -171,7 +173,7 @@ class BufferedWriter implements BufferedWriterInterface
      */
     private function flushDelete()
     {
-        /** @var EntityRepository $this->repository */
+        /** @var EntityRepository<E> $this->repository */
         if (empty($this->delete)) {
             return 0;
         }
@@ -184,7 +186,7 @@ class BufferedWriter implements BufferedWriterInterface
         $toDelete = [];
 
         foreach ($this->delete as list($entity, $options)) {
-            if ($this->repository->notify(Events::PRE_DELETE, [$entity, $this->repository]) !== false) {
+            if ($this->repository->notify(new BeforeDelete($entity, $this->repository)) !== false) {
                 $toDelete[] = $entity;
             }
         }
@@ -196,7 +198,7 @@ class BufferedWriter implements BufferedWriterInterface
         $count = $this->repository->queries()->entities($toDelete)->delete();
 
         foreach ($toDelete as $entity) {
-            $this->repository->notify(Events::POST_DELETE, [$entity, $this->repository, $count]);
+            $this->repository->notify(new AfterDelete($entity, $this->repository, $count));
         }
 
         return $count;
