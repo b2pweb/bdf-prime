@@ -183,6 +183,21 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
     }
 
     /**
+     * Define the discriminator map and field
+     *
+     * @param string $field
+     * @param array<string, class-string<Mapper>> $map
+     * @return void
+     *
+     * @internal
+     */
+    public function setDiscriminatorMap(string $field, array $map): void
+    {
+        $this->discriminatorColumn = $field;
+        $this->discriminatorMap = $map;
+    }
+
+    /**
      * Check whether the class is a discriminated mapper
      *
      * @return boolean
