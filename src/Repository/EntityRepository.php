@@ -754,7 +754,9 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
      */
     public function schema(bool $force = false): StructureUpgraderInterface
     {
-        if (!$this->mapper->hasSchemaManager() && !$force) {
+        $ignore = !$this->mapper->hasSchemaManager() || (method_exists($this->connection(), 'getParameters') && ($this->connection()->getParameters()['ignore'] ?? false));
+
+        if ($ignore && !$force) {
             return new NullStructureUpgrader();
         }
 

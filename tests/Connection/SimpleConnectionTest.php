@@ -79,7 +79,17 @@ class SimpleConnectionTest extends TestCase
         $this->connection->setName('test');
         $this->assertEquals('test', $this->connection->getName());
     }
-    
+
+    public function test_getParameters()
+    {
+        $this->assertSame([
+            'memory' => true,
+            'driver' => 'pdo_sqlite',
+            'charset' => 'utf8',
+            'wrapperClass' => 'Bdf\Prime\Connection\SimpleConnection',
+        ], $this->connection->getParameters());
+    }
+
     /**
      * 
      */

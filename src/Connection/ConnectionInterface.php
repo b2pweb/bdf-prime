@@ -26,6 +26,7 @@ use Doctrine\Common\EventManager;
  *
  * @method void addConnectionClosedListener(Closure $listener)
  * @method void removeConnectionClosedListener(Closure $listener)
+ * @method array getParameters()
  */
 interface ConnectionInterface
 {
@@ -149,6 +150,24 @@ interface ConnectionInterface
      * @return string|null
      */
     public function getDatabase(): ?string;
+
+    /**
+     * Get the connection parameters
+     *
+     * @return array{
+     *     host?: string,
+     *     port?: int,
+     *     user?: string,
+     *     password?: string,
+     *     dbname?: string,
+     *     path?: string,
+     *     memory?: bool,
+     *     ignore?: bool
+     * }
+     *
+     * @todo Uncomment in prime 3.0
+     */
+    //public function getParameters(): array;
 
     /**
      * Get the platform instance

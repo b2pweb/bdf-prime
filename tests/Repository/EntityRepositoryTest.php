@@ -18,6 +18,8 @@ use Bdf\Prime\Query\Query;
 use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
 use Bdf\Prime\Repository\Event\AfterLoad;
 use Bdf\Prime\Right;
+use Bdf\Prime\Schema\NullStructureUpgrader;
+use Bdf\Prime\Schema\RepositoryUpgrader;
 use Bdf\Prime\Test\RepositoryAssertion;
 use Bdf\Prime\TestEntity;
 use Bdf\Prime\TestEmbeddedEntity;
@@ -1197,9 +1199,14 @@ class EntityRepositoryTest extends TestCase
         $this->assertEquals($entity, TestEntity::refresh($entity));
         $repository->mapper()->setReadOnly(false);
     }
+
+    public function test_schema_ignored_connection()
+    {
+        $this->prime()->connections()->declareConnection('ignored', 'sqlite::memory:?ignore=1');
+        $this->assertInstanceOf(NullStructureUpgrader::class, IgnoredConnectionEntity::repository()->schema());
+        $this->assertInstanceOf(RepositoryUpgrader::class, IgnoredConnectionEntity::repository()->schema(true));
+    }
 }
-
-
 
 class TestLazyLoadingConnection extends Model
 {
@@ -1231,4 +1238,34 @@ class TestLazyLoadingConnectionMapper extends Mapper
     }
 
 
+}
+
+class IgnoredConnectionEntity extends Model
+{
+    public $id;
+}
+
+class IgnoredConnectionEntityMapper extends Mapper
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function schema(): array
+    {
+        return [
+            'connection' => 'ignored',
+            'table' => 'test_ignored',
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildFields($builder): void
+    {
+        $builder
+            ->integer('id')
+            ->autoincrement()
+        ;
+    }
 }

@@ -140,6 +140,15 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
+    public function getParameters(): array
+    {
+        /** @psalm-suppress InternalMethod */
+        return $this->getParams();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function isConnected()
     {
         return $this->_conn !== null;

@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Migration;
 
 use Bdf\Prime\Prime;
+use Bdf\Prime\PrimeTestCase;
 use Composer\Autoload\ClassLoader;
 use Composer\Composer;
 use Composer\InstalledVersions;
@@ -15,6 +16,8 @@ use Psr\Container\ContainerInterface;
  */
 class MigrationTest extends TestCase
 {
+    use PrimeTestCase;
+
     /**
      * @var Migration
      */
@@ -25,6 +28,8 @@ class MigrationTest extends TestCase
      */
     protected function setUp(): void
     {
+        $this->configurePrime();
+
         $this->migration = new Migration(
             '123456789',
             new Container([
@@ -32,7 +37,12 @@ class MigrationTest extends TestCase
             ])
         );
     }
-    
+
+    protected function tearDown(): void
+    {
+        $this->unsetPrime();
+    }
+
     /**
      * 
      */
@@ -103,6 +113,19 @@ class MigrationTest extends TestCase
         $this->assertEquals('new', $entity['name']);
         
         Prime::drop('Bdf\Prime\TestEntity');
+    }
+
+    /**
+     *
+     */
+    public function test_ignored_connection()
+    {
+        $this->prime()->connections()->declareConnection('ignored', 'sqlite::memory:?ignore=1');
+        $this->migration->update('create table test (id integer primary key)', [], 'ignored');
+        $this->assertFalse($this->prime()->connection('ignored')->schema()->has('test'));
+
+        $this->assertTrue($this->migration->isIgnoredConnection('ignored'));
+        $this->assertFalse($this->migration->isIgnoredConnection('test'));
     }
 }
 

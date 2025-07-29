@@ -1,3 +1,16 @@
+v2.3.0
+------
+
+* Feat: Add `Bdf\Prime\Connection\SimpleConnection::getParameters()` to retrieve the connection parameters.
+        This method is also soft-added to `Bdf\Prime\Connection\ConnectionInterface` for compatibility.
+* Feat: Add `Bdf\Prime\Migration\Migration::isIgnoredConnection()` to check if the migration should be ignored for the current connection.
+* Change: `Bdf\Prime\Migration\Migration::update()` will not be performed if the connection is ignored.
+* Change: `Bdf\Prime\Repository\EntityRepository::schema()` will return `NullStructureUpgrader` if the connection is ignored.
+
+BC Breaks
+* Change: Adding "ignore" option to a connection will disable schema management and migration for this connection.
+          Before this change, only the create and drop database operations were ignored.
+
 v2.2.0
 ------
 

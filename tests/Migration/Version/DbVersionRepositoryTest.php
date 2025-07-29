@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Migration\Version;
 
 use Bdf\Prime\Prime;
+use Bdf\Prime\PrimeTestCase;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -10,6 +11,8 @@ use PHPUnit\Framework\TestCase;
  */
 class DbVersionRepositoryTest extends TestCase
 {
+    use PrimeTestCase;
+
     /**
      * @var DbVersionRepository
      */
@@ -20,9 +23,16 @@ class DbVersionRepositoryTest extends TestCase
      */
     protected function setUp(): void
     {
+        $this->configurePrime();
+
         $this->repository = new DbVersionRepository(Prime::connection('test'), 'migration');
     }
-    
+
+    protected function tearDown(): void
+    {
+        $this->unsetPrime();
+    }
+
     /**
      * 
      */
