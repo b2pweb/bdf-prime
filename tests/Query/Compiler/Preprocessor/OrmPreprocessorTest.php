@@ -188,11 +188,11 @@ class OrmPreprocessorTest extends TestCase
     {
         $resolver = $this->createMock(AliasResolver::class);
         $reflection = new \ReflectionProperty($this->preprocessor, 'aliasResolver');
-        $reflection->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $reflection->setAccessible(true);
         $reflection->setValue($this->preprocessor, $resolver);
 
         $reflection = new \ReflectionProperty($this->preprocessor, 'type');
-        $reflection->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $reflection->setAccessible(true);
         $reflection->setValue($this->preprocessor, 'select');
 
         $resolver->expects($this->once())
