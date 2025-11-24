@@ -65,7 +65,7 @@ class KeyValueQueryTest extends TestCase
         $query = new KeyValueQuery($this->connection, $preprocessor);
 
         $p = new \ReflectionProperty(AbstractReadCommand::class, 'compiler');
-        $p->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $p->setAccessible(true);
         $p->setValue($query, new KeyValueSqlCompiler($this->connection));
 
         return $query;

@@ -153,7 +153,7 @@ class EntityGenerator
      *
      * @var self::FIELD_*
      */
-    private string $fieldVisibility = self::FIELD_VISIBLE_PROTECTED;
+    private $fieldVisibility = self::FIELD_VISIBLE_PROTECTED;
 
     /**
      * Use type on generated properties
@@ -887,7 +887,7 @@ class EntityGenerator
      *
      * @api
      */
-    public function setFieldVisibility(string $visibility): void
+    public function setFieldVisibility($visibility): void
     {
         if ($visibility !== static::FIELD_VISIBLE_PRIVATE && $visibility !== static::FIELD_VISIBLE_PROTECTED) {
             throw new \InvalidArgumentException('Invalid provided visibility (only private and protected are allowed): ' . $visibility);
@@ -899,7 +899,7 @@ class EntityGenerator
     /**
      * Get the field visibility
      */
-    public function getFieldVisibility(): string
+    public function getFieldVisibility()
     {
         return $this->fieldVisibility;
     }
@@ -1026,7 +1026,7 @@ class PropertyGenerator
     private ?string $typeHint = null;
     private bool $nullable = false;
     private ?string $varTag = null;
-    private string $visibility = EntityGenerator::FIELD_VISIBLE_PROTECTED;
+    private $visibility = EntityGenerator::FIELD_VISIBLE_PROTECTED;
     private $defaultValue;
     private bool $hasDefaultValue = false;
     private ?string $initialize = null;
@@ -1054,7 +1054,7 @@ class PropertyGenerator
         $this->varTag = $varTag;
     }
 
-    public function setVisibility(string $visibility): void
+    public function setVisibility($visibility): void
     {
         $this->visibility = $visibility;
     }
