@@ -9,6 +9,7 @@ use Bdf\Prime\Entity\Model;
  */
 class Address extends Model
 {
+    public ?int $id = null;
     public ?string $address = null;
     public ?string $zipCode = null;
     public ?string $city = null;

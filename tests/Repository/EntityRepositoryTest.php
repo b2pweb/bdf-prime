@@ -14,6 +14,7 @@ use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Pack;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\Query;
 use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
 use Bdf\Prime\Repository\Event\AfterLoad;
@@ -1117,7 +1118,7 @@ class EntityRepositoryTest extends TestCase
 
         $queries = TestEntity::repository()->queries();
         $r = new \ReflectionProperty($queries, 'metadataCache');
-        $r->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $r->setAccessible(true);
 
         $this->assertSame($cache, $r->getValue($queries));
     }
@@ -1196,6 +1197,17 @@ class EntityRepositoryTest extends TestCase
 
         $this->assertEquals($entity, TestEntity::refresh($entity));
         $repository->mapper()->setReadOnly(false);
+    }
+
+    public function test_query_with_explicit_type()
+    {
+        $repository = TestEntity::repository();
+
+        $this->assertInstanceOf(Query::class, $repository->query(Query::class));
+        $this->assertSame('SELECT t0.* FROM test_ t0', $repository->query(Query::class)->toSql());
+
+        $this->assertInstanceOf(KeyValueQuery::class, $repository->query(KeyValueQuery::class));
+        $this->assertSame('SELECT * FROM test_', $repository->query(KeyValueQuery::class)->toSql());
     }
 }
 

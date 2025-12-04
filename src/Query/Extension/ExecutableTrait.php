@@ -12,12 +12,15 @@ use Bdf\Prime\Query\QueryInterface;
  * Trait for provide execute() wrapper methods
  *
  * @psalm-require-implements \Bdf\Prime\Query\ReadCommandInterface
+ * @template R as object|array
  */
 trait ExecutableTrait
 {
     /**
      * {@inheritdoc}
      * @see QueryInterface::all()
+     *
+     * @return R[]|CollectionInterface<R>
      */
     #[ReadOperation]
     public function all($columns = null)
@@ -28,6 +31,8 @@ trait ExecutableTrait
     /**
      * {@inheritdoc}
      * @see QueryInterface::first()
+     *
+     * @return R|null
      */
     #[ReadOperation]
     public function first($columns = null)

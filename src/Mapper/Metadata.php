@@ -30,6 +30,7 @@ use stdClass;
  *     unsigned?: bool,
  *     unique?: bool|string,
  *     class?: class-string,
+ *     storageType?: string,
  *     virtual?: bool
  * }
  *

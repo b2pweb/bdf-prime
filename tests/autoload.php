@@ -27,3 +27,4 @@ include_once __DIR__ . '/Entity/_files/embedded.php';
 date_default_timezone_set('Europe/Paris');
 
 SebastianBergmann\Comparator\Factory::getInstance()->register(new \Bdf\PHPUnit\Comparator\DateTimeComparator());
+\Doctrine\Deprecations\Deprecation::enableWithTriggerError();

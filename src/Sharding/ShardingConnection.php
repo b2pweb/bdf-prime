@@ -440,6 +440,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      * {@inheritdoc}
      *
      * @psalm-suppress DeprecatedMethod
+     * @deprecated Will be removed on prime 3.0
      */
     public function getWrappedConnection()
     {

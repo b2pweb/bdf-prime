@@ -5,6 +5,7 @@ namespace Bdf\Prime\Mapper;
 use Bdf\Prime\Behaviors\BehaviorInterface;
 use Bdf\Prime\Cache\CacheInterface;
 use Bdf\Prime\Clock\ClockAwareInterface;
+use Bdf\Prime\Clock\NativeClock;
 use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
 use Bdf\Prime\Entity\Hydrator\MapperHydratorInterface;
@@ -482,6 +483,15 @@ abstract class Mapper implements ClockAwareInterface
     final public function setClock(ClockInterface $clock): void
     {
         $this->clock = $clock;
+    }
+
+    /**
+     * Get the current clock instance
+     * If no clock has been set using {@see Mapper::setClock()}, the default clock {@see NativeClock::instance()} will be returned
+     */
+    final public function clock(): ClockInterface
+    {
+        return $this->clock ?? NativeClock::instance();
     }
 
     /**
