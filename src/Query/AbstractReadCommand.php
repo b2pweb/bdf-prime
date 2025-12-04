@@ -24,6 +24,7 @@ use Bdf\Prime\Query\Extension\ExecutableTrait;
 abstract class AbstractReadCommand extends CompilableClause implements ReadCommandInterface
 {
     use CachableTrait;
+    /** @use ExecutableTrait<R> */
     use ExecutableTrait;
 
     /**

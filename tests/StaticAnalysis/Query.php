@@ -2,9 +2,14 @@
 
 namespace StaticAnalysis;
 
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\SimpleConnection;
+use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
+use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Relations\EntityRelation;
+use Bdf\Prime\Sharding\ShardingQuery;
+use Doctrine\DBAL\Connection;
 
 final class Query
 {
@@ -74,6 +79,36 @@ final class Query
         $this->checkPerson(
             Person::filter(fn (Person $person) => $person->getFirstName() === 'John' || $person->getLastName() === 'Doe')
                 ->get('123')
+        );
+    }
+
+    public function explicitQueryType(): void
+    {
+        /** @psalm-check-type $query = \Bdf\Prime\Query\Query<ConnectionInterface&Connection, Person> */
+        $query = Person::repository()->query(\Bdf\Prime\Query\Query::class);
+        $this->checkPerson($query
+            ->where('firstName', 'John')
+            ->order('birthDate', 'desc')
+            ->first()
+        );
+        /** @psalm-check-type $query = KeyValueQuery<ConnectionInterface, Person> */
+        $query = Person::repository()->query(KeyValueQuery::class);
+        $this->checkPerson($query
+            ->where('firstName', 'John')
+            ->first()
+        );
+        /** @psalm-check-type $query = ShardingQuery<Person> */
+        $query = Person::repository()->query(ShardingQuery::class);
+
+        /** @psalm-check-type $query = KeyValueQuery<ConnectionInterface, Address> */
+        $query = (new Person())->relation(Address::class)->query(KeyValueQuery::class);
+        $this->checkAddress($query->first());
+
+        /** @psalm-check-type $query = \Bdf\Prime\Query\Query<ConnectionInterface&Connection, Address> */
+        $query = (new Person())->relation(Address::class)->query(\Bdf\Prime\Query\Query::class);
+        $this->checkAddress($query
+            ->distinct()
+            ->first()
         );
     }
 

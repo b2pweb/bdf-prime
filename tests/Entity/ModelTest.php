@@ -7,6 +7,8 @@ use Bdf\Prime\Customer;
 use Bdf\Prime\Folder;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
+use Bdf\Prime\Query\Query;
 use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\Event\AfterDelete;
@@ -911,6 +913,36 @@ class ModelTest extends TestCase
         $user->insert();
         
         $customer = $user->relation('customer')->first();
+        $this->assertEquals('customer', $customer->name);
+    }
+
+    /**
+     *
+     */
+    public function test_on_relation_with_custom_query_class()
+    {
+        $customer = new Customer([
+            'id' => 1,
+            'name' => 'customer',
+            'roles' => []
+        ]);
+        $user = new User([
+            'id' => 1,
+            'name' => 'user',
+            'roles' => [],
+            'customer' => $customer
+        ]);
+        $customer->insert();
+        $user->insert();
+
+        $query = $user->relation('customer')->query(KeyValueQuery::class);
+        $this->assertInstanceOf(KeyValueQuery::class, $query);
+        $customer = $query->first();
+        $this->assertEquals('customer', $customer->name);
+
+        $query = $user->relation('customer')->query(Query::class);
+        $this->assertInstanceOf(Query::class, $query);
+        $customer = $query->first();
         $this->assertEquals('customer', $customer->name);
     }
 
