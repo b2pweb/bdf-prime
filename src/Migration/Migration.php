@@ -36,23 +36,23 @@ class Migration implements MigrationInterface
     /**
      * The console input.
      *
-     * @var InputInterface
+     * @var InputInterface|null
      */
-    protected $input;
+    protected $input = null;
 
     /**
      * The console output.
      *
-     * @var OutputInterface
+     * @var OutputInterface|null
      */
-    protected $output;
+    protected $output = null;
 
     /**
      * The console helper.
      *
-     * @var HelperSet
+     * @var HelperSet|null
      */
-    protected $helperSet;
+    protected $helperSet = null;
 
     /**
      * Migration constructor
@@ -125,6 +125,10 @@ class Migration implements MigrationInterface
      */
     public function getInput(): InputInterface
     {
+        if ($this->input === null) {
+            throw new \LogicException('Console input is not set.');
+        }
+
         return $this->input;
     }
 
@@ -147,6 +151,10 @@ class Migration implements MigrationInterface
      */
     public function getOutput(): OutputInterface
     {
+        if ($this->output === null) {
+            throw new \LogicException('Console output is not set.');
+        }
+
         return $this->output;
     }
 
@@ -181,6 +189,10 @@ class Migration implements MigrationInterface
      */
     public function getHelperSet()
     {
+        if ($this->helperSet === null) {
+            throw new \LogicException('Console helper set is not set.');
+        }
+
         return $this->helperSet;
     }
 
