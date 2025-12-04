@@ -2,6 +2,8 @@
 
 namespace Bdf\Prime\Query;
 
+use Bdf\Prime\Query\Criteria\CriteriaInterface;
+use Bdf\Prime\Query\Criteria\FilterEntry;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
@@ -121,10 +123,31 @@ class Clause implements ClauseInterface
             $glue = ($operator ?: CompositeExpression::TYPE_AND);
             $parts = [];
 
+            if ($expression instanceof CriteriaInterface && $expression->separator() !== null) {
+                $glue = $expression->separator();
+            }
+
             foreach ($expression as $key => $value) {
                 if (isset($this->customFilters[$key])) {
                     // Custom filter
                     $this->customFilters[$key]($this, $value);
+                } elseif ($value instanceof CriteriaInterface) {
+                    // Embedded criteria
+                    $statements = $this->statements;
+                    $this->statements = [];
+                    $this->buildClause($statement, $value);
+                    $parts[] = [
+                        'nested'  => $this->statements[$statement],
+                        'glue'    => $glue,
+                    ];
+                    $this->statements = $statements;
+                } elseif ($value instanceof FilterEntry) {
+                    $parts[] = [
+                        'column'    => $value->field,
+                        'operator'  => $value->operator,
+                        'value'     => $value->value,
+                        'glue'      => $glue,
+                    ];
                 } elseif (is_int($key)) {
                     @trigger_error('Raw SQL expression is deprecated since Prime 1.3.2. Use Query::whereRaw() or Clause::buildRaw() instead.', E_USER_DEPRECATED);
 

@@ -41,6 +41,7 @@ use UnitEnum;
  *     customSchemaOptions?: array,
  *     platformOptions?: array,
  *     columnDefinition?: string,
+ *     storageType?: string,
  *     virtual?: bool
  * }
  *
@@ -603,6 +604,25 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     public function fixed(bool $flag = true)
     {
         $this->fields[$this->current]['fixed'] = $flag;
+
+        return $this;
+    }
+
+    /**
+     * Define the actual type used to store the data.
+     *
+     * When provided, the schema manager will use this type instead of the default one,
+     * the default type will only be used to parse or normalize the value.
+     *
+     * @param string $type The type name. Should be a constant of TypeInterface.
+     *
+     * @return $this
+     *
+     * @see TypeInterface::* constants
+     */
+    public function storedAs(string $type)
+    {
+        $this->fields[$this->current]['storageType'] = $type;
 
         return $this;
     }

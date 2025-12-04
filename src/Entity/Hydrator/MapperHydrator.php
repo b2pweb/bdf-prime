@@ -336,7 +336,7 @@ class MapperHydrator implements MapperHydratorInterface
         }
 
         $this->reflectionProperties[$class][$attribute] = $reflectionProperty = new ReflectionProperty($class, $property);
-        $reflectionProperty->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $reflectionProperty->setAccessible(true);
 
         $this->writeToReflection($reflectionProperty, $entity, $value, $skipInvalid, $metadata);
     }
@@ -370,7 +370,7 @@ class MapperHydrator implements MapperHydratorInterface
         }
 
         $this->reflectionProperties[$class][$attribute] = $reflectionProperty = new ReflectionProperty($class, $property);
-        $reflectionProperty->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $reflectionProperty->setAccessible(true);
 
         $this->writeToReflection($reflectionProperty, $entity, $value, $skipInvalid, $metadata);
     }
@@ -394,7 +394,7 @@ class MapperHydrator implements MapperHydratorInterface
         }
 
         $this->reflectionProperties[$class][$attribute] = $propertyReflection = new ReflectionProperty($class, $property);
-        $propertyReflection->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $propertyReflection->setAccessible(true);
 
         try {
             return $propertyReflection->getValue($entity);
