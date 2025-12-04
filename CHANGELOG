@@ -1,6 +1,7 @@
 v2.3.0
 ------
 
+* Feat: Add `Bdf\Prime\Mapper\Mapper::clock()` to get the clock instance
 * Feat: Add transaction handling methods on `Bdf\Prime\Connection\TransactionManagerInterface`
 * Change: `EntityRepository::transaction()` do not rely on nested transaction if not enabled on the connection
 * Feat: Add custom criteria system :
