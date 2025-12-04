@@ -51,6 +51,7 @@ use Doctrine\DBAL\Connection;
 use Exception;
 
 use function method_exists;
+use function trigger_error;
 
 /**
  * Db repository
@@ -336,14 +337,18 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
             throw new BadMethodCallException('Transactions are not supported by the connection '.$connection->getName());
         }
 
-        // @todo handle Doctrine DBAL Exception ?
-        // @todo transaction method on connection ?
+        if (method_exists($connection, 'inTransaction')) {
+            return $connection->inTransaction(fn () => $work($this));
+        }
+
+        // @todo remove in prime 3.0
         try {
             $connection->beginTransaction();
 
             $result = $work($this);
 
             if ($result === false) {
+                @trigger_error('Returning false from a transaction task to rollback is deprecated since Prime 2.3, use an exception instead', E_USER_DEPRECATED);
                 $connection->rollback();
             } else {
                 $connection->commit();
