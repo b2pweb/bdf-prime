@@ -13,6 +13,9 @@ v2.3.0
     * Add `Bdf\Prime\Query\Criteria\Criterion`, `Bdf\Prime\Query\Criteria\LikeCriterion`, `Bdf\Prime\Query\Criteria\StartsWithCriterion` attributes for annotate properties as criterion
     * Change `Bdf\Prime\Query\Clause::buildClause()` to handle nested criteria and expression on composite criteria
 * Feat: Allow to explicitly declare the type of the column in the schema using `FieldBuilder::storedAs()`
+* Feat: Add `Bdf\Prime\Mapper\Attribute\DiscriminatorMap` attribute to define the discriminator map on single table inheritance in replacement of overriding properties `discriminatorColumn` and `discriminatorMap` of the mapper
+* Feat: Add `Bdf\Prime\Mapper\Mapper::setDiscriminatorMap()`
+* Change: Mapper's configurators attributes now handle inheritance (i.e. attributes declared on parent class are inherited by child classes)
 
 BC Breaks
 * Deprecated: Returning `false` on callback of `EntityRepository::transaction()` to rollback the transaction is deprecated. Use exception instead.
