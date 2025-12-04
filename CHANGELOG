@@ -1,3 +1,8 @@
+v2.3.0
+------
+
+* Feat: Allow to explicitly declare the type of the column in the schema using `FieldBuilder::storedAs()`
+
 v2.2.0
 ------
 
