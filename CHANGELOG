@@ -2,6 +2,17 @@ v2.3.0
 ------
 
 * Feat: Add `Bdf\Prime\Mapper\Mapper::clock()` to get the clock instance
+* Feat: Add transaction handling methods on `Bdf\Prime\Connection\TransactionManagerInterface`
+* Change: `EntityRepository::transaction()` do not rely on nested transaction if not enabled on the connection
+* Feat: Add custom criteria system :
+    * Add `Bdf\Prime\Query\Criteria\CriteriaInterface` and `Bdf\Prime\Query\Criteria\CustomCriteria` for define custom criteria
+    * Add `Bdf\Prime\Query\Criteria\Criterion`, `Bdf\Prime\Query\Criteria\LikeCriterion`, `Bdf\Prime\Query\Criteria\StartsWithCriterion` attributes for annotate properties as criterion
+    * Change `Bdf\Prime\Query\Clause::buildClause()` to handle nested criteria and expression on composite criteria
+* Feat: Allow to explicitly declare the type of the column in the schema using `FieldBuilder::storedAs()`
+
+BC Breaks
+* Deprecated: Returning `false` on callback of `EntityRepository::transaction()` to rollback the transaction is deprecated. Use exception instead.
+* Deprecated: Unknown aggregate expression are now deprecated. Use select with expression instead.
 
 v2.2.0
 ------

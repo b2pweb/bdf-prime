@@ -23,6 +23,7 @@ use Bdf\Prime\Query\Custom\KeyValue\KeyValueSqlCompiler;
 use Bdf\Prime\Query\Query;
 use Bdf\Prime\TestEntity;
 use Bdf\Prime\Types\TypeInterface;
+use Exception;
 use PHPUnit\Framework\TestCase;
 
 // Declare read timeout in case the extension musqli does not support this constant.
@@ -650,6 +651,313 @@ class SimpleConnectionTest extends TestCase
         // Restart prime for next tests
         $this->unsetPrime();
         $this->configurePrime();
+    }
+
+    public function test_inTransaction_base_success()
+    {
+        while ($this->connection->isTransactionActive()) {
+            $this->connection->rollBack();
+        }
+
+        $this->connection->useNestedTransaction(false);
+        TestEntity::repository()->schema()->migrate();
+
+        $result = $this->connection->inTransaction(function () {
+            $this->assertTrue($this->connection->isTransactionActive());
+            $this->assertFalse($this->connection->isNestedTransactionEnabled());
+
+            $entity = new TestEntity(['name' => 'john']);
+            $entity->insert();
+
+            return 42;
+        });
+
+        $this->assertSame(42, $result);
+        $this->assertFalse($this->connection->isTransactionActive());
+        $this->assertFalse($this->connection->isNestedTransactionEnabled());
+        $this->assertEquals(new TestEntity(['id' => 1, 'name' => 'john']), TestEntity::first());
+    }
+
+    public function test_inTransaction_base_with_exception_should_rollback()
+    {
+        while ($this->connection->isTransactionActive()) {
+            $this->connection->rollBack();
+        }
+
+        $this->connection->useNestedTransaction(false);
+        TestEntity::repository()->schema()->migrate();
+
+        try {
+            $this->connection->inTransaction(function () {
+                $this->assertTrue($this->connection->isTransactionActive());
+                $this->assertFalse($this->connection->isNestedTransactionEnabled());
+
+                $entity = new TestEntity(['name' => 'john']);
+                $entity->insert();
+
+                throw new Exception();
+            });
+            $this->fail('Expect exception');
+        } catch (Exception $e) {}
+
+        $this->assertFalse($this->connection->isTransactionActive());
+        $this->assertFalse($this->connection->isNestedTransactionEnabled());
+        $this->assertNull(TestEntity::first());
+    }
+
+    public function test_inTransaction_transaction_already_open_without_nested_should_not_commit()
+    {
+        while ($this->connection->isTransactionActive()) {
+            $this->connection->rollBack();
+        }
+
+        $this->connection->useNestedTransaction(false);
+        TestEntity::repository()->schema()->migrate();
+        $this->connection->beginTransaction();
+
+        $result = $this->connection->inTransaction(function () {
+            $this->assertTrue($this->connection->isTransactionActive());
+            $this->assertFalse($this->connection->isNestedTransactionEnabled());
+
+            $entity = new TestEntity(['name' => 'john']);
+            $entity->insert();
+
+            return 42;
+        });
+
+        $this->assertSame(42, $result);
+        $this->assertTrue($this->connection->isTransactionActive());
+        $this->assertFalse($this->connection->isNestedTransactionEnabled());
+        $this->assertEquals(new TestEntity(['id' => 1, 'name' => 'john']), TestEntity::first());
+    }
+
+    public function test_inTransaction_transaction_already_open_without_nested_should_not_rollback()
+    {
+        while ($this->connection->isTransactionActive()) {
+            $this->connection->rollBack();
+        }
+
+        $this->connection->useNestedTransaction(false);
+        TestEntity::repository()->schema()->migrate();
+        $this->connection->beginTransaction();
+
+        try {
+            $this->connection->inTransaction(function () {
+                $this->assertTrue($this->connection->isTransactionActive());
+                $this->assertFalse($this->connection->isNestedTransactionEnabled());
+
+                $entity = new TestEntity(['name' => 'john']);
+                $entity->insert();
+
+                throw new Exception();
+            });
+            $this->fail('Expect exception');
+        } catch (Exception $e) {}
+
+        $this->assertTrue($this->connection->isTransactionActive());
+        $this->assertFalse($this->connection->isNestedTransactionEnabled());
+        $this->assertEquals(new TestEntity(['id' => 1, 'name' => 'john']), TestEntity::first());
+    }
+
+    public function test_inTransaction_transaction_already_open_with_nested_enabled()
+    {
+        while ($this->connection->isTransactionActive()) {
+            $this->connection->rollBack();
+        }
+
+        $this->connection->useNestedTransaction(true);
+        TestEntity::repository()->schema()->migrate();
+        $this->connection->beginTransaction();
+
+        $result = $this->connection->inTransaction(function () {
+            $this->assertTrue($this->connection->isTransactionActive());
+            $this->assertTrue($this->connection->isNestedTransactionEnabled());
+            $this->assertEquals(2, $this->connection->getTransactionNestingLevel());
+
+            $entity = new TestEntity(['name' => 'john']);
+            $entity->insert();
+
+            return 42;
+        });
+
+        $this->assertSame(42, $result);
+        $this->assertTrue($this->connection->isTransactionActive());
+        $this->assertTrue($this->connection->isNestedTransactionEnabled());
+        $this->assertEquals(1, $this->connection->getTransactionNestingLevel());
+        $this->assertEquals(new TestEntity(['id' => 1, 'name' => 'john']), TestEntity::first());
+    }
+
+    public function test_inTransaction_transaction_already_open_with_nested_enabled_with_exception_should_rollback()
+    {
+        while ($this->connection->isTransactionActive()) {
+            $this->connection->rollBack();
+        }
+
+        $this->connection->useNestedTransaction(true);
+        TestEntity::repository()->schema()->migrate();
+        $this->connection->beginTransaction();
+
+        try {
+            $this->connection->inTransaction(function () {
+                $this->assertTrue($this->connection->isTransactionActive());
+                $this->assertEquals(2, $this->connection->getTransactionNestingLevel());
+
+                $entity = new TestEntity(['name' => 'john']);
+                $entity->insert();
+
+                throw new Exception();
+            });
+            $this->fail('Expect exception');
+        } catch (Exception $e) {}
+
+        $this->assertTrue($this->connection->isTransactionActive());
+        $this->assertTrue($this->connection->isNestedTransactionEnabled());
+        $this->assertEquals(1, $this->connection->getTransactionNestingLevel());
+        $this->assertNull(TestEntity::first());
+    }
+
+    public function test_inNestedTransaction_base_success()
+    {
+        while ($this->connection->isTransactionActive()) {
+            $this->connection->rollBack();
+        }
+
+        $this->connection->useNestedTransaction(false);
+        TestEntity::repository()->schema()->migrate();
+
+        $result = $this->connection->inNestedTransaction(function () {
+            $this->assertTrue($this->connection->isTransactionActive());
+            $this->assertTrue($this->connection->isNestedTransactionEnabled());
+
+            $entity = new TestEntity(['name' => 'john']);
+            $entity->insert();
+
+            return 42;
+        });
+
+        $this->assertSame(42, $result);
+        $this->assertFalse($this->connection->isTransactionActive());
+        $this->assertFalse($this->connection->isNestedTransactionEnabled());
+        $this->assertEquals(new TestEntity(['id' => 1, 'name' => 'john']), TestEntity::first());
+    }
+
+    public function test_inNestedTransaction_base_with_exception_should_rollback()
+    {
+        while ($this->connection->isTransactionActive()) {
+            $this->connection->rollBack();
+        }
+
+        $this->connection->useNestedTransaction(false);
+        TestEntity::repository()->schema()->migrate();
+
+        try {
+            $this->connection->inNestedTransaction(function () {
+                $this->assertTrue($this->connection->isTransactionActive());
+                $this->assertTrue($this->connection->isNestedTransactionEnabled());
+
+                $entity = new TestEntity(['name' => 'john']);
+                $entity->insert();
+
+                throw new Exception();
+            });
+            $this->fail('Expect exception');
+        } catch (Exception $e) {}
+
+        $this->assertFalse($this->connection->isTransactionActive());
+        $this->assertFalse($this->connection->isNestedTransactionEnabled());
+        $this->assertNull(TestEntity::first());
+    }
+
+    public function test_inNestedTransaction_transaction_already_open_with_nested_enabled()
+    {
+        while ($this->connection->isTransactionActive()) {
+            $this->connection->rollBack();
+        }
+
+        $this->connection->useNestedTransaction(true);
+        TestEntity::repository()->schema()->migrate();
+        $this->connection->beginTransaction();
+
+        $result = $this->connection->inNestedTransaction(function () {
+            $this->assertTrue($this->connection->isTransactionActive());
+            $this->assertTrue($this->connection->isNestedTransactionEnabled());
+            $this->assertEquals(2, $this->connection->getTransactionNestingLevel());
+
+            $entity = new TestEntity(['name' => 'john']);
+            $entity->insert();
+
+            return 42;
+        });
+
+        $this->assertSame(42, $result);
+        $this->assertTrue($this->connection->isTransactionActive());
+        $this->assertTrue($this->connection->isNestedTransactionEnabled());
+        $this->assertEquals(1, $this->connection->getTransactionNestingLevel());
+        $this->assertEquals(new TestEntity(['id' => 1, 'name' => 'john']), TestEntity::first());
+    }
+
+    public function test_inNestedTransaction_transaction_already_open_with_nested_enabled_with_exception_should_rollback()
+    {
+        while ($this->connection->isTransactionActive()) {
+            $this->connection->rollBack();
+        }
+
+        $this->connection->useNestedTransaction(true);
+        TestEntity::repository()->schema()->migrate();
+        $this->connection->beginTransaction();
+
+        try {
+            $this->connection->inNestedTransaction(function () {
+                $this->assertTrue($this->connection->isTransactionActive());
+                $this->assertEquals(2, $this->connection->getTransactionNestingLevel());
+
+                $entity = new TestEntity(['name' => 'john']);
+                $entity->insert();
+
+                throw new Exception();
+            });
+            $this->fail('Expect exception');
+        } catch (Exception $e) {}
+
+        $this->assertTrue($this->connection->isTransactionActive());
+        $this->assertTrue($this->connection->isNestedTransactionEnabled());
+        $this->assertEquals(1, $this->connection->getTransactionNestingLevel());
+        $this->assertNull(TestEntity::first());
+    }
+
+    public function test_isTransactionActive()
+    {
+        while ($this->connection->isTransactionActive()) {
+            $this->connection->rollBack();
+        }
+
+        $this->assertFalse($this->connection->isTransactionActive());
+
+        $this->connection->beginTransaction();
+        $this->assertTrue($this->connection->isTransactionActive());
+    }
+
+    public function test_useNestedTransaction()
+    {
+        while ($this->connection->isTransactionActive()) {
+            $this->connection->rollBack();
+        }
+        $this->connection->useNestedTransaction(false);
+
+        $this->assertFalse($this->connection->isNestedTransactionEnabled());
+        $this->assertFalse($this->connection->useNestedTransaction());
+        $this->assertTrue($this->connection->isNestedTransactionEnabled());
+
+        $this->connection->beginTransaction();
+        $this->connection->beginTransaction();
+        $this->assertSame(2, $this->connection->getTransactionNestingLevel());
+
+        $this->connection->rollBack();
+        $this->connection->rollBack();
+        $this->assertSame(0, $this->connection->getTransactionNestingLevel());
+
+        $this->assertTrue($this->connection->useNestedTransaction(false));
+        $this->assertFalse($this->connection->isNestedTransactionEnabled());
     }
 }
 

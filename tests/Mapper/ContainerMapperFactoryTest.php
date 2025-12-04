@@ -177,7 +177,7 @@ class ContainerMapperFactoryTest extends TestCase
         $mapper = $factory->build(Prime::service(), TestEntity::class);
 
         $r = new \ReflectionProperty(Mapper::class, 'clock');
-        $r->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $r->setAccessible(true);
 
         $this->assertSame($clock, $r->getValue($mapper));
     }

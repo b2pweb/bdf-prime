@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Schema\Adapter\Metadata;
 
 use Bdf\Prime\Document;
+use Bdf\Prime\EntityWithCustomStorageType;
 use Bdf\Prime\Faction;
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Platform\PlatformInterface;
@@ -131,5 +132,14 @@ class MetadataColumnTest extends TestCase
         $column = new MetadataColumn($this->metadata->attributes['enabled'], $this->types);
 
         $this->assertSame(1, $column->defaultValue());
+    }
+
+    public function test_custom_storage_type()
+    {
+        $this->metadata = EntityWithCustomStorageType::repository()->mapper()->metadata();
+
+        $column = new MetadataColumn($this->metadata->attributes['enabled'], $this->types);
+
+        $this->assertEquals($this->types->get(TypeInterface::INTEGER), $column->type());
     }
 }

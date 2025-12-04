@@ -234,7 +234,7 @@ class KeyValueSqlCompilerTest extends TestCase
         $query = $this->query()->from('test_')->where(['id' => 5])->values(['name' => 'Robert']);
 
         $refl = new \ReflectionMethod($query, 'setType');
-        $refl->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $refl->setAccessible(true);
         $refl->invokeArgs($query, [Compilable::TYPE_UPDATE]);
 
         $compiled = $this->compiler->compileUpdate($query);
@@ -252,7 +252,7 @@ class KeyValueSqlCompilerTest extends TestCase
         $query = $this->query()->from('test_')->where(['id' => 5])->values(['name' => 'Robert', 'foreign_key' => 42]);
 
         $refl = new \ReflectionMethod($query, 'setType');
-        $refl->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $refl->setAccessible(true);
         $refl->invokeArgs($query, [Compilable::TYPE_UPDATE]);
 
         $compiled = $this->compiler->compileUpdate($query);
@@ -281,7 +281,7 @@ class KeyValueSqlCompilerTest extends TestCase
         $query = $this->query()->from('test_')->values(['name' => 'Robert']);
 
         $refl = new \ReflectionMethod($query, 'setType');
-        $refl->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $refl->setAccessible(true);
         $refl->invokeArgs($query, [Compilable::TYPE_UPDATE]);
 
         $compiled = $this->compiler->compileUpdate($query);
@@ -297,7 +297,7 @@ class KeyValueSqlCompilerTest extends TestCase
         $query = $this->query()->from('test_')->where(['id' => 5])->values(['name' => ['1', '2']], ['name' => 'array']);
 
         $refl = new \ReflectionMethod($query, 'setType');
-        $refl->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $refl->setAccessible(true);
         $refl->invokeArgs($query, [Compilable::TYPE_UPDATE]);
 
         $compiled = $this->compiler->compileUpdate($query);
@@ -317,7 +317,7 @@ class KeyValueSqlCompilerTest extends TestCase
         ;
 
         $refl = new \ReflectionMethod($query, 'setType');
-        $refl->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $refl->setAccessible(true);
         $refl->invokeArgs($query, [Compilable::TYPE_UPDATE]);
 
         $this->assertEquals($this->connection->prepare('UPDATE user_ SET name_ = ? WHERE id_ = ?'), $this->compiler->compileUpdate($query));

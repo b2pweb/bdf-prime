@@ -45,12 +45,13 @@
     "ramsey/uuid": "^4.2",
     "symfony/polyfill-php80": "~1.16",
     "benmorel/weakmap-polyfill": "^0.3.0",
-    "nette/php-generator": "~3.6|~4.0",
+    "nette/php-generator": "~3.6|~4.2",
     "psr/clock": "^1.0"
   },
   "require-dev": {
     "b2pweb/bdf-phpunit": "~1.0",
     "symfony/cache": "~5.0|~6.0|~7.0",
+    "doctrine/cache": "~2.0",
     "friendsofphp/php-cs-fixer": "~3.64",
     "phpunit/phpunit": "~9.0",
     "symfony/console": "~4.3|~5.0|~6.0|~7.0",

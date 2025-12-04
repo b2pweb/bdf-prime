@@ -1117,7 +1117,7 @@ class EntityRepositoryTest extends TestCase
 
         $queries = TestEntity::repository()->queries();
         $r = new \ReflectionProperty($queries, 'metadataCache');
-        $r->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $r->setAccessible(true);
 
         $this->assertSame($cache, $r->getValue($queries));
     }
