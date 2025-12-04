@@ -121,6 +121,7 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
      */
     public function link(string $relationClass, ?string $relationName = null)
     {
+        /** @var QueryInterface<ConnectionInterface, R> */
         return $this->repository
             ->relation($relationClass, $relationName)
             ->link($this->all())

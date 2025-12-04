@@ -29,9 +29,9 @@ trait SimpleTableJoinRelation
     /**
      * {@inheritdoc}
      */
-    public function link($owner): ReadCommandInterface
+    public function link($owner, ?string $queryClass = null): ReadCommandInterface
     {
-        return $this->query($this->getLocalKeyValue($owner));
+        return $this->query($this->getLocalKeyValue($owner), [], $queryClass);
     }
 
     /**
@@ -64,8 +64,9 @@ trait SimpleTableJoinRelation
 
     /**
      * @see AbstractRelation::query()
+     * @todo Use the queryClass parameter in Prime 3.0
      */
-    abstract protected function query($value, $constraints = []): ReadCommandInterface;
+    abstract protected function query($value, $constraints = []/*, ?string $queryClass = null*/): ReadCommandInterface;
 
     /**
      * @see AbstractRelation::applyConstraints()

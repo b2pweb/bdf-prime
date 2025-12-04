@@ -79,8 +79,16 @@ class SqlPlatform implements PlatformInterface
      */
     public function name(): string
     {
-        /** @psalm-suppress DeprecatedMethod */
-        return $this->grammar->getName();
+        switch (true) {
+            case $this->grammar instanceof AbstractMySQLPlatform:
+                return 'mysql';
+
+            case $this->grammar instanceof SqlitePlatform:
+                return 'sqlite';
+
+            default:
+                return 'generic_sql';
+        }
     }
 
     /**

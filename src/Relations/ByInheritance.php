@@ -91,11 +91,12 @@ class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
-    public function link($owner): ReadCommandInterface
+    public function link($owner, ?string $queryClass = null): ReadCommandInterface
     {
         $this->updateDiscriminatorValue($owner);
 
-        return $this->subRelation()->link($owner);
+        /** @psalm-suppress TooManyArguments */
+        return $this->subRelation()->link($owner, $queryClass);
     }
 
     /**

@@ -176,7 +176,7 @@ class SchemaManager extends AbstractSchemaManager
     public function has(string $tableName): bool
     {
         try {
-            return $this->getDoctrineManager()->tablesExist($tableName);
+            return $this->getDoctrineManager()->tablesExist([$tableName]);
         } catch (DoctrineDBALException $e) {
             /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException($e->getMessage(), $e->getCode(), $e);

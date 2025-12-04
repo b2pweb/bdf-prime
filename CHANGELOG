@@ -6,8 +6,27 @@ v2.3.0
 * Feat: Add `Bdf\Prime\Migration\Migration::isIgnoredConnection()` to check if the migration should be ignored for the current connection.
 * Change: `Bdf\Prime\Migration\Migration::update()` will not be performed if the connection is ignored.
 * Change: `Bdf\Prime\Repository\EntityRepository::schema()` will return `NullStructureUpgrader` if the connection is ignored.
+* Feat: Allow to explicitly specify the query type on query factory methods:
+    * Add `Bdf\Prime\Repository\RepositoryInterface::query()` to create a query with a specific type (not enforced on the interface for BC reasons)
+    * Add $queryClass parameter on `Bdf\Prime\Relations\EntityRelation::query()`
+    * Add $queryClass parameter on `Bdf\Prime\Relations\RelationInterface::link()` (not enforced on the interface for BC reasons)
+* Feat: Add `Bdf\Prime\Mapper\Mapper::clock()` to get the clock instance
+* Feat: Add transaction handling methods on `Bdf\Prime\Connection\TransactionManagerInterface`
+* Change: `EntityRepository::transaction()` do not rely on nested transaction if not enabled on the connection
+* Feat: Add custom criteria system :
+    * Add `Bdf\Prime\Query\Criteria\CriteriaInterface` and `Bdf\Prime\Query\Criteria\CustomCriteria` for define custom criteria
+    * Add `Bdf\Prime\Query\Criteria\Criterion`, `Bdf\Prime\Query\Criteria\LikeCriterion`, `Bdf\Prime\Query\Criteria\StartsWithCriterion` attributes for annotate properties as criterion
+    * Change `Bdf\Prime\Query\Clause::buildClause()` to handle nested criteria and expression on composite criteria
+* Feat: Allow to explicitly declare the type of the column in the schema using `FieldBuilder::storedAs()`
+* Feat: Add `Bdf\Prime\Mapper\Attribute\DiscriminatorMap` attribute to define the discriminator map on single table inheritance in replacement of overriding properties `discriminatorColumn` and `discriminatorMap` of the mapper
+* Feat: Add `Bdf\Prime\Mapper\Mapper::setDiscriminatorMap()`
+* Change: Mapper's configurators attributes now handle inheritance (i.e. attributes declared on parent class are inherited by child classes)
 
 BC Breaks
+* Deprecated: Returning `false` on callback of `EntityRepository::transaction()` to rollback the transaction is deprecated. Use exception instead.
+* Deprecated: Unknown aggregate expression are now deprecated. Use select with expression instead.
+* Change: `Bdf\Prime\Relations\Util\SimpleTableJoinRelation::link()` now takes the query class as parameter.
+* Change: all implementations of `Bdf\Prime\Relations\RelationInterface::link()` now takes the query class as parameter.
 * Change: Adding "ignore" option to a connection will disable schema management and migration for this connection.
           Before this change, only the create and drop database operations were ignored.
 

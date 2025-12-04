@@ -12,6 +12,8 @@ use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Customer;
 use Bdf\Prime\Location;
 use Bdf\Prime\Project;
+use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
+use Bdf\Prime\Query\Query;
 use Bdf\Prime\Test\RepositoryAssertion;
 use PHPUnit\Framework\TestCase;
 
@@ -125,6 +127,24 @@ class HasOneTest extends TestCase
 
         $location = $customer->relation('location')->first();
 
+        $this->assertEquals($customer->id, $location->id);
+    }
+
+    /**
+     *
+     */
+    public function test_link_with_custom_query()
+    {
+        $customer = $this->getTestPack()->get('customer');
+
+        $query = Customer::repository()->relation('location')->link($customer, KeyValueQuery::class);
+        $this->assertInstanceOf(KeyValueQuery::class, $query);
+        $location = $query->first();
+        $this->assertEquals($customer->id, $location->id);
+
+        $query = Customer::repository()->relation('location')->link($customer, Query::class);
+        $this->assertInstanceOf(Query::class, $query);
+        $location = $query->first();
         $this->assertEquals($customer->id, $location->id);
     }
 

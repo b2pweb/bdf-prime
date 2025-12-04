@@ -85,7 +85,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function link($owner): ReadCommandInterface
+    public function link($owner, ?string $queryClass = null): ReadCommandInterface
     {
         throw new \BadMethodCallException('Cannot request from a null relation');
     }

@@ -6,6 +6,7 @@ use _files\TestClock;
 use Bdf\Prime\Behaviors\Behavior;
 use Bdf\Prime\Bench\HydratorGeneration;
 use Bdf\Prime\Clock\ClockAwareInterface;
+use Bdf\Prime\Clock\NativeClock;
 use Bdf\Prime\Customer;
 use Bdf\Prime\CustomerCriteria;
 use Bdf\Prime\CustomerMapper;
@@ -16,7 +17,6 @@ use Bdf\Prime\Entity\Hydrator\MapperHydrator;
 use Bdf\Prime\Entity\Hydrator\MapperHydratorInterface;
 use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\IdGenerators\AbstractGenerator;
-use Bdf\Prime\IdGenerators\GeneratorInterface;
 use Bdf\Prime\IdGenerators\GuidGenerator;
 use Bdf\Prime\IdGenerators\NullGenerator;
 use Bdf\Prime\IdGenerators\TableGenerator;
@@ -83,8 +83,20 @@ class MapperTest extends TestCase
         $this->assertTrue($mapper->hasSchemaManager());
         $this->assertInstanceOf(MapperHydrator::class, $mapper->hydrator());
         $this->assertNull($mapper->allowUnknownAttribute());
+        $this->assertSame(NativeClock::instance(), $mapper->clock());
     }
-    
+
+    public function test_setClock()
+    {
+        $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
+        $mapper->build();
+
+        $clock = $this->createMock(ClockInterface::class);
+        $mapper->setClock($clock);
+
+        $this->assertSame($clock, $mapper->clock());
+    }
+
     /**
      * 
      */

@@ -109,9 +109,9 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function link($owner): ReadCommandInterface
+    public function link($owner, ?string $queryClass = null): ReadCommandInterface
     {
-        return $this->query($this->getLocalKeyValue($owner));
+        return $this->query($this->getLocalKeyValue($owner), [], $queryClass);
     }
 
     /**
