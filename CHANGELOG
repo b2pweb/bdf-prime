@@ -5,6 +5,7 @@ v2.3.0
     * Add `Bdf\Prime\Query\Criteria\CriteriaInterface` and `Bdf\Prime\Query\Criteria\CustomCriteria` for define custom criteria
     * Add `Bdf\Prime\Query\Criteria\Criterion`, `Bdf\Prime\Query\Criteria\LikeCriterion`, `Bdf\Prime\Query\Criteria\StartsWithCriterion` attributes for annotate properties as criterion
     * Change `Bdf\Prime\Query\Clause::buildClause()` to handle nested criteria and expression on composite criteria
+* Feat: Allow to explicitly declare the type of the column in the schema using `FieldBuilder::storedAs()`
 
 v2.2.0
 ------

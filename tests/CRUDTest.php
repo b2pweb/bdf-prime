@@ -542,4 +542,25 @@ class CRUDTest extends TestCase
         $this->assertEquals('SELECT t0.* FROM my_custom_nullable t0 WHERE t0.foo IN (?,?)', $query->toSql());
         $this->assertSame(['0', 'bar'], $query->getBindings());
     }
+
+    public function test_with_custom_storage_type()
+    {
+        $this->pack()->declareEntity(EntityWithCustomStorageType::class);
+        $entity = new EntityWithCustomStorageType([
+            'id' => 42,
+            'name' => 'foo',
+            'value' => ['foo', 'bar', 'baz'],
+            'enabled' => true,
+        ]);
+        $entity->insert();
+
+        $this->assertEquals($entity, EntityWithCustomStorageType::refresh($entity));
+
+        $this->assertEquals([[
+            'id' => '42.0',
+            'name' => 'foo',
+            'value' => ',foo,bar,baz,',
+            'enabled' => '1',
+        ]], EntityWithCustomStorageType::repository()->builder()->execute()->all());
+    }
 }

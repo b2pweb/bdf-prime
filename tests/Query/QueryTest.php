@@ -1164,7 +1164,7 @@ class QueryTest extends TestCase
         $query = $this->query();
 
         $r = new \ReflectionProperty(Query::class, 'type');
-        $r->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $r->setAccessible(true);
         $r->setValue($query, 'invalid');
 
         $query->compile();
@@ -1181,7 +1181,7 @@ class QueryTest extends TestCase
         $query = $this->query();
 
         $r = new \ReflectionProperty(Query::class, 'compiler');
-        $r->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $r->setAccessible(true);
         $r->setValue($query, new \stdClass());
 
         $query->compile();

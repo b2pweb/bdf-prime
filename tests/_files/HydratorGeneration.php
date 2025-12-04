@@ -76,7 +76,7 @@ trait HydratorGeneration
     private function setUpGeneratedHydrators(string... $entityClasses): void
     {
         $r = new \ReflectionProperty(Mapper::class, 'hydrator');
-        $r->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $r->setAccessible(true);
 
         foreach ($entityClasses as $entityClass) {
             $hydrator = $this->createGeneratedHydrator($entityClass);
