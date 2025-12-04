@@ -1,6 +1,11 @@
 v2.3.0
 ------
 
+* Feat: Add `Bdf\Prime\Connection\SimpleConnection::getParameters()` to retrieve the connection parameters.
+        This method is also soft-added to `Bdf\Prime\Connection\ConnectionInterface` for compatibility.
+* Feat: Add `Bdf\Prime\Migration\Migration::isIgnoredConnection()` to check if the migration should be ignored for the current connection.
+* Change: `Bdf\Prime\Migration\Migration::update()` will not be performed if the connection is ignored.
+* Change: `Bdf\Prime\Repository\EntityRepository::schema()` will return `NullStructureUpgrader` if the connection is ignored.
 * Feat: Allow to explicitly specify the query type on query factory methods:
     * Add `Bdf\Prime\Repository\RepositoryInterface::query()` to create a query with a specific type (not enforced on the interface for BC reasons)
     * Add $queryClass parameter on `Bdf\Prime\Relations\EntityRelation::query()`
@@ -22,6 +27,8 @@ BC Breaks
 * Deprecated: Unknown aggregate expression are now deprecated. Use select with expression instead.
 * Change: `Bdf\Prime\Relations\Util\SimpleTableJoinRelation::link()` now takes the query class as parameter.
 * Change: all implementations of `Bdf\Prime\Relations\RelationInterface::link()` now takes the query class as parameter.
+* Change: Adding "ignore" option to a connection will disable schema management and migration for this connection.
+          Before this change, only the create and drop database operations were ignored.
 
 v2.2.0
 ------
