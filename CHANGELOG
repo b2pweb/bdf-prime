@@ -21,6 +21,7 @@ v2.3.0
 * Feat: Add `Bdf\Prime\Mapper\Attribute\DiscriminatorMap` attribute to define the discriminator map on single table inheritance in replacement of overriding properties `discriminatorColumn` and `discriminatorMap` of the mapper
 * Feat: Add `Bdf\Prime\Mapper\Mapper::setDiscriminatorMap()`
 * Change: Mapper's configurators attributes now handle inheritance (i.e. attributes declared on parent class are inherited by child classes)
+* Change: Allow iterable criteria and closure filters on `EntityRepository::count()` and `EntityRelation::count()`
 
 BC Breaks
 * Deprecated: Returning `false` on callback of `EntityRepository::transaction()` to rollback the transaction is deprecated. Use exception instead.

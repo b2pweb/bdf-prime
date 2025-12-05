@@ -15,6 +15,7 @@ use Bdf\Prime\Pack;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
+use Bdf\Prime\Query\Expression\Like;
 use Bdf\Prime\Query\Query;
 use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
 use Bdf\Prime\Repository\Event\AfterLoad;
@@ -140,6 +141,7 @@ class EntityRepositoryTest extends TestCase
 
         $this->assertEquals(2, Prime::repository('Bdf\Prime\TestEntity')->count());
         $this->assertEquals(1, Prime::repository('Bdf\Prime\TestEntity')->count(['name :like' => '%2']));
+        $this->assertEquals(1, Prime::repository('Bdf\Prime\TestEntity')->count(fn (Query $query) => $query->where('name', (new Like(2))->endsWith())));
     }
 
     /**

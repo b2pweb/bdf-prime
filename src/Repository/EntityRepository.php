@@ -16,6 +16,7 @@ use Bdf\Prime\Events;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
+use Bdf\Prime\Query\Contract\Aggregatable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
@@ -50,6 +51,7 @@ use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Connection;
 use Exception;
 
+use function assert;
 use function method_exists;
 use function trigger_error;
 
@@ -576,19 +578,28 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * Count entity
+     * Count number of entities matching the criteria
      *
-     * @param array $criteria
-     * @param string|array|null $attributes
+     * Usage:
+     * ```php
+     * MyEntity::repository()->count(); // Count all entities
+     * MyEntity::repository()->count(['status' => 'active']); // Count with criteria
+     * MyEntity::repository()->count(fn ($query) => $query->where('status', 'active')->where('age', '>', 18)); // Count with callback
+     * ```
+     *
+     * @param iterable<string,mixed>|callable(QueryInterface):void $criteria The filtering criteria. If not set, will count all entities of the repository
+     * @param string|array|null $attributes The attribute(s) to count. If null, will count all (COUNT(*))
      *
      * @return int
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function count(array $criteria = [], $attributes = null): int
+    public function count($criteria = [], $attributes = null): int
     {
-        /** @psalm-suppress UndefinedInterfaceMethod */
-        return $this->builder()->where($criteria)->count($attributes);
+        $query = $this->queries->builder()->where($criteria);
+        assert($query instanceof Aggregatable);
+
+        return $query->count($attributes);
     }
 
     /**
