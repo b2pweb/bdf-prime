@@ -138,6 +138,8 @@ final class Query
     {
         $this->checkInt(Person::count());
         $this->checkInt(Person::repository()->count());
+        $this->checkInt(Person::repository()->count(['firstName' => 'John']));
+        $this->checkInt(Person::repository()->count(fn(QueryInterface $query) => $query->where('firstName', 'John')));
         $this->checkInt(Person::updateBy(['firstName' => 'XXX'], ['firstName' => 'John']));
         $this->checkInt(Person::repository()->updateBy(['firstName' => 'XXX'], ['firstName' => 'John']));
         $this->checkBool(Person::exists(new Person()));
@@ -167,6 +169,8 @@ final class Query
         $this->checkAddressCollection($relation->by('zipCode')->all());
         $this->checkAddress($relation->create());
         $this->checkInt($relation->count());
+        $this->checkInt($relation->count(['zipCode' => '84660']));
+        $this->checkInt($relation->count(fn(QueryInterface $query) => $query->where('zipCode', '84660')));
     }
 
     public function test_relation_with_class(): void

@@ -53,7 +53,7 @@ use Bdf\Serializer\Metadata\Builder\ClassMetadataBuilder;
  * @psalm-method static EntityQuery filter(\Closure $filter)
  *
  * @method static int updateBy(array $attributes, array $criteria = [])
- * @method static int count(array $criteria = [], $attributes = null)
+ * @method static int count(iterable|callable $criteria = [], $attributes = null)
  * @method static bool exists(self $entity)
  * @method static static|null refresh(self $entity)
  */

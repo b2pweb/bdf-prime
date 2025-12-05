@@ -189,11 +189,12 @@ interface RepositoryInterface
     /**
      * Count entity
      *
-     * @param array $criteria
+     * @param array<string, mixed> $criteria
      * @param string|array|null $attributes
      *
      * @return int
      * @throws PrimeException
+     * @todo Update signature in prime 3.0 to match EntityRepository::count()
      */
     #[ReadOperation]
     public function count(array $criteria = [], $attributes = null): int;

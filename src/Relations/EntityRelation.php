@@ -4,6 +4,7 @@ namespace Bdf\Prime\Relations;
 
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Exception\PrimeException;
+use Bdf\Prime\Query\Contract\Aggregatable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
@@ -16,6 +17,7 @@ use Error;
 use ReflectionClass;
 use ReflectionException;
 
+use function assert;
 use function sprintf;
 
 /**
@@ -39,7 +41,6 @@ use function sprintf;
  * @psalm-method R findByIdOrNew(mixed|array $pk) Get one entity by its primary key or instantiate a new one, using where clause criteria if not found in repository
  * @psalm-method R firstOrFail() Get the first result of the query, or throws an exception if no result
  * @psalm-method R firstOrNew(bool $useCriteriaAsDefault = true) Get the first result of the query, or create a new instance if no result. If $useCriteriaAsDefault is true, the where criteria will be used as default values for the new instance.
- * @psalm-method int count()
  *
  * @mixin ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>
  * @psalm-no-seal-methods
@@ -255,6 +256,31 @@ class EntityRelation
     {
         /** @psalm-suppress TooManyArguments */
         return $this->relation->link($this->owner, $queryClass);
+    }
+
+    /**
+     * Count number of related entities matching the criteria
+     *
+     * Usage:
+     * ```php
+     * $entity->relation('relation')->count(); // Count all entities
+     * $entity->relation('relation')->count(['status' => 'active']); // Count with criteria
+     * $entity->relation('relation')->count(fn ($query) => $query->where('status', 'active')->where('age', '>', 18)); // Count with callback
+     * ```
+     *
+     * @param iterable<string,mixed>|callable(QueryInterface):void $criteria The filtering criteria. If not set, will count all entities of the repository
+     * @param string|array|null $attributes The attribute(s) to count. If null, will count all (COUNT(*))
+     *
+     * @return int
+     * @throws PrimeException
+     */
+    #[ReadOperation]
+    public function count($criteria = [], $attributes = null): int
+    {
+        $query = $this->query()->where($criteria);
+        assert($query instanceof Aggregatable);
+
+        return $query->count($attributes);
     }
 
     /**
