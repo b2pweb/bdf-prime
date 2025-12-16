@@ -1220,6 +1220,20 @@ class EntityRepositoryTest extends TestCase
         $this->assertInstanceOf(KeyValueQuery::class, $repository->query(KeyValueQuery::class));
         $this->assertSame('SELECT * FROM test_', $repository->query(KeyValueQuery::class)->toSql());
     }
+
+    public function test_save_with_listener_once_triggering_save_should_not_cause_infinite_loop()
+    {
+        $repository = TestEntity::repository();
+        $entity = new TestEntity(['name' => 'initial']);
+        $repository->insert($entity);
+
+        $entity->name = 'updated';
+
+        $repository->updated(function () use ($entity) { $entity->save(); }, true);
+        $entity->save();
+
+        $this->assertEquals('updated', TestEntity::refresh($entity)->name);
+    }
 }
 
 class TestLazyLoadingConnection extends Model

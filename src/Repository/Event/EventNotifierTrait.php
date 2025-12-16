@@ -151,11 +151,11 @@ trait EventNotifierTrait
         }
 
         foreach ($this->listeners[$eventClass] ?? [] as $index => [$listener, $once, $isLegacy]) {
-            $ret = $isLegacy ? $listener(...$event->legacyArgs()) : $listener($event);
-
             if ($once) {
                 unset($this->listeners[$eventClass][$index]);
             }
+
+            $ret = $isLegacy ? $listener(...$event->legacyArgs()) : $listener($event);
 
             if ($ret === false) {
                 return false;
