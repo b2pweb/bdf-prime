@@ -1197,6 +1197,20 @@ class EntityRepositoryTest extends TestCase
         $this->assertEquals($entity, TestEntity::refresh($entity));
         $repository->mapper()->setReadOnly(false);
     }
+
+    public function test_save_with_listener_once_triggering_save_should_not_cause_infinite_loop()
+    {
+        $repository = TestEntity::repository();
+        $entity = new TestEntity(['name' => 'initial']);
+        $repository->insert($entity);
+
+        $entity->name = 'updated';
+
+        $repository->updated(function () use ($entity) { $entity->save(); }, true);
+        $entity->save();
+
+        $this->assertEquals('updated', TestEntity::refresh($entity)->name);
+    }
 }
 
 
