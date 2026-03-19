@@ -26,6 +26,7 @@ use Bdf\Prime\Record\SimpleRecordHydrator;
 abstract class AbstractReadCommand extends CompilableClause implements ReadCommandInterface
 {
     use CachableTrait;
+    /** @use ExecutableTrait<R> */
     use ExecutableTrait;
 
     /**

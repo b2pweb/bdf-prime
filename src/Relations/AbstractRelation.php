@@ -18,7 +18,10 @@ use Bdf\Prime\Relations\Info\NullRelationInfo;
 use Bdf\Prime\Relations\Info\RelationInfoInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 
+use function func_get_arg;
+use function func_num_args;
 use function is_object;
+use function method_exists;
 
 /**
  * Base class for define common methods for relations
@@ -322,13 +325,19 @@ abstract class AbstractRelation implements RelationInterface
      *
      * @param string|array $value
      * @param mixed        $constraints
+     * @param class-string|null $queryClass
      *
      * @return ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>&Deletable
      */
-    protected function query($value, $constraints = []): ReadCommandInterface
+    protected function query($value, $constraints = []/*, ?string $queryClass = null*/): ReadCommandInterface
     {
+        // Cannot use real argument for BC reasons.
+        // @todo use real argument on Prime 3.0
+        $queryClass = func_num_args() > 2 ? func_get_arg(2) : null;
+        $query = method_exists($this->distant, 'query') ? $this->distant->query($queryClass) : $this->distant->queries()->builder();
+
         return $this->applyConstraints(
-            $this->applyWhereKeys($this->distant->queries()->builder(), $value),
+            $this->applyWhereKeys($query, $value),
             $constraints
         );
     }

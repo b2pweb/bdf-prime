@@ -16,6 +16,8 @@ use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Project;
 use Bdf\Prime\Test\RepositoryAssertion;
+use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
+use Bdf\Prime\Query\Query;
 use Bdf\Prime\TestFile;
 use Bdf\Prime\User;
 use PHPUnit\Framework\TestCase;
@@ -207,6 +209,25 @@ class HasManyTest extends TestCase
 
         $this->assertEquals('1', $documents[0]->id);
         $this->assertEquals('2', $documents[1]->id);
+    }
+
+    /**
+     *
+     */
+    public function test_link_with_custom_query()
+    {
+        $customer = $this->getTestPack()->get('customer');
+
+        $query = Prime::repository('Bdf\Prime\Customer')->relation('documents')->link($customer, KeyValueQuery::class);
+        $this->assertInstanceOf(KeyValueQuery::class, $query);
+
+        $documents = $query->all();
+
+        $this->assertEquals('1', $documents[0]->id);
+        $this->assertEquals('2', $documents[1]->id);
+
+        $query = Prime::repository('Bdf\Prime\Customer')->relation('documents')->link($customer, Query::class);
+        $this->assertInstanceOf(Query::class, $query);
     }
 
     /**

@@ -621,6 +621,27 @@ class CRUDTest extends TestCase
             new NameAndDocuments('Mark', [$doc3]),
         ], $records);
     }
+
+    public function test_with_custom_storage_type()
+    {
+        $this->pack()->declareEntity(EntityWithCustomStorageType::class);
+        $entity = new EntityWithCustomStorageType([
+            'id' => 42,
+            'name' => 'foo',
+            'value' => ['foo', 'bar', 'baz'],
+            'enabled' => true,
+        ]);
+        $entity->insert();
+
+        $this->assertEquals($entity, EntityWithCustomStorageType::refresh($entity));
+
+        $this->assertEquals([[
+            'id' => '42.0',
+            'name' => 'foo',
+            'value' => ',foo,bar,baz,',
+            'enabled' => '1',
+        ]], EntityWithCustomStorageType::repository()->builder()->execute()->all());
+    }
 }
 
 class IdNameRecord

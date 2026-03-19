@@ -18,6 +18,7 @@ use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Customer;
 use Bdf\Prime\Project;
 use Bdf\Prime\ProjectIntegrator;
+use Bdf\Prime\Query\Query;
 use Bdf\Prime\Test\RepositoryAssertion;
 use Bdf\Prime\UserGroup;
 use Doctrine\DBAL\Logging\DebugStack;
@@ -287,6 +288,24 @@ class BelongsToManyTest extends TestCase
             ->relation('packs')
                 ->link($customer)
                 ->all();
+
+        $this->assertEquals('1', $packs[0]->id);
+        $this->assertEquals('2', $packs[1]->id);
+    }
+
+    /**
+     *
+     */
+    public function test_link_entity_with_custom_query()
+    {
+        $customer = $this->getTestPack()->get('customer');
+
+        $query = Prime::repository('Bdf\Prime\Customer')
+            ->relation('packs')->link($customer, MyCustomQuery::class);
+
+        $this->assertInstanceOf(MyCustomQuery::class, $query);
+
+        $packs = $query->all();
 
         $this->assertEquals('1', $packs[0]->id);
         $this->assertEquals('2', $packs[1]->id);
@@ -674,3 +693,5 @@ class BelongsToManyTest extends TestCase
         $this->assertNotSame($loadedGroups, $user->groups);
     }
 }
+
+class MyCustomQuery extends Query {}

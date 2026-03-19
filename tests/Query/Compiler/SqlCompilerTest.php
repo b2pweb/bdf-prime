@@ -612,7 +612,7 @@ class SqlCompilerTest extends TestCase
     private function setCompiler(AbstractReadCommand $query, CompilerInterface $compiler)
     {
         $p = new \ReflectionProperty(AbstractReadCommand::class, 'compiler');
-        $p->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $p->setAccessible(true);
         $p->setValue($query, $compiler);
     }
 }

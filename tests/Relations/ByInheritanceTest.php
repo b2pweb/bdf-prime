@@ -11,9 +11,12 @@ use Bdf\Prime\DocumentControlTask;
 use Bdf\Prime\DocumentEager;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Task;
 use Bdf\Prime\User;
 use PHPUnit\Framework\TestCase;
+
+use function var_dump;
 
 /**
  *
@@ -107,6 +110,21 @@ class ByInheritanceTest extends TestCase
         $this->expectExceptionMessage('The mapper could not manage single table inheritance relation');
 
         (new ByInheritance('test', Prime::repository('Bdf\Prime\User'), 'id'));
+    }
+
+    /**
+     *
+     */
+    public function test_link_with_custom_query()
+    {
+        $task = Task::findById(10);
+        $relation = Task::repository()->relation('target');
+
+        $query = $relation->link($task, KeyValueQuery::class);
+        $this->assertInstanceOf(KeyValueQuery::class, $query);
+
+        $res = $query->all();
+        $this->assertEquals([Document::findById(20)], $res);
     }
 
     /**

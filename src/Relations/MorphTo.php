@@ -104,7 +104,7 @@ class MorphTo extends BelongsTo
      *
      * @fixme Do not works with EntityCollection
      */
-    public function link($owner): ReadCommandInterface
+    public function link($owner, ?string $queryClass = null): ReadCommandInterface
     {
         if (!is_object($owner)) {
             throw new InvalidArgumentException('MorphTo relation do not supports querying on collection');
@@ -116,7 +116,7 @@ class MorphTo extends BelongsTo
             throw new InvalidArgumentException('The discriminator is missing on the owner entity');
         }
 
-        return parent::link($owner);
+        return parent::link($owner, $queryClass);
     }
 
     /**

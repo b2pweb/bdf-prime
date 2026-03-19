@@ -2,9 +2,14 @@
 
 namespace StaticAnalysis;
 
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\SimpleConnection;
+use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
+use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Relations\EntityRelation;
+use Bdf\Prime\Sharding\ShardingQuery;
+use Doctrine\DBAL\Connection;
 
 final class Query
 {
@@ -83,6 +88,36 @@ final class Query
         );
     }
 
+    public function explicitQueryType(): void
+    {
+        /** @psalm-check-type $query = \Bdf\Prime\Query\Query<ConnectionInterface&Connection, Person> */
+        $query = Person::repository()->query(\Bdf\Prime\Query\Query::class);
+        $this->checkPerson($query
+            ->where('firstName', 'John')
+            ->order('birthDate', 'desc')
+            ->first()
+        );
+        /** @psalm-check-type $query = KeyValueQuery<ConnectionInterface, Person> */
+        $query = Person::repository()->query(KeyValueQuery::class);
+        $this->checkPerson($query
+            ->where('firstName', 'John')
+            ->first()
+        );
+        /** @psalm-check-type $query = ShardingQuery<Person> */
+        $query = Person::repository()->query(ShardingQuery::class);
+
+        /** @psalm-check-type $query = KeyValueQuery<ConnectionInterface, Address> */
+        $query = (new Person())->relation(Address::class)->query(KeyValueQuery::class);
+        $this->checkAddress($query->first());
+
+        /** @psalm-check-type $query = \Bdf\Prime\Query\Query<ConnectionInterface&Connection, Address> */
+        $query = (new Person())->relation(Address::class)->query(\Bdf\Prime\Query\Query::class);
+        $this->checkAddress($query
+            ->distinct()
+            ->first()
+        );
+    }
+
     public function collection(): void
     {
         $this->checkPersonCollection(Person::collection([new Person()]));
@@ -109,6 +144,8 @@ final class Query
     {
         $this->checkInt(Person::count());
         $this->checkInt(Person::repository()->count());
+        $this->checkInt(Person::repository()->count(['firstName' => 'John']));
+        $this->checkInt(Person::repository()->count(fn(QueryInterface $query) => $query->where('firstName', 'John')));
         $this->checkInt(Person::updateBy(['firstName' => 'XXX'], ['firstName' => 'John']));
         $this->checkInt(Person::repository()->updateBy(['firstName' => 'XXX'], ['firstName' => 'John']));
         $this->checkBool(Person::exists(new Person()));
@@ -138,6 +175,8 @@ final class Query
         $this->checkAddressCollection($relation->by('zipCode')->all());
         $this->checkAddress($relation->create());
         $this->checkInt($relation->count());
+        $this->checkInt($relation->count(['zipCode' => '84660']));
+        $this->checkInt($relation->count(fn(QueryInterface $query) => $query->where('zipCode', '84660')));
     }
 
     public function test_relation_with_class(): void

@@ -18,6 +18,7 @@ use Bdf\Prime\Customer;
 use Bdf\Prime\Pack;
 use Bdf\Prime\CustomerPack;
 use Bdf\Prime\Project;
+use Bdf\Prime\Query\Expression\Attribute;
 use Bdf\Prime\Test\TestPack;
 use Bdf\Prime\TestFile;
 use Bdf\Prime\User;
@@ -355,6 +356,41 @@ class FunctionnalTest extends TestCase
             ]),
             Project::where('id', 1)->first()
         );
+    }
+
+    /**
+     *
+     */
+    public function test_count_on_entity_relation()
+    {
+        TestPack::pack()->nonPersist([
+            'project' => $project = new Project([
+                'id' => 1,
+                'name' => 'Projet 1'
+            ]),
+            'company' => new Company([
+                'id' => 1,
+                'name' => 'Société 1'
+            ])
+        ])
+        ->nonPersist([
+            'developer' => new Developer([
+                'id' => 1,
+                'name' => 'Dév 1',
+                'project' => TestPack::pack()->get('project'),
+                'company' => $this->getTestPack()->get('company')
+            ]),
+            'leadDeveloper' => new Developer([
+                'id' => 2,
+                'name' => 'Dév 2',
+                'lead' => true,
+                'project' => TestPack::pack()->get('project'),
+                'company' => $this->getTestPack()->get('company')
+            ]),
+        ]);
+
+        $this->assertSame(2, $project->relation('developers')->count());
+        $this->assertSame(1, $project->relation('developers')->count(['lead' => true]));
     }
 
     /**

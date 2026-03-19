@@ -5,6 +5,7 @@ namespace Bdf\Prime\Mapper;
 use Bdf\Prime\Behaviors\BehaviorInterface;
 use Bdf\Prime\Cache\CacheInterface;
 use Bdf\Prime\Clock\ClockAwareInterface;
+use Bdf\Prime\Clock\NativeClock;
 use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
 use Bdf\Prime\Entity\Hydrator\MapperHydratorInterface;
@@ -34,12 +35,16 @@ use Closure;
 use LogicException;
 use Psr\Clock\ClockInterface;
 use ReflectionAttribute;
+use ReflectionClass;
 use ReflectionObject;
 use stdClass;
 
+use function array_reverse;
 use function class_exists;
 use function count;
 use function current;
+use function get_class;
+use function get_parent_class;
 use function implode;
 use function is_string;
 use function method_exists;
@@ -478,6 +483,15 @@ abstract class Mapper implements ClockAwareInterface
     final public function setClock(ClockInterface $clock): void
     {
         $this->clock = $clock;
+    }
+
+    /**
+     * Get the current clock instance
+     * If no clock has been set using {@see Mapper::setClock()}, the default clock {@see NativeClock::instance()} will be returned
+     */
+    final public function clock(): ClockInterface
+    {
+        return $this->clock ?? NativeClock::instance();
     }
 
     /**
@@ -1237,11 +1251,21 @@ abstract class Mapper implements ClockAwareInterface
             return [];
         }
 
-        $attributes = (new ReflectionObject($this))->getAttributes(MapperConfigurationInterface::class, ReflectionAttribute::IS_INSTANCEOF);
+        $classes = [];
+
+        for ($class = get_class($this); $class && $class !== Mapper::class; $class = get_parent_class($class)) {
+            $classes[] = $class;
+        }
+
         $configurators = [];
 
-        foreach ($attributes as $attribute) {
-            $configurators[] = $attribute->newInstance();
+        // Apply configurators in reverse order to ensure that the last one wins
+        foreach (array_reverse($classes) as $class) {
+            $attributes = (new ReflectionClass($class))->getAttributes(MapperConfigurationInterface::class, ReflectionAttribute::IS_INSTANCEOF);
+
+            foreach ($attributes as $attribute) {
+                $configurators[] = $attribute->newInstance();
+            }
         }
 
         return $configurators;

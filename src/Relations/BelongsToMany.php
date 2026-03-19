@@ -192,10 +192,10 @@ class BelongsToMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function link($owner): ReadCommandInterface
+    public function link($owner, ?string $queryClass = null): ReadCommandInterface
     {
         /** @var QueryInterface<\Bdf\Prime\Connection\ConnectionInterface, R>&EntityJoinable $query */
-        $query = $this->distant->queries()->builder();
+        $query = $this->distant->query($queryClass);
 
         return $query
             ->joinEntity($this->through->entityName(), $this->throughDistant, $this->distantKey, $this->attributeAim.'Through')

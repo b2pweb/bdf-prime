@@ -36,23 +36,23 @@ class Migration implements MigrationInterface
     /**
      * The console input.
      *
-     * @var InputInterface
+     * @var InputInterface|null
      */
-    protected $input;
+    protected $input = null;
 
     /**
      * The console output.
      *
-     * @var OutputInterface
+     * @var OutputInterface|null
      */
-    protected $output;
+    protected $output = null;
 
     /**
      * The console helper.
      *
-     * @var HelperSet
+     * @var HelperSet|null
      */
-    protected $helperSet;
+    protected $helperSet = null;
 
     /**
      * Migration constructor
@@ -125,6 +125,10 @@ class Migration implements MigrationInterface
      */
     public function getInput(): InputInterface
     {
+        if ($this->input === null) {
+            throw new \LogicException('Console input is not set.');
+        }
+
         return $this->input;
     }
 
@@ -147,6 +151,10 @@ class Migration implements MigrationInterface
      */
     public function getOutput(): OutputInterface
     {
+        if ($this->output === null) {
+            throw new \LogicException('Console output is not set.');
+        }
+
         return $this->output;
     }
 
@@ -181,6 +189,10 @@ class Migration implements MigrationInterface
      */
     public function getHelperSet()
     {
+        if ($this->helperSet === null) {
+            throw new \LogicException('Console helper set is not set.');
+        }
+
         return $this->helperSet;
     }
 
@@ -211,7 +223,34 @@ class Migration implements MigrationInterface
      */
     public function update($sql, array $params = [], $connectionName = null)
     {
-        return (int) $this->connection($connectionName)->executeStatement($sql, $params);
+        $conn = $this->connection($connectionName);
+
+        if (method_exists($conn, 'getParameters') && ($conn->getParameters()['ignore'] ?? false)) {
+            $logger = $this->log();
+
+            if ($logger) {
+                $logger->info('Migration skipped because the connection {connection} is set to ignore changes', [
+                    'connection' => $conn->getName(),
+                    'sql' => $sql,
+                ]);
+            }
+            return 0;
+        }
+
+        return (int) $conn->executeStatement($sql, $params);
+    }
+
+    /**
+     * Check if the connection should be ignored (i.e. should not apply schema changes)
+     *
+     * @param string|null $connectionName
+     * @return bool
+     */
+    public function isIgnoredConnection(?string $connectionName = null): bool
+    {
+        $conn = $this->connection($connectionName);
+
+        return method_exists($conn, 'getParameters') && ($conn->getParameters()['ignore'] ?? false);
     }
 
     /**

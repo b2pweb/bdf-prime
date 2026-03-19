@@ -14,10 +14,14 @@ use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Pack;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
+use Bdf\Prime\Query\Expression\Like;
 use Bdf\Prime\Query\Query;
 use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
 use Bdf\Prime\Repository\Event\AfterLoad;
 use Bdf\Prime\Right;
+use Bdf\Prime\Schema\NullStructureUpgrader;
+use Bdf\Prime\Schema\RepositoryUpgrader;
 use Bdf\Prime\Test\RepositoryAssertion;
 use Bdf\Prime\TestEntity;
 use Bdf\Prime\TestEmbeddedEntity;
@@ -137,6 +141,7 @@ class EntityRepositoryTest extends TestCase
 
         $this->assertEquals(2, Prime::repository('Bdf\Prime\TestEntity')->count());
         $this->assertEquals(1, Prime::repository('Bdf\Prime\TestEntity')->count(['name :like' => '%2']));
+        $this->assertEquals(1, Prime::repository('Bdf\Prime\TestEntity')->count(fn (Query $query) => $query->where('name', (new Like(2))->endsWith())));
     }
 
     /**
@@ -1117,7 +1122,7 @@ class EntityRepositoryTest extends TestCase
 
         $queries = TestEntity::repository()->queries();
         $r = new \ReflectionProperty($queries, 'metadataCache');
-        $r->setAccessible(true);
+        PHP_VERSION_ID >= 80100 or $r->setAccessible(true);
 
         $this->assertSame($cache, $r->getValue($queries));
     }
@@ -1197,9 +1202,39 @@ class EntityRepositoryTest extends TestCase
         $this->assertEquals($entity, TestEntity::refresh($entity));
         $repository->mapper()->setReadOnly(false);
     }
+
+    public function test_schema_ignored_connection()
+    {
+        $this->prime()->connections()->declareConnection('ignored', 'sqlite::memory:?ignore=1');
+        $this->assertInstanceOf(NullStructureUpgrader::class, IgnoredConnectionEntity::repository()->schema());
+        $this->assertInstanceOf(RepositoryUpgrader::class, IgnoredConnectionEntity::repository()->schema(true));
+    }
+
+    public function test_query_with_explicit_type()
+    {
+        $repository = TestEntity::repository();
+
+        $this->assertInstanceOf(Query::class, $repository->query(Query::class));
+        $this->assertSame('SELECT t0.* FROM test_ t0', $repository->query(Query::class)->toSql());
+
+        $this->assertInstanceOf(KeyValueQuery::class, $repository->query(KeyValueQuery::class));
+        $this->assertSame('SELECT * FROM test_', $repository->query(KeyValueQuery::class)->toSql());
+    }
+
+    public function test_save_with_listener_once_triggering_save_should_not_cause_infinite_loop()
+    {
+        $repository = TestEntity::repository();
+        $entity = new TestEntity(['name' => 'initial']);
+        $repository->insert($entity);
+
+        $entity->name = 'updated';
+
+        $repository->updated(function () use ($entity) { $entity->save(); }, true);
+        $entity->save();
+
+        $this->assertEquals('updated', TestEntity::refresh($entity)->name);
+    }
 }
-
-
 
 class TestLazyLoadingConnection extends Model
 {
@@ -1231,4 +1266,34 @@ class TestLazyLoadingConnectionMapper extends Mapper
     }
 
 
+}
+
+class IgnoredConnectionEntity extends Model
+{
+    public $id;
+}
+
+class IgnoredConnectionEntityMapper extends Mapper
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function schema(): array
+    {
+        return [
+            'connection' => 'ignored',
+            'table' => 'test_ignored',
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildFields($builder): void
+    {
+        $builder
+            ->integer('id')
+            ->autoincrement()
+        ;
+    }
 }

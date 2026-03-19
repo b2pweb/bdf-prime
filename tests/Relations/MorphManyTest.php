@@ -3,6 +3,8 @@
 namespace Bdf\Prime\Relations;
 
 use Bdf\Prime\PrimeTestCase;
+use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
+use Bdf\Prime\Query\Query;
 use Bdf\Prime\Test\TestPack;
 use Bdf\Prime\Admin;
 use Bdf\Prime\Customer;
@@ -150,6 +152,23 @@ class MorphManyTest extends TestCase
         $document = $admin->relation('documents')->first();
 
         $this->assertEquals('10', $document->id);
+    }
+
+    /**
+     *
+     */
+    public function test_link_with_custom_query()
+    {
+        $admin = TestPack::pack()->get('admin');
+
+        $query = Admin::repository()->relation('documents')->link($admin, KeyValueQuery::class);
+        $this->assertInstanceOf(KeyValueQuery::class, $query);
+        $document = $query->first();
+
+        $this->assertEquals('10', $document->id);
+
+        $query = Admin::repository()->relation('documents')->link($admin, Query::class);
+        $this->assertInstanceOf(Query::class, $query);
     }
 
     /**

@@ -16,6 +16,8 @@ use Bdf\Prime\Integrator;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Project;
+use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
+use Bdf\Prime\Query\Query;
 use Bdf\Prime\Test\RepositoryAssertion;
 use Bdf\Prime\Test\TestPack;
 use Bdf\Prime\User;
@@ -280,6 +282,23 @@ class MorphToTest extends TestCase
             ->first();
 
         $this->assertEquals(TestPack::pack()->get('user')->name, $user->name);
+    }
+
+    /**
+     *
+     */
+    public function test_link_with_custom_query()
+    {
+        $document = TestPack::pack()->get('document-user');
+
+        $query = Prime::repository('Bdf\Prime\Document')->relation('uploader')->link($document, KeyValueQuery::class);
+        $this->assertInstanceOf(KeyValueQuery::class, $query);
+        $user = $query->first();
+
+        $this->assertEquals(TestPack::pack()->get('user')->name, $user->name);
+
+        $query = Prime::repository('Bdf\Prime\Document')->relation('uploader')->link($document, Query::class);
+        $this->assertInstanceOf(Query::class, $query);
     }
 
     /**

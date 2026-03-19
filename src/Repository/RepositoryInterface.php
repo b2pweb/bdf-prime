@@ -12,9 +12,15 @@ use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
+use Bdf\Prime\Query\Query;
+use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Relations\RelationInterface;
 use Bdf\Prime\Repository\Write\WriterInterface;
 use Bdf\Prime\Schema\StructureUpgraderInterface;
+use Bdf\Prime\Sharding\ShardingQuery;
+use Doctrine\DBAL\Connection;
 
 /**
  * RepositoryInterface
@@ -165,13 +171,30 @@ interface RepositoryInterface
     public function writer(): WriterInterface;
 
     /**
+     * Get query builder of the given type
+     *
+     * @param null|class-string<Q> $queryClass The query type to create. If null, the default query type will be used
+     *
+     * @return QueryInterface<ConnectionInterface, E>
+     * @psalm-return (Q is null ? QueryInterface<ConnectionInterface, E> : (
+     *                Q is Query ? Query<ConnectionInterface&Connection, E> : (
+     *                Q is KeyValueQuery ? KeyValueQuery<ConnectionInterface, E> : (
+     *                Q is ShardingQuery ? ShardingQuery<E> : (
+     *                QueryInterface<ConnectionInterface, E>)))))
+     *
+     * @template Q as ReadCommandInterface
+     */
+    //public function query(?string $queryClass = null): ReadCommandInterface;
+
+    /**
      * Count entity
      *
-     * @param array $criteria
+     * @param array<string, mixed> $criteria
      * @param string|array|null $attributes
      *
      * @return int
      * @throws PrimeException
+     * @todo Update signature in prime 3.0 to match EntityRepository::count()
      */
     #[ReadOperation]
     public function count(array $criteria = [], $attributes = null): int;

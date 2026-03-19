@@ -3,12 +3,18 @@
 namespace Bdf\Prime\Relations;
 
 use Bdf\Prime\Collection\Indexer\EntityIndexerInterface;
+use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\EntityJoinable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
+use Bdf\Prime\Query\Query;
+use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
+use Bdf\Prime\Sharding\ShardingQuery;
+use Doctrine\DBAL\Connection;
 
 /**
  * RelationInterface
@@ -145,10 +151,19 @@ interface RelationInterface
      * The result query can be used to requests related entities
      *
      * @param L|L[] $owner The relation owner, or collection of owners
+     * @param class-string<Q>|null $queryClass The query type to create. If null, the default query type will be used. Some query may not be compatible with the relation.
      *
      * @return ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>
+     * @psalm-return (Q is null ? QueryInterface<ConnectionInterface, R> : (
+     *                 Q is Query ? Query<ConnectionInterface&Connection, R> : (
+     *                 Q is KeyValueQuery ? KeyValueQuery<ConnectionInterface, R> : (
+     *                 Q is ShardingQuery ? ShardingQuery<R> : (
+     *                 QueryInterface<ConnectionInterface, R>)))))
+     *
+     * @template Q as ReadCommandInterface
+     * @todo use real $queryClass parameter type on Prime 3.0
      */
-    public function link($owner): ReadCommandInterface;
+    public function link($owner/*, ?string $queryClass = null*/): ReadCommandInterface;
 
     /**
      * Add join expression on query builder

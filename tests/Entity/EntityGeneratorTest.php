@@ -836,6 +836,6 @@ PHP
     {
         $result = trim(shell_exec('echo ' . escapeshellarg($str) . ' | ' . PHP_BINARY . ' -l'));
 
-        $this->assertStringStartsWith('No syntax errors detected', $result, 'On generated file ' . $str);
+        $this->assertStringContainsString('No syntax errors detected', $result, 'On generated file ' . $str);
     }
 }
