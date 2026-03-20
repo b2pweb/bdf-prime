@@ -31,7 +31,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
     /**
      * The discriminator map of mappers
      *
-     * @var array<string, class-string<Mapper>>
+     * @var array<array-key, class-string<Mapper>>
      */
     protected $discriminatorMap = [];
 
@@ -98,7 +98,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
     /**
      * Get the discriminator map of entities
      *
-     * @return array<string, class-string>
+     * @return array<array-key, class-string>
      * @final
      */
     public function getEntityMap(): array
@@ -186,7 +186,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      * Define the discriminator map and field
      *
      * @param string $field
-     * @param array<string, class-string<Mapper>> $map
+     * @param array<array-key, class-string<Mapper>> $map
      * @return void
      *
      * @internal
