@@ -53,7 +53,7 @@ class EntityCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->addArgument('mapper', InputArgument::REQUIRED, 'Mapper file or directory to parse')

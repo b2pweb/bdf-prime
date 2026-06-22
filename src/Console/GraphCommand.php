@@ -46,7 +46,7 @@ class GraphCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Get the schema graphic from mappers')

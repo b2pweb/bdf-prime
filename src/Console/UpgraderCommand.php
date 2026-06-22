@@ -48,7 +48,7 @@ class UpgraderCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Upgrade schema from mappers')

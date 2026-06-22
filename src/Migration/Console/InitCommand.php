@@ -17,7 +17,7 @@ class InitCommand extends AbstractCommand
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Initialise this directory for use with migration')
