@@ -5,11 +5,9 @@ namespace Bdf\Prime\Query;
 use Bdf\Prime\Cache\ArrayCache;
 use Bdf\Prime\Cache\CacheInterface;
 use Bdf\Prime\Cache\CacheKey;
-use Bdf\Prime\Cache\DoctrineCacheAdapter;
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
-use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\SqlCompiler;
 use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Criteria\CriteriaInterface;
@@ -19,6 +17,9 @@ use Bdf\Prime\Query\Expression\Like;
 use Bdf\Prime\Query\Expression\Now;
 use Bdf\Prime\Query\Expression\Raw;
 use Bdf\Prime\Query\Factory\QueryFactoryInterface;
+use Bdf\Prime\Record\Field;
+use Bdf\Prime\Types\TypeInterface;
+use DateTime;
 use Doctrine\DBAL\Cache\ArrayResult;
 use Doctrine\DBAL\Result;
 use PHPUnit\Framework\TestCase;
@@ -1914,6 +1915,141 @@ class QueryTest extends TestCase
         ], $result);
 
         $this->assertSame('SELECT name FROM test_ GROUP BY name HAVING COUNT(*) > ?', $query->toSql());
+    }
+
+    /**
+     *
+     */
+    public function test_record()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'test-name1'
+        ]);
+        $this->push([
+            'id'   => 2,
+            'name' => 'test-name2'
+        ]);
+
+        $r = new class {
+            public function __construct(
+                public readonly int $id = 0,
+                public readonly string $name = ''
+            ) {}
+        };
+
+        $records = $this->query()->as($r::class)->all();
+
+        $this->assertContainsOnly($r::class, $records);
+        $this->assertSame(1, $records[0]->id);
+        $this->assertSame('test-name1', $records[0]->name);
+        $this->assertSame(2, $records[1]->id);
+        $this->assertSame('test-name2', $records[1]->name);
+    }
+
+    /**
+     *
+     */
+    public function test_record_with_expression()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'John'
+        ]);
+        $this->push([
+            'id'   => 2,
+            'name' => 'Robert'
+        ]);
+
+        $r = new class {
+            public function __construct(
+                public readonly string $name = '',
+
+                #[Field(expression: new Raw('SOUNDEX(name)'))]
+                public readonly string $sound = '',
+            ) {}
+        };
+
+        $records = $this->query()->as($r::class)->all();
+
+        $this->assertContainsOnly($r::class, $records);
+        $this->assertSame('John', $records[0]->name);
+        $this->assertSame('J500', $records[0]->sound);
+        $this->assertSame('Robert', $records[1]->name);
+        $this->assertSame('R163', $records[1]->sound);
+    }
+
+    /**
+     *
+     */
+    public function test_record_with_alias()
+    {
+        $this->push([
+            'id'   => 1,
+            'name' => 'test-name1'
+        ]);
+        $this->push([
+            'id'   => 2,
+            'name' => 'test-name2'
+        ]);
+
+        $r = new class {
+            public function __construct(
+                #[Field('id')]
+                public readonly int $foo = 0,
+                #[Field('name')]
+                public readonly string $bar = ''
+            ) {}
+        };
+
+        $records = $this->query()->as($r::class)->all();
+
+        $this->assertContainsOnly($r::class, $records);
+        $this->assertSame(1, $records[0]->foo);
+        $this->assertSame('test-name1', $records[0]->bar);
+        $this->assertSame(2, $records[1]->foo);
+        $this->assertSame('test-name2', $records[1]->bar);
+    }
+
+    /**
+     *
+     */
+    public function test_record_with_type()
+    {
+        $this->push([
+            'id' => 1,
+            'name' => 'test-name1',
+            'date_insert' => new \DateTime('2025-01-21 12:00:00'),
+        ]);
+        $this->push([
+            'id' => 2,
+            'name' => 'test-name2',
+            'date_insert' => new \DateTime('2025-01-28 08:00:00'),
+        ]);
+        $this->push([
+            'id' => 3,
+            'name' => 'test-name3',
+        ]);
+
+        $r = new class {
+            public function __construct(
+                public readonly int $id = 0,
+                #[Field('date_insert', type: TypeInterface::DATETIME)]
+                public readonly ?DateTime $createdAt = null,
+            )
+            {
+            }
+        };
+
+        $records = $this->query()->as($r::class)->all();
+
+        $this->assertContainsOnly($r::class, $records);
+        $this->assertSame(1, $records[0]->id);
+        $this->assertEquals(new \DateTime('2025-01-21 12:00:00'), $records[0]->createdAt);
+        $this->assertSame(2, $records[1]->id);
+        $this->assertEquals(new \DateTime('2025-01-28 08:00:00'), $records[1]->createdAt);
+        $this->assertSame(3, $records[2]->id);
+        $this->assertNull($records[2]->createdAt);
     }
 
     public function test_where_filter_entry()

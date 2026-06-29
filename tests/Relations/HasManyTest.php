@@ -2,25 +2,24 @@
 
 namespace Bdf\Prime\Relations;
 
+use Bdf\Prime\Admin;
 use Bdf\Prime\Collection\EntityCollection;
 use Bdf\Prime\Collection\Indexer\EntityIndexer;
 use Bdf\Prime\Collection\Indexer\SingleEntityIndexer;
 use Bdf\Prime\Commit;
 use Bdf\Prime\Company;
+use Bdf\Prime\Customer;
 use Bdf\Prime\Developer;
-use Bdf\Prime\Faction;
+use Bdf\Prime\Document;
 use Bdf\Prime\Folder;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
-use Bdf\Prime\Admin;
-use Bdf\Prime\Customer;
-use Bdf\Prime\Document;
 use Bdf\Prime\Project;
+use Bdf\Prime\Test\RepositoryAssertion;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\Query;
 use Bdf\Prime\TestFile;
 use Bdf\Prime\User;
-use Bdf\Prime\Test\RepositoryAssertion;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -92,6 +91,37 @@ class HasManyTest extends TestCase
     protected function tearDown(): void
     {
         $this->primeStop();
+    }
+
+    public function test_localKeyProperty()
+    {
+        $relation = Customer::repository()->relation('documents');
+        $this->assertSame('id', $relation->localKeyProperty());
+    }
+
+    public function test_loadByForeignKeys()
+    {
+        $this->pack()->nonPersist([
+            $newDoc = new Document([
+                'id'             => '3',
+                'customerId'     => '456',
+                'uploaderType'   => 'admin',
+                'uploaderId'     => '1',
+            ]),
+        ]);
+
+        $relation = Customer::repository()->relation('documents');
+
+        $loaded = $relation->loadByForeignKeys(['123', '456', '404']);
+
+        $this->assertEquals([
+            '123' => [
+                $this->getTestPack()->get('document-admin'),
+                $this->getTestPack()->get('document-user'),
+            ],
+            '456' => [$newDoc],
+            '404' => [],
+        ], $loaded);
     }
 
     /**

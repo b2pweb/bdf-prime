@@ -87,6 +87,20 @@ class ByInheritanceTest extends TestCase
         $this->primeStop();
     }
 
+    public function test_localKeyProperty()
+    {
+        $relation = Task::repository()->relation('target');
+        $this->assertSame('targetId', $relation->localKeyProperty());
+    }
+
+    public function test_loadByForeignKeys()
+    {
+        $this->expectException(\BadMethodCallException::class);
+
+        $relation = Task::repository()->relation('target');
+        $relation->loadByForeignKeys(['10', '321']);
+    }
+
     /**
      *
      */

@@ -11,9 +11,12 @@ use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Exception\QueryBuildingException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
+use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Query\Closure\ClosureCompiler;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\Whereable;
+use Bdf\Prime\Record\RecordHydratorInterface;
+use Bdf\Prime\Record\RepositoryRecordHydrator;
 use Bdf\Prime\Relations\Relation;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\Event\AfterLoad;
@@ -31,7 +34,7 @@ use function is_array;
  *
  * @template E as object
  */
-class QueryRepositoryExtension extends QueryCompatExtension
+class QueryRepositoryExtension extends QueryCompatExtension implements RecordHydratorInterface
 {
     /**
      * @var RepositoryInterface<E>
@@ -76,6 +79,8 @@ class QueryRepositoryExtension extends QueryCompatExtension
      */
     protected $byOptions;
 
+    protected RepositoryRecordHydrator $recordManager;
+
 
     /**
      * QueryRepositoryExtension constructor.
@@ -89,6 +94,7 @@ class QueryRepositoryExtension extends QueryCompatExtension
         $this->metadata = $repository->metadata();
         $this->mapper = $repository->mapper();
         $this->closureCompiler = $closureCompiler;
+        $this->recordManager = new RepositoryRecordHydrator($this->repository);
     }
 
     /**
@@ -493,6 +499,96 @@ class QueryRepositoryExtension extends QueryCompatExtension
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function projection(string $recordClass): ?array
+    {
+        return $this->recordManager->projection($recordClass);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepare(string $recordClass, array $rows): array
+    {
+        return $this->recordManager->prepare($recordClass, $rows);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function instantiate(string $recordClass, array $data, PlatformInterface $platform): object
+    {
+        return $this->recordManager->instantiate($recordClass, $data, $platform);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finalize(string $recordClass, array $entities): array
+    {
+        $entities = $this->recordManager->finalize($recordClass, $entities);
+
+        /** @var EntityRepository<E> $repository */
+        $repository = $this->repository;
+        $hasLoadEvent = $repository->hasListeners(AfterLoad::class);
+
+        // Save into local vars to ensure that value will not be changed during execution
+        $withRelations = $this->withRelations;
+        $withoutRelations = $this->withoutRelations;
+        $byOptions = $this->byOptions;
+
+        // @todo handle by() with record. with() cannot be used with record
+        if (($byOptions || $withRelations) && ($recordClass !== $this->repository->entityClass() && class_exists($recordClass))) {
+            throw new BadMethodCallException('by() or with() methods are not available with record.');
+        }
+
+        $indexer = new EntityIndexer($this->mapper, $byOptions ? [$byOptions['attribute']] : []);
+
+        // Force loading of eager relations
+        if (!empty($this->metadata->eagerRelations)) {
+            $withRelations = array_merge($this->metadata->eagerRelations, $withRelations);
+
+            // Skip relation that should not be loaded.
+            foreach ($withoutRelations as $relationName => $nestedRelations) {
+                // Only a leaf concerns this query.
+                if (empty($nestedRelations)) {
+                    unset($withRelations[$relationName]);
+                }
+            }
+        }
+
+        /** @var E $entity */
+        foreach ($entities as $entity) {
+            $indexer->push($entity);
+
+            if ($hasLoadEvent) {
+                $repository->notify(new AfterLoad($entity, $repository));
+            }
+        }
+
+        foreach ($withRelations as $relationName => $relationInfos) {
+            $repository->relation($relationName)->load(
+                $indexer,
+                $relationInfos['relations'],
+                $relationInfos['constraints'],
+                $withoutRelations[$relationName] ?? []
+            );
+        }
+
+        switch (true) {
+            case $byOptions === null:
+                return $indexer->all();
+
+            case $byOptions['combine']:
+                return $indexer->by($byOptions['attribute']);
+
+            default:
+                return $indexer->byOverride($byOptions['attribute']);
+        }
+    }
+
+    /**
      * Post processor for hydrating entities
      *
      * @param ResultSetInterface<array<string, mixed>> $data
@@ -502,6 +598,8 @@ class QueryRepositoryExtension extends QueryCompatExtension
      */
     public function processEntities(ResultSetInterface $data)
     {
+        @trigger_error('QueryRepositoryExtension::processEntities() is deprecated since 2.3 replaced by RecordHydratorInterface.', E_USER_DEPRECATED);
+
         /** @var EntityRepository<E> $repository */
         $repository = $this->repository;
         $hasLoadEvent = $repository->hasListeners(AfterLoad::class);
@@ -586,6 +684,7 @@ class QueryRepositoryExtension extends QueryCompatExtension
     public function apply(ReadCommandInterface $query): void
     {
         $query->setExtension($this);
-        $query->post([$this, 'processEntities'], false);
+        $query->setRecordHydrator($this);
+        $query->as($this->mapper->getEntityClass());
     }
 }

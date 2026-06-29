@@ -47,6 +47,12 @@ final class Query
         $this->checkPersonNotNull(Person::by('firstName')->firstOrNew());
     }
 
+    public function record(): void
+    {
+        $this->checkRecord(Person::repository()->as(MyRecord::class)->first());
+        $this->checkRecords(Person::repository()->as(MyRecord::class)->all());
+    }
+
     public function complexQuery(): void
     {
         $this->checkPerson(
@@ -212,4 +218,12 @@ final class Query
      * @param iterable<Address> $addresses
      */
     public function checkAddressCollection(iterable $addresses): void {}
+
+    public function checkRecord(?MyRecord $record): void {}
+
+    /**
+     * @param iterable<MyRecord> $records
+     * @return void
+     */
+    public function checkRecords(iterable $records): void {}
 }

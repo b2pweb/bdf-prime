@@ -53,6 +53,14 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
+    public function localKeyProperty(): ?string
+    {
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setLocalAlias(?string $localAlias)
     {
         return $this;
@@ -72,6 +80,14 @@ final class NullRelation implements RelationInterface
     public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
     {
         // No-op
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadByForeignKeys(array $keys): array
+    {
+        return [];
     }
 
     /**

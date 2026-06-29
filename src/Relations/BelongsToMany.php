@@ -205,6 +205,36 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function loadByForeignKeys(array $keys): array
+    {
+        ['throughEntities' => $throughEntities, 'entities' => $entities] = $this->relations($keys, [], [], []);
+
+        $loaded = [];
+
+        // Match local foreign keys with distant entities
+        foreach ($throughEntities as $fk => $ids) {
+            foreach ($ids as $id) {
+                if ($distant = $entities[$id] ?? null) {
+                    $loaded[$fk][] = $distant;
+                }
+            }
+        }
+
+        // Add missing keys to the result
+        if (count($loaded) === count($keys)) {
+            return $loaded;
+        }
+
+        foreach ($keys as $key) {
+            $loaded[$key] ??= [];
+        }
+
+        return $loaded;
+    }
+
+    /**
      * Get a query from through entity repository
      *
      * @param string|array  $key

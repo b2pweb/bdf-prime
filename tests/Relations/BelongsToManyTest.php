@@ -92,6 +92,46 @@ class BelongsToManyTest extends TestCase
     protected function tearDown(): void
     {
         $this->primeStop();
+        $this->unsetPrime();
+    }
+
+    public function test_localKeyProperty()
+    {
+        $relation = Customer::repository()->relation('packs');
+        $this->assertSame('id', $relation->localKeyProperty());
+    }
+
+    public function test_loadByForeignKey()
+    {
+        $this->pack()->nonPersist([
+            new Customer([
+                'id'            => '456',
+                'name'          => 'Customer',
+            ]),
+            new CustomerPack([
+                'customerId' => '456',
+                'packId' => 1,
+            ]),
+            new CustomerPack([
+                'customerId' => '456',
+                'packId' => 4,
+            ]),
+        ]);
+
+        $relation = Customer::repository()->relation('packs');
+        $loaded = $relation->loadByForeignKeys(['123', '456', '404']);
+
+        $this->assertEquals([
+            '123' => [
+                $this->getTestPack()->get('pack-referencement'),
+                $this->getTestPack()->get('pack-classic'),
+            ],
+            '456' => [
+                $this->getTestPack()->get('pack-referencement'),
+                $this->getTestPack()->get('pack-empty2'),
+            ],
+            '404' => [],
+        ], $loaded);
     }
 
     /**

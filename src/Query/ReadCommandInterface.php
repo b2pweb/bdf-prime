@@ -8,6 +8,7 @@ use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\Cachable;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
+use Bdf\Prime\Record\RecordHydratorInterface;
 
 /**
  * Base type for "read" operation commands
@@ -84,6 +85,23 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      * @template EACH as bool
      */
     public function post(callable $processor, bool $forEach = true);
+
+    /**
+     * Define the returned record type
+     *
+     * Usage:
+     * ```php
+     * // Return array<MyRecord>
+     * $results = $query->as(MyRecord::class)->all();
+     * ```
+     *
+     * @param class-string<E> $recordClassName
+     * @return ReadCommandInterface<C, E>&$this
+     * @psalm-return ReadCommandInterface<C, E>
+     *
+     * @template E as object
+     */
+    public function as(string $recordClassName);
 
     /**
      * Set the collection class
@@ -186,4 +204,11 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      */
     #[ReadOperation]
     public function inRow(string/*|ExpressionInterface*/ $column);
+
+    /**
+     * Define the record hydrator to used when {@see ReadCommandInterface::as()} is called
+     *
+     * @param RecordHydratorInterface $hydrator
+     */
+    public function setRecordHydrator(RecordHydratorInterface $hydrator): void;
 }

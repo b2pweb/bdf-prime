@@ -22,6 +22,14 @@ v2.3.0
 * Feat: Add `Bdf\Prime\Mapper\Mapper::setDiscriminatorMap()`
 * Change: Mapper's configurators attributes now handle inheritance (i.e. attributes declared on parent class are inherited by child classes)
 * Change: Allow iterable criteria and closure filters on `EntityRepository::count()` and `EntityRelation::count()`
+* Feat: Add record system
+    * Add `Bdf\Prime\SimpleRecordHydrator` for DBAL record hydration
+    * Add `Bdf\Prime\Record\RepositoryRecordHydrator` for ORM record hydration
+    * Add `Bdf\Prime\Query\ReadCommandInterface::as()` to define the returned record
+* Change: `QueryRepositoryExtension` now implements `RecordHydratorInterface`:
+    * Register on the query using `ReadCommandInterface::setRecordHydrator()` instead of use `ReadCommandInterface::post()`
+    * `QueryRepositoryExtension::processEntities()` is now deprecated
+* Feat: Add `Bdf\Prime\Relation\RelationInterface::loadByForeignKey()` to load relations without owner entity
 
 BC Breaks
 * Deprecated: Returning `false` on callback of `EntityRepository::transaction()` to rollback the transaction is deprecated. Use exception instead.
@@ -30,6 +38,10 @@ BC Breaks
 * Change: all implementations of `Bdf\Prime\Relations\RelationInterface::link()` now takes the query class as parameter.
 * Change: Adding "ignore" option to a connection will disable schema management and migration for this connection.
           Before this change, only the create and drop database operations were ignored.
+* Minimum PHP version is now 8.1
+* Add methods on `Bdf\Prime\Query\ReadCommandInterface`:
+    * as()
+    * setRecordHydrator()
 
 v2.2.0
 ------

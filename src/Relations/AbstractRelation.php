@@ -6,8 +6,10 @@ use BadMethodCallException;
 use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Collection\Indexer\EntityIndexerInterface;
 use Bdf\Prime\Collection\Indexer\EntitySetIndexer;
+use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Locatorizable;
 use Bdf\Prime\Query\Contract\Deletable;
+use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\Whereable;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
@@ -124,6 +126,14 @@ abstract class AbstractRelation implements RelationInterface
     public function localRepository(): RepositoryInterface
     {
         return $this->local;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function localKeyProperty(): ?string
+    {
+        return null;
     }
 
     //
@@ -429,6 +439,15 @@ abstract class AbstractRelation implements RelationInterface
      * {@inheritdoc}
      */
     public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
+    {
+        throw new BadMethodCallException('Unsupported operation '.__METHOD__);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    #[ReadOperation]
+    public function loadByForeignKeys(array $keys): array
     {
         throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }

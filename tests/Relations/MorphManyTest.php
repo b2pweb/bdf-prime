@@ -77,6 +77,25 @@ class MorphManyTest extends TestCase
         $this->primeStop();
     }
 
+    public function test_localKeyProperty()
+    {
+        $relation = Admin::repository()->relation('documents');
+        $this->assertSame('id', $relation->localKeyProperty());
+    }
+
+    public function test_loadByForeignKeys()
+    {
+        $relation = Admin::repository()->relation('documents');
+        $loaded = $relation->loadByForeignKeys(['10', '404']);
+
+        $this->assertEquals([
+            10 => [
+                $this->pack()->get('document-admin')
+            ],
+            404 => [],
+        ], $loaded);
+    }
+
     /**
      *
      */

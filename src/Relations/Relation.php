@@ -137,14 +137,23 @@ abstract class Relation extends AbstractRelation
     }
 
     /**
+     * {@inheritdoc}
+     */
+    #[ReadOperation]
+    public function loadByForeignKeys(array $keys): array
+    {
+        return $this->relations($keys, [], [], []);
+    }
+
+    /**
      * Get the entities
      *
-     * @param array $keys
+     * @param array $keys List of local keys values (i.e. foreign key on the owner table) to load
      * @param array $with
      * @param array $constraints
      * @param array $without
      *
-     * @return array  Entities
+     * @return array Entities, indexed by the local key value (i.e. foreign key on the owner table). The value may be an array of entities if the relation is a collection, or a single entity if the relation is a single entity
      * @throws PrimeException
      */
     #[ReadOperation]

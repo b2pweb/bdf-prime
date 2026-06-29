@@ -3,6 +3,7 @@
 namespace Bdf\Prime;
 
 use Bdf\Prime\Exception\DBALException;
+use Bdf\Prime\Record\LoadRelation;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use PHPUnit\Framework\TestCase;
 
@@ -543,6 +544,84 @@ class CRUDTest extends TestCase
         $this->assertSame(['0', 'bar'], $query->getBindings());
     }
 
+    public function test_record()
+    {
+        $this->pack()->nonPersist([
+            new User([
+                'id' => 12,
+                'name' => 'John',
+                'roles' => ['2'],
+                'customer' => new Customer(['id' => '1']),
+            ]),
+            new User([
+                'id' => 13,
+                'name' => 'Mark',
+                'roles' => ['5'],
+                'customer' => new Customer(['id' => '1']),
+            ]),
+        ]);
+
+        $records = User::repository()->builder()->as(IdNameRecord::class)->all();
+
+        $this->assertContainsOnly(IdNameRecord::class, $records);
+        $this->assertEquals([
+            new IdNameRecord('12', 'John'),
+            new IdNameRecord('13', 'Mark'),
+        ], $records);
+    }
+
+    public function test_record_with_relation()
+    {
+        $this->pack()->nonPersist([
+            $customer1 = new Customer(['id' => 1, 'name' => 'Customer 1']),
+            $customer2 = new Customer(['id' => 2, 'name' => 'Customer 2']),
+            new User([
+                'id' => 12,
+                'name' => 'John',
+                'roles' => ['2'],
+                'customer' => $customer1,
+            ]),
+            new User([
+                'id' => 13,
+                'name' => 'Mark',
+                'roles' => ['5'],
+                'customer' => $customer2,
+            ]),
+            $doc1 = new Document([
+                'id' => 1,
+                'customerId' => 1,
+                'uploaderType' => 'user',
+                'uploaderId' => 12,
+            ]),
+            $doc2 = new Document([
+                'id' => 2,
+                'customerId' => 1,
+                'uploaderType' => 'user',
+                'uploaderId' => 12,
+            ]),
+            $doc3 = new Document([
+                'id' => 3,
+                'customerId' => 2,
+                'uploaderType' => 'user',
+                'uploaderId' => 13,
+            ]),
+        ]);
+
+        $records = User::repository()->builder()->as(NameAndCustomer::class)->all();
+
+        $this->assertEquals([
+            new NameAndCustomer('John', $customer1),
+            new NameAndCustomer('Mark', $customer2),
+        ], $records);
+
+        $records = User::repository()->builder()->as(NameAndDocuments::class)->all();
+
+        $this->assertEquals([
+            new NameAndDocuments('John', [$doc1, $doc2]),
+            new NameAndDocuments('Mark', [$doc3]),
+        ], $records);
+    }
+
     public function test_with_custom_storage_type()
     {
         $this->pack()->declareEntity(EntityWithCustomStorageType::class);
@@ -563,4 +642,32 @@ class CRUDTest extends TestCase
             'enabled' => '1',
         ]], EntityWithCustomStorageType::repository()->builder()->execute()->all());
     }
+}
+
+class IdNameRecord
+{
+    public function __construct(
+        public readonly string $id,
+        public readonly string $name,
+    ) {}
+}
+
+class NameAndCustomer
+{
+    public function __construct(
+        public readonly string $name,
+
+        #[LoadRelation(Customer::class)]
+        public readonly Customer $customer,
+    ) {}
+}
+
+class NameAndDocuments
+{
+    public function __construct(
+        public readonly string $name,
+
+        #[LoadRelation(Document::class)]
+        public readonly array $documents,
+    ) {}
 }

@@ -76,6 +76,17 @@ class NullRelationTest extends TestCase
         $this->primeStop();
     }
 
+    public function test_localKeyProperty()
+    {
+        $relation = User::repository()->relation('none');
+        $this->assertNull($relation->localKeyProperty());
+    }
+
+    public function test_loadByForeignKeys()
+    {
+        $this->assertSame([], User::repository()->relation('none')->loadByForeignKeys([1, 2, 3]));
+    }
+
     /**
      *
      */

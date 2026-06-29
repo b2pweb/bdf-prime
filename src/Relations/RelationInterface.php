@@ -51,6 +51,14 @@ interface RelationInterface
     public function localRepository(): RepositoryInterface;
 
     /**
+     * The property name from the owner entity which contains the foreign key of the relation
+     * If the relation is not based on a foreign key, or if the foreign key is composite, this method should return null
+     *
+     * @return string|null The property name, or null if not supported
+     */
+    public function localKeyProperty(): ?string;
+
+    /**
      * Set the alias for to use for the joined table
      *
      * @param string|null $localAlias
@@ -92,6 +100,21 @@ interface RelationInterface
      */
     #[ReadOperation]
     public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void;
+
+    /**
+     * Manually load relation entities by their foreign keys
+     *
+     * The keys of the returned array should match with the parameter keys.
+     * If the related entity is not found, the key may be omitted from the result array.
+     * No other keys should be present in the result array.
+     *
+     * @param list<array-key> $keys The foreign keys
+     *
+     * @return array<array-key, R|R[]> Entities, indexed by the foreign key. The value can be a single entity for single entity relation, or an array of entities for collection relation
+     * @throws PrimeException
+     */
+    #[ReadOperation]
+    public function loadByForeignKeys(array $keys): array;
 
     /**
      * Load relation if not yet loaded

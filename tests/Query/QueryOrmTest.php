@@ -1270,4 +1270,16 @@ class QueryOrmTest extends TestCase
         $this->assertEquals('SELECT t0.* FROM entity_with_constraint t0 WHERE t0.enabled = ?', $query->toSql());
         $this->assertEquals('SELECT t0.* FROM entity_with_constraint t0 WHERE t0.name = ? AND (t0.enabled = ?)', $query->where('name', '')->toSql());
     }
+
+    public function test_as_should_define_projection()
+    {
+        $r = new class('', '') {
+            public function __construct(
+                public readonly string $id,
+                public readonly string $name,
+            ) {}
+        };
+
+        $this->assertSame('SELECT t0.id, t0.name FROM test_ t0', $this->query->as($r::class)->toSql());
+    }
 }
