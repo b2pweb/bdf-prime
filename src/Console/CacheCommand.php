@@ -39,7 +39,7 @@ class CacheCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Manage all prime caches')

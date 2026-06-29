@@ -58,7 +58,7 @@ class HydratorGenerationCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Generate optimized hydrator classes for entities')

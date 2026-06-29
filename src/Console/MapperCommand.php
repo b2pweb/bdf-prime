@@ -40,7 +40,7 @@ class MapperCommand extends Command
     /**
      * {@inheritdoc}
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Generate mapper prototype class')

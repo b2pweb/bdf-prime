@@ -65,6 +65,10 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
+    - name: Install psr/simple-cache v2.0 on PHP 8.0
+      if: matrix.php-versions == '8.0'
+      run: composer require --dev psr/simple-cache:^2.0
+
     # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
     # Docs: https://getcomposer.org/doc/articles/scripts.md
 
