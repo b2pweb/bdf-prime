@@ -143,7 +143,7 @@ class ConnectionManagerTest extends TestCase
 
         $connection = $manager->getConnection('test');
         
-        $this->assertEquals('sqlite', $connection->getDatabasePlatform()->getName());
+        $this->assertEquals('sqlite', $connection->platform()->name());
     }
 
     /**

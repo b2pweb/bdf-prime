@@ -24,7 +24,6 @@ class ConfigurationTest extends TestCase
         $configuration = new Configuration();
         
         $this->assertEquals(new TypesRegistry(), $configuration->getTypes());
-        $this->assertNull($configuration->getSQLLogger());
     }
 
     /**
@@ -81,11 +80,9 @@ class ConfigurationTest extends TestCase
     public function test_set_parameters_from_constructor()
     {
         $configuration = new Configuration([
-            'logger' => $logger = new PsrDecorator(new NullLogger()),
             'autoCommit' => false,
         ]);
         
-        $this->assertSame($logger, $configuration->getSQLLogger());
         $this->assertFalse($configuration->getAutoCommit());
     }
 

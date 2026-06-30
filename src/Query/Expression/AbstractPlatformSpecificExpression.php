@@ -52,10 +52,6 @@ abstract class AbstractPlatformSpecificExpression implements ExpressionInterface
 
         $platform = $compiler->platform();
 
-        if (!method_exists($platform, 'apply')) {
-            throw new LogicException('The platform ' . get_class($platform) . ' does not support the method apply().');
-        }
-
         return $platform->apply($configured);
     }
 

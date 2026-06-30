@@ -95,17 +95,6 @@ class ShardingConnectionTest extends TestCase
     /**
      *
      */
-    public function test_wrapped_connection_of_shard()
-    {
-        $sharding = $this->connections->getConnection('sharding');
-        $sharding->useShard('shard1');
-
-        $this->assertEquals($sharding->getConnection('shard1')->getWrappedConnection(), $sharding->getWrappedConnection());
-    }
-
-    /**
-     *
-     */
     public function test_unknown_sub_connection()
     {
         $this->expectException(ShardingException::class);
@@ -248,7 +237,7 @@ class ShardingConnectionTest extends TestCase
         $this->assertEquals('shard1', $rows[0]['name']);
         $this->assertEquals('shard2', $rows[1]['name']);
 
-        $result = $connection->exec('delete from test');
+        $result = $connection->executeStatement('delete from test');
         $this->assertEquals(2, $result);
         $this->assertEquals(0, count($connection->executeQuery('select * from test')->fetchAllAssociative()));
     }
@@ -278,7 +267,7 @@ class ShardingConnectionTest extends TestCase
         $this->assertEquals('shard1', $rows[0]['name']);
         $this->assertEquals('shard2', $rows[1]['name']);
 
-        $result = $connection->executeUpdate('delete from test');
+        $result = $connection->executeStatement('delete from test');
         $this->assertEquals(2, $result);
         $this->assertEquals(0, count($connection->executeQuery('select * from test')->fetchAllAssociative()));
     }

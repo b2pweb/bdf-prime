@@ -13,7 +13,10 @@ use Bdf\Prime\Schema\Bag\Table;
 use Bdf\Prime\SchemaAssertion;
 use Bdf\Prime\Types\TypeInterface;
 use Bdf\Prime\Types\TypesRegistry;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use PHPUnit\Framework\TestCase;
+
+use function array_map;
 
 /**
  *
@@ -55,8 +58,8 @@ class TableTransformerTest extends TestCase
         $doctrine = (new TableTransformer($table, $platform))->toDoctrine();
 
         $this->assertInstanceOf(\Doctrine\DBAL\Schema\Table::class, $doctrine);
-        $this->assertEquals('table_', $doctrine->getName());
-        $this->assertEquals(['id_'], $doctrine->getPrimaryKey()->getColumns());
+        $this->assertEquals('table_', $doctrine->getObjectName()->toString());
+        $this->assertEquals(['id_'], array_map(fn (UnqualifiedName $name) => $name->toString(), $doctrine->getPrimaryKeyConstraint()->getColumnNames()));
 
         $this->assertTable($table, new DoctrineTable($doctrine, $platform->types()));
     }

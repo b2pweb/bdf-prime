@@ -67,9 +67,9 @@ final class ColumnTransformer
             'autoincrement' => $this->column->autoIncrement(),
             'unsigned'      => $this->column->unsigned(),
             'fixed'         => $this->column->fixed(),
-            'comment'       => $this->column->comment(),
+            'comment'       => $this->column->comment() ?? '',
             'precision'     => $this->column->precision(),
-            'scale'         => $this->column->scale(),
+            'scale'         => $this->column->scale() ?? 0,
             'default'       => $this->column->defaultValue(),
         ];
     }

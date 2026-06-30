@@ -23,10 +23,6 @@ use Doctrine\Common\EventManager;
  * Base connection type
  *
  * Allows creating and executing queries, and handle a platform
- *
- * @method void addConnectionClosedListener(Closure $listener)
- * @method void removeConnectionClosedListener(Closure $listener)
- * @method array getParameters()
  */
 interface ConnectionInterface
 {
@@ -167,7 +163,7 @@ interface ConnectionInterface
      *
      * @todo Uncomment in prime 3.0
      */
-    //public function getParameters(): array;
+    public function getParameters(): array;
 
     /**
      * Get the platform instance
@@ -178,26 +174,13 @@ interface ConnectionInterface
     public function platform(): PlatformInterface;
 
     /**
-     * Gets the EventManager used by the Connection.
-     *
-     * @return EventManager
-     *
-     * @todo Ne pas utiliser l'event manager de doctrine ?
-     *       C'est actuellement le plus simple et léger, mais ajoute une dépendence forte à Doctrine
-     *
-     * @internal
-     * @deprecated Since 2.2. Will be removed in 3.0 without replacement
-     */
-    public function getEventManager();
-
-    /**
      * Add a new listener to be notified when the connection is closed or reset
      *
      * @param Closure(ConnectionInterface):void $listener The listener to add. The connection instance is passed as argument.
      *
      * @return void
      */
-    //public function addConnectionClosedListener(Closure $listener): void;
+    public function addConnectionClosedListener(Closure $listener): void;
 
     /**
      * Remove the connection closed listener
@@ -207,7 +190,7 @@ interface ConnectionInterface
      *
      * @return void
      */
-    //public function removeConnectionClosedListener(Closure $listener): void;
+    public function removeConnectionClosedListener(Closure $listener): void;
 
     /**
      * Closes the connection and trigger "onConnectionClosed" event

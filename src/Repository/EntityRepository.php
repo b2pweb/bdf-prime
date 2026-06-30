@@ -79,7 +79,7 @@ use function trigger_error;
  * @psalm-suppress DeprecatedInterface
  * @psalm-no-seal-methods
  */
-class EntityRepository implements RepositoryInterface, EventSubscriber, ConnectionClosedListenerInterface, RepositoryEventsSubscriberInterface
+class EntityRepository implements RepositoryInterface, RepositoryEventsSubscriberInterface
 {
     use EventNotifierTrait;
 

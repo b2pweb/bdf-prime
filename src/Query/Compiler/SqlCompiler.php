@@ -298,7 +298,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
                 .$query->state()->compiledParts['orders'];
 
         if ($query->isLimitQuery()) {
-            $sql = $this->platform()->grammar()->modifyLimitQuery($sql, $query->statements['limit'], $query->statements['offset']);
+            $sql = $this->platform()->grammar()->modifyLimitQuery($sql, $query->statements['limit'], $query->statements['offset'] ?? 0);
         }
 
         return $query->state()->compiled = $sql.$query->state()->compiledParts['lock'];
@@ -1044,14 +1044,10 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
 
         // The lock should not be applied on aggregate function
         if ($lock !== null && !$query->statements['aggregate']) {
-            // Lock for update
-            if ($lock === LockMode::PESSIMISTIC_WRITE) {
-                return ' ' . $this->platform()->grammar()->getWriteLockSQL();
-            }
+            $clause = $this->platform()->apply(new ForUpdate($lock));
 
-            // Shared Lock: other process can read the row but not update it.
-            if ($lock === LockMode::PESSIMISTIC_READ) {
-                return ' ' . $this->platform()->grammar()->getReadLockSQL();
+            if ($clause !== '') {
+                return ' ' . $clause;
             }
         }
 

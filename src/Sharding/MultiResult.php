@@ -76,7 +76,7 @@ final class MultiResult implements IteratorAggregate, DriverResult
     /**
      * {@inheritdoc}
      */
-    public function fetchNumeric()
+    public function fetchNumeric(): array|false
     {
         return $this->fetch(__FUNCTION__);
     }
@@ -84,7 +84,7 @@ final class MultiResult implements IteratorAggregate, DriverResult
     /**
      * {@inheritdoc}
      */
-    public function fetchAssociative()
+    public function fetchAssociative(): array|false
     {
         return $this->fetch(__FUNCTION__);
     }
@@ -92,7 +92,7 @@ final class MultiResult implements IteratorAggregate, DriverResult
     /**
      * {@inheritdoc}
      */
-    public function fetchOne()
+    public function fetchOne(): mixed
     {
         return $this->fetch(__FUNCTION__);
     }
@@ -140,7 +140,7 @@ final class MultiResult implements IteratorAggregate, DriverResult
      *
      * @return false|mixed False if there is no more results, or the current row value
      */
-    private function fetch(string $method)
+    private function fetch(string $method): mixed
     {
         for (;; ++$this->current) {
             // Stop the fetch if there is no statement
@@ -160,7 +160,7 @@ final class MultiResult implements IteratorAggregate, DriverResult
      * @param string $method
      * @return list<mixed>
      */
-    private function fetchAll(string $method)
+    private function fetchAll(string $method): array
     {
         $result = [];
 

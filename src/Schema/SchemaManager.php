@@ -12,6 +12,8 @@ use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\SchemaDiff as DoctrineSchemaDiff;
 use Doctrine\DBAL\Schema\Table as DoctrineTable;
 
+use function var_dump;
+
 /**
  * SchemaManager using doctrine schemas
  *
@@ -247,7 +249,7 @@ class SchemaManager extends AbstractSchemaManager
     public function diff($new, $old)
     {
         /** @psalm-suppress InternalMethod */
-        $comparator = new Comparator();
+        $comparator = new Comparator($this->getConnection()->platform()->grammar());
         $comparator->setListDropColumn($this->useDrop);
 
         return $comparator->compareSchemas(

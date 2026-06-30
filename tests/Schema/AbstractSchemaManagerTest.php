@@ -332,7 +332,7 @@ class AbstractSchemaManagerTest extends TestCase
             ;
         });
 
-        $this->assertEquals(['CREATE TABLE new_table_ (id_ BIGINT NOT NULL, name_ VARCHAR(32) NOT NULL, PRIMARY KEY(id_))'], $manager->pending());
+        $this->assertEquals(['CREATE TABLE new_table_ (id_ BIGINT NOT NULL, name_ VARCHAR(32) NOT NULL, PRIMARY KEY (id_))'], $manager->pending());
     }
 
     /**
@@ -350,7 +350,7 @@ class AbstractSchemaManagerTest extends TestCase
             ;
         });
 
-        $this->assertEquals(['CREATE TABLE new_table_ (id_ BIGINT NOT NULL, name_ VARCHAR(32) NOT NULL, PRIMARY KEY(id_))'], $manager->pending());
+        $this->assertEquals(['CREATE TABLE new_table_ (id_ BIGINT NOT NULL, name_ VARCHAR(32) NOT NULL, PRIMARY KEY (id_))'], $manager->pending());
         $this->assertEquals(['DROP TABLE new_table_'], $manager->rollbackQueries());
     }
 }

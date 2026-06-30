@@ -19,6 +19,8 @@ use Bdf\Prime\Types\UnitEnumType;
 use Bdf\Serializer\Normalizer\ObjectNormalizer;
 use Bdf\Serializer\SerializerBuilder;
 
+use function array_replace_recursive;
+
 /**
  * PrimeTestCase
  */
@@ -43,10 +45,14 @@ trait PrimeTestCase
     /**
      * 
      */
-    public function configurePrime()
+    public function configurePrime(array $config = [])
     {
+        if ($config) {
+            $this->unsetPrime();
+        }
+
         if (!Prime::isConfigured()) {
-            Prime::configure([
+            Prime::configure(array_replace_recursive([
 //                'logger' => new PsrDecorator(new Logger()),
 //                'resultCache' => new \Bdf\Prime\Cache\ArrayCache(),
                 'connection' => [
@@ -70,7 +76,7 @@ trait PrimeTestCase
                     BackedEnumType::INT_ENUM => BackedEnumType::class,
                 ],
                 'clock' => new TestClock(),
-            ]);
+            ], $config));
 
             $serializer = SerializerBuilder::create()
                 ->build();
@@ -99,9 +105,9 @@ trait PrimeTestCase
     /**
      *
      */
-    public function primeStart()
+    public function primeStart(array $config = [])
     {
-        $this->configurePrime();
+        $this->configurePrime($config);
 
         if (method_exists($this, 'declareTestData')) {
             $this->declareTestData(TestPack::pack());

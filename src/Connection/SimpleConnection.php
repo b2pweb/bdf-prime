@@ -28,7 +28,6 @@ use Bdf\Prime\Query\Factory\QueryFactoryInterface;
 use Bdf\Prime\Query\Query;
 use Bdf\Prime\Schema\SchemaManager;
 use Closure;
-use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection as BaseConnection;
@@ -90,13 +89,12 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      * @param array $params
      * @param Driver $driver
      * @param Configuration|null $config
-     * @param EventManager|null $eventManager
      * @throws DoctrineDBALException
      */
-    public function __construct(array $params, Driver $driver, ?Configuration $config = null, ?EventManager $eventManager = null)
+    public function __construct(array $params, Driver $driver, ?Configuration $config = null)
     {
         /** @psalm-suppress InternalMethod */
-        parent::__construct($params, $driver, $config, $eventManager);
+        parent::__construct($params, $driver, $config);
 
         /** @psalm-suppress InvalidArgument */
         $this->factory = new DefaultQueryFactory(
@@ -151,7 +149,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function isConnected()
+    public function isConnected(): bool
     {
         return $this->_conn !== null;
     }
@@ -264,7 +262,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function delete($table, array $criteria, array $types = [])
+    public function delete(string $table, array $criteria = [], array $types = []): int|string
     {
         return $this->from($table)->where($criteria)->delete();
     }
@@ -272,7 +270,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function update($table, array $data, array $criteria, array $types = [])
+    public function update(string $table, array $data, array $criteria = [], array $types = []): int|string
     {
         return $this->from($table)->where($criteria)->update($data, $types);
     }
@@ -280,7 +278,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function insert($table, array $data, array $types = [])
+    public function insert(string $table, array $data, array $types = []): int|string
     {
         return $this->from($table)->insert($data);
     }
@@ -298,8 +296,6 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      */
     public function executeQuery(string $sql, array $params = [], $types = [], ?QueryCacheProfile $qcp = null): Result
     {
-        $this->prepareLogger();
-
         $types = $types ?: Binder::types($params);
 
         return $this->runOrReconnect(fn () => parent::executeQuery($sql, $params, $types, $qcp));
@@ -308,10 +304,8 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function executeStatement($sql, array $params = [], array $types = [])
+    public function executeStatement(string $sql, array $params = [], array $types = []): int|string
     {
-        $this->prepareLogger();
-
         $types = $types ?: Binder::types($params);
 
         return $this->runOrReconnect(fn () => parent::executeStatement($sql, $params, $types));
@@ -377,8 +371,6 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
         $statement = Binder::bindValues($statement, $query);
         $isRead = $query->type() === Compilable::TYPE_SELECT;
 
-        $this->prepareLogger();
-
         try {
             $result = $isRead
                 ? new DoctrineResultSet($statement->executeQuery())
@@ -408,44 +400,6 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
         }
 
         return $result;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function beginTransaction(): bool
-    {
-        $this->prepareLogger();
-
-        return parent::beginTransaction() ?? true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function commit(): bool
-    {
-        $this->prepareLogger();
-
-        return parent::commit() ?? true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function rollBack(): bool
-    {
-        $this->prepareLogger();
-
-        return parent::rollBack() ?? true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isTransactionActive(): bool
-    {
-        return parent::isTransactionActive();
     }
 
     /**
@@ -528,29 +482,8 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     {
         parent::close();
 
-        // To remove in 3.0
-        $this->_eventManager->dispatchEvent(ConnectionClosedListenerInterface::EVENT_NAME);
-
         foreach ($this->onConnectionClosedListeners as $listener) {
             $listener($this);
-        }
-    }
-
-    /**
-     * Setup the logger by setting the connection
-     *
-     * @return void
-     * @psalm-suppress DeprecatedMethod
-     * @psalm-suppress DeprecatedClass
-     * @todo remove on prime 3.0
-     */
-    protected function prepareLogger(): void
-    {
-        /** @psalm-suppress InternalMethod */
-        $logger = $this->getConfiguration()->getSQLLogger();
-
-        if ($logger && $logger instanceof ConnectionAwareInterface) {
-            $logger->setConnection($this);
         }
     }
 

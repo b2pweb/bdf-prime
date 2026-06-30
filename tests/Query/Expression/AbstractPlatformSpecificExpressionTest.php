@@ -11,12 +11,17 @@ use Bdf\Prime\Query\CompilableClause as Q;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Expression\AbstractPlatformSpecificExpression;
 use Bdf\Prime\TestEntity;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use LogicException;
 use PHPUnit\Framework\TestCase;
+
+use ReflectionProperty;
+
+use function is_array;
 
 class AbstractPlatformSpecificExpressionTest extends TestCase
 {
@@ -96,25 +101,16 @@ class AbstractPlatformSpecificExpressionTest extends TestCase
         $expr->build($this->createMock(CompilableClause::class), new \stdClass());
     }
 
-    public function test_invalid_platform()
-    {
-        $expr = new class extends AbstractPlatformSpecificExpression { };
-        $compiler = $this->createMock(CompilerInterface::class);
-        $platform = $this->createMock(PlatformInterface::class);
-
-        $this->expectException(LogicException::class);
-        $this->expectExceptionMessage('The platform ' . get_class($platform) . ' does not support the method apply().');
-
-        $compiler->expects($this->once())->method('platform')->willReturn($platform);
-
-        $expr->build($this->createMock(CompilableClause::class), $compiler);
-    }
-
     private function setupConnection($dsn): void
     {
         $this->configurePrime();
 
         $this->prime()->connections()->removeConnection('test');
         $this->prime()->connections()->declareConnection('test', $dsn);
+
+        if (is_array($dsn) && isset($dsn['platform'])) {
+            $r = new ReflectionProperty(Connection::class, 'platform');
+            $r->setValue($this->prime()->connection('test'), $dsn['platform']);
+        }
     }
 }

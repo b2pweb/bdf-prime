@@ -136,9 +136,9 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
     /**
      * {@inheritdoc}
      */
-    public function quote($value, $type = null)
+    public function quote(string $value): string
     {
-        return $this->readConnection->quote($value, $type);
+        return $this->readConnection->quote($value);
     }
 
     /**

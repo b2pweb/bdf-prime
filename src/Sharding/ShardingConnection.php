@@ -348,55 +348,37 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function beginTransaction(): bool
+    public function beginTransaction(): void
     {
-        $success = true;
-
         foreach ($this->getSelectedShards() as $shard) {
-            if (!$shard->beginTransaction()) {
-                $success = false;
-            }
+            $shard->beginTransaction();
         }
-
-        return $success;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function commit(): bool
+    public function commit(): void
     {
-        $success = true;
-
         foreach ($this->getSelectedShards() as $shard) {
-            if (!$shard->commit()) {
-                $success = false;
-            }
+            $shard->commit();
         }
-
-        return $success;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rollBack(): bool
+    public function rollBack(): void
     {
-        $success = true;
-
         foreach ($this->getSelectedShards() as $shard) {
-            if (!$shard->rollBack()) {
-                $success = false;
-            }
+            $shard->rollBack();
         }
-
-        return $success;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createSavepoint($savepoint)
+    public function createSavepoint($savepoint): void
     {
         foreach ($this->getSelectedShards() as $shard) {
             $shard->createSavepoint($savepoint);
@@ -406,7 +388,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function releaseSavepoint($savepoint)
+    public function releaseSavepoint($savepoint): void
     {
         foreach ($this->getSelectedShards() as $shard) {
             $shard->releaseSavepoint($savepoint);
@@ -416,7 +398,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function rollbackSavepoint($savepoint)
+    public function rollbackSavepoint($savepoint): void
     {
         foreach ($this->getSelectedShards() as $shard) {
             $shard->rollbackSavepoint($savepoint);
@@ -426,7 +408,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function lastInsertId($name = null)
+    public function lastInsertId($name = null): string|int
     {
         if ($this->isUsingShard()) {
             return $this->getSelectedShard()->lastInsertId($name);
@@ -434,21 +416,5 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
 
         // TODO doit on lever une exception ?
         return parent::lastInsertId($name);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @psalm-suppress DeprecatedMethod
-     * @deprecated Will be removed on prime 3.0
-     */
-    public function getWrappedConnection()
-    {
-        if ($this->isUsingShard()) {
-            return $this->getSelectedShard()->getWrappedConnection();
-        }
-
-        // TODO doit on lever une exception ?
-        return parent::getWrappedConnection();
     }
 }

@@ -4,8 +4,10 @@ namespace Bdf\Prime;
 
 use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\Record\LoadRelation;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 /**
  *
@@ -471,7 +473,7 @@ class CRUDTest extends TestCase
     {
         // Force supports partial indexes : Doctrine not set to true whereas is supported
         $platform = new class extends SqlitePlatform {
-            public function supportsPartialIndexes() { return true; }
+            public function supportsPartialIndexes(): bool { return true; }
         };
 
         $this->prime()->connections()->declareConnection('test2', [
@@ -479,6 +481,9 @@ class CRUDTest extends TestCase
             'memory' => true,
             'platform' => $platform
         ]);
+        $connection = $this->prime()->connection('test2');
+        $r = new ReflectionProperty(Connection::class, 'platform');
+        $r->setValue($connection, $platform);
 
         PartialIndexEntity::repository()->on('test2');
 

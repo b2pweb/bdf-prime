@@ -15,6 +15,8 @@ use Bdf\Prime\Schema\Manager\DatabaseStructureManagerInterface;
 use Bdf\Prime\Schema\Manager\TableManagerInterface;
 use Doctrine\DBAL\Exception as DoctrineDBALException;
 
+use function var_dump;
+
 /**
  * Class AbstractSchemaManager
  *

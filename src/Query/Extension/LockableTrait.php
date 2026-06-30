@@ -20,7 +20,7 @@ trait LockableTrait
      *
      * @see Lockable::lock()
      */
-    public function lock(int $lock = LockMode::PESSIMISTIC_WRITE)
+    public function lock(LockMode $lock = LockMode::PESSIMISTIC_WRITE)
     {
         $this->compilerState->invalidate('lock');
 
@@ -34,7 +34,7 @@ trait LockableTrait
      *
      * @see Lockable::isLocked()
      */
-    public function isLocked(int $lock = LockMode::PESSIMISTIC_WRITE): bool
+    public function isLocked(LockMode $lock = LockMode::PESSIMISTIC_WRITE): bool
     {
         return $this->statements['lock'] === $lock;
     }
