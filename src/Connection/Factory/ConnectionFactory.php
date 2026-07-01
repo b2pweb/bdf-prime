@@ -62,14 +62,13 @@ class ConnectionFactory implements ConnectionFactoryInterface
      * Create the instance of the connection
      *
      * @param array{wrapperClass?: class-string<T>, ...} $parameters
-     * @param EventManager|null $eventManager The event manager, optional.
      *
      * @return ConnectionInterface
      * @throws DBALException
      *
      * @template T as ConnectionInterface
      */
-    private function createConnection(array $parameters, Configuration $config, ?EventManager $eventManager = null): ConnectionInterface
+    private function createConnection(array $parameters, Configuration $config): ConnectionInterface
     {
         // Set the custom driver class + wrapper
         if (isset($parameters['driver']) && isset(self::$driversMap[$parameters['driver']])) {
@@ -98,7 +97,7 @@ class ConnectionFactory implements ConnectionFactoryInterface
              * @var T
              * @psalm-suppress InvalidArgument
              */
-            return DriverManager::getConnection($parameters, $config, $eventManager);
+            return DriverManager::getConnection($parameters, $config);
         } catch (DoctrineDBALException $e) {
             /** @psalm-suppress InvalidScalarArgument */
             throw new DBALException('Cannot create the connection : '.$e->getMessage(), $e->getCode(), $e);

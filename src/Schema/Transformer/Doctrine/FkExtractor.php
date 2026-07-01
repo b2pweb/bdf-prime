@@ -22,6 +22,7 @@ final class FkExtractor implements ConstraintVisitorInterface
      */
     public function onForeignKey(ForeignKeyInterface $foreignKey)
     {
+        /** @psalm-suppress InternalMethod */
         $this->fk[] = new ForeignKeyConstraint(
             $foreignKey->fields(),
             $foreignKey->table(),

@@ -9,7 +9,6 @@ use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Collection\EntityCollection;
 use Bdf\Prime\Collection\Indexer\SingleEntityIndexer;
 use Bdf\Prime\Connection\ConnectionInterface;
-use Bdf\Prime\Connection\Event\ConnectionClosedListenerInterface;
 use Bdf\Prime\Connection\TransactionManagerInterface;
 use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Events;
@@ -47,7 +46,6 @@ use Bdf\Prime\Schema\StructureUpgraderInterface;
 use Bdf\Prime\ServiceLocator;
 use Bdf\Prime\Sharding\ShardingQuery;
 use Closure;
-use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Connection;
 use Exception;
 
@@ -79,7 +77,7 @@ use function trigger_error;
  * @psalm-suppress DeprecatedInterface
  * @psalm-no-seal-methods
  */
-class EntityRepository implements RepositoryInterface, EventSubscriber, ConnectionClosedListenerInterface, RepositoryEventsSubscriberInterface
+class EntityRepository implements RepositoryInterface, RepositoryEventsSubscriberInterface
 {
     use EventNotifierTrait;
 
@@ -282,13 +280,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
         if ($this->connection === null) {
             //Repository query factory load the connection on its constructor. Use lazy to let the connection being loaded as late as possible.
             $this->connection = $this->serviceLocator->connection($this->mapper->metadata()->connection);
-
-            if (method_exists($this->connection, 'addConnectionClosedListener')) {
-                $this->connection->addConnectionClosedListener($this->onCloseListener);
-            } else {
-                /** @psalm-suppress DeprecatedMethod */
-                $this->connection->getEventManager()->addEventSubscriber($this);
-            }
+            $this->connection->addConnectionClosedListener($this->onCloseListener);
         }
 
         return $this->connection;
@@ -1115,17 +1107,6 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     }
 
     /**
-     * {@inheritdoc}
-     *
-     * @deprecated Since 2.2, will be removed in 3.0.
-     */
-    public function getSubscribedEvents()
-    {
-        /** @psalm-suppress DeprecatedClass */
-        return [ConnectionClosedListenerInterface::EVENT_NAME];
-    }
-
-    /**
      * Free metadata information on the given entity
      * Note: This method is called by the model destructor
      *
@@ -1150,13 +1131,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     public function destroy(): void
     {
         if ($this->connection !== null) {
-            if (method_exists($this->connection, 'removeConnectionClosedListener')) {
-                $this->connection->removeConnectionClosedListener($this->onCloseListener);
-            } else {
-                /** @psalm-suppress DeprecatedMethod */
-                $this->connection->getEventManager()->removeEventSubscriber($this);
-            }
-
+            $this->connection->removeConnectionClosedListener($this->onCloseListener);
             $this->connection = null;
         }
 
@@ -1205,13 +1180,7 @@ class EntityRepository implements RepositoryInterface, EventSubscriber, Connecti
     private function reset(): void
     {
         if ($this->connection !== null) {
-            if (method_exists($this->connection, 'removeConnectionClosedListener')) {
-                $this->connection->removeConnectionClosedListener($this->onCloseListener);
-            } else {
-                /** @psalm-suppress DeprecatedMethod */
-                $this->connection->getEventManager()->removeEventSubscriber($this);
-            }
-
+            $this->connection->removeConnectionClosedListener($this->onCloseListener);
             $this->connection = null;
         }
 

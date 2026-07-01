@@ -4,6 +4,7 @@ namespace Bdf\Prime\Schema\Transformer\Doctrine;
 
 use Bdf\Prime\Schema\IndexInterface;
 use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 
 /**
  * Transform Index to doctrine
@@ -31,6 +32,7 @@ final class IndexTransformer
      */
     public function toDoctrine()
     {
+        /** @psalm-suppress InternalMethod */
         return new Index(
             $this->index->name(),
             $this->index->fields(),

@@ -196,12 +196,11 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * Quote a value
      *
      * @param scalar $value
-     * @param \Doctrine\DBAL\ParameterType::* $type
      *
      * @return string
      * @throws PrimeException
      */
-    public function quote($value, ?int $type = null): string;
+    public function quote($value): string;
 
     /**
      * Quote a identifier

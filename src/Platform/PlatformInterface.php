@@ -6,8 +6,6 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 
 /**
  * Interface for Prime connection platforms
- *
- * @method mixed apply(PlatformSpecificOperationInterface $operation)
  */
 interface PlatformInterface
 {
@@ -48,5 +46,5 @@ interface PlatformInterface
      *
      * @template R
      */
-    //public function apply(PlatformSpecificOperationInterface $operation);
+    public function apply(PlatformSpecificOperationInterface $operation);
 }

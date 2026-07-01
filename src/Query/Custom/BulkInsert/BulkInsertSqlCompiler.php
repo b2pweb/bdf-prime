@@ -7,7 +7,7 @@ use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\AbstractCompiler;
 use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 use Bdf\Prime\Types\TypeInterface;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 
 /**
  * Compiler for @see BulkInsertQuery
@@ -121,7 +121,7 @@ class BulkInsertSqlCompiler extends AbstractCompiler implements QuoteCompilerInt
                 return 'REPLACE';
 
             case BulkInsertQuery::MODE_IGNORE:
-                if ($this->platform()->grammar() instanceof SqlitePlatform) {
+                if ($this->platform()->grammar() instanceof SQLitePlatform) {
                     return 'INSERT OR IGNORE';
                 } else {
                     return 'INSERT IGNORE';

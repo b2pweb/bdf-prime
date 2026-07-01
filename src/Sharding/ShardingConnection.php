@@ -109,9 +109,8 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      * @param array                              $params       The connection parameters.
      * @param \Doctrine\DBAL\Driver              $driver       The driver to use.
      * @param \Doctrine\DBAL\Configuration|null  $config       The configuration, optional.
-     * @param \Doctrine\Common\EventManager|null $eventManager The event manager, optional.
      */
-    public function __construct(array $params, Driver $driver, ?Configuration $config = null, ?EventManager $eventManager = null)
+    public function __construct(array $params, Driver $driver, ?Configuration $config = null)
     {
         if (!isset($params['shard_connections'])) {
             throw new LogicException('Sharding connection needs "shard_connections" configuration in parameters');
@@ -124,7 +123,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
         $this->shardChoser = $params['shardChoser'] ?? new ModuloChoser();
         $this->connections = $params['shard_connections'];
 
-        parent::__construct($params, $driver, $config, $eventManager);
+        parent::__construct($params, $driver, $config);
 
         /** @var DefaultQueryFactory $queryFactory */
         $queryFactory = $this->factory();
@@ -133,14 +132,6 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
         $queryFactory->alias(InsertQueryInterface::class, ShardingInsertQuery::class);
         /** @psalm-suppress InvalidArgument */
         $queryFactory->alias(KeyValueQueryInterface::class, ShardingKeyValueQuery::class);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDatabase(): ?string
-    {
-        return '';
     }
 
     /**
@@ -348,55 +339,37 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function beginTransaction(): bool
+    public function beginTransaction(): void
     {
-        $success = true;
-
         foreach ($this->getSelectedShards() as $shard) {
-            if (!$shard->beginTransaction()) {
-                $success = false;
-            }
+            $shard->beginTransaction();
         }
-
-        return $success;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function commit(): bool
+    public function commit(): void
     {
-        $success = true;
-
         foreach ($this->getSelectedShards() as $shard) {
-            if (!$shard->commit()) {
-                $success = false;
-            }
+            $shard->commit();
         }
-
-        return $success;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function rollBack(): bool
+    public function rollBack(): void
     {
-        $success = true;
-
         foreach ($this->getSelectedShards() as $shard) {
-            if (!$shard->rollBack()) {
-                $success = false;
-            }
+            $shard->rollBack();
         }
-
-        return $success;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function createSavepoint($savepoint)
+    public function createSavepoint($savepoint): void
     {
         foreach ($this->getSelectedShards() as $shard) {
             $shard->createSavepoint($savepoint);
@@ -406,7 +379,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function releaseSavepoint($savepoint)
+    public function releaseSavepoint($savepoint): void
     {
         foreach ($this->getSelectedShards() as $shard) {
             $shard->releaseSavepoint($savepoint);
@@ -416,7 +389,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function rollbackSavepoint($savepoint)
+    public function rollbackSavepoint($savepoint): void
     {
         foreach ($this->getSelectedShards() as $shard) {
             $shard->rollbackSavepoint($savepoint);
@@ -426,29 +399,13 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function lastInsertId($name = null)
+    public function lastInsertId($name = null): string|int
     {
         if ($this->isUsingShard()) {
-            return $this->getSelectedShard()->lastInsertId($name);
+            return $this->getSelectedShard()->lastInsertId();
         }
 
         // TODO doit on lever une exception ?
-        return parent::lastInsertId($name);
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @psalm-suppress DeprecatedMethod
-     * @deprecated Will be removed on prime 3.0
-     */
-    public function getWrappedConnection()
-    {
-        if ($this->isUsingShard()) {
-            return $this->getSelectedShard()->getWrappedConnection();
-        }
-
-        // TODO doit on lever une exception ?
-        return parent::getWrappedConnection();
+        return parent::lastInsertId();
     }
 }

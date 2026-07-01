@@ -37,8 +37,7 @@ class JsonFunctionalTest extends TestCase
     public function test_schema()
     {
         $this->assertSame([
-            'CREATE TABLE test_json (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, data CLOB NOT NULL --(DC2Type:json)
-, object CLOB DEFAULT NULL)'
+            'CREATE TABLE test_json (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, data CLOB NOT NULL, object CLOB DEFAULT NULL)'
         ], EntityWithJson::repository()->schema(true)->diff());
     }
 

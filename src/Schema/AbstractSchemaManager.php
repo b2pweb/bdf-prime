@@ -10,9 +10,6 @@ use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Schema\Builder\TableBuilder;
 use Bdf\Prime\Schema\Builder\TypesHelperTableBuilder;
-use Bdf\Prime\Schema\Manager\DatabaseManagerInterface;
-use Bdf\Prime\Schema\Manager\DatabaseStructureManagerInterface;
-use Bdf\Prime\Schema\Manager\TableManagerInterface;
 use Doctrine\DBAL\Exception as DoctrineDBALException;
 
 /**

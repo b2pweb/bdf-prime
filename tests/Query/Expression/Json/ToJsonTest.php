@@ -7,8 +7,10 @@ use Bdf\Prime\Query\Expression\Attribute;
 use Bdf\Prime\Query\Expression\Json\JsonSet;
 use Bdf\Prime\Query\Expression\Json\ToJson;
 use Bdf\Prime\Query\Expression\Raw;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 class ToJsonTest extends TestCase
 {
@@ -25,9 +27,11 @@ class ToJsonTest extends TestCase
 
         $this->prime()->connections()->declareConnection('mariadb', MYSQL_CONNECTION_DSN.'?serverVersion=11.0.1-mariadb');
         $this->prime()->connections()->declareConnection('mysql', MYSQL_CONNECTION_DSN.'?serverVersion=11.0.1');
-        $this->prime()->connections()->declareConnection('other', [
-            'platform' => new PostgreSQLPlatform(),
-        ] + MYSQL_CONNECTION_PARAMETERS);
+        $this->prime()->connections()->declareConnection('other', MYSQL_CONNECTION_PARAMETERS);
+
+        $other = $this->prime()->connection('other');
+        $r = new ReflectionProperty(Connection::class, 'platform');
+        $r->setValue($other, new PostgreSQLPlatform());
     }
 
     /**

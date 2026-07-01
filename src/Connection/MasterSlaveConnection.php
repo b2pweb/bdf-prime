@@ -66,9 +66,8 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
      * @param array                              $params       The connection parameters.
      * @param \Doctrine\DBAL\Driver              $driver       The driver to use.
      * @param \Doctrine\DBAL\Configuration|null  $config       The configuration, optional.
-     * @param \Doctrine\Common\EventManager|null $eventManager The event manager, optional.
      */
-    public function __construct(array $params, Driver $driver, ?Configuration $config = null, ?EventManager $eventManager = null)
+    public function __construct(array $params, Driver $driver, ?Configuration $config = null)
     {
         if (!isset($params['read'])) {
             throw new LogicException('Master/slave connection needs readable connection in parameters');
@@ -76,7 +75,7 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
 
         $this->readConnection = $params['read'];
 
-        parent::__construct($params, $driver, $config, $eventManager);
+        parent::__construct($params, $driver, $config);
     }
 
     /**
@@ -136,9 +135,9 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
     /**
      * {@inheritdoc}
      */
-    public function quote($value, $type = null)
+    public function quote(string $value): string
     {
-        return $this->readConnection->quote($value, $type);
+        return $this->readConnection->quote($value);
     }
 
     /**

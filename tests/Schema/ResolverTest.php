@@ -153,8 +153,8 @@ class ResolverTest extends TestCase
         $resolver->drop();
 
         $this->assertEquals([
-            'CREATE TABLE customer_ (id_ BIGINT NOT NULL, parent_id BIGINT DEFAULT NULL, name_ VARCHAR(255) NOT NULL, PRIMARY KEY(id_))',
-            'CREATE TABLE customer_seq_ (id BIGINT NOT NULL, PRIMARY KEY(id))'
+            'CREATE TABLE customer_ (id_ BIGINT NOT NULL, parent_id BIGINT DEFAULT NULL, name_ VARCHAR(255) NOT NULL, PRIMARY KEY (id_))',
+            'CREATE TABLE customer_seq_ (id BIGINT NOT NULL, PRIMARY KEY (id))'
         ], $resolver->diff());
     }
 
@@ -169,8 +169,8 @@ class ResolverTest extends TestCase
         $this->assertEquals([
             'up' => [
                 'test' => [
-                    'CREATE TABLE customer_ (id_ BIGINT NOT NULL, parent_id BIGINT DEFAULT NULL, name_ VARCHAR(255) NOT NULL, PRIMARY KEY(id_))',
-                    'CREATE TABLE customer_seq_ (id BIGINT NOT NULL, PRIMARY KEY(id))',
+                    'CREATE TABLE customer_ (id_ BIGINT NOT NULL, parent_id BIGINT DEFAULT NULL, name_ VARCHAR(255) NOT NULL, PRIMARY KEY (id_))',
+                    'CREATE TABLE customer_seq_ (id BIGINT NOT NULL, PRIMARY KEY (id))',
                 ]
             ],
             'down' => [
@@ -192,7 +192,7 @@ class ResolverTest extends TestCase
         $this->assertEquals([
             'up' => [
                 'test' => [
-                    'CREATE TABLE user_ (id_ BIGINT NOT NULL, name_ VARCHAR(255) NOT NULL, roles_ CLOB NOT NULL, customer_id BIGINT NOT NULL, faction_id BIGINT DEFAULT NULL, PRIMARY KEY(id_))',
+                    'CREATE TABLE user_ (id_ BIGINT NOT NULL, name_ VARCHAR(255) NOT NULL, roles_ CLOB NOT NULL, customer_id BIGINT NOT NULL, faction_id BIGINT DEFAULT NULL, PRIMARY KEY (id_))',
                 ]
             ],
             'down' => [

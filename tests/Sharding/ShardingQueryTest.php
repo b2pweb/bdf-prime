@@ -2,10 +2,11 @@
 
 namespace Bdf\Prime\Sharding;
 
+use Bdf\Prime\Connection\Middleware\DebugStack\DebugStack;
+use Bdf\Prime\Connection\Middleware\DebugStack\DebugStackMiddleware;
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Schema\Builder\TypesHelperTableBuilder;
-use Doctrine\DBAL\Logging\DebugStack;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -29,6 +30,7 @@ class ShardingQueryTest extends TestCase
      * @var SimpleConnection
      */
     private $shard2;
+    private DebugStack $queries;
 
 
     /**
@@ -36,7 +38,7 @@ class ShardingQueryTest extends TestCase
      */
     protected function setUp(): void
     {
-        $this->configurePrime();
+        $this->configurePrime(['middlewares' => [new DebugStackMiddleware($this->queries = new DebugStack())]]);
 
         $this->prime()->connections()->removeConnection('test');
         $this->prime()->connections()->declareConnection('test', [
@@ -152,17 +154,15 @@ class ShardingQueryTest extends TestCase
 
     public function test_update_should_use_where_to_pick_shard()
     {
-        $this->connection->getConfiguration()->setSQLLogger($logger = new DebugStack());
-        $this->connection->getShardConnection('shard1')->getConfiguration()->setSQLLogger($logger);
-        $this->connection->getShardConnection('shard2')->getConfiguration()->setSQLLogger($logger);
+        $this->queries->clear();
 
         $this->query()->insert(['id' => 1, 'name' => 'John']);
         $this->query()->insert(['id' => 2, 'name' => 'Mike']);
 
-        $this->assertCount(2, $logger->queries);
+        $this->assertCount(2, $this->queries->queries);
 
         $this->query()->where('id', 1)->update(['name' => 'Jean']);
-        $this->assertCount(3, $logger->queries);
+        $this->assertCount(3, $this->queries->queries);
 
         $this->assertSame('Jean', $this->query()->pickShard(1)->first()['name']);
     }

@@ -6,7 +6,7 @@ use BadMethodCallException;
 use Bdf\Prime\Platform\PlatformInterface;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 
 use function get_class;
 
@@ -37,7 +37,7 @@ trait SqlPlatformOperationTrait
     /**
      * {@inheritdoc}
      */
-    public function onSqlitePlatform(SqlPlatform $platform, SqlitePlatform $grammar)
+    public function onSqlitePlatform(SqlPlatform $platform, SQLitePlatform $grammar)
     {
         return $this->onGenericSqlPlatform($platform, $grammar);
     }

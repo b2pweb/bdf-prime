@@ -34,17 +34,12 @@ class Configuration extends BaseConfiguration
      * Set configuration
      *
      * @param array $options
-     * @psalm-suppress DeprecatedMethod
      */
     public function __construct(array $options = [])
     {
-        if (isset($options['logger'])) {
-            $this->setSQLLogger($options['logger']);
+        parent::__construct();
 
-            /** @psalm-suppress InternalProperty */
-            unset($options['logger']);
-        }
-
+        // @todo deprecated ?
         foreach ($options as $name => $value) {
             $this->$name = $value;
         }

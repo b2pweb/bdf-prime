@@ -247,7 +247,7 @@ class SchemaManager extends AbstractSchemaManager
     public function diff($new, $old)
     {
         /** @psalm-suppress InternalMethod */
-        $comparator = new Comparator();
+        $comparator = new Comparator($this->getConnection()->platform()->grammar());
         $comparator->setListDropColumn($this->useDrop);
 
         return $comparator->compareSchemas(

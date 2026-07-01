@@ -7,6 +7,9 @@ use Bdf\Prime\Collection\Indexer\EntityIndexer;
 use Bdf\Prime\Collection\Indexer\SingleEntityIndexer;
 use Bdf\Prime\Commit;
 use Bdf\Prime\Company;
+use Bdf\Prime\Connection\Middleware\DebugStack\DebugStack;
+use Bdf\Prime\Connection\Middleware\DebugStack\DebugStackMiddleware;
+use Bdf\Prime\Customer;
 use Bdf\Prime\CustomerPack;
 use Bdf\Prime\Developer;
 use Bdf\Prime\FileUser;
@@ -15,13 +18,11 @@ use Bdf\Prime\Integrator;
 use Bdf\Prime\Pack;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
-use Bdf\Prime\Customer;
 use Bdf\Prime\Project;
 use Bdf\Prime\ProjectIntegrator;
 use Bdf\Prime\Query\Query;
 use Bdf\Prime\Test\RepositoryAssertion;
 use Bdf\Prime\UserGroup;
-use Doctrine\DBAL\Logging\DebugStack;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -36,13 +37,14 @@ class BelongsToManyTest extends TestCase
      * @var BelongsToMany
      */
     private $relation;
+    private DebugStack $queries;
 
     /**
      *
      */
     protected function setUp(): void
     {
-        $this->primeStart();
+        $this->primeStart(['middlewares' => [new DebugStackMiddleware($this->queries = new DebugStack())]]);
     }
 
     /**
@@ -160,16 +162,16 @@ class BelongsToManyTest extends TestCase
             'name'          => 'Customer2',
         ]);
         $this->getTestPack()->nonPersist($customer);
+        $this->queries->clear();
 
-        $this->prime()->connection('test')->getConfiguration()->setSQLLogger($logger = new DebugStack());
         $customer->load('packs');
 
         $this->assertSame([], $customer->packs);
         $this->assertTrue($this->relation->isLoaded($customer));
 
-        $this->assertCount(1, $logger->queries);
-        $this->assertEquals('SELECT customer_id as customerId, pack_id as packId FROM customer_pack_ WHERE customer_id = ?', $logger->queries[1]['sql']);
-        $this->assertEquals([1 => '124'], $logger->queries[1]['params']);
+        $this->assertCount(1, $this->queries->queries);
+        $this->assertEquals('SELECT customer_id as customerId, pack_id as packId FROM customer_pack_ WHERE customer_id = ?', $this->queries->queries[0]->sql);
+        $this->assertEquals(['124'], $this->queries->queries[0]->parameters);
     }
 
     /**

@@ -32,7 +32,7 @@ final class DoctrineForeignKey implements ForeignKeyInterface
      */
     public function name(): string
     {
-        return $this->fk->getName();
+        return $this->fk->getObjectName()->toString();
     }
 
     /**

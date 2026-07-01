@@ -29,9 +29,9 @@ final class DoctrineIndex implements IndexInterface
     /**
      * {@inheritdoc}
      */
-    public function name(): ?string
+    public function name(): string
     {
-        return $this->index->getName();
+        return $this->index->getObjectName()->toString();
     }
 
     /**

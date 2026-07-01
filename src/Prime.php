@@ -15,7 +15,6 @@ use Bdf\Prime\Mapper\MapperFactory;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Doctrine\DBAL\Logging\SQLLogger;
 use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
 use RuntimeException;
 
 /**
@@ -459,14 +458,13 @@ class Prime
             $mapperFactory
         );
 
+        $middlewares = static::$config['middlewares'] ?? [];
+
         if ($logger = static::$config['logger'] ?? null) {
-            if ($logger instanceof SQLLogger) {
-                /** @psalm-suppress DeprecatedMethod */
-                $configuration->setSQLLogger($logger);
-            } elseif ($logger instanceof LoggerInterface) {
-                $configuration->setMiddlewares([new LoggerMiddleware($logger)]);
-            }
+            $middlewares[] = new LoggerMiddleware($logger);
         }
+
+        $configuration->setMiddlewares($middlewares);
 
         if ($types = static::$config['types'] ?? null) {
             foreach ($types as $alias => $type) {

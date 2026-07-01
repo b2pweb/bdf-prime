@@ -5,7 +5,7 @@ namespace Bdf\Prime\Platform\Sql;
 use Bdf\Prime\Platform\PlatformSpecificOperationInterface;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 
 /**
  * Base type for operation that supports SQL platform
@@ -41,9 +41,9 @@ interface SqlPlatformOperationInterface extends PlatformSpecificOperationInterfa
      * Apply operation on a SQLite platform
      *
      * @param SqlPlatform $platform
-     * @param SqlitePlatform $grammar
+     * @param SQLitePlatform $grammar
      *
      * @return R
      */
-    public function onSqlitePlatform(SqlPlatform $platform, SqlitePlatform $grammar);
+    public function onSqlitePlatform(SqlPlatform $platform, SQLitePlatform $grammar);
 }

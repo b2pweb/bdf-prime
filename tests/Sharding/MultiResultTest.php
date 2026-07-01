@@ -37,10 +37,10 @@ class MultiResultTest extends TestCase
     public function test_single_result()
     {
         $connection = $this->createMock(Connection::class);
-        $result = new MultiResult([new Result(new ArrayResult([
-            ['firstName' => 'Bob', 'lastName' => 'Morison'],
-            ['firstName' => 'Albert', 'lastName' => 'Rutherford'],
-            ['firstName' => 'Jean', 'lastName' => 'Dupont'],
+        $result = new MultiResult([new Result(new ArrayResult(['firstName', 'lastName'], [
+            ['Bob', 'Morison'],
+            ['Albert', 'Rutherford'],
+            ['Jean', 'Dupont'],
         ]), $connection)]);
 
         $this->assertSame(2, $result->columnCount());
@@ -57,10 +57,10 @@ class MultiResultTest extends TestCase
     public function test_single_result_fetchAllNumeric()
     {
         $connection = $this->createMock(Connection::class);
-        $result = new MultiResult([new Result(new ArrayResult([
-            ['firstName' => 'Bob', 'lastName' => 'Morison'],
-            ['firstName' => 'Albert', 'lastName' => 'Rutherford'],
-            ['firstName' => 'Jean', 'lastName' => 'Dupont'],
+        $result = new MultiResult([new Result(new ArrayResult(['firstName', 'lastName'], [
+            ['Bob', 'Morison'],
+            ['Albert', 'Rutherford'],
+            ['Jean', 'Dupont'],
         ]), $connection)]);
 
         $this->assertSame([
@@ -76,10 +76,10 @@ class MultiResultTest extends TestCase
     public function test_single_result_fetchAllAssociative()
     {
         $connection = $this->createMock(Connection::class);
-        $result = new MultiResult([new Result(new ArrayResult([
-            ['firstName' => 'Bob', 'lastName' => 'Morison'],
-            ['firstName' => 'Albert', 'lastName' => 'Rutherford'],
-            ['firstName' => 'Jean', 'lastName' => 'Dupont'],
+        $result = new MultiResult([new Result(new ArrayResult(['firstName', 'lastName'], [
+            ['Bob', 'Morison'],
+            ['Albert', 'Rutherford'],
+            ['Jean', 'Dupont'],
         ]), $connection)]);
 
         $this->assertSame([
@@ -95,10 +95,10 @@ class MultiResultTest extends TestCase
     public function test_single_result_fetchFirstColumn()
     {
         $connection = $this->createMock(Connection::class);
-        $result = new MultiResult([new Result(new ArrayResult([
-            ['firstName' => 'Bob', 'lastName' => 'Morison'],
-            ['firstName' => 'Albert', 'lastName' => 'Rutherford'],
-            ['firstName' => 'Jean', 'lastName' => 'Dupont'],
+        $result = new MultiResult([new Result(new ArrayResult(['firstName', 'lastName'], [
+            ['Bob', 'Morison'],
+            ['Albert', 'Rutherford'],
+            ['Jean', 'Dupont'],
         ]), $connection)]);
 
         $this->assertSame(['Bob', 'Albert', 'Jean'], $result->fetchFirstColumn());
@@ -110,10 +110,10 @@ class MultiResultTest extends TestCase
     public function test_single_result_iterator()
     {
         $connection = $this->createMock(Connection::class);
-        $result = new MultiResult([new Result(new ArrayResult([
-            ['firstName' => 'Bob', 'lastName' => 'Morison'],
-            ['firstName' => 'Albert', 'lastName' => 'Rutherford'],
-            ['firstName' => 'Jean', 'lastName' => 'Dupont'],
+        $result = new MultiResult([new Result(new ArrayResult(['firstName', 'lastName'], [
+            ['Bob', 'Morison'],
+            ['Albert', 'Rutherford'],
+            ['Jean', 'Dupont'],
         ]), $connection)]);
 
         $this->assertSame([
@@ -130,12 +130,12 @@ class MultiResultTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $result = new MultiResult();
-        $result->add(new Result(new ArrayResult([
-            ['firstName' => 'Bob', 'lastName' => 'Morison'],
+        $result->add(new Result(new ArrayResult(['firstName', 'lastName'], [
+            ['Bob', 'Morison'],
         ]), $connection));
-        $result->add(new Result(new ArrayResult([
-            ['firstName' => 'Albert', 'lastName' => 'Rutherford'],
-            ['firstName' => 'Jean', 'lastName' => 'Dupont'],
+        $result->add(new Result(new ArrayResult(['firstName', 'lastName'], [
+            ['Albert', 'Rutherford'],
+            ['Jean', 'Dupont'],
         ]), $connection));
 
         $this->assertSame(2, $result->columnCount());
@@ -153,12 +153,12 @@ class MultiResultTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $result = new MultiResult();
-        $result->add(new Result(new ArrayResult([
-            ['firstName' => 'Bob', 'lastName' => 'Morison'],
+        $result->add(new Result(new ArrayResult(['firstName', 'lastName'], [
+            ['Bob', 'Morison'],
         ]), $connection));
-        $result->add(new Result(new ArrayResult([
-            ['firstName' => 'Albert', 'lastName' => 'Rutherford'],
-            ['firstName' => 'Jean', 'lastName' => 'Dupont'],
+        $result->add(new Result(new ArrayResult(['firstName', 'lastName'], [
+            ['Albert', 'Rutherford'],
+            ['Jean', 'Dupont'],
         ]), $connection));
 
         $this->assertSame([
@@ -175,12 +175,12 @@ class MultiResultTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $result = new MultiResult();
-        $result->add(new Result(new ArrayResult([
-            ['firstName' => 'Bob', 'lastName' => 'Morison'],
+        $result->add(new Result(new ArrayResult(['firstName', 'lastName'], [
+            ['Bob', 'Morison'],
         ]), $connection));
-        $result->add(new Result(new ArrayResult([
-            ['firstName' => 'Albert', 'lastName' => 'Rutherford'],
-            ['firstName' => 'Jean', 'lastName' => 'Dupont'],
+        $result->add(new Result(new ArrayResult(['firstName', 'lastName'], [
+            ['Albert', 'Rutherford'],
+            ['Jean', 'Dupont'],
         ]), $connection));
 
         $this->assertSame([
@@ -197,12 +197,12 @@ class MultiResultTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $result = new MultiResult();
-        $result->add(new Result(new ArrayResult([
-            ['firstName' => 'Bob', 'lastName' => 'Morison'],
+        $result->add(new Result(new ArrayResult(['firstName', 'lastName'], [
+            ['Bob', 'Morison'],
         ]), $connection));
-        $result->add(new Result(new ArrayResult([
-            ['firstName' => 'Albert', 'lastName' => 'Rutherford'],
-            ['firstName' => 'Jean', 'lastName' => 'Dupont'],
+        $result->add(new Result(new ArrayResult(['firstName', 'lastName'], [
+            ['Albert', 'Rutherford'],
+            ['Jean', 'Dupont'],
         ]), $connection));
 
         $this->assertSame(['Bob', 'Albert', 'Jean'], $result->fetchFirstColumn());
@@ -215,12 +215,12 @@ class MultiResultTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
         $result = new MultiResult();
-        $result->add(new Result(new ArrayResult([
-            ['firstName' => 'Bob', 'lastName' => 'Morison'],
+        $result->add(new Result(new ArrayResult(['firstName', 'lastName'], [
+            ['Bob', 'Morison'],
         ]), $connection));
-        $result->add(new Result(new ArrayResult([
-            ['firstName' => 'Albert', 'lastName' => 'Rutherford'],
-            ['firstName' => 'Jean', 'lastName' => 'Dupont'],
+        $result->add(new Result(new ArrayResult(['firstName', 'lastName'], [
+            ['Albert', 'Rutherford'],
+            ['Jean', 'Dupont'],
         ]), $connection));
 
         $this->assertSame([

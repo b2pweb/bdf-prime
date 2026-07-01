@@ -203,7 +203,7 @@ final class DoctrineResultSet implements ResultSetInterface
      */
     public function count(): int
     {
-        return $this->result->rowCount();
+        return (int) $this->result->rowCount();
     }
 
     /**

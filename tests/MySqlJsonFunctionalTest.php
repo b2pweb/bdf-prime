@@ -27,9 +27,10 @@ class MySqlJsonFunctionalTest extends JsonFunctionalTest
         $this->assertContains(
             $queries[0],
             [
-                'CREATE TABLE test_json (id INT AUTO_INCREMENT NOT NULL, data LONGTEXT NOT NULL COMMENT \'(DC2Type:json)\', object LONGTEXT DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB',
-                'CREATE TABLE test_json (id INT AUTO_INCREMENT NOT NULL, data JSON NOT NULL COMMENT \'(DC2Type:json)\', object LONGTEXT DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB',
-                'CREATE TABLE test_json (id INT AUTO_INCREMENT NOT NULL, data JSON NOT NULL, object LONGTEXT DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB',
+                'CREATE TABLE test_json (id INT AUTO_INCREMENT NOT NULL, data LONGTEXT NOT NULL COMMENT \'(DC2Type:json)\', object LONGTEXT DEFAULT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB',
+                'CREATE TABLE test_json (id INT AUTO_INCREMENT NOT NULL, data JSON NOT NULL COMMENT \'(DC2Type:json)\', object LONGTEXT DEFAULT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB',
+                'CREATE TABLE test_json (id INT AUTO_INCREMENT NOT NULL, data JSON NOT NULL, object LONGTEXT DEFAULT NULL, PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8 COLLATE `utf8_unicode_ci` ENGINE = InnoDB',
+                'CREATE TABLE test_json (id INT AUTO_INCREMENT NOT NULL, data JSON NOT NULL, object LONGTEXT DEFAULT NULL, PRIMARY KEY (id))',
             ]
         );
     }

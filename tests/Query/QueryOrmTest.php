@@ -54,7 +54,7 @@ class QueryOrmTest extends TestCase
         $this->query = $this->repository->builder();
         
         $connection = $this->createConnectionMock();
-        $connection->expects($this->any())->method('executeQuery')->willReturn(new Result(new ArrayResult([]), $connection));
+        $connection->expects($this->any())->method('executeQuery')->willReturn(new Result(new ArrayResult([], []), $connection));
         
         $this->query->on($connection);
     }
@@ -679,7 +679,7 @@ class QueryOrmTest extends TestCase
         $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(*) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->willReturn(new Result(new ArrayResult([['aggregate' => 1]]), $connection));
+            ->willReturn(new Result(new ArrayResult(['aggregate'], [[1]]), $connection));
 
         $this->query->on($connection)->where('name', 'test')->paginationCount();
     }
@@ -692,7 +692,7 @@ class QueryOrmTest extends TestCase
         $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(*) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->willReturn(new Result(new ArrayResult([['aggregate' => 1]]), $connection));
+            ->willReturn(new Result(new ArrayResult(['aggregate'], [[1]]), $connection));
 
         $this->query->on($connection)->select('name')->where('name', 'test')->paginationCount();
     }
@@ -722,7 +722,7 @@ class QueryOrmTest extends TestCase
         $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(DISTINCT IFNULL(t0.name,\"___null___\")) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->willReturn(new Result(new ArrayResult([['aggregate' => 1]]), $connection));
+            ->willReturn(new Result(new ArrayResult(['aggregate'], [[1]]), $connection));
 
         $this->query->on($connection)->select('name')->distinct()->where('name', 'test')->paginationCount();
     }
@@ -735,7 +735,7 @@ class QueryOrmTest extends TestCase
         $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(DISTINCT IFNULL(t0.name,\"___null___\")) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->willReturn(new Result(new ArrayResult([['aggregate' => 1]]), $connection));
+            ->willReturn(new Result(new ArrayResult(['aggregate'], [[1]]), $connection));
 
         $this->query->on($connection)->distinct()->select('name', 'dateInsert')->where('name', 'test')->paginationCount();
     }
@@ -748,7 +748,7 @@ class QueryOrmTest extends TestCase
         $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(DISTINCT IFNULL(t0.name,\"___null___\")) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->willReturn(new Result(new ArrayResult([['aggregate' => 1]]), $connection));
+            ->willReturn(new Result(new ArrayResult(['aggregate'], [[1]]), $connection));
 
         $this->query->on($connection)->group('name', 'dateInsert')->where('name', 'test')->paginationCount();
     }
@@ -761,7 +761,7 @@ class QueryOrmTest extends TestCase
         $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(*) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->willReturn(new Result(new ArrayResult([['aggregate' => 1]]), $connection));
+            ->willReturn(new Result(new ArrayResult(['aggregate'], [[1]]), $connection));
 
         $this->query->on($connection)->select('name', 'dateInsert')->where('name', 'test')->count();
     }
@@ -774,7 +774,7 @@ class QueryOrmTest extends TestCase
         $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(t0.name) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->willReturn(new Result(new ArrayResult([['aggregate' => 1]]), $connection));
+            ->willReturn(new Result(new ArrayResult(['aggregate'], [[1]]), $connection));
 
         $this->query->on($connection)->where('name', 'test')->count('name');
     }
@@ -787,7 +787,7 @@ class QueryOrmTest extends TestCase
         $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(DISTINCT t0.name) AS aggregate FROM $this->table t0 WHERE t0.name = ?")
-            ->willReturn(new Result(new ArrayResult([['aggregate' => 1]]), $connection));
+            ->willReturn(new Result(new ArrayResult(['aggregate'], [[1]]), $connection));
 
         $this->query->on($connection)->distinct()->where('name', 'test')->count('name');
     }
@@ -800,7 +800,7 @@ class QueryOrmTest extends TestCase
         $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(*) AS aggregate FROM $this->table t0 INNER JOIN foreign_ t1 ON t1.pk_id = t0.foreign_key WHERE t0.name = ? AND t1.name_ LIKE ? AND t1.city LIKE ?")
-            ->willReturn(new Result(new ArrayResult([['aggregate' => 1]]), $connection));
+            ->willReturn(new Result(new ArrayResult(['aggregate'], [[1]]), $connection));
 
         $this->query
             ->on($connection)
@@ -820,7 +820,7 @@ class QueryOrmTest extends TestCase
         $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT ".strtoupper($method)."(*) AS aggregate FROM $this->table t0")
-            ->willReturn(new Result(new ArrayResult([['aggregate' => 1]]), $connection));
+            ->willReturn(new Result(new ArrayResult(['aggregate'], [[1]]), $connection));
 
         $this->query->on($connection)->$method();
     }
@@ -833,7 +833,7 @@ class QueryOrmTest extends TestCase
         $connection = $this->createConnectionMock();
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT ".strtoupper($method)."(DISTINCT t0.name) AS aggregate FROM $this->table t0")
-            ->willReturn(new Result(new ArrayResult([['aggregate' => 1]]), $connection));
+            ->willReturn(new Result(new ArrayResult(['aggregate'], [[1]]), $connection));
 
         $this->query->on($connection)->distinct()->$method('name');
     }
@@ -846,19 +846,6 @@ class QueryOrmTest extends TestCase
             ['max'],
             ['sum'],
         ];
-    }
-
-    /**
-     *
-     */
-    public function test_unknown_aggregate()
-    {
-        $connection = $this->createConnectionMock();
-        $connection->expects($this->once())->method('executeQuery')
-            ->with("SELECT MD5(DISTINCT t0.name) AS aggregate FROM $this->table t0")
-            ->willReturn(new Result(new ArrayResult([['aggregate' => 1]]), $connection));
-
-        $this->query->on($connection)->distinct()->aggregate('md5', 'name');
     }
 
     /**

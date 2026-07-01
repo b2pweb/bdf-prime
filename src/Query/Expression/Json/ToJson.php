@@ -11,7 +11,7 @@ use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\MariaDBPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use LogicException;
 
 use function array_is_list;
@@ -52,7 +52,7 @@ final class ToJson extends AbstractPlatformSpecificExpression
     /**
      * {@inheritdoc}
      */
-    protected function buildForSqlite(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, SqlitePlatform $grammar): string
+    protected function buildForSqlite(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, SQLitePlatform $grammar): string
     {
         if (!$compiler instanceof QuoteCompilerInterface) {
             throw new LogicException('ToJson expression is not supported by the current compiler');

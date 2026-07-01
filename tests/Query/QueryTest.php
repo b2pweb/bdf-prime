@@ -21,6 +21,7 @@ use Bdf\Prime\Record\Field;
 use Bdf\Prime\Types\TypeInterface;
 use DateTime;
 use Doctrine\DBAL\Cache\ArrayResult;
+use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Result;
 use PHPUnit\Framework\TestCase;
 use Traversable;
@@ -1069,7 +1070,7 @@ class QueryTest extends TestCase
     {
         Prime::service()->connections()->declareConnection('mysql', ['adapter' => 'mysql', 'serverVersion' => '5.6']);
 
-        $query = Prime::connection('mysql')->from('test_')->lock(2);
+        $query = Prime::connection('mysql')->from('test_')->lock(LockMode::PESSIMISTIC_READ);
         $this->assertEquals("SELECT * FROM test_ LOCK IN SHARE MODE", $query->toSql());
 
         Prime::service()->connections()->removeConnection('mysql');
@@ -1093,7 +1094,7 @@ class QueryTest extends TestCase
         $connection->expects($this->any())->method('factory')->willReturn($mysql->factory());
         $connection->expects($this->once())->method('executeQuery')
             ->with("SELECT COUNT(*) AS aggregate FROM test_")
-            ->will($this->returnValue(new Result(new ArrayResult([['aggregate' => 1]]), $connection)));
+            ->will($this->returnValue(new Result(new ArrayResult(['aggregate'], [[1]]), $connection)));
 
         $query = new Query($connection);
         $query->from('test_')->lock()->count();
@@ -1111,7 +1112,7 @@ class QueryTest extends TestCase
 
         $query->lock();
         $this->assertTrue($query->isLocked());
-        $this->assertFalse($query->isLocked(2));
+        $this->assertFalse($query->isLocked(LockMode::PESSIMISTIC_READ));
     }
 
     /**

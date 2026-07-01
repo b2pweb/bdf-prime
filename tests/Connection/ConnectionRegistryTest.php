@@ -34,7 +34,7 @@ class ConnectionRegistryTest extends TestCase
 
         $connection = $registry->getConnection('test');
         
-        $this->assertEquals('sqlite', $connection->getDatabasePlatform()->getName());
+        $this->assertEquals('sqlite', $connection->platform()->name());
     }
 
     /**
@@ -132,7 +132,7 @@ class ConnectionRegistryTest extends TestCase
     public function test_configuration_resolver()
     {
         $configuration = new Configuration();
-        $configuration->setDisableTypeComments(true);
+        $configuration->setAutoCommit(false);
 
         $resolver = new ConfigurationResolver();
         $resolver->addConfiguration('foo', $configuration);

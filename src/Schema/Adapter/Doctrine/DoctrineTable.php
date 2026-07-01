@@ -44,7 +44,7 @@ final class DoctrineTable implements TableInterface
      */
     public function name(): string
     {
-        return $this->table->getName();
+        return $this->table->getObjectName()->toString();
     }
 
     /**

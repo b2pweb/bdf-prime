@@ -15,6 +15,7 @@ use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\ConnectionManager;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\ServiceLocator;
+use Doctrine\DBAL\ParameterType;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
@@ -78,8 +79,8 @@ class LoggerMiddlewareTest extends TestCase
                 'charset' => 'utf8',
                 'wrapperClass' => 'Bdf\Prime\Connection\SimpleConnection',
             ]]],
-            [LogLevel::DEBUG, '[test] Executing statement: SELECT ? (parameters: {"1":1}, types: {"1":2})', ['connection' => 'test', 'sql' => 'SELECT ?', 'params' => [1 => 1], 'types' => [1 => 2]]],
-            [LogLevel::DEBUG, '[test] Executing statement: SELECT ? (parameters: {"1":2}, types: {"1":2})', ['connection' => 'test', 'sql' => 'SELECT ?', 'params' => [1 => 2], 'types' => [1 => 2]]],
+            [LogLevel::DEBUG, '[test] Executing statement: SELECT ? (parameters: {"1":1}, types: )', ['connection' => 'test', 'sql' => 'SELECT ?', 'params' => [1 => 1], 'types' => [1 => ParameterType::STRING]]],
+            [LogLevel::DEBUG, '[test] Executing statement: SELECT ? (parameters: {"1":2}, types: )', ['connection' => 'test', 'sql' => 'SELECT ?', 'params' => [1 => 2], 'types' => [1 => ParameterType::STRING]]],
             [LogLevel::INFO, '[test] Disconnecting', ['connection' => 'test']],
         );
         $stmt = $this->connection->prepare('SELECT ?');
