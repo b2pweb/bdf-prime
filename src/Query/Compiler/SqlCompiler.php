@@ -13,8 +13,7 @@ use Bdf\Prime\Query\Query;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\SqlQueryInterface;
 use Bdf\Prime\Types\TypeInterface;
-use Doctrine\DBAL\LockMode;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use UnexpectedValueException;
 
@@ -77,7 +76,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
         $query->state()->currentPart = 0;
 
         if ($query->statements['ignore'] && $this->platform()->grammar()->getReservedKeywordsList()->isKeyword('IGNORE')) {
-            if ($this->platform()->grammar() instanceof SqlitePlatform) {
+            if ($this->platform()->grammar() instanceof SQLitePlatform) {
                 $insert = 'INSERT OR IGNORE INTO ';
             } else {
                 $insert = 'INSERT IGNORE INTO ';

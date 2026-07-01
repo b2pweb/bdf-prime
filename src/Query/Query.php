@@ -22,6 +22,7 @@ use Bdf\Prime\Query\Extension\LockableTrait;
 use Bdf\Prime\Query\Extension\OrderableTrait;
 use Bdf\Prime\Query\Extension\PaginableTrait;
 use Bdf\Prime\Query\Extension\SimpleJoinTrait;
+use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use Stringable;
 
@@ -54,7 +55,7 @@ use Stringable;
  *     limit: int|null,
  *     offset: int|null,
  *     aggregate: array|null,
- *     lock: int|null,
+ *     lock: LockMode|null,
  *     ...
  * } $statements
  */
@@ -118,9 +119,9 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     /**
      * {@inheritdoc}
      */
-    public function quote($value, ?int $type = null): string
+    public function quote($value): string
     {
-        return $this->connection->quote($value, $type);
+        return $this->connection->quote($value);
     }
 
     /**

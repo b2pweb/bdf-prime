@@ -129,7 +129,7 @@ final class MultiResult implements IteratorAggregate, DriverResult
         $count = 0;
 
         foreach ($this->results as $statement) {
-            $count += $statement->rowCount();
+            $count += (int) $statement->rowCount();
         }
 
         return $count;

@@ -8,7 +8,7 @@ use Bdf\Prime\Platform\Sql\SqlPlatformOperationInterface;
 use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Override;
 
 /**
@@ -18,7 +18,8 @@ final readonly class ForUpdate implements SqlPlatformOperationInterface
 {
     public function __construct(
         private LockMode $lock,
-    ) {}
+    ) {
+    }
 
     #[Override]
     public function onUnknownPlatform(PlatformInterface $platform, object $grammar): string
@@ -47,7 +48,7 @@ final readonly class ForUpdate implements SqlPlatformOperationInterface
     }
 
     #[Override]
-    public function onSqlitePlatform(SqlPlatform $platform, SqlitePlatform $grammar): string
+    public function onSqlitePlatform(SqlPlatform $platform, SQLitePlatform $grammar): string
     {
         return '';
     }

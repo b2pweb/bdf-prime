@@ -374,7 +374,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
         try {
             $result = $isRead
                 ? new DoctrineResultSet($statement->executeQuery())
-                : new UpdateResultSet($statement->executeStatement())
+                : new UpdateResultSet((int) $statement->executeStatement())
             ;
         } catch (DoctrineDBALException $exception) {
             // Prepared query on SQLite for PHP < 7.2 invalidates the query when schema change
@@ -383,7 +383,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
                 $statement = Binder::bindValues($query->compile(true), $query);
                 $result = $isRead
                     ? new DoctrineResultSet($statement->executeQuery())
-                    : new UpdateResultSet($statement->executeStatement())
+                    : new UpdateResultSet((int) $statement->executeStatement())
                 ;
             } elseif ($this->causedByLostConnection($exception->getPrevious())) { // If the connection is lost, the query must be recompiled
                 $this->close();
@@ -392,7 +392,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
                 $statement = Binder::bindValues($query->compile(true), $query);
                 $result = $isRead
                     ? new DoctrineResultSet($statement->executeQuery())
-                    : new UpdateResultSet($statement->executeStatement())
+                    : new UpdateResultSet((int) $statement->executeStatement())
                 ;
             } else {
                 throw $exception;

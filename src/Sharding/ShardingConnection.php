@@ -109,9 +109,8 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      * @param array                              $params       The connection parameters.
      * @param \Doctrine\DBAL\Driver              $driver       The driver to use.
      * @param \Doctrine\DBAL\Configuration|null  $config       The configuration, optional.
-     * @param \Doctrine\Common\EventManager|null $eventManager The event manager, optional.
      */
-    public function __construct(array $params, Driver $driver, ?Configuration $config = null, ?EventManager $eventManager = null)
+    public function __construct(array $params, Driver $driver, ?Configuration $config = null)
     {
         if (!isset($params['shard_connections'])) {
             throw new LogicException('Sharding connection needs "shard_connections" configuration in parameters');
@@ -124,7 +123,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
         $this->shardChoser = $params['shardChoser'] ?? new ModuloChoser();
         $this->connections = $params['shard_connections'];
 
-        parent::__construct($params, $driver, $config, $eventManager);
+        parent::__construct($params, $driver, $config);
 
         /** @var DefaultQueryFactory $queryFactory */
         $queryFactory = $this->factory();
@@ -133,14 +132,6 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
         $queryFactory->alias(InsertQueryInterface::class, ShardingInsertQuery::class);
         /** @psalm-suppress InvalidArgument */
         $queryFactory->alias(KeyValueQueryInterface::class, ShardingKeyValueQuery::class);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDatabase(): ?string
-    {
-        return '';
     }
 
     /**
@@ -411,10 +402,10 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     public function lastInsertId($name = null): string|int
     {
         if ($this->isUsingShard()) {
-            return $this->getSelectedShard()->lastInsertId($name);
+            return $this->getSelectedShard()->lastInsertId();
         }
 
         // TODO doit on lever une exception ?
-        return parent::lastInsertId($name);
+        return parent::lastInsertId();
     }
 }

@@ -11,8 +11,7 @@ use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
-use LogicException;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 
 use function get_class;
 
@@ -76,11 +75,11 @@ abstract class AbstractPlatformSpecificExpression implements ExpressionInterface
      * @param Q $query
      * @param CompilerInterface $compiler
      * @param SqlPlatform $platform
-     * @param SqlitePlatform $grammar
+     * @param SQLitePlatform $grammar
      *
      * @return string
      */
-    protected function buildForSqlite(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, SqlitePlatform $grammar): string
+    protected function buildForSqlite(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, SQLitePlatform $grammar): string
     {
         return $this->buildForGenericSql($query, $compiler, $platform, $grammar);
     }
@@ -134,7 +133,7 @@ abstract class AbstractPlatformSpecificExpression implements ExpressionInterface
     /**
      * {@inheritdoc}
      */
-    final public function onSqlitePlatform(SqlPlatform $platform, SqlitePlatform $grammar)
+    final public function onSqlitePlatform(SqlPlatform $platform, SQLitePlatform $grammar)
     {
         return $this->buildForSqlite($this->query, $this->compiler, $platform, $grammar);
     }

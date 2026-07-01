@@ -43,6 +43,7 @@ final class ColumnTransformer
      */
     public function toDoctrine()
     {
+        /** @psalm-suppress InternalMethod */
         $column = new Column(
             $this->column->name(),
             Type::getType(

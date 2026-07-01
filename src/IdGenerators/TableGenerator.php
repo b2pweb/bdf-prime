@@ -11,7 +11,7 @@ use Bdf\Prime\Platform\Sql\SqlPlatformOperationTrait;
 use Bdf\Prime\ServiceLocator;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use LogicException;
 
 use function get_class;
@@ -89,7 +89,7 @@ class TableGenerator extends AbstractGenerator
                 return (string) $this->connection->lastInsertId();
             }
 
-            public function onSqlitePlatform(SqlPlatform $platform, SqlitePlatform $grammar): string
+            public function onSqlitePlatform(SqlPlatform $platform, SQLitePlatform $grammar): string
             {
                 $this->connection->executeStatement('UPDATE '.$this->table.' SET '.$this->column.' = '.$this->column.'+1');
                 return (string) $this->connection->executeQuery('SELECT '.$this->column.' FROM '.$this->table)->fetchOne();

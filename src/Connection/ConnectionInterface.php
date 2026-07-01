@@ -158,7 +158,8 @@ interface ConnectionInterface
      *     dbname?: string,
      *     path?: string,
      *     memory?: bool,
-     *     ignore?: bool
+     *     ignore?: bool,
+     *     ...array<string, mixed>
      * }
      *
      * @todo Uncomment in prime 3.0

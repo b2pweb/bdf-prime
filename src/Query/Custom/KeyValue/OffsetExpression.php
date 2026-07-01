@@ -7,7 +7,7 @@ use Bdf\Prime\Platform\Sql\SqlPlatformOperationInterface;
 use Bdf\Prime\Platform\Sql\SqlPlatformOperationTrait;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 
 /**
  * Generate the OFFSET expression (without LIMIT)
@@ -32,7 +32,7 @@ final class OffsetExpression implements SqlPlatformOperationInterface
     /**
      * {@inheritdoc}
      */
-    public function onSqlitePlatform(SqlPlatform $platform, SqlitePlatform $grammar): string
+    public function onSqlitePlatform(SqlPlatform $platform, SQLitePlatform $grammar): string
     {
         return ' LIMIT -1 OFFSET '.$this->offset;
     }

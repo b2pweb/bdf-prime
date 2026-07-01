@@ -10,7 +10,8 @@ final readonly class DebugStackMiddleware implements Middleware
 {
     public function __construct(
         private DebugStack $debugStack,
-    ) {}
+    ) {
+    }
 
     #[Override]
     public function wrap(Driver $driver): Driver

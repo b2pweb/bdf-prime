@@ -43,6 +43,7 @@ class Comparator extends BaseComparator
         $diff = parent::compareTables($oldTable, $newTable);
 
         if (!$this->listDropColumn) {
+            /** @psalm-suppress InternalMethod */
             $diff = new TableDiff(
                 $oldTable,
                 addedColumns: $diff->getAddedColumns(),

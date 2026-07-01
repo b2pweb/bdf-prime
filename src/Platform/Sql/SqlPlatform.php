@@ -21,7 +21,7 @@ use Bdf\Prime\Types\TypeInterface;
 use Bdf\Prime\Types\TypesRegistryInterface;
 use Doctrine\DBAL\Platforms\AbstractMySQLPlatform;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 
 /**
  * Base class for SQL platforms
@@ -79,16 +79,11 @@ class SqlPlatform implements PlatformInterface
      */
     public function name(): string
     {
-        switch (true) {
-            case $this->grammar instanceof AbstractMySQLPlatform:
-                return 'mysql';
-
-            case $this->grammar instanceof SqlitePlatform:
-                return 'sqlite';
-
-            default:
-                return 'generic_sql';
-        }
+        return match (true) {
+            $this->grammar instanceof AbstractMySQLPlatform => 'mysql',
+            $this->grammar instanceof SQLitePlatform => 'sqlite',
+            default => 'generic_sql',
+        };
     }
 
     /**
@@ -121,7 +116,7 @@ class SqlPlatform implements PlatformInterface
         switch (true) {
             case $grammar instanceof AbstractMySQLPlatform:
                 return $operation->onMysqlPlatform($this, $grammar);
-            case $grammar instanceof SqlitePlatform:
+            case $grammar instanceof SQLitePlatform:
                 return $operation->onSqlitePlatform($this, $grammar);
             default:
                 return $operation->onGenericSqlPlatform($this, $grammar);

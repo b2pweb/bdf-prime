@@ -9,7 +9,7 @@ use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 use Bdf\Prime\Query\Expression\AbstractPlatformSpecificExpression;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use LogicException;
 
 /**
@@ -44,7 +44,7 @@ final class JsonContainsPath extends AbstractPlatformSpecificExpression
         $this->path = $path;
     }
 
-    protected function buildForSqlite(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, SqlitePlatform $grammar): string
+    protected function buildForSqlite(CompilableClause $query, CompilerInterface $compiler, SqlPlatform $platform, SQLitePlatform $grammar): string
     {
         if (!$compiler instanceof QuoteCompilerInterface) {
             throw new LogicException('JsonContainsPath expression is not supported by the current compiler');

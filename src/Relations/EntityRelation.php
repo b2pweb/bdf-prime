@@ -90,12 +90,7 @@ class EntityRelation
     public function proxy(): object
     {
         $r = new ReflectionClass($this->relation->relationRepository()->entityClass());
-
-        if (!method_exists($r, 'newLazyProxy')) {
-            throw new Error(sprintf('Cannot use method %s: PHP 8.4 is required for create a proxy object.', __METHOD__));
-        }
-
-        return $r->newLazyProxy(fn () => $this->query()->first());
+        return $r->newLazyProxy(fn () => $this->query()->firstOrFail());
     }
 
     /**

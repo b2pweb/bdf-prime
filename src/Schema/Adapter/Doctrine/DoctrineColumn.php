@@ -41,7 +41,7 @@ final class DoctrineColumn implements ColumnInterface
      */
     public function name(): string
     {
-        return $this->column->getName();
+        return $this->column->getObjectName()->toString();
     }
 
     /**
