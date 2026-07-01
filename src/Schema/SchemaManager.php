@@ -12,8 +12,6 @@ use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\SchemaDiff as DoctrineSchemaDiff;
 use Doctrine\DBAL\Schema\Table as DoctrineTable;
 
-use function var_dump;
-
 /**
  * SchemaManager using doctrine schemas
  *

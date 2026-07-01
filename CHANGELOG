@@ -1,3 +1,32 @@
+v3.0.0
+------
+
+* Change: Minimum PHP version is now 8.4
+* Change: Minimum version of doctrine/dbal is now 4.0
+* Add: `Bdf\Prime\Connection\Middleware\DebugStack\DebugStackMiddleware` in replacement of doctrine's `DebugStack` for query logging and debugging
+* Change: `Bdf\Prime\Prime::configure()` now can take the `middlewares` option to defined middlewares on all connections.
+
+BC Breaks:
+* Remove: `Bdf\Prime\Visitor` package, with mapper and graphviz visitors without replacements
+* Remove: `Bdf\Prime\Console\GraphCommand` and `Bdf\Prime\Console\MapperCommand` commands, without replacements
+* Remove: `Bdf\Prime\Logger\PsrDecorator`, replace by `Bdf\Prime\Connection\Middleware\LoggerMiddleware`
+* Remove: doctrine event manager from connection
+* Remove: `Bdf\Prime\Connection\Event\ConnectionClosedListenerInterface`
+* Remove: logger option on `Bdf\Prime\Configuration`. Use `Bdf\Prime\Connection\Middleware\LoggerMiddleware` instead.
+* Remove: methods on `Bdf\Prime\Connection\SimpleConnection` and its children, due to doctrine DBAL update: (non exhaustive list)
+    * getWrappedConnection()
+    * exec()
+    * query()
+    * executeUpdate()
+    * getEventManager()
+* Change: $type parameter on `Bdf\Prime\SqlQueryInterface::quote()` and its implementations is removed. Only string is supported now.
+* Change: Introduce methods on interface that has been soft-added in previous versions:
+    * `Bdf\Prime\Connection\ConnectionInterface::getParameters()`
+    * `Bdf\Prime\Connection\ConnectionInterface::addConnectionClosedListener()`
+    * `Bdf\Prime\Platform\PlatformInterface::apply()`
+* Change: use `LockMode` enum instead of int constant on `Bdf\Prime\Query\Contract\Lockable` methods
+* Change: `Bdf\Prime\Connection\ShardingConnection::getDatabase()` now return the database name of the default connection instead of empty string
+
 v2.3.0
 ------
 

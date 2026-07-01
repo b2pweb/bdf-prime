@@ -161,8 +161,6 @@ interface ConnectionInterface
      *     ignore?: bool,
      *     ...array<string, mixed>
      * }
-     *
-     * @todo Uncomment in prime 3.0
      */
     public function getParameters(): array;
 

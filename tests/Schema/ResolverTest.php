@@ -14,8 +14,6 @@ use Bdf\Prime\Types\TypeInterface;
 use Bdf\Prime\User;
 use PHPUnit\Framework\TestCase;
 
-use function var_dump;
-
 /**
  *
  */
