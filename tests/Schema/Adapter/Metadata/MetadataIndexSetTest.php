@@ -80,6 +80,32 @@ class MetadataIndexSetTest extends TestCase
     /**
      *
      */
+    public function test_secondaries()
+    {
+        $all = $this->indexSet->secondaries();
+
+        $this->assertCount(3, $all);
+
+        $this->assertContainsOnly(IndexInterface::class, $all);
+
+        $found = false;
+
+        foreach ($all as $index) {
+            if ($index->fields() == ['address_', 'zip_code']) {
+                $found = true;
+
+                $this->assertFalse($index->unique());
+                $this->assertEquals(0, $index->type());
+            }
+        }
+
+        $this->assertTrue($found);
+        $this->assertNotContains($this->indexSet->primary(), $all);
+    }
+
+    /**
+     *
+     */
     public function test_unamed_indexes()
     {
         $all = $this->indexSet->all();

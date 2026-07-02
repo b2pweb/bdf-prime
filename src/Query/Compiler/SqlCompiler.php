@@ -17,6 +17,9 @@ use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use UnexpectedValueException;
 
+use function array_map;
+use function explode;
+use function implode;
 use function is_string;
 use function sprintf;
 use function trigger_error;
@@ -47,25 +50,33 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
             return $column;
         }
 
-        return $this->platform()->grammar()->quoteIdentifier($column);
+        $grammar = $this->platform()->grammar();
+
+        if (str_contains($column, '.')) {
+            $parts = array_map($grammar->quoteSingleIdentifier(...), explode('.', $column));
+
+            return implode('.', $parts);
+        }
+
+        return $grammar->quoteSingleIdentifier($column);
     }
 
     /**
      * Quote a identifier on multiple columns
      *
      * @param SqlQueryInterface&CompilableClause $query
-     * @param array $columns
+     * @param string[] $columns
      *
-     * @return array
+     * @return string[]
      * @throws PrimeException
      */
-    public function quoteIdentifiers(CompilableClause $query, array $columns)
+    public function quoteIdentifiers(CompilableClause $query, array $columns): array
     {
         if (!$query->isQuoteIdentifier()) {
             return $columns;
         }
 
-        return array_map([$this->platform()->grammar(), 'quoteIdentifier'], $columns);
+        return array_map(fn (string $column) => $this->quoteIdentifier($query, $column), $columns);
     }
 
     /**
@@ -75,13 +86,13 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
     {
         $query->state()->currentPart = 0;
 
-        if ($query->statements['ignore'] && $this->platform()->grammar()->getReservedKeywordsList()->isKeyword('IGNORE')) {
+        if ($query->statements['ignore']) {
             if ($this->platform()->grammar() instanceof SQLitePlatform) {
                 $insert = 'INSERT OR IGNORE INTO ';
             } else {
                 $insert = 'INSERT IGNORE INTO ';
             }
-        } elseif ($query->statements['replace'] && $this->platform()->grammar()->getReservedKeywordsList()->isKeyword('REPLACE')) {
+        } elseif ($query->statements['replace']) {
             $insert = 'REPLACE INTO ';
         } else {
             $insert = 'INSERT INTO ';
@@ -347,7 +358,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
             return 'SELECT '.$this->compileAggregate($query, $query->statements['aggregate'][0], $query->statements['aggregate'][1], $query->statements['distinct']);
         }
 
-        if ($query->statements['distinct'] && $this->platform()->grammar()->getReservedKeywordsList()->isKeyword('DISTINCT')) {
+        if ($query->statements['distinct']) {
             $select = 'SELECT DISTINCT ';
         } else {
             $select = 'SELECT ';
@@ -389,7 +400,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
             $column = $query->preprocessor()->field($column);
             $column = $this->quoteIdentifier($query, $column);
 
-            if ($distinct && $this->platform()->grammar()->getReservedKeywordsList()->isKeyword('DISTINCT')) {
+            if ($distinct) {
                 // Le count ne compte pas les fields qui ont une valeur NULL.
                 // Pour une pagination, il est important de compter les valeurs null sachant qu'elles seront sélectionnées.
                 // La pagination utilise une column que pour le distinct.

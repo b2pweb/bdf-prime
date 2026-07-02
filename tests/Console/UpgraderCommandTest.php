@@ -272,7 +272,7 @@ PHP, file_get_contents($files[0])
     public function test_execute_with_and_without_useDrop()
     {
         $this->prime()->connection()->schema()->table('person', function (TypesHelperTableBuilder $builder) {
-            $builder->integer('id')->autoincrement();
+            $builder->integer('id')->primary()->autoincrement();
             $builder->string('foo');
             $builder->string('firstName');
             $builder->string('lastName');

@@ -50,7 +50,6 @@ class Comparator extends BaseComparator
                 changedColumns: $diff->getChangedColumns(),
                 droppedColumns: [],
                 addedIndexes: $diff->getAddedIndexes(),
-                modifiedIndexes: $diff->getModifiedIndexes(),
                 droppedIndexes: $diff->getDroppedIndexes(),
                 renamedIndexes: $diff->getRenamedIndexes(),
             );

@@ -354,7 +354,6 @@ class TestPack
     {
         foreach ($this->getActiveConnections() as $connection) {
             try {
-                $connection->setNestTransactionsWithSavepoints(true);
                 $connection->beginTransaction();
             } catch (\Exception $e) {
             }

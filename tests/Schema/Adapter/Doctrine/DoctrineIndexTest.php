@@ -16,7 +16,7 @@ class DoctrineIndexTest extends TestCase
      */
     public function test_simple()
     {
-        $index = new DoctrineIndex(new Index('name', ['col1', 'col2']));
+        $index = new DoctrineIndex(new Index('name', ['col1', 'col2']), false);
 
         $this->assertEquals('name', $index->name());
         $this->assertEquals(['col1', 'col2'], $index->fields());
@@ -31,7 +31,7 @@ class DoctrineIndexTest extends TestCase
      */
     public function test_unique()
     {
-        $index = new DoctrineIndex(new Index('name', ['col1'], true));
+        $index = new DoctrineIndex(new Index('name', ['col1'], true), false);
 
         $this->assertEquals('name', $index->name());
         $this->assertEquals(['col1'], $index->fields());
@@ -46,7 +46,7 @@ class DoctrineIndexTest extends TestCase
      */
     public function test_primary()
     {
-        $index = new DoctrineIndex(new Index('name', ['col1'], true, true));
+        $index = new DoctrineIndex(new Index('name', ['col1'], true, true), true);
 
         $this->assertEquals('name', $index->name());
         $this->assertEquals(['col1'], $index->fields());
@@ -61,7 +61,7 @@ class DoctrineIndexTest extends TestCase
      */
     public function test_options()
     {
-        $index = new DoctrineIndex(new Index('name', ['col1'], true, true, ['fulltext'], ['lengths' => [12]]));
+        $index = new DoctrineIndex(new Index('name', ['col1'], false, false, ['fulltext'], ['lengths' => [12]]), false);
 
         $this->assertSame([
             'lengths'  => [12],
@@ -74,12 +74,12 @@ class DoctrineIndexTest extends TestCase
      */
     public function test_fieldOptions()
     {
-        $index = new DoctrineIndex(new Index('name', ['col1', 'col2'], true, true, ['fulltext'], ['lengths' => [12]]));
+        $index = new DoctrineIndex(new Index('name', ['col1', 'col2'], false, false, ['fulltext'], ['lengths' => [12]]), false);
 
         $this->assertSame(['length'  => 12], $index->fieldOptions('col1'));
         $this->assertSame([], $index->fieldOptions('col2'));
 
-        $index = new DoctrineIndex(new Index('name', ['col1', 'col2'], true, true));
+        $index = new DoctrineIndex(new Index('name', ['col1', 'col2'], true, false));
         $this->assertSame([], $index->fieldOptions('col1'));
     }
 }

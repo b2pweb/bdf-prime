@@ -5,6 +5,8 @@ namespace Bdf\Prime\Schema\Bag;
 use Bdf\Prime\Schema\IndexInterface;
 use Bdf\Prime\Schema\IndexSetInterface;
 
+use function array_filter;
+
 /**
  * Index set class
  * An index set represents a set of index, with a primary key
@@ -52,6 +54,14 @@ final class IndexSet implements IndexSetInterface
     public function all(): array
     {
         return $this->indexes;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function secondaries(): array
+    {
+        return array_filter($this->indexes, static fn (IndexInterface $index) => !$index->primary());
     }
 
     /**

@@ -2,36 +2,34 @@
 
 namespace Bdf\Prime\Schema\Transformer\Doctrine;
 
+use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\Schema\IndexInterface;
 use Doctrine\DBAL\Schema\Index;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
+
+use function in_array;
+use function trigger_error;
 
 /**
  * Transform Index to doctrine
  */
 final class IndexTransformer
 {
-    /**
-     * @var IndexInterface
-     */
-    private $index;
-
-
-    /**
-     * IndexTransformer constructor.
-     *
-     * @param IndexInterface $index
-     */
-    public function __construct(IndexInterface $index)
-    {
-        $this->index = $index;
+    public function __construct(
+        private readonly IndexInterface $index,
+    ) {
     }
 
     /**
      * @return Index
      */
-    public function toDoctrine()
+    public function toDoctrine(): Index
     {
+        if ($this->index->primary()) {
+            @trigger_error(sprintf('Calling %s() on a primary index is deprecated. Use %s() instead.', __METHOD__, self::class.'::toDoctrinePrimaryKey'), E_USER_DEPRECATED);
+        }
+
         /** @psalm-suppress InternalMethod */
         return new Index(
             $this->index->name(),
@@ -44,11 +42,35 @@ final class IndexTransformer
     }
 
     /**
+     * Transform the index as doctrine primary key
+     */
+    public function toDoctrinePrimaryKey(): PrimaryKeyConstraint
+    {
+        if (!$this->index->primary()) {
+            throw new DBALException('The given index is not a primary key');
+        }
+
+        $editor = PrimaryKeyConstraint::editor()
+            ->setUnquotedColumnNames(...$this->index->fields())
+        ;
+
+        if ($this->index->name() !== null) {
+            $editor->setUnquotedName($this->index->name());
+        }
+
+        if (in_array('nonclustered', $this->extractFlags())) {
+            $editor->setIsClustered(false);
+        }
+
+        return $editor->create();
+    }
+
+    /**
      * Extract the index flags (boolean option)
      *
      * @return array
      */
-    private function extractFlags()
+    private function extractFlags(): array
     {
         $flags = [];
 
@@ -66,7 +88,7 @@ final class IndexTransformer
      *
      * @return array
      */
-    private function extractOptions()
+    private function extractOptions(): array
     {
         $options = $this->index->options();
 
@@ -89,7 +111,7 @@ final class IndexTransformer
      *
      * @return array|null The option, or null if not provided
      */
-    private function extractFieldsLengths()
+    private function extractFieldsLengths(): ?array
     {
         $lengths = [];
         $found = false;

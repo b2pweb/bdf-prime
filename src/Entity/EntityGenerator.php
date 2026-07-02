@@ -22,6 +22,8 @@ use Nette\PhpGenerator\PromotedParameter;
 use Nette\PhpGenerator\Property;
 use Nette\PhpGenerator\TraitUse;
 
+use Nette\PhpGenerator\Visibility;
+
 use function array_map;
 use function class_exists;
 
@@ -52,12 +54,12 @@ class EntityGenerator
     /**
      * Specifies class fields should be protected.
      */
-    public const FIELD_VISIBLE_PROTECTED = ClassType::VisibilityProtected;
+    public const FIELD_VISIBLE_PROTECTED = Visibility::Protected;
 
     /**
      * Specifies class fields should be private.
      */
-    public const FIELD_VISIBLE_PRIVATE = ClassType::VisibilityPrivate;
+    public const FIELD_VISIBLE_PRIVATE = Visibility::Private;
 
     /**
      * The prime service locator

@@ -187,7 +187,7 @@ class SchemaManagerTest extends TestCase
     {
         $this->schema->table('table_with_boolean', function (TypesHelperTableBuilder $builder) {
             $builder
-                ->integer('id')->autoincrement()
+                ->integer('id')->primary()->autoincrement()
                 ->boolean('value', false)
             ;
         });
@@ -196,7 +196,7 @@ class SchemaManagerTest extends TestCase
 
         $schema->change('table_with_boolean', function (TypesHelperTableBuilder $builder) {
             $builder
-                ->integer('id')->autoincrement()
+                ->integer('id')->primary()->autoincrement()
                 ->boolean('value', false)
             ;
         });

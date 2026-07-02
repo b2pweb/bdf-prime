@@ -1055,7 +1055,7 @@ class QueryTest extends TestCase
     public function test_write_lock()
     {
         // Set server version to ensure that no connection will be created for detecting the version
-        Prime::service()->connections()->declareConnection('mysql', ['adapter' => 'mysql', 'serverVersion' => '5.6']);
+        Prime::service()->connections()->declareConnection('mysql', ['adapter' => 'mysql', 'serverVersion' => '8.1']);
 
         $query = Prime::connection('mysql')->from('test_')->lock();
         $this->assertEquals("SELECT * FROM test_ FOR UPDATE", $query->toSql());
@@ -1068,7 +1068,7 @@ class QueryTest extends TestCase
      */
     public function test_read_lock()
     {
-        Prime::service()->connections()->declareConnection('mysql', ['adapter' => 'mysql', 'serverVersion' => '5.6']);
+        Prime::service()->connections()->declareConnection('mysql', ['adapter' => 'mysql', 'serverVersion' => '8.1']);
 
         $query = Prime::connection('mysql')->from('test_')->lock(LockMode::PESSIMISTIC_READ);
         $this->assertEquals("SELECT * FROM test_ LOCK IN SHARE MODE", $query->toSql());
@@ -1081,7 +1081,7 @@ class QueryTest extends TestCase
      */
     public function test_no_lock_on_aggregate()
     {
-        Prime::service()->connections()->declareConnection('mysql', ['adapter' => 'mysql', 'serverVersion' => '5.6']);
+        Prime::service()->connections()->declareConnection('mysql', ['adapter' => 'mysql', 'serverVersion' => '8.1']);
         $mysql = Prime::service()->connections()->getConnection('mysql');
 
         $connection = $this->getMockBuilder(SimpleConnection::class)

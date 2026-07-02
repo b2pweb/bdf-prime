@@ -9,7 +9,11 @@ use Bdf\Prime\Schema\ConstraintSetInterface;
 use Bdf\Prime\Schema\IndexSetInterface;
 use Bdf\Prime\Schema\TableInterface;
 use Bdf\Prime\Types\TypesRegistryInterface;
+use Doctrine\DBAL\Schema\Index\IndexedColumn;
+use Doctrine\DBAL\Schema\Index\IndexType;
 use Doctrine\DBAL\Schema\Table;
+
+use function array_map;
 
 /**
  * Adapt doctrine table to prime table
@@ -73,17 +77,17 @@ final class DoctrineTable implements TableInterface
     /**
      * Get the primary key index of the table
      *
-     * @return DoctrineIndex|null The index, or null if the table has no primary key
+     * @return DoctrinePrimaryKeyIndex|null The index, or null if the table has no primary key
      */
-    public function primary(): ?DoctrineIndex
+    public function primary(): ?DoctrinePrimaryKeyIndex
     {
-        $primary = $this->table->getPrimaryKey();
+        $primary = $this->table->getPrimaryKeyConstraint();
 
         if ($primary === null) {
             return null;
         }
 
-        return new DoctrineIndex($primary);
+        return new DoctrinePrimaryKeyIndex($primary);
     }
 
     /**
@@ -91,12 +95,27 @@ final class DoctrineTable implements TableInterface
      */
     public function indexes(): IndexSetInterface
     {
-        return new IndexSet(
-            array_map(
-                static fn ($index) => new DoctrineIndex($index),
-                $this->table->getIndexes()
-            )
-        );
+        $pk = $this->primary();
+        $indexes = [];
+
+        if ($pk !== null) {
+            $indexes[] = $pk;
+        }
+
+        foreach ($this->table->getIndexes() as $index) {
+            // Doctrine 4 register the primary key as index, so we skip it without using any deprecated methods (isPrimary is deprecated)
+            if (
+                $pk !== null
+                && $index->getType() === IndexType::UNIQUE
+                && array_map(static fn (IndexedColumn $col) => $col->getColumnName()->toString(), $index->getIndexedColumns()) === $pk->fields()
+            ) {
+                continue;
+            }
+
+            $indexes[] = new DoctrineIndex($index, canBePrimary: false);
+        }
+
+        return new IndexSet($indexes);
     }
 
     /**
