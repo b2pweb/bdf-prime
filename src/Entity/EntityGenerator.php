@@ -9,7 +9,6 @@ use Bdf\Prime\Mapper\Info\PropertyInfo;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\ServiceLocator;
 use Bdf\Prime\Types\PhpTypeInterface;
-use Doctrine\Inflector\Inflector;
 use Doctrine\Inflector\Inflector as InflectorObject;
 use Doctrine\Inflector\InflectorFactory;
 use Nette\PhpGenerator\ClassType;
@@ -21,7 +20,6 @@ use Nette\PhpGenerator\Printer;
 use Nette\PhpGenerator\PromotedParameter;
 use Nette\PhpGenerator\Property;
 use Nette\PhpGenerator\TraitUse;
-
 use Nette\PhpGenerator\Visibility;
 
 use function array_map;

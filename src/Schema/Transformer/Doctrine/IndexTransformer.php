@@ -5,6 +5,7 @@ namespace Bdf\Prime\Schema\Transformer\Doctrine;
 use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\Schema\IndexInterface;
 use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\Index\IndexType;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 
@@ -14,10 +15,10 @@ use function trigger_error;
 /**
  * Transform Index to doctrine
  */
-final class IndexTransformer
+final readonly class IndexTransformer
 {
     public function __construct(
-        private readonly IndexInterface $index,
+        private IndexInterface $index,
     ) {
     }
 
@@ -28,7 +29,54 @@ final class IndexTransformer
     {
         if ($this->index->primary()) {
             @trigger_error(sprintf('Calling %s() on a primary index is deprecated. Use %s() instead.', __METHOD__, self::class.'::toDoctrinePrimaryKey'), E_USER_DEPRECATED);
+
+            // Cannot create a primary index using the new IndexEditor API, so for this case, we use the legacy constructor
+            // @todo delete in prime 4.0
+            /** @psalm-suppress InternalMethod */
+            return new Index(
+                $this->index->name(),
+                $this->index->fields(),
+                $this->index->unique(),
+                $this->index->primary(),
+                $this->extractFlags(),
+                $this->extractOptions()
+            );
         }
+
+        // @todo doctine dbal v4 has a bug on the handling of "length" option. So we must use the legacy constructor for now
+        // $editor = Index::editor()
+        //     ->setType($this->resolveType())
+        // ;
+        //
+        // if ($this->index->name() !== null) {
+        //     $editor->setUnquotedName($this->index->name());
+        // }
+        //
+        // $lengths = $this->index->options()['lengths'] ?? null;
+        //
+        // foreach ($this->index->fields() as $i => $field) {
+        //     $length = $this->index->fieldOptions($field)['length'] ?? null;
+        //
+        //     if ($length === null && $lengths !== null) {
+        //         $length = $lengths[$i] ?? null;
+        //     }
+        //
+        //     // Doctrine 4.4 doesn't provide public interface to define columns with length, so we must use internal constructor
+        //     /** @psalm-suppress InternalMethod */
+        //     $column = new Index\IndexedColumn(UnqualifiedName::unquoted($field), $length);
+        //
+        //     $editor->addColumn($column);
+        // }
+        //
+        // if ($this->index->options()['clustered'] ?? false) {
+        //     $editor->setIsClustered(true);
+        // }
+        //
+        // if (isset($this->index->options()['where'])) {
+        //     $editor->setPredicate($this->index->options()['where']);
+        // }
+        //
+        // return $editor->create();
 
         /** @psalm-suppress InternalMethod */
         return new Index(
@@ -128,5 +176,22 @@ final class IndexTransformer
         }
 
         return $found ? $lengths : null;
+    }
+
+    private function resolveType(): IndexType
+    {
+        if ($this->index->unique()) {
+            return IndexType::UNIQUE;
+        }
+
+        if ($this->index->options()['fulltext'] ?? false) {
+            return IndexType::FULLTEXT;
+        }
+
+        if ($this->index->options()['spatial'] ?? false) {
+            return IndexType::SPATIAL;
+        }
+
+        return IndexType::REGULAR;
     }
 }

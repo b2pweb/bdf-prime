@@ -12,37 +12,17 @@ use Doctrine\DBAL\Schema\Table;
 /**
  * Transform Prime table to doctrine table
  */
-final class TableTransformer
+final readonly class TableTransformer
 {
-    /**
-     * @var TableInterface
-     */
-    private $table;
-
-    /**
-     * @var PlatformInterface
-     */
-    private $platform;
-
-
-    /**
-     * TableTransformer constructor.
-     *
-     * @param TableInterface $table
-     * @param PlatformInterface $platform
-     */
-    public function __construct(TableInterface $table, PlatformInterface $platform)
-    {
-        $this->table = $table;
-        $this->platform = $platform;
+    public function __construct(
+        private TableInterface $table,
+    ) {
     }
 
     /**
      * Get the doctrine table
-     *
-     * @return Table
      */
-    public function toDoctrine()
+    public function toDoctrine(): Table
     {
         if ($this->table instanceof DoctrineTable) {
             return $this->table->toDoctrine();
@@ -54,7 +34,7 @@ final class TableTransformer
         return new Table(
             $this->table->name(),
             array_map(
-                fn (ColumnInterface $column) => new ColumnTransformer($column, $this->platform)->toDoctrine(),
+                static fn (ColumnInterface $column) => new ColumnTransformer($column)->toDoctrine(),
                 $this->table->columns()
             ),
             array_map(
@@ -65,8 +45,7 @@ final class TableTransformer
             options: $this->table->options(),
             primaryKeyConstraint: ($primary = $this->table->indexes()->primary())
                 ? new IndexTransformer($primary)->toDoctrinePrimaryKey()
-                : null
-            ,
+                : null,
         );
     }
 }

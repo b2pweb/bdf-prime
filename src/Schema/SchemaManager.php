@@ -93,7 +93,7 @@ class SchemaManager extends AbstractSchemaManager
 
         $tables = array_map(function ($table) {
             if ($table instanceof TableInterface) {
-                return (new TableTransformer($table, $this->platform))->toDoctrine();
+                return (new TableTransformer($table))->toDoctrine();
             }
 
             return $table;

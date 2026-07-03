@@ -17,7 +17,8 @@ final readonly class DoctrinePrimaryKeyIndex implements IndexInterface
 {
     public function __construct(
         private PrimaryKeyConstraint $index,
-    ) {}
+    ) {
+    }
 
     #[Override]
     public function name(): ?string

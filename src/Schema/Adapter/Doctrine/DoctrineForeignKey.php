@@ -5,7 +5,6 @@ namespace Bdf\Prime\Schema\Adapter\Doctrine;
 use Bdf\Prime\Schema\Constraint\ConstraintVisitorInterface;
 use Bdf\Prime\Schema\Constraint\ForeignKeyInterface;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
-
 use Doctrine\DBAL\Schema\ForeignKeyConstraint\MatchType;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint\ReferentialAction;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;

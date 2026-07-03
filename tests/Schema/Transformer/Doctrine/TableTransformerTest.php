@@ -34,7 +34,7 @@ class TableTransformerTest extends TestCase
         $doctrine = $this->createMock(\Doctrine\DBAL\Schema\Table::class);
         $table = new DoctrineTable($doctrine, new TypesRegistry());
 
-        $this->assertSame($doctrine, (new TableTransformer($table, new DummyPlatform()))->toDoctrine());
+        $this->assertSame($doctrine, (new TableTransformer($table))->toDoctrine());
     }
 
     /**
@@ -55,7 +55,7 @@ class TableTransformerTest extends TestCase
             ])
         );
 
-        $doctrine = (new TableTransformer($table, $platform))->toDoctrine();
+        $doctrine = (new TableTransformer($table))->toDoctrine();
 
         $this->assertInstanceOf(\Doctrine\DBAL\Schema\Table::class, $doctrine);
         $this->assertEquals('table_', $doctrine->getObjectName()->toString());

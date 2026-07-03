@@ -363,8 +363,6 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      *
      * @throws DoctrineDBALException
      * @throws PrimeException
-     *
-     * @psalm-suppress InternalMethod
      */
     protected function executePrepared(Statement $statement, Compilable $query)
     {
@@ -442,9 +440,6 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
 
     /**
      * {@inheritdoc}
-     *
-     * @psalm-suppress DeprecatedProperty
-     * @psalm-suppress DeprecatedClass
      */
     public function close(): void
     {
@@ -466,8 +461,6 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      * @throws DBALException When any other error occurs
      *
      * @template T
-     *
-     * @psalm-suppress InternalMethod
      */
     protected function runOrReconnect(Closure $callback)
     {
@@ -480,7 +473,6 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
                     // Only reconnect the start transaction.
                     // Should raise exception during transaction.
                     $this->close();
-                    /** @psalm-suppress InternalMethod */
                     $this->connect();
 
                     return $callback();
