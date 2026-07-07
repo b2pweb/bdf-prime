@@ -129,7 +129,7 @@ class ExpressionTest extends TestCase
             "SELECT t0.* FROM $this->table t0 WHERE MATCH(t0.name AGAINST('test'))",
 
             $this->query
-            ->where([new Expression\FullTextMatch('name', 'test')])
+            ->whereRaw(new Expression\FullTextMatch('name', 'test'))
             ->toSql()
         );
     }
@@ -143,7 +143,7 @@ class ExpressionTest extends TestCase
             "SELECT t0.* FROM $this->table t0 WHERE MATCH(t0.name AGAINST('test') IN BOOLEAN MODE)",
 
             $this->query
-            ->where([new Expression\FullTextMatch('name', 'test', true)])
+            ->whereRaw(new Expression\FullTextMatch('name', 'test', true))
             ->toSql()
         );
     }

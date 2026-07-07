@@ -522,9 +522,8 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
 
     /**
      * {@inheritdoc}
-     * @todo change column type hint on prime 3.0
      */
-    public function havingNull(/*string|ExpressionInterface*/ $column, string $type = CompositeExpression::TYPE_AND)
+    public function havingNull(string|ExpressionInterface $column, string $type = CompositeExpression::TYPE_AND)
     {
         $this->compilerState->invalidate('having');
 
@@ -533,9 +532,8 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
 
     /**
      * {@inheritdoc}
-     * @todo change column type hint on prime 3.0
      */
-    public function havingNotNull(/*string|ExpressionInterface*/ $column, string $type = CompositeExpression::TYPE_AND)
+    public function havingNotNull(string|ExpressionInterface $column, string $type = CompositeExpression::TYPE_AND)
     {
         $this->compilerState->invalidate('having');
 
@@ -544,18 +542,16 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
 
     /**
      * {@inheritdoc}
-     * @todo change column type hint on prime 3.0
      */
-    public function orHavingNull(/*string|ExpressionInterface*/ $column)
+    public function orHavingNull(string|ExpressionInterface $column)
     {
         return $this->havingNull($column, CompositeExpression::TYPE_OR);
     }
 
     /**
      * {@inheritdoc}
-     * @todo change column type hint on prime 3.0
      */
-    public function orHavingNotNull(/*string|ExpressionInterface*/ $column)
+    public function orHavingNotNull(string|ExpressionInterface $column)
     {
         return $this->havingNotNull($column, CompositeExpression::TYPE_OR);
     }

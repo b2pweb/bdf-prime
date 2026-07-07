@@ -96,13 +96,11 @@ class QueryOrmTest extends TestCase
      */
     public function test_insert_with_undeclared_field()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown attribute "undefined" on entity "Bdf\Prime\TestEntity"');
+
         $data = ['id' => 1, 'name' => 'Test name', 'undefined' => 'my value'];
         $this->query->insert($data);
-
-        $this->assertEquals("INSERT INTO $this->table (id, name, undefined) VALUES(?, ?, ?)",
-            $this->query->toSql());
-
-        $this->assertEquals([1, 'Test name', 'my value'], $this->query->getBindings());
     }
     
     /**
@@ -584,7 +582,8 @@ class QueryOrmTest extends TestCase
             "SELECT t0.* FROM $this->table t0 WHERE 1 AND 2",
             
             $this->query
-            ->where([new Raw('1'), new Raw('2')])
+            ->whereRaw(new Raw('1'))
+            ->whereRaw(new Raw('2'))
             ->toSql()
         );
     }
@@ -635,9 +634,9 @@ class QueryOrmTest extends TestCase
      */
     public function test_from_dbal_value()
     {
+        $this->query->allowUnknownAttribute();
         $this->assertEquals(
             "SELECT t0.* FROM $this->table t0, customer_ c WHERE c.name_ = ?",
-
             $this->query->from('customer_', 'c')->where('c.name_', 'test')->toSql()
         );
     }
@@ -664,6 +663,8 @@ class QueryOrmTest extends TestCase
      */
     public function test_from_dbal_value_without_alias()
     {
+        $this->query->allowUnknownAttribute();
+
         $this->assertEquals(
             "SELECT t0.* FROM $this->table t0, customer_ WHERE customer_.name_ = ?",
 

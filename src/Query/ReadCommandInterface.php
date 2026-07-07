@@ -17,9 +17,6 @@ use Bdf\Prime\Record\RecordHydratorInterface;
  * @method $this with(string|string[] $relations) Relations to load
  * @method $this without(string|string[] $relations) Relations to discard
  * @method $this filter(\Closure $predicate) Filter entities
- * @method R|null get($pk) Get one entity by its identifier
- * @method R getOrFail($pk) Get one entity or throws when entity is not found
- * @method R getOrNew($pk) Get one entity or return a new one if not found in repository
  * @method R|null findById(mixed|array $pk) Get one entity by its primary key or null if not found in repository
  * @method R findByIdOrFail(mixed|array $pk) Get one entity by its primary key or throws if not found in repository
  * @method R findByIdOrNew(mixed|array $pk) Get one entity by its primary key or return a new one if not found in repository, using the where criteria as default values
@@ -172,12 +169,9 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      *
      * @return list<mixed>
      * @throws PrimeException When execute fail
-     *
-     * @psalm-suppress MismatchingDocblockParamType
-     * @todo Change parameter type hint on prime 3.0
      */
     #[ReadOperation]
-    public function inRows(string/*|ExpressionInterface*/ $column): array;
+    public function inRows(string|ExpressionInterface $column): array;
 
     /**
      * Get a column value
@@ -198,12 +192,9 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      *
      * @return mixed
      * @throws PrimeException When execute fail
-     *
-     * @psalm-suppress MismatchingDocblockParamType
-     * @todo Change parameter type hint on prime 3.0
      */
     #[ReadOperation]
-    public function inRow(string/*|ExpressionInterface*/ $column);
+    public function inRow(string|ExpressionInterface $column);
 
     /**
      * Define the record hydrator to used when {@see ReadCommandInterface::as()} is called

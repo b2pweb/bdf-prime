@@ -147,7 +147,7 @@ class FunctionnalTest extends TestCase
         $customer->insert();
         $parent->insert();
         
-        $customer = Customer::with('parent')->get(1);
+        $customer = Customer::with('parent')->findById(1);
         
         $this->assertEquals('Parent', $customer->parent->name);
     }

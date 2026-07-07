@@ -201,8 +201,8 @@ class CustomRelationTest extends TestCase
         ]);
 
         $this->assertEquals([$r1, $r2], $owner->relation('relation')->all());
-        $this->assertEquals($r2, $owner->relation('relation')->get(2));
-        $this->assertNull($owner->relation('relation')->get(3));
+        $this->assertEquals($r2, $owner->relation('relation')->findById(2));
+        $this->assertNull($owner->relation('relation')->findById(3));
         $this->assertEquals([$r1], $owner->relation('relation')->where('value', 'Hello')->all());
 
         $this->assertEquals([$owner, $owner2], EntityForeignInOwner::where('relation.value', 'Hello')->all());

@@ -2,7 +2,6 @@
 
 namespace Bdf\Prime\Repository\Write;
 
-use Bdf\Prime\Events;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\WriteOperation;

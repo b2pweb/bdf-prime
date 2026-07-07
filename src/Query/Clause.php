@@ -148,14 +148,6 @@ class Clause implements ClauseInterface
                         'value'     => $value->value,
                         'glue'      => $glue,
                     ];
-                } elseif (is_int($key)) {
-                    @trigger_error('Raw SQL expression is deprecated since Prime 1.3.2. Use Query::whereRaw() or Clause::buildRaw() instead.', E_USER_DEPRECATED);
-
-                    if (!$value instanceof ExpressionInterface) {
-                        throw new \InvalidArgumentException('Raw SQL expression must be an instance of ExpressionInterface');
-                    }
-
-                    $this->buildRaw($statement, $value, $glue);
                 } elseif ($key[0] === ':') {
                     // Special command
                     $this->addCommand($key, $value);

@@ -13,7 +13,6 @@ use Bdf\Prime\Query\ReadCommandInterface;
 use InvalidArgumentException;
 
 use function is_string;
-use function method_exists;
 use function str_contains;
 use function strrchr;
 use function substr;
@@ -84,12 +83,7 @@ final class KeyWalkStrategy implements WalkStrategyInterface
             $operator = $query->getOrders()[$column] === Orderable::ORDER_ASC ? '>' : '<';
 
             // #FRAM-86 : reset where clause
-            // @todo remove method_exists check on prime 3.0
-            if (method_exists($query, 'whereReplace')) {
-                $query->whereReplace($column, $operator, $cursor->cursor);
-            } else {
-                $query->where($column, $operator, $cursor->cursor);
-            }
+            $query->whereReplace($column, $operator, $cursor->cursor);
         }
 
         $cursor->entities = $cursor->query->all();

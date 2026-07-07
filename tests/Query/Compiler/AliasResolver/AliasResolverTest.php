@@ -71,15 +71,6 @@ class AliasResolverTest extends TestCase
     /**
      *
      */
-    public function test_resolve_dbal_expression()
-    {
-        $this->assertEquals('123.456', $this->resolver->resolve('123.456'));
-        $this->assertEquals('123', $this->resolver->resolve('123'));
-    }
-
-    /**
-     *
-     */
     public function test_resolve_dbal_expression_enabled()
     {
         $this->resolver->setAllowUnknownAttribute(true);

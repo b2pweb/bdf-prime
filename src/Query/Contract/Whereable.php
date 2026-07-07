@@ -7,8 +7,6 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 /**
  * Interface for where() method
- *
- * @method $this whereReplace(string $column, $operator = null, $value = null) Add or replace single where criterion.
  */
 interface Whereable
 {
@@ -62,7 +60,7 @@ interface Whereable
      *
      * @return $this This Query instance.
      */
-    //public function whereReplace(string $column, $operator = null, $value = null); // @todo uncomment on prime 3.0
+    public function whereReplace(string $column, $operator = null, $value = null);
 
     /**
      * Adds one or more restrictions to the query results, forming a logical
@@ -93,11 +91,8 @@ interface Whereable
      * @param string $type
      *
      * @return $this This Query instance.
-     *
-     * @psalm-suppress MismatchingDocblockParamType
-     * @todo Change column type hint on prime 3.0
      */
-    public function whereNull(string/*|ExpressionInterface*/ $column, string $type = CompositeExpression::TYPE_AND);
+    public function whereNull(string|ExpressionInterface $column, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add where IS NOT NULL expression
@@ -106,11 +101,8 @@ interface Whereable
      * @param string $type
      *
      * @return $this This Query instance.
-     *
-     * @psalm-suppress MismatchingDocblockParamType
-     * @todo Change column type hint on prime 3.0
      */
-    public function whereNotNull(string/*|ExpressionInterface*/ $column, string $type = CompositeExpression::TYPE_AND);
+    public function whereNotNull(string|ExpressionInterface $column, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add OR where IS NULL expression
@@ -118,11 +110,8 @@ interface Whereable
      * @param string|ExpressionInterface $column
      *
      * @return $this This Query instance.
-     *
-     * @psalm-suppress MismatchingDocblockParamType
-     * @todo Change column type hint on prime 3.0
      */
-    public function orWhereNull(string/*|ExpressionInterface*/ $column);
+    public function orWhereNull(string|ExpressionInterface $column);
 
     /**
      * Add OR where IS NOT NULL expression
@@ -130,11 +119,8 @@ interface Whereable
      * @param string|ExpressionInterface $column
      *
      * @return $this This Query instance.
-     *
-     * @psalm-suppress MismatchingDocblockParamType
-     * @todo Change column type hint on prime 3.0
      */
-    public function orWhereNotNull(string/*|ExpressionInterface*/ $column);
+    public function orWhereNotNull(string|ExpressionInterface $column);
 
     /**
      * Add where SQL expression

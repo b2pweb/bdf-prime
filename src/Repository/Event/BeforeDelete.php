@@ -28,12 +28,4 @@ final class BeforeDelete implements RepositoryEventInterface
         $this->entity = $entity;
         $this->repository = $repository;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function legacyArgs(): array
-    {
-        return [$this->entity, $this->repository];
-    }
 }

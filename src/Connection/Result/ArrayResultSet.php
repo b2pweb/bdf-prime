@@ -42,34 +42,6 @@ final class ArrayResultSet extends ArrayIterator implements ResultSetInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @psalm-suppress DeprecatedConstant
-     */
-    public function fetchMode($mode, $options = null)
-    {
-        switch ($mode) {
-            case self::FETCH_ASSOC:
-                return $this->asAssociative();
-
-            case self::FETCH_NUM:
-                return $this->asList();
-
-            case self::FETCH_COLUMN:
-                return $this->asColumn($options ?? 0);
-
-            case self::FETCH_OBJECT:
-                return $this->asObject();
-
-            case self::FETCH_CLASS:
-                return $this->asClass($options);
-
-            default:
-                throw new DBALException('Unsupported fetch mode ' . $mode);
-        }
-    }
-
-    /**
-     * {@inheritdoc}
      */
     public function asAssociative(): ResultSetInterface
     {
@@ -141,8 +113,7 @@ final class ArrayResultSet extends ArrayIterator implements ResultSetInterface
     /**
      * {@inheritdoc}
      */
-    #[\ReturnTypeWillChange]
-    public function current()
+    public function current(): mixed
     {
         $value = parent::current();
 

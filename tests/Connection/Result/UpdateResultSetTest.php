@@ -20,7 +20,6 @@ class UpdateResultSetTest extends TestCase
        $this->assertSame($rs, $rs->asObject());
        $this->assertSame($rs, $rs->asColumn());
        $this->assertSame($rs, $rs->asClass('Foo'));
-       $this->assertSame($rs, $rs->fetchMode('foo'));
 
        $this->assertEquals($original, $rs);
     }

@@ -8,6 +8,8 @@ use Bdf\Prime\Types\TypesRegistry;
 use Bdf\Prime\Types\TypesRegistryInterface;
 use Doctrine\DBAL\Configuration as BaseConfiguration;
 
+use function trigger_error;
+
 /**
  * Configuration
  *
@@ -18,7 +20,7 @@ class Configuration extends BaseConfiguration
     /**
      * @var TypesRegistryInterface|null
      */
-    private ?TypesRegistryInterface $types;
+    private ?TypesRegistryInterface $types = null;
 
     /**
      * @var array<class-string<PlatformTypeInterface>|PlatformTypeInterface>
@@ -34,15 +36,32 @@ class Configuration extends BaseConfiguration
      * Set configuration
      *
      * @param array $options
+     * @param array<class-string<PlatformTypeInterface>|PlatformTypeInterface> $platformTypes
+     * @param null|callable(string):bool $schemaAssetsFilter
      */
-    public function __construct(array $options = [])
-    {
+    public function __construct(
+        array $options = [],
+        ?string $name = null,
+        ?array $platformTypes = null,
+        ?callable $schemaAssetsFilter = null,
+        ?TypesRegistryInterface $types = null,
+        ?bool $autoCommit = null,
+    ) {
         parent::__construct();
 
-        // @todo deprecated ?
+        if ($options) {
+            @trigger_error('Passing configuration options as array is deprecated since Prime 3.0 and will be removed in Prime 4.0', E_USER_DEPRECATED);
+        }
+
         foreach ($options as $name => $value) {
             $this->$name = $value;
         }
+
+        $this->name = $name ?? $this->name;
+        $this->platformTypes = $platformTypes ?? $this->platformTypes;
+        $this->types = $types ?? $this->types;
+        $this->schemaAssetsFilter = $schemaAssetsFilter ?? $this->schemaAssetsFilter;
+        $this->autoCommit = $autoCommit ?? $this->autoCommit;
     }
 
     /**
@@ -81,11 +100,7 @@ class Configuration extends BaseConfiguration
      */
     public function getTypes(): TypesRegistryInterface
     {
-        if (!isset($this->types)) {
-            $this->setTypes(new TypesRegistry());
-        }
-
-        return $this->types;
+        return $this->types ??= new TypesRegistry();
     }
 
     /**

@@ -106,7 +106,8 @@ class Versionable extends Behavior
     public function beforeUpdate(BeforeUpdate $event): void
     {
         if ($event->attributes !== null) {
-            $event->attributes->append(self::COLUMN_NAME);
+            /** @psalm-suppress NullArgument */
+            $event->attributes[] = self::COLUMN_NAME;
         }
 
         $this->incrementVersion($event->entity, $event->repository);

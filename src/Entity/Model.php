@@ -35,9 +35,6 @@ use Bdf\Serializer\Metadata\Builder\ClassMetadataBuilder;
  * @psalm-method static EntityCollection collection(array<self> $entities = [])
  * @method static Criteria criteria(array $criteria = [])
  *
- * @method static static|null get(mixed $key)
- * @method static static getOrNew(mixed $key)
- * @method static static getOrFail(mixed $key)
  * @method static static|null findById(mixed $key)
  * @method static static findByIdOrNew(mixed $key)
  * @method static static findByIdOrFail(mixed $key)
@@ -321,14 +318,6 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
     public function deleteAll($relations): int
     {
         return static::repository()->deleteAll($this, $relations);
-    }
-
-    /**
-     * @deprecated This method is empty and will be removed in 3.0
-     */
-    public function __destruct()
-    {
-        // No-op
     }
 
     //---- events

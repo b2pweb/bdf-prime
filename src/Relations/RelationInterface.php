@@ -161,9 +161,8 @@ interface RelationInterface
      *                 QueryInterface<ConnectionInterface, R>)))))
      *
      * @template Q as ReadCommandInterface
-     * @todo use real $queryClass parameter type on Prime 3.0
      */
-    public function link($owner/*, ?string $queryClass = null*/): ReadCommandInterface;
+    public function link($owner, ?string $queryClass = null): ReadCommandInterface;
 
     /**
      * Add join expression on query builder
@@ -310,13 +309,4 @@ interface RelationInterface
      * @return boolean
      */
     public function isLoaded($entity): bool;
-
-    /**
-     * Clear relation entity data of the entity
-     *
-     * @param L $entity
-     *
-     * @internal Will be removed in 3.0
-     */
-    public function clearInfo($entity): void;
 }

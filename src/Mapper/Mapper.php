@@ -47,7 +47,6 @@ use function get_class;
 use function get_parent_class;
 use function implode;
 use function is_string;
-use function method_exists;
 use function sprintf;
 
 /**
@@ -146,12 +145,9 @@ abstract class Mapper implements ClockAwareInterface
      * This is useful for example for the select compilation, where the attribute can be a DBAL expression,
      * but can produce security issue if input is not properly checked
      *
-     * For compatibility reason, this value is null by default, which will raise a deprecated notice, and enable the feature.
-     * In next major version, this value will be false by default, and should be manually enabled on Mapper.
-     *
-     * @var bool|null
+     * @var bool
      */
-    private ?bool $allowUnknownAttribute = null;
+    private bool $allowUnknownAttribute = false;
 
     /**
      * The relation builder
@@ -367,12 +363,9 @@ abstract class Mapper implements ClockAwareInterface
      * This is useful for example for the select compilation, where the attribute can be a DBAL expression,
      * but can produce security issue if input is not properly checked
      *
-     * For compatibility reason, this value is null by default, which will raise a deprecated notice, and enable the feature.
-     * In next major version, this value will be false by default, and should be manually enabled on Mapper.
-     *
-     * @return bool|null
+     * @return bool
      */
-    final public function allowUnknownAttribute(): ?bool
+    final public function allowUnknownAttribute(): bool
     {
         return $this->allowUnknownAttribute;
     }
@@ -383,9 +376,6 @@ abstract class Mapper implements ClockAwareInterface
      * If true, query with undeclared attributes on criteria will not throw an exception , and use it as is
      * This is useful for example for the select compilation, where the attribute can be a DBAL expression,
      * but can produce security issue if input is not properly checked
-     *
-     * By default, this value is null, which will raise a deprecated notice, and enable the feature.
-     * In next major version, this value will be false by default, and should be manually enabled.
      *
      * @param bool $allowUnknownAttribute
      */
@@ -1247,13 +1237,9 @@ abstract class Mapper implements ClockAwareInterface
      */
     private function loadConfigurators(): array
     {
-        if (!method_exists(ReflectionObject::class, 'getAttributes')) {
-            return [];
-        }
-
         $classes = [];
 
-        for ($class = get_class($this); $class && $class !== Mapper::class; $class = get_parent_class($class)) {
+        for ($class = static::class; $class && $class !== Mapper::class; $class = get_parent_class($class)) {
             $classes[] = $class;
         }
 
@@ -1261,7 +1247,7 @@ abstract class Mapper implements ClockAwareInterface
 
         // Apply configurators in reverse order to ensure that the last one wins
         foreach (array_reverse($classes) as $class) {
-            $attributes = (new ReflectionClass($class))->getAttributes(MapperConfigurationInterface::class, ReflectionAttribute::IS_INSTANCEOF);
+            $attributes = new ReflectionClass($class)->getAttributes(MapperConfigurationInterface::class, ReflectionAttribute::IS_INSTANCEOF);
 
             foreach ($attributes as $attribute) {
                 $configurators[] = $attribute->newInstance();
@@ -1279,13 +1265,9 @@ abstract class Mapper implements ClockAwareInterface
      */
     private function loadMethodsFromAttributes(string $attributeClass): array
     {
-        if (!method_exists(ReflectionObject::class, 'getAttributes')) {
-            return [];
-        }
-
         $functions = [];
 
-        foreach ((new ReflectionObject($this))->getMethods() as $method) {
+        foreach (new ReflectionObject($this)->getMethods() as $method) {
             foreach ($method->getAttributes($attributeClass) as $attribute) {
                 $query = $attribute->newInstance();
                 $name = $query->name() ?? $method->getName();

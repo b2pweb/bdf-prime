@@ -36,12 +36,4 @@ final class BeforeUpdate implements RepositoryEventInterface
         $this->repository = $repository;
         $this->attributes = $attributes;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function legacyArgs(): array
-    {
-        return [$this->entity, $this->repository, $this->attributes];
-    }
 }

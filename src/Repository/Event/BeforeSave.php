@@ -31,12 +31,4 @@ final class BeforeSave implements RepositoryEventInterface
         $this->repository = $repository;
         $this->isNew = $isNew;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function legacyArgs(): array
-    {
-        return [$this->entity, $this->repository, $this->isNew];
-    }
 }

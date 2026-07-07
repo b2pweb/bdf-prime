@@ -91,12 +91,9 @@ class AliasResolver
      * This is useful for example for the select compilation, where the attribute can be a DBAL expression,
      * but can produce security issue if input is not properly checked
      *
-     * For compatibility reason, this value is null by default, which will raise a deprecated notice, and enable the feature.
-     * In next major version, this value will be false by default, and should be manually enabled on Mapper.
-     *
-     * @var bool|null
+     * @var bool
      */
-    private ?bool $allowUnknownAttribute = null;
+    private bool $allowUnknownAttribute = false;
 
 
     /**
@@ -128,7 +125,7 @@ class AliasResolver
      *
      * @see Mapper::allowUnknownAttribute()
      */
-    public function setAllowUnknownAttribute(?bool $allowUnknownAttribute): void
+    public function setAllowUnknownAttribute(bool $allowUnknownAttribute): void
     {
         $this->allowUnknownAttribute = $allowUnknownAttribute;
     }
@@ -177,12 +174,6 @@ class AliasResolver
             //No metadata found => DBAL expression.
             if ($metadata === null) {
                 if ($this->allowUnknownAttribute) {
-                    return $attribute;
-                }
-
-                if ($this->allowUnknownAttribute === null) {
-                    @trigger_error('Using unknown attribute "'.$attribute.'" on on entity "'.$this->repository->entityName().'" is deprecated, and will raise an exception on Prime 3. Please use Mapper::allowUnknownAttribute() to enable this feature.', E_USER_DEPRECATED);
-
                     return $attribute;
                 }
 

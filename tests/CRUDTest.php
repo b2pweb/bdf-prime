@@ -158,7 +158,7 @@ class CRUDTest extends TestCase
 
         $repository = Prime::repository('Bdf\Prime\Customer');
 
-        $entity = $repository->get(1);
+        $entity = $repository->findById(1);
 
         $entity->name = __FUNCTION__ . ' updated';
         $this->assertEquals(1, $repository->update($entity), 'method update');
@@ -175,7 +175,7 @@ class CRUDTest extends TestCase
 
         $repository = Prime::repository('Bdf\Prime\Customer');
 
-        $entity = $repository->get(1);
+        $entity = $repository->findById(1);
 
         $count = $repository->update($entity);
 
@@ -206,7 +206,7 @@ class CRUDTest extends TestCase
 
         $this->pack()->nonPersist($this->basicCustomer);
 
-        $entity = $repository->get(1);
+        $entity = $repository->findById(1);
         $entity->name = __FUNCTION__ . ' updated';
 
         $this->assertEquals(2, $repository->replace($entity), 'method replace'); // 2 means DELETE + INSERT
@@ -409,7 +409,7 @@ class CRUDTest extends TestCase
             new User(['id' => 1, 'name' => 'TEST1 to check event', 'customer' => new Customer(['id' => '1']), 'roles' => ['2']])
         );
             
-        $entity = Prime::repository('Bdf\Prime\User')->get(1);
+        $entity = Prime::repository('Bdf\Prime\User')->findById(1);
 
         $this->assertEquals('TEST1 afterLoad', $entity->name);
     }
@@ -456,7 +456,7 @@ class CRUDTest extends TestCase
             ])
         );
 
-        $document = Document::get(1);
+        $document = Document::findById(1);
 
         $this->assertInstanceOf('Bdf\Prime\Contact', $document->contact);
         $this->assertInstanceOf('Bdf\Prime\Location', $document->contact->location);

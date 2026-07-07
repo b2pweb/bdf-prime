@@ -136,7 +136,7 @@ interface RepositoryInterface
      *
      * @template R as object
      */
-    public function relation(string $relationClass/*, ?string $relationName = null*/): RelationInterface;
+    public function relation(string $relationClass, ?string $relationName = null): RelationInterface;
 
     /**
      * Get the repository constraints
@@ -184,20 +184,19 @@ interface RepositoryInterface
      *
      * @template Q as ReadCommandInterface
      */
-    //public function query(?string $queryClass = null): ReadCommandInterface;
+    public function query(?string $queryClass = null): ReadCommandInterface;
 
     /**
      * Count entity
      *
-     * @param array<string, mixed> $criteria
+     * @param iterable<string,mixed>|callable(QueryInterface):void $criteria
      * @param string|array|null $attributes
      *
      * @return int
      * @throws PrimeException
-     * @todo Update signature in prime 3.0 to match EntityRepository::count()
      */
     #[ReadOperation]
-    public function count(array $criteria = [], $attributes = null): int;
+    public function count(iterable|callable $criteria = [], string|array|null $attributes = null): int;
 
     /**
      * Assert that entity exists in repository

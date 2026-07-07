@@ -409,15 +409,6 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
 
         try {
             $result = $task();
-
-            if ($result === false) {
-                @trigger_error('Returning false from a transaction task to rollback is deprecated since Prime 2.3, use an exception instead', E_USER_DEPRECATED);
-                $this->rollBack(); // This statement is invalid when no new transaction is started, but we keep this behavior for backward compatibility
-
-                /** @psalm-suppress FalsableReturnStatement */
-                return false;
-            }
-
             $this->commit();
 
             return $result;

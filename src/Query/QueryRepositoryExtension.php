@@ -5,7 +5,6 @@ namespace Bdf\Prime\Query;
 use BadMethodCallException;
 use Bdf\Prime\Collection\Indexer\EntityIndexer;
 use Bdf\Prime\Connection\ConnectionInterface;
-use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Exception\QueryBuildingException;
@@ -112,84 +111,6 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
         }
 
         return $this->repository->repository($name);
-    }
-
-    /**
-     * Get one entity by identifier
-     *
-     * @param ReadCommandInterface<ConnectionInterface, E>&Whereable $query
-     * @param mixed         $id
-     * @param null|string|array  $attributes
-     *
-     * @return E|null
-     * @deprecated Since 2.1. Use {@see findById()} instead.
-     */
-    public function get(ReadCommandInterface $query, $id, $attributes = null)
-    {
-        @trigger_error('Query::get()/getOrFail()/getOrNew() is deprecated since 2.1. Use findById() instead.', E_USER_DEPRECATED);
-
-        if (empty($id)) {
-            return null;
-        }
-
-        if (!is_array($id)) {
-            list($identifierName) = $this->metadata->primary['attributes'];
-            $id = [$identifierName => $id];
-        } else {
-            foreach ($id as $key => $value) {
-                if (is_int($key)) {
-                    throw new \InvalidArgumentException('Raw SQL expressions are not allowed in get() method');
-                }
-            }
-        }
-
-        return $query->where($id)->first($attributes);
-    }
-
-    /**
-     * Get one entity or throws entity not found
-     *
-     * @param ReadCommandInterface<ConnectionInterface, E>&Whereable $query
-     * @param mixed $id
-     * @param null|string|array $attributes
-     *
-     * @return E
-     *
-     * @throws EntityNotFoundException  If entity is not found
-     * @deprecated Since 2.1. Use {@see findByIdOrFail()} instead.
-     */
-    public function getOrFail(ReadCommandInterface $query, $id, $attributes = null)
-    {
-        /** @psalm-suppress DeprecatedMethod */
-        $entity = $this->get($query, $id, $attributes);
-
-        if ($entity !== null) {
-            return $entity;
-        }
-
-        throw new EntityNotFoundException('Cannot resolve entity identifier "'.implode('", "', (array)$id).'"');
-    }
-
-    /**
-     * Get one entity or return a new one if not found in repository
-     *
-     * @param ReadCommandInterface<ConnectionInterface, E>&Whereable $query
-     * @param mixed $id
-     * @param null|string|array $attributes
-     *
-     * @return E
-     * @deprecated Since 2.1. Use {@see findByIdOrNew()} instead.
-     */
-    public function getOrNew(ReadCommandInterface $query, $id, $attributes = null)
-    {
-        /** @psalm-suppress DeprecatedMethod */
-        $entity = $this->get($query, $id, $attributes);
-
-        if ($entity !== null) {
-            return $entity;
-        }
-
-        return $this->repository->entity();
     }
 
     /**
@@ -585,71 +506,6 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
 
             default:
                 return $indexer->byOverride($byOptions['attribute']);
-        }
-    }
-
-    /**
-     * Post processor for hydrating entities
-     *
-     * @param ResultSetInterface<array<string, mixed>> $data
-     *
-     * @return array
-     * @throws PrimeException
-     */
-    public function processEntities(ResultSetInterface $data)
-    {
-        @trigger_error('QueryRepositoryExtension::processEntities() is deprecated since 2.3 replaced by RecordHydratorInterface.', E_USER_DEPRECATED);
-
-        /** @var EntityRepository<E> $repository */
-        $repository = $this->repository;
-        $hasLoadEvent = $repository->hasListeners(AfterLoad::class);
-
-        // Save into local vars to ensure that value will not be changed during execution
-        $withRelations = $this->withRelations;
-        $withoutRelations = $this->withoutRelations;
-        $byOptions = $this->byOptions;
-
-        $entities = new EntityIndexer($this->mapper, $byOptions ? [$byOptions['attribute']] : []);
-
-        // Force loading of eager relations
-        if (!empty($this->metadata->eagerRelations)) {
-            $withRelations = array_merge($this->metadata->eagerRelations, $withRelations);
-
-            // Skip relation that should not be loaded.
-            foreach ($withoutRelations as $relationName => $nestedRelations) {
-                // Only a leaf concerns this query.
-                if (empty($nestedRelations)) {
-                    unset($withRelations[$relationName]);
-                }
-            }
-        }
-
-        foreach ($data as $result) {
-            $entities->push($entity = $this->mapper->prepareFromRepository($result, $repository->connection()->platform()));
-
-            if ($hasLoadEvent) {
-                $repository->notify(new AfterLoad($entity, $repository));
-            }
-        }
-
-        foreach ($withRelations as $relationName => $relationInfos) {
-            $repository->relation($relationName)->load(
-                $entities,
-                $relationInfos['relations'],
-                $relationInfos['constraints'],
-                $withoutRelations[$relationName] ?? []
-            );
-        }
-
-        switch (true) {
-            case $byOptions === null:
-                return $entities->all();
-
-            case $byOptions['combine']:
-                return $entities->by($byOptions['attribute']);
-
-            default:
-                return $entities->byOverride($byOptions['attribute']);
         }
     }
 

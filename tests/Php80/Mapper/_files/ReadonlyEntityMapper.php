@@ -40,18 +40,21 @@ class ReadonlyEntityMapper extends Mapper
     #[Scope]
     public function foo(QueryInterface $query, string $bar): QueryInterface
     {
+        $query->allowUnknownAttribute();
         return $query->where('foo', $bar);
     }
 
     #[Scope('oof')]
     protected function bar(QueryInterface $query, string $bar): QueryInterface
     {
+        $query->allowUnknownAttribute();
         return $query->where('bar', $bar);
     }
 
     #[Scope]
     public static function baz(QueryInterface $query, string $bar): QueryInterface
     {
+        $query->allowUnknownAttribute();
         return $query->where('baz', $bar);
     }
 

@@ -7,9 +7,6 @@ use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 
 /**
  * Base type for compilable clause
- *
- * @method bool|null isAllowUnknownAttribute()
- * @method void allowUnknownAttribute(bool|null $allowUnknownAttributes = true)
  */
 interface CompilableClauseInterface extends ClauseInterface
 {
@@ -49,9 +46,9 @@ interface CompilableClauseInterface extends ClauseInterface
      * If true, the compiler will not throw an exception if an attribute is not found in the entity metadata,
      * and will be used as is.
      *
-     * @return bool|null
+     * @return bool
      */
-    //public function isAllowUnknownAttribute(): ?bool;
+    public function isAllowUnknownAttribute(): bool;
 
     /**
      * Allow or deny the usage of unknown attribute
@@ -59,8 +56,8 @@ interface CompilableClauseInterface extends ClauseInterface
      * If allowed, the compiler will not throw an exception if an attribute is not found in the entity metadata,
      * and will be used as is.
      *
-     * @param bool|null $allowUnknownAttributes
+     * @param bool $allowUnknownAttributes
      * @return void
      */
-    //public function allowUnknownAttribute(?bool $allowUnknownAttributes = true): void;
+    public function allowUnknownAttribute(bool $allowUnknownAttributes = true): void;
 }

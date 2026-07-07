@@ -82,7 +82,7 @@ class MapperTest extends TestCase
         $this->assertFalse($mapper->isReadOnly());
         $this->assertTrue($mapper->hasSchemaManager());
         $this->assertInstanceOf(MapperHydrator::class, $mapper->hydrator());
-        $this->assertNull($mapper->allowUnknownAttribute());
+        $this->assertFalse($mapper->allowUnknownAttribute());
         $this->assertSame(NativeClock::instance(), $mapper->clock());
     }
 

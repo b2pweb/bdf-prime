@@ -21,7 +21,7 @@ final readonly class DoctrineIndex implements IndexInterface
         private bool $canBePrimary = true,
     ) {
         if ($canBePrimary) {
-            @trigger_error(sprintf('Use of %s to store primery key is deprecated. Use %s instead.', self::class, DoctrinePrimaryKeyIndex::class), E_USER_DEPRECATED);
+            @trigger_error(sprintf('Use of %s to store primary key is deprecated. Use %s instead.', self::class, DoctrinePrimaryKeyIndex::class), E_USER_DEPRECATED);
         }
     }
 

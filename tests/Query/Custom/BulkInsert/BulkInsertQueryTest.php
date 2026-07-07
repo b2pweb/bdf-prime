@@ -4,9 +4,7 @@ namespace Bdf\Prime\Query\Custom\BulkInsert;
 
 use Bdf\Prime\Cache\ArrayCache;
 use Bdf\Prime\Cache\CacheKey;
-use Bdf\Prime\Cache\DoctrineCacheAdapter;
 use Bdf\Prime\Connection\SimpleConnection;
-use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Schema\Builder\TypesHelperTableBuilder;
 use Bdf\Prime\TestEmbeddedEntity;

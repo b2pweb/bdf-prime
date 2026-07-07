@@ -23,58 +23,6 @@ use Iterator;
 interface ResultSetInterface extends Iterator, Countable
 {
     /**
-     * Fetch the rows as associative array
-     * This is the default fetch mode
-     * No options available
-     *
-     * @deprecated Use asAssociative() instead
-     */
-    public const FETCH_ASSOC = 'assoc';
-
-    /**
-     * Fetch the rows as a numeric array
-     * No options available
-     *
-     * @deprecated Use asList() instead
-     */
-    public const FETCH_NUM = 'num';
-
-    /**
-     * Fetch only one columns on each rows
-     * Option : integer column number to fetch. Starts at 0 (zero)
-     *
-     * @deprecated Use asColumn() instead
-     */
-    public const FETCH_COLUMN = 'column';
-
-    /**
-     * Fetch rows into a simple object (stdClass)
-     * No options available
-     *
-     * @deprecated Use asObject() instead
-     */
-    public const FETCH_OBJECT = 'object';
-
-    /**
-     * Fetch rows into a new class
-     * Option : string The class name
-     *
-     * @deprecated Use asClass() instead
-     */
-    public const FETCH_CLASS = 'class';
-
-
-    /**
-     * @param string $mode The fetch mode. Should be one of the ResultSetInterface::FETCH_* constant
-     * @param mixed $options
-     *
-     * @return $this
-     *
-     * @deprecated Use dedicated method instead
-     */
-    public function fetchMode($mode, $options = null);
-
-    /**
      * The result will be fetched as associative array
      *
      * Note: this is the default behavior of the connection

@@ -50,8 +50,8 @@ class JsonFunctionalTest extends TestCase
 
         $this->pack()->nonPersist($entity);
 
-        $this->assertSame(['foo' => 'bar'], EntityWithJson::repository()->get($entity->id)->data);
-        $this->assertEquals((object) ['foo' => 'bar'], EntityWithJson::repository()->get($entity->id)->object);
+        $this->assertSame(['foo' => 'bar'], EntityWithJson::repository()->findById($entity->id)->data);
+        $this->assertEquals((object) ['foo' => 'bar'], EntityWithJson::repository()->findById($entity->id)->object);
     }
 
     public function test_extract_on_select()

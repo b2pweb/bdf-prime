@@ -23,6 +23,7 @@ use DateTime;
 use Doctrine\DBAL\Cache\ArrayResult;
 use Doctrine\DBAL\LockMode;
 use Doctrine\DBAL\Result;
+use Generator;
 use PHPUnit\Framework\TestCase;
 use Traversable;
 
@@ -400,15 +401,6 @@ class QueryTest extends TestCase
         $query = $this->query()->whereNotNull('id');
 
         $this->assertEquals('SELECT * FROM test_ WHERE id IS NOT NULL', $query->toSql());
-    }
-
-    /**
-     *
-     */
-    public function test_where_raw_string_not_allowed()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->query()->where([['a']]);
     }
 
     /**
@@ -2106,7 +2098,7 @@ class QueryTest extends TestCase
                 return 'OR';
             }
 
-            public function getIterator()
+            public function getIterator(): Generator
             {
                 yield 'id >' => 1;
                 yield 'name :like' => 'j%';
@@ -2151,7 +2143,7 @@ class QueryTest extends TestCase
                 return 'OR';
             }
 
-            public function getIterator()
+            public function getIterator(): Generator
             {
                 yield 'id >' => 2;
                 yield 'name :like' => 'j%';

@@ -6,22 +6,17 @@ use BadMethodCallException;
 use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Collection\Indexer\EntityIndexerInterface;
 use Bdf\Prime\Collection\Indexer\EntitySetIndexer;
-use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Locatorizable;
 use Bdf\Prime\Query\Contract\Deletable;
 use Bdf\Prime\Query\Contract\ReadOperation;
-use Bdf\Prime\Query\Contract\Whereable;
-use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Relations\Info\LocalHashTableRelationInfo;
 use Bdf\Prime\Relations\Info\NullRelationInfo;
 use Bdf\Prime\Relations\Info\RelationInfoInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 
-use function func_get_arg;
-use function func_num_args;
+use function assert;
 use function is_object;
-use function method_exists;
 
 /**
  * Base class for define common methods for relations
@@ -257,15 +252,6 @@ abstract class AbstractRelation implements RelationInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function clearInfo($entity): void
-    {
-        /** @psalm-suppress DeprecatedMethod */
-        $this->relationInfo->clear($entity);
-    }
-
-    /**
      * Apply the constraints on query builder
      * Allows overload of global constraints if both constraints are arrays
      *
@@ -329,13 +315,11 @@ abstract class AbstractRelation implements RelationInterface
      *
      * @return ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>&Deletable
      */
-    protected function query($value, $constraints = []/*, ?string $queryClass = null*/): ReadCommandInterface
+    protected function query($value, $constraints = [], ?string $queryClass = null): ReadCommandInterface
     {
-        // Cannot use real argument for BC reasons.
-        // @todo use real argument on Prime 3.0
-        $queryClass = func_num_args() > 2 ? func_get_arg(2) : null;
-        $query = method_exists($this->distant, 'query') ? $this->distant->query($queryClass) : $this->distant->queries()->builder();
+        $query = $this->distant->query($queryClass);
 
+        /** @var ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>&Deletable */
         return $this->applyConstraints(
             $this->applyWhereKeys($query, $value),
             $constraints
@@ -379,7 +363,6 @@ abstract class AbstractRelation implements RelationInterface
         if ($relation !== null) {
             $this->relationInfo->markAsLoaded($entity);
         } else {
-            /** @psalm-suppress DeprecatedMethod */
             $this->relationInfo->clear($entity);
         }
     }

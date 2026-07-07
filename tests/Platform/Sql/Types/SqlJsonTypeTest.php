@@ -34,7 +34,7 @@ class SqlJsonTypeTest extends TestCase
     {
         $column = $this->createMock(ColumnInterface::class);
 
-        $this->assertEquals(Types::TEXT, $this->type->declaration($column));
+        $this->assertEquals(Types::JSON, $this->type->declaration($column));
     }
 
     /**

@@ -200,49 +200,29 @@ class RepositoryQueryFactoryTest extends TestCase
     /**
      *
      */
-    public function test_get()
+    public function test_findByIdOrFail_success()
     {
-        $this->assertEntity($this->pack()->get('entity'), $this->factory->get(1));
-        $this->assertEntity($this->pack()->get('entity'), $this->factory->get(['name' => 'Entity']));
-        $this->assertEquals(new TestEntity(['name' => 'Entity']), $this->factory->get(1, ['name']));
-        $this->assertNull($this->factory->get('not_found'));
+        $this->assertEntity($this->pack()->get('entity'), $this->factory->findByIdOrFail(1));
     }
 
     /**
      *
      */
-    public function test_get_should_disallow_raw_expression()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->factory->get([['true']]);
-    }
-
-    /**
-     *
-     */
-    public function test_getOrFail_success()
-    {
-        $this->assertEntity($this->pack()->get('entity'), $this->factory->getOrFail(1));
-    }
-
-    /**
-     *
-     */
-    public function test_getOrFail_not_found()
+    public function test_findByIdOrFail_not_found()
     {
         $this->expectException(EntityNotFoundException::class);
         $this->expectExceptionMessage('Cannot resolve entity identifier "not_found"');
 
-        $this->factory->getOrFail('not_found');
+        $this->factory->findByIdOrFail('not_found');
     }
 
     /**
      *
      */
-    public function test_getOrNew()
+    public function test_findByIdOrNew()
     {
-        $this->assertEntity($this->pack()->get('entity'), $this->factory->getOrNew(1));
-        $this->assertEquals(new TestEntity(), $this->factory->getOrNew('not_found'));
+        $this->assertEntity($this->pack()->get('entity'), $this->factory->findByIdOrNew(1));
+        $this->assertEquals(new TestEntity(['id' => 'not_found']), $this->factory->findByIdOrNew('not_found'));
     }
 
     /**

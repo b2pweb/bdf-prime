@@ -375,7 +375,7 @@ class BelongsToTest extends TestCase
 
         $affected = $user->relation('customer')->deleteAll();
 
-        $customer = Customer::get($user->customer->id);
+        $customer = Customer::findById($user->customer->id);
 
         $this->assertEquals(1, $affected);
         $this->assertEquals(null, $customer);
@@ -401,14 +401,14 @@ class BelongsToTest extends TestCase
         ]);
         Prime::push($faction);
 
-        $user = Prime::repository('Bdf\Prime\Admin')->with('faction')->get('999');
+        $user = Prime::repository('Bdf\Prime\Admin')->with('faction')->findById('999');
         $this->assertEquals('test-faction', $user->faction->name);
         $this->assertTrue($user->relation('faction')->isLoaded());
 
         $faction->domain = 'non-admin';
         Prime::repository('Bdf\Prime\Faction')->update($faction);
 
-        $user = Prime::repository('Bdf\Prime\Admin')->with('faction')->get('999');
+        $user = Prime::repository('Bdf\Prime\Admin')->with('faction')->findById('999');
         $this->assertEquals(null, $user->faction->name);
         $this->assertFalse($user->relation('faction')->isLoaded());
     }
@@ -432,14 +432,14 @@ class BelongsToTest extends TestCase
         ]);
         Prime::push($faction);
 
-        $user = Prime::repository('Bdf\Prime\Admin')->with('faction')->get('999');
+        $user = Prime::repository('Bdf\Prime\Admin')->with('faction')->findById('999');
         $this->assertEquals('test-faction', $user->faction->name);
         $this->assertTrue($user->relation('faction')->isLoaded());
 
         $faction->enabled = false;
         Prime::repository('Bdf\Prime\Faction')->update($faction);
 
-        $user = Prime::repository('Bdf\Prime\Admin')->with('faction')->get('999');
+        $user = Prime::repository('Bdf\Prime\Admin')->with('faction')->findById('999');
         $this->assertEquals(null, $user->faction->name);
         $this->assertFalse($user->relation('faction')->isLoaded());
     }
@@ -643,7 +643,7 @@ class BelongsToTest extends TestCase
 
         $repository = Prime::repository('Bdf\Prime\Commit');
 
-        $commit = $repository->get(1);
+        $commit = $repository->findById(1);
 
         $relation = $repository->relation('project');
         $relation->load(new SingleEntityIndexer(Commit::mapper(), $commit), [], [], ['commits']);

@@ -36,14 +36,6 @@ class SqlPlatformTest extends TestCase
         $this->platform = new SqlPlatform(new MySQLPlatform(), new TypesRegistry());
     }
 
-    /**
-     *
-     */
-    public function test_name()
-    {
-        $this->assertEquals('mysql', $this->platform->name());
-    }
-
     public function test_apply_not_sql_operation()
     {
         $operation = $this->createMock(PlatformSpecificOperationInterface::class);

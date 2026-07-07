@@ -7,10 +7,5 @@ namespace Bdf\Prime\Repository\Event;
  */
 interface RepositoryEventInterface
 {
-    /**
-     * Get the list or argument for legacy listeners
-     *
-     * @return list<mixed>
-     */
-    public function legacyArgs(): array;
+
 }
