@@ -27,6 +27,13 @@ interface IndexSetInterface
     public function all(): array;
 
     /**
+     * Get all secondaries indexes (i.e. all indexes ignoring the primary key)
+     *
+     * @return array<string, IndexInterface>
+     */
+    public function secondaries(): array;
+
+    /**
      * Get one index by its name
      *
      * @param string $name

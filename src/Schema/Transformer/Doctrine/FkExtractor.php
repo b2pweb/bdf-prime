@@ -15,20 +15,20 @@ final class FkExtractor implements ConstraintVisitorInterface
     /**
      * @var ForeignKeyConstraint[]
      */
-    private $fk = [];
+    private array $fk = [];
 
     /**
      * {@inheritdoc}
      */
-    public function onForeignKey(ForeignKeyInterface $foreignKey)
+    public function onForeignKey(ForeignKeyInterface $foreignKey): void
     {
-        /** @psalm-suppress InternalMethod */
-        $this->fk[] = new ForeignKeyConstraint(
-            $foreignKey->fields(),
-            $foreignKey->table(),
-            $foreignKey->referred(),
-            $foreignKey->name()
-        );
+        $this->fk[] = ForeignKeyConstraint::editor()
+            ->setUnquotedName($foreignKey->name())
+            ->setUnquotedReferencingColumnNames(...$foreignKey->fields())
+            ->setUnquotedReferencedTableName($foreignKey->table())
+            ->setUnquotedReferencedColumnNames(...$foreignKey->referred())
+            ->create()
+        ;
     }
 
     /**
@@ -36,7 +36,7 @@ final class FkExtractor implements ConstraintVisitorInterface
      *
      * @return ForeignKeyConstraint[]
      */
-    public function all()
+    public function all(): array
     {
         return $this->fk;
     }
@@ -44,7 +44,7 @@ final class FkExtractor implements ConstraintVisitorInterface
     /**
      * {@inheritdoc}
      */
-    public function onCheck(CheckInterface $check)
+    public function onCheck(CheckInterface $check): void
     {
     }
 }

@@ -697,7 +697,6 @@ class SimpleConnectionTest extends TestCase
             $this->connection->rollBack();
         }
 
-        $this->connection->useNestedTransaction(true);
         TestEntity::repository()->schema()->migrate();
         $this->connection->beginTransaction();
 

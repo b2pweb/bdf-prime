@@ -4,26 +4,25 @@ namespace Bdf\Prime\Schema\Adapter\Doctrine;
 
 use Bdf\Prime\Schema\IndexInterface;
 use Doctrine\DBAL\Schema\Index;
+use Doctrine\DBAL\Schema\Index\IndexedColumn;
+use Doctrine\DBAL\Schema\Index\IndexType;
+
+use function array_map;
+use function sprintf;
+use function trigger_error;
 
 /**
  * Adapt doctrine index to prime index
  */
-final class DoctrineIndex implements IndexInterface
+final readonly class DoctrineIndex implements IndexInterface
 {
-    /**
-     * @var Index
-     */
-    private $index;
-
-
-    /**
-     * DoctrineIndex constructor.
-     *
-     * @param Index $index
-     */
-    public function __construct(Index $index)
-    {
-        $this->index = $index;
+    public function __construct(
+        private Index $index,
+        private bool $canBePrimary = true,
+    ) {
+        if ($canBePrimary) {
+            @trigger_error(sprintf('Use of %s to store primery key is deprecated. Use %s instead.', self::class, DoctrinePrimaryKeyIndex::class), E_USER_DEPRECATED);
+        }
     }
 
     /**
@@ -39,7 +38,7 @@ final class DoctrineIndex implements IndexInterface
      */
     public function unique(): bool
     {
-        return $this->index->isUnique();
+        return $this->index->getType() === IndexType::UNIQUE;
     }
 
     /**
@@ -47,7 +46,7 @@ final class DoctrineIndex implements IndexInterface
      */
     public function primary(): bool
     {
-        return $this->index->isPrimary();
+        return $this->canBePrimary && $this->index->isPrimary();
     }
 
     /**
@@ -55,15 +54,15 @@ final class DoctrineIndex implements IndexInterface
      */
     public function type(): int
     {
-        if ($this->index->isSimpleIndex()) {
-            return self::TYPE_SIMPLE;
-        }
-
-        if ($this->index->isPrimary()) {
+        if ($this->canBePrimary && $this->index->isPrimary()) {
             return self::TYPE_PRIMARY;
         }
 
-        return self::TYPE_UNIQUE;
+        if ($this->index->getType() === IndexType::UNIQUE) {
+            return self::TYPE_UNIQUE;
+        }
+
+        return self::TYPE_SIMPLE;
     }
 
     /**
@@ -71,7 +70,7 @@ final class DoctrineIndex implements IndexInterface
      */
     public function fields(): array
     {
-        return $this->index->getColumns();
+        return array_map(static fn (IndexedColumn $col) => $col->getColumnName()->toString(), $this->index->getIndexedColumns());
     }
 
     /**
@@ -87,10 +86,38 @@ final class DoctrineIndex implements IndexInterface
      */
     public function options(): array
     {
-        return array_merge(
-            $this->index->getOptions(),
-            array_fill_keys($this->index->getFlags(), true)
-        );
+        $options = [];
+
+        $lengths = [];
+        $hasLengths = false;
+
+        foreach ($this->index->getIndexedColumns() as $column) {
+            $lengths[] = $len = $column->getLength();
+
+            if ($len !== null) {
+                $hasLengths = true;
+            }
+        }
+
+        if ($hasLengths) {
+            $options['lengths'] = $lengths;
+        }
+
+        if ($this->index->isClustered()) {
+            $options['clustered'] = true;
+        }
+
+        switch ($this->index->getType()) {
+            case IndexType::FULLTEXT:
+                $options['fulltext'] = true;
+                break;
+
+            case IndexType::SPATIAL:
+                $options['spacial'] = true;
+                break;
+        }
+
+        return $options;
     }
 
     /**
@@ -100,12 +127,12 @@ final class DoctrineIndex implements IndexInterface
     {
         $options = [];
 
-        if ($this->index->hasOption('lengths')) {
-            $lengths = $this->index->getOption('lengths');
-            $index = array_search($field, $this->fields());
-
-            if ($index !== false && isset($lengths[$index])) {
-                $options['length'] = $lengths[$index];
+        foreach ($this->index->getIndexedColumns() as $indexedColumn) {
+            if ($indexedColumn->getColumnName()->toString() === $field) {
+                if (($length = $indexedColumn->getLength()) !== null) {
+                    $options['length'] = $length;
+                }
+                break;
             }
         }
 

@@ -7,6 +7,7 @@ use Bdf\Prime\Schema\Adapter\Doctrine\DoctrineTable as PrimeTableAdapter;
 use Bdf\Prime\Schema\Transformer\Doctrine\TableTransformer;
 use Doctrine\DBAL\Exception as DoctrineDBALException;
 use Doctrine\DBAL\Schema\AbstractSchemaManager as DoctrineSchemaManager;
+use Doctrine\DBAL\Schema\ComparatorConfig;
 use Doctrine\DBAL\Schema\Schema as DoctrineSchema;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\DBAL\Schema\SchemaDiff as DoctrineSchemaDiff;
@@ -92,7 +93,7 @@ class SchemaManager extends AbstractSchemaManager
 
         $tables = array_map(function ($table) {
             if ($table instanceof TableInterface) {
-                return (new TableTransformer($table, $this->platform))->toDoctrine();
+                return (new TableTransformer($table))->toDoctrine();
             }
 
             return $table;
@@ -247,7 +248,10 @@ class SchemaManager extends AbstractSchemaManager
     public function diff($new, $old)
     {
         /** @psalm-suppress InternalMethod */
-        $comparator = new Comparator($this->getConnection()->platform()->grammar());
+        $comparator = new Comparator(
+            $this->getConnection()->platform()->grammar(),
+            new ComparatorConfig(reportModifiedIndexes: false),
+        );
         $comparator->setListDropColumn($this->useDrop);
 
         return $comparator->compareSchemas(

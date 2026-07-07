@@ -8,6 +8,8 @@ use Bdf\Prime\Schema\Bag\Index;
 use Bdf\Prime\Schema\IndexInterface;
 use Bdf\Prime\Schema\IndexSetInterface;
 
+use function array_change_key_case;
+
 /**
  * Adapt Metadata to IndexSet
  */
@@ -42,10 +44,20 @@ final class MetadataIndexSet implements IndexSetInterface
      */
     public function all(): array
     {
-        $indexes =  $this->extractIndexes($this->metadata->indexes);
+        $indexes = $this->extractIndexes($this->metadata->indexes);
 
         $primary = $this->primary();
         $indexes[$primary->name()] = $primary;
+
+        return array_change_key_case($indexes, CASE_LOWER);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function secondaries(): array
+    {
+        $indexes = $this->extractIndexes($this->metadata->indexes);
 
         return array_change_key_case($indexes, CASE_LOWER);
     }

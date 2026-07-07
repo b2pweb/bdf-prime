@@ -363,8 +363,6 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      *
      * @throws DoctrineDBALException
      * @throws PrimeException
-     *
-     * @psalm-suppress InternalMethod
      */
     protected function executePrepared(Statement $statement, Compilable $query)
     {
@@ -405,35 +403,9 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function isNestedTransactionEnabled(): bool
+    public function inTransaction(callable $task): mixed
     {
-        return $this->getNestTransactionsWithSavepoints();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function useNestedTransaction(bool $flag = true): bool
-    {
-        $currentState = $this->getNestTransactionsWithSavepoints();
-
-        if ($flag !== $currentState) {
-            $this->setNestTransactionsWithSavepoints($flag);
-        }
-
-        return $currentState;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function inTransaction(callable $task)
-    {
-        $newTransaction = $this->isNestedTransactionEnabled() || !$this->isTransactionActive();
-
-        if ($newTransaction) {
-            $this->beginTransaction();
-        }
+        $this->beginTransaction();
 
         try {
             $result = $task();
@@ -441,18 +413,16 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
             if ($result === false) {
                 @trigger_error('Returning false from a transaction task to rollback is deprecated since Prime 2.3, use an exception instead', E_USER_DEPRECATED);
                 $this->rollBack(); // This statement is invalid when no new transaction is started, but we keep this behavior for backward compatibility
-                $newTransaction = false;
+
+                /** @psalm-suppress FalsableReturnStatement */
+                return false;
             }
 
-            if ($newTransaction) {
-                $this->commit();
-            }
+            $this->commit();
 
             return $result;
         } catch (Throwable $e) {
-            if ($newTransaction) {
-                $this->rollBack();
-            }
+            $this->rollBack();
 
             throw $e;
         }
@@ -463,20 +433,13 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      */
     public function inNestedTransaction(callable $task)
     {
-        $nestedState = $this->useNestedTransaction();
+        @trigger_error('The method ' . __METHOD__ . ' is deprecated since Prime 3.0, use inTransaction() instead', E_USER_DEPRECATED);
 
-        try {
-            return $this->inTransaction($task);
-        } finally {
-            $this->useNestedTransaction($nestedState);
-        }
+        return $this->inTransaction($task);
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @psalm-suppress DeprecatedProperty
-     * @psalm-suppress DeprecatedClass
      */
     public function close(): void
     {
@@ -498,8 +461,6 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      * @throws DBALException When any other error occurs
      *
      * @template T
-     *
-     * @psalm-suppress InternalMethod
      */
     protected function runOrReconnect(Closure $callback)
     {
@@ -512,7 +473,6 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
                     // Only reconnect the start transaction.
                     // Should raise exception during transaction.
                     $this->close();
-                    /** @psalm-suppress InternalMethod */
                     $this->connect();
 
                     return $callback();

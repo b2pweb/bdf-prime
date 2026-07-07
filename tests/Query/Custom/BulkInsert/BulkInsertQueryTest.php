@@ -37,7 +37,7 @@ class BulkInsertQueryTest extends TestCase
 
         $this->connection->schema()
             ->table('person', function (TypesHelperTableBuilder $builder) {
-                $builder->integer('id')->autoincrement();
+                $builder->integer('id')->primary()->autoincrement();
                 $builder->string('first_name');
                 $builder->string('last_name');
                 $builder->integer('age')->nillable();

@@ -5,26 +5,20 @@ namespace Bdf\Prime\Schema\Adapter\Doctrine;
 use Bdf\Prime\Schema\Constraint\ConstraintVisitorInterface;
 use Bdf\Prime\Schema\Constraint\ForeignKeyInterface;
 use Doctrine\DBAL\Schema\ForeignKeyConstraint;
+use Doctrine\DBAL\Schema\ForeignKeyConstraint\MatchType;
+use Doctrine\DBAL\Schema\ForeignKeyConstraint\ReferentialAction;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+
+use function array_map;
 
 /**
  * Adapt doctrine foreign key to prime foreign key
  */
-final class DoctrineForeignKey implements ForeignKeyInterface
+final readonly class DoctrineForeignKey implements ForeignKeyInterface
 {
-    /**
-     * @var ForeignKeyConstraint
-     */
-    private $fk;
-
-
-    /**
-     * DoctrineForeignKey constructor.
-     *
-     * @param ForeignKeyConstraint $fk
-     */
-    public function __construct(ForeignKeyConstraint $fk)
-    {
-        $this->fk = $fk;
+    public function __construct(
+        private ForeignKeyConstraint $fk,
+    ) {
     }
 
     /**
@@ -48,7 +42,7 @@ final class DoctrineForeignKey implements ForeignKeyInterface
      */
     public function fields(): array
     {
-        return $this->fk->getLocalColumns();
+        return array_map(static fn (UnqualifiedName $name) => $name->toString(), $this->fk->getReferencingColumnNames());
     }
 
     /**
@@ -56,11 +50,11 @@ final class DoctrineForeignKey implements ForeignKeyInterface
      */
     public function match(): string
     {
-        if (!$this->fk->hasOption('match')) {
-            return self::MATCH_SIMPLE;
-        }
-
-        return $this->fk->getOption('match');
+        return match ($this->fk->getMatchType()) {
+            MatchType::PARTIAL => self::MATCH_PARTIAL,
+            MatchType::FULL => self::MATCH_FULL,
+            default => self::MATCH_SIMPLE,
+        };
     }
 
     /**
@@ -68,7 +62,7 @@ final class DoctrineForeignKey implements ForeignKeyInterface
      */
     public function table(): string
     {
-        return $this->fk->getForeignTableName();
+        return $this->fk->getReferencedTableName()->toString();
     }
 
     /**
@@ -76,7 +70,7 @@ final class DoctrineForeignKey implements ForeignKeyInterface
      */
     public function referred(): array
     {
-        return $this->fk->getForeignColumns();
+        return array_map(static fn (UnqualifiedName $name) => $name->toString(), $this->fk->getReferencedColumnNames());
     }
 
     /**
@@ -84,11 +78,11 @@ final class DoctrineForeignKey implements ForeignKeyInterface
      */
     public function onDelete(): string
     {
-        if (!$this->fk->hasOption('onDelete')) {
-            return self::MODE_RESTRICT;
-        }
+        $action = $this->fk->getOnDeleteAction();
 
-        return $this->fk->getOption('onDelete');
+        // The default on prime 1 and 2 is RESTRICT, but doctrine dbal v4 use NO ACTION.
+        // Change it to RESTRICT for compatiblity purposes
+        return $action === ReferentialAction::NO_ACTION ? self::MODE_RESTRICT : $action->toSQL();
     }
 
     /**
@@ -96,10 +90,10 @@ final class DoctrineForeignKey implements ForeignKeyInterface
      */
     public function onUpdate(): string
     {
-        if (!$this->fk->hasOption('onUpdate')) {
-            return self::MODE_RESTRICT;
-        }
+        $action = $this->fk->getOnUpdateAction();
 
-        return $this->fk->getOption('onUpdate');
+        // The default on prime 1 and 2 is RESTRICT, but doctrine dbal v4 use NO ACTION.
+        // Change it to RESTRICT for compatiblity purposes
+        return $action === ReferentialAction::NO_ACTION ? self::MODE_RESTRICT : $action->toSQL();
     }
 }

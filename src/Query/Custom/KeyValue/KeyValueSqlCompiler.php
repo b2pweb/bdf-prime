@@ -10,6 +10,10 @@ use Bdf\Prime\Query\Contract\Compilable;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Doctrine\DBAL\Statement;
 
+use function array_map;
+use function explode;
+use function implode;
+
 /**
  * SQL compiler for KeyValueQuery
  *
@@ -57,10 +61,17 @@ class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInter
      */
     public function quoteIdentifier(CompilableClause $query, string $column): string
     {
-        return $query->isQuoteIdentifier()
-            ? $this->platform()->grammar()->quoteIdentifier($column)
-            : $column
-        ;
+        if (!$query->isQuoteIdentifier()) {
+            return $column;
+        }
+
+        $grammar = $this->platform()->grammar();
+
+        if (!str_contains($column, '.')) {
+            return $grammar->quoteSingleIdentifier($column);
+        }
+
+        return implode('.', array_map($grammar->quoteSingleIdentifier(...), explode('.', $column)));
     }
 
     /**

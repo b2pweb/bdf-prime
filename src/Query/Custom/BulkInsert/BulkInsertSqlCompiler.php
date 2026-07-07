@@ -9,6 +9,10 @@ use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
 use Bdf\Prime\Types\TypeInterface;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 
+use function array_map;
+use function explode;
+use function implode;
+
 /**
  * Compiler for @see BulkInsertQuery
  *
@@ -68,7 +72,13 @@ class BulkInsertSqlCompiler extends AbstractCompiler implements QuoteCompilerInt
             return $column;
         }
 
-        return $this->platform()->grammar()->quoteIdentifier($column);
+        $grammar = $this->platform()->grammar();
+
+        if (!str_contains($column, '.')) {
+            return $grammar->quoteSingleIdentifier($column);
+        }
+
+        return implode('.', array_map($grammar->quoteSingleIdentifier(...), explode('.', $column)));
     }
 
     /**

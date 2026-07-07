@@ -84,8 +84,7 @@ abstract class DatabaseCommand extends Command
                 continue;
             }
 
-            /** @psalm-suppress InternalMethod */
-            $parameters = $connection->getParams(); // @todo: Use ConnectionInterface::getParameters() when fully available (prime 3 ?)
+            $parameters = $connection->getParameters();
 
             // Skip connections marked as "ignore" on configuration
             // Permit to declare SQLite connections, which do not supports database management
