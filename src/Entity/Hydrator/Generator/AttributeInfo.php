@@ -168,11 +168,6 @@ class AttributeInfo
      */
     public function isTyped(): bool
     {
-        if (PHP_VERSION_ID < 70400) {
-            return false;
-        }
-
-        /** @psalm-suppress UndefinedMethod */
         return $this->reflection()->hasType();
     }
 
@@ -185,7 +180,6 @@ class AttributeInfo
      */
     public function isNullable(): bool
     {
-        /** @psalm-suppress UndefinedMethod */
         return !$this->isTyped() || $this->reflection()->getType()->allowsNull();
     }
 

@@ -336,7 +336,6 @@ class MapperHydrator implements MapperHydratorInterface
         }
 
         $this->reflectionProperties[$class][$attribute] = $reflectionProperty = new ReflectionProperty($class, $property);
-        PHP_VERSION_ID >= 80100 or $reflectionProperty->setAccessible(true);
 
         $this->writeToReflection($reflectionProperty, $entity, $value, $skipInvalid, $metadata);
     }
@@ -370,7 +369,6 @@ class MapperHydrator implements MapperHydratorInterface
         }
 
         $this->reflectionProperties[$class][$attribute] = $reflectionProperty = new ReflectionProperty($class, $property);
-        PHP_VERSION_ID >= 80100 or $reflectionProperty->setAccessible(true);
 
         $this->writeToReflection($reflectionProperty, $entity, $value, $skipInvalid, $metadata);
     }
@@ -394,7 +392,6 @@ class MapperHydrator implements MapperHydratorInterface
         }
 
         $this->reflectionProperties[$class][$attribute] = $propertyReflection = new ReflectionProperty($class, $property);
-        PHP_VERSION_ID >= 80100 or $propertyReflection->setAccessible(true);
 
         try {
             return $propertyReflection->getValue($entity);
@@ -413,11 +410,10 @@ class MapperHydrator implements MapperHydratorInterface
      */
     private function shouldSkipValue(ReflectionProperty $property, $value): bool
     {
-        if (PHP_VERSION_ID < 70400 || $value !== null) {
+        if ($value !== null) {
             return false;
         }
 
-        /** @psalm-suppress UndefinedMethod */
         return $property->hasType() && !$property->getType()->allowsNull();
     }
 
