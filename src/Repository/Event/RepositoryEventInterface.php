@@ -7,5 +7,4 @@ namespace Bdf\Prime\Repository\Event;
  */
 interface RepositoryEventInterface
 {
-
 }
