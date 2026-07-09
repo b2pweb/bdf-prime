@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * Manage the migration process
  */
-class MigrationManager
+final class MigrationManager
 {
     public const UP = 'up';
     public const DOWN = 'down';

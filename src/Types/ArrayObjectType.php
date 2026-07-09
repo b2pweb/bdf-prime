@@ -5,7 +5,7 @@ namespace Bdf\Prime\Types;
 /**
  * Map to associative array object
  */
-class ArrayObjectType extends AbstractSerializeType
+final class ArrayObjectType extends AbstractSerializeType
 {
     /**
      * {@inheritdoc}

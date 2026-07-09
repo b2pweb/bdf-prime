@@ -5,7 +5,7 @@ namespace Bdf\Prime\Types;
 /**
  * JSON object type
  */
-class JsonType extends AbstractJsonType
+final class JsonType extends AbstractJsonType
 {
     /**
      * {@inheritdoc}

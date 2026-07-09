@@ -7,7 +7,7 @@ use Bdf\Prime\Entity\Hydrator\Exception\HydratorGenerationException;
 /**
  * Accessor for embedded entity
  */
-class EmbeddedAccessor
+final class EmbeddedAccessor
 {
     private CodeGenerator $code;
     private EmbeddedInfo $embedded;

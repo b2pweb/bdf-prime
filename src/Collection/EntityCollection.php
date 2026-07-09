@@ -36,7 +36,7 @@ use IteratorAggregate;
  * @implements CollectionInterface<E>
  * @implements IteratorAggregate<array-key, E>
  */
-class EntityCollection implements IteratorAggregate, CollectionInterface, ImportableInterface
+final class EntityCollection implements IteratorAggregate, CollectionInterface, ImportableInterface
 {
     /**
      * @var RepositoryInterface<E>

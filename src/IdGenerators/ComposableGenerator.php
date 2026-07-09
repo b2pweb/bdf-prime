@@ -11,7 +11,7 @@ use Bdf\Prime\ServiceLocator;
  * @template C as ConnectionInterface
  * @implements GeneratorInterface<C>
  */
-class ComposableGenerator implements GeneratorInterface
+final class ComposableGenerator implements GeneratorInterface
 {
     /**
      * @var GeneratorInterface[]

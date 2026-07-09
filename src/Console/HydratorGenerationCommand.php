@@ -22,7 +22,7 @@ use Symfony\Component\Filesystem\Filesystem;
  * HydratorGenerationCommand
  */
 #[AsCommand('prime:hydrator', 'Generate optimized hydrator classes for entities')]
-class HydratorGenerationCommand extends Command
+final class HydratorGenerationCommand extends Command
 {
     protected static $defaultName = 'prime:hydrator';
 

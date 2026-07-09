@@ -27,7 +27,7 @@ use Psr\SimpleCache\CacheInterface as Psr16Cache;
  * @mixin QueryInterface<ConnectionInterface, E>
  * @psalm-no-seal-methods
  */
-class RepositoryQueryFactory
+final class RepositoryQueryFactory
 {
     /**
      * @var RepositoryInterface<E>

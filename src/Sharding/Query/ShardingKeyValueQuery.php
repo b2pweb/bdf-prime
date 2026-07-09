@@ -27,7 +27,7 @@ use Bdf\Prime\Sharding\ShardingConnection;
  * @implements KeyValueQueryInterface<ShardingConnection, R>
  * @extends AbstractReadCommand<ShardingConnection, R>
  */
-class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterface
+final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterface
 {
     use CachableTrait;
     /** @use ExecutableTrait<R> */

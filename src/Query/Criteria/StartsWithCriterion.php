@@ -9,7 +9,7 @@ use Bdf\Prime\Query\Expression\ExpressionInterface;
  * @psalm-immutable
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class StartsWithCriterion extends LikeCriterion
+readonly class StartsWithCriterion extends LikeCriterion
 {
     /**
      * @param string|ExpressionInterface|null $field

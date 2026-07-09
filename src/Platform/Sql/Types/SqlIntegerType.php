@@ -11,7 +11,7 @@ use Doctrine\DBAL\Types\Types;
 /**
  * Basic integer type for database
  */
-class SqlIntegerType extends AbstractPlatformType
+final class SqlIntegerType extends AbstractPlatformType
 {
     /**
      * @var string[]

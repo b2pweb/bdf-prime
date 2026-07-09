@@ -48,7 +48,7 @@ use Bdf\Prime\Query\Extension\CachableTrait;
  * @template C as \Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection
  * @implements InsertQueryInterface<C>
  */
-class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, InsertQueryInterface
+final class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, InsertQueryInterface
 {
     use CachableTrait;
 
@@ -57,14 +57,14 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
      *
      * @var C
      */
-    protected ConnectionInterface $connection;
+    private ConnectionInterface $connection;
 
     /**
      * The SQL compiler
      *
      * @var CompilerInterface<BulkInsertQuery>&QuoteCompilerInterface
      */
-    protected CompilerInterface $compiler;
+    private CompilerInterface $compiler;
 
 
     /**

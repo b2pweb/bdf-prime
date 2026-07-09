@@ -9,7 +9,7 @@ use Doctrine\Inflector\Inflector;
 /**
  * SimpleInfector
  */
-class SimpleInfector implements InflectorInterface
+final class SimpleInfector implements InflectorInterface
 {
     /**
      * The inflector instance

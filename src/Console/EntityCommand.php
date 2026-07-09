@@ -29,7 +29,7 @@ use Symfony\Component\Filesystem\Filesystem;
  * @psalm-suppress InvalidCast
  */
 #[AsCommand('prime:entity', 'Generate entity class by mapper')]
-class EntityCommand extends Command
+final class EntityCommand extends Command
 {
     protected static $defaultName = 'prime:entity';
 

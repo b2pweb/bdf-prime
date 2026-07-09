@@ -20,7 +20,7 @@ use Doctrine\DBAL\Platforms\SQLitePlatform;
  *
  * @extends AbstractGenerator<\Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection>
  */
-class TableGenerator extends AbstractGenerator
+final class TableGenerator extends AbstractGenerator
 {
     /**
      * {@inheritdoc}

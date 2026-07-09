@@ -42,42 +42,42 @@ use function count;
  *
  * @property EntityRepository<R> $distant
  */
-class BelongsToMany extends Relation
+final class BelongsToMany extends Relation
 {
     /**
      * Through repository
      *
      * @var EntityRepository
      */
-    protected RepositoryInterface $through;
+    private RepositoryInterface $through;
 
     /**
      * Through local key
      *
      * @var string
      */
-    protected string $throughLocal;
+    private string $throughLocal;
 
     /**
      * Through distant key
      *
      * @var string
      */
-    protected string $throughDistant;
+    private string $throughDistant;
 
     /**
      * The through global constraints
      *
      * @var array
      */
-    protected array $throughConstraints = [];
+    private array $throughConstraints = [];
 
     /**
      * Merge of all constraints
      *
      * @var array
      */
-    protected array $allConstraints = [];
+    private array $allConstraints = [];
 
     /**
      * {@inheritdoc}

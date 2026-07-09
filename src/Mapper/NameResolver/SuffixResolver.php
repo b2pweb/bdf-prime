@@ -5,9 +5,9 @@ namespace Bdf\Prime\Mapper\NameResolver;
 /**
  * @package Bdf\Prime\Mapper\NameResolver
  */
-class SuffixResolver implements ResolverInterface
+final class SuffixResolver implements ResolverInterface
 {
-    protected string $suffix;
+    private string $suffix;
 
     /**
      * @param string $suffix

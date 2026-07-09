@@ -8,7 +8,7 @@ namespace Bdf\Prime\Sharding;
  *
  * @implements ShardChoserInterface<int>
  */
-class ModuloChoser implements ShardChoserInterface
+final class ModuloChoser implements ShardChoserInterface
 {
     /**
      * {@inheritdoc}

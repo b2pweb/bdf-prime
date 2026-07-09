@@ -5,7 +5,7 @@ namespace Bdf\Prime\Entity\Hydrator\Generator;
 /**
  * Information about an embedded object
  */
-class EmbeddedInfo
+final class EmbeddedInfo
 {
     private string $path;
     private array $metadata;

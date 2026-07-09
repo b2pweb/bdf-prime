@@ -11,7 +11,7 @@ use Doctrine\DBAL\Types\Types;
 /**
  * Basic boolean type for database
  */
-class SqlBooleanType extends AbstractPlatformType
+final class SqlBooleanType extends AbstractPlatformType
 {
     /**
      * {@inheritdoc}

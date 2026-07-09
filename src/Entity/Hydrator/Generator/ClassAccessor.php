@@ -9,7 +9,7 @@ use ReflectionProperty;
 /**
  * Handle accessor from class
  */
-class ClassAccessor
+final class ClassAccessor
 {
     public const SCOPE_EXTERNAL = 'external';
     public const SCOPE_INHERIT  = 'inherit';

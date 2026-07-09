@@ -5,7 +5,7 @@ namespace Bdf\Prime\Types;
 /**
  * Accept a time type (H:i:s)
  */
-class TimeType extends AbstractDateTimeType
+final class TimeType extends AbstractDateTimeType
 {
     /**
      * TimeType constructor.

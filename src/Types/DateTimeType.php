@@ -5,7 +5,7 @@ namespace Bdf\Prime\Types;
 /**
  * Type that maps a DATETIME ISO8601 to a PHP DateTime Object
  */
-class DateTimeType extends AbstractDateTimeType
+final class DateTimeType extends AbstractDateTimeType
 {
     /**
      * DateTimeType constructor.

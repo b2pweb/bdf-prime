@@ -9,7 +9,7 @@ use Bdf\Prime\Sharding\ShardingConnection;
 /**
  * ShardingConnection
  */
-class ShardingConnectionFactory implements ConnectionFactoryInterface
+final class ShardingConnectionFactory implements ConnectionFactoryInterface
 {
     /**
      * The delegated loader

@@ -15,7 +15,7 @@ use UnitEnum;
 /**
  * Manage types of platform
  */
-class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
+final class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
 {
     /**
      * Map of interface to prime type

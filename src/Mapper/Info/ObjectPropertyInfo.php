@@ -11,22 +11,22 @@ use function assert;
  *
  * @package Bdf\Prime\Mapper\Info
  */
-class ObjectPropertyInfo implements InfoInterface
+final class ObjectPropertyInfo implements InfoInterface
 {
     /**
      * The property name
      */
-    protected string $name;
+    private string $name;
 
     /**
      * The metadata from the metadata object
      */
-    protected array $metadata;
+    private array $metadata;
 
     /**
      * The metadata from the metadata object
      */
-    protected ?array $relation = null;
+    private ?array $relation = null;
 
 
     /**

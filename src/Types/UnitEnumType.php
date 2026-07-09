@@ -9,7 +9,7 @@ use function constant;
 use function defined;
 use function is_subclass_of;
 
-class UnitEnumType extends AbstractFacadeType
+final class UnitEnumType extends AbstractFacadeType
 {
     public const UNIT_ENUM = 'unit_enum';
 

@@ -21,7 +21,7 @@ use function implode;
  * @extends AbstractCompiler<BulkInsertQuery, \Doctrine\DBAL\Connection&\Bdf\Prime\Connection\ConnectionInterface>
  * @implements QuoteCompilerInterface<BulkInsertQuery>
  */
-class BulkInsertSqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
+final class BulkInsertSqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
 {
     /**
      * {@inheritdoc}

@@ -22,10 +22,10 @@ use function is_string;
 /**
  * Preprocessor for Orm operation (i.e. with EntityRepository and Alias resolver)
  */
-class OrmPreprocessor implements PreprocessorInterface
+final class OrmPreprocessor implements PreprocessorInterface
 {
-    protected ?AliasResolver $aliasResolver = null;
-    protected Metadata $metadata;
+    private ?AliasResolver $aliasResolver = null;
+    private Metadata $metadata;
 
     /**
      * The query repository
@@ -33,8 +33,8 @@ class OrmPreprocessor implements PreprocessorInterface
      * @internal
      */
     private RepositoryInterface $repository;
-    protected string $type = '';
-    protected PlatformInterface $platform;
+    private string $type = '';
+    private PlatformInterface $platform;
     private bool $allowUnknownAttribute = false;
 
 

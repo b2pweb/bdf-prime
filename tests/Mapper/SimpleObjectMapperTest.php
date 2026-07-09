@@ -2,7 +2,9 @@
 
 namespace Bdf\Prime\Mapper;
 
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Prime;
+use Bdf\Prime\Relations\Builder\RelationBuilder;
 use Bdf\Prime\Test\RepositoryAssertion;
 use PHPUnit\Framework\TestCase;
 use stdClass;
@@ -156,38 +158,30 @@ class SimpleEntityMapper extends Mapper
             'table'      => 'test_',
         ];
     }
-    
+
     /**
      * {@inheritdoc}
      */
-    public function fields(): iterable
+    public function buildFields(FieldBuilder $builder): void
     {
-        return [
-            'id'          => ['type' => 'integer', 'primary' => Metadata::PK_AUTOINCREMENT],
-            'name'        => ['type' => 'string', 'length' => '255'],
-            'dateInsert'  => ['type' => 'datetime', 'alias' => 'date_insert', 'nillable' => true],
-            'foreign'     => [
-                'class'    => __NAMESPACE__.'\SimpleEmbeddedEntity',
-                'embedded' => [
-                    'id'    => ['type' => 'integer', 'alias' => 'foreign_key', 'nillable' => true],
-                ]
-            ],
-        ];
+        $builder
+            ->integer('id')->autoincrement()
+            ->string('name')
+            ->dateTime('dateInsert')->alias('date_insert')->nillable()
+            ->embedded('foreign', __NAMESPACE__.'\SimpleEmbeddedEntity', function(FieldBuilder $builder){
+                $builder->integer('id')->alias('foreign_key')->nillable();
+            })
+        ;
     }
-    
+
     /**
      * {@inheritdoc}
      */
-    public function relations(): array
+    public function buildRelations(RelationBuilder $builder): void
     {
-        return [
-            'foreign' => [
-                'type'       => 'hasOne',
-                'entity'     => __NAMESPACE__.'\SimpleEmbeddedEntity',
-                'localKey'   => 'foreign.id',
-                'distantKey' => 'id',
-            ]
-        ];
+        $builder->on('foreign')
+            ->hasOne(__NAMESPACE__.'\SimpleEmbeddedEntity', 'foreign.id')
+        ;
     }
 }
 
@@ -204,16 +198,16 @@ class SimpleEmbeddedEntityMapper extends Mapper
             'table' => 'foreign_',
         ];
     }
-    
+
     /**
      * {@inheritdoc}
      */
-    public function fields(): iterable
+    public function buildFields(FieldBuilder $builder): void
     {
-        return [
-            'id'          => ['type' => 'integer', 'primary' => Metadata::PK_SEQUENCE, 'alias' => 'pk_id'],
-            'name'        => ['type' => 'string', 'length' => '90', 'alias' => 'name_'],
-            'city'        => ['type' => 'string', 'length' => '90', 'nillable' => true],
-        ];
+        $builder
+            ->integer('id')->sequence()->alias('pk_id')
+            ->string('name', 90)->alias('name_')
+            ->string('city', 90)->nillable()
+        ;
     }
 }

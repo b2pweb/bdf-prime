@@ -5,7 +5,7 @@ namespace Bdf\Prime\Types;
 /**
  * Accept a date type (Y-m-d)
  */
-class DateType extends AbstractDateTimeType
+final class DateType extends AbstractDateTimeType
 {
     /**
      * DateType constructor.

@@ -7,7 +7,7 @@ use Bdf\Prime\Configuration;
 /**
  * Allows declaration of configuration custom by connection. Use a default connection if the configuration is not set.
  */
-class ConfigurationResolver implements ConfigurationResolverInterface
+final class ConfigurationResolver implements ConfigurationResolverInterface
 {
     /**
      * @var Configuration[]

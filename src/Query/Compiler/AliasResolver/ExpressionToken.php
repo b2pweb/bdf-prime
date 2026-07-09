@@ -5,7 +5,7 @@ namespace Bdf\Prime\Query\Compiler\AliasResolver;
 /**
  * ExpressionToken
  */
-class ExpressionToken
+final class ExpressionToken
 {
     public const TYPE_DYN   = 0;
     public const TYPE_STA   = 1;

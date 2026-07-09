@@ -20,31 +20,31 @@ use Bdf\Prime\Types\TypeInterface;
  * @template E as object
  * @extends Behavior<E>
  */
-class Blameable extends Behavior
+final class Blameable extends Behavior
 {
     /**
      * The user resolver
      *
      * @var callable
      */
-    protected $userResolver;
+    private $userResolver;
 
     /**
      * The created by info.
      * Contains keys 'name' and 'alias'
      */
-    protected ?array $createdBy;
+    private ?array $createdBy;
 
     /**
      * The updated by info.
      * Contains keys 'name' and 'alias'
      */
-    protected ?array $updatedBy;
+    private ?array $updatedBy;
 
     /**
      * The property type
      */
-    protected string $type;
+    private string $type;
 
     /**
      * Blameable constructor.

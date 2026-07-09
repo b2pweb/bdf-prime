@@ -9,7 +9,7 @@ use DateTimeInterface;
 /**
  * Type that maps a SQL TIMESTAMP to a PHP DateTime Object
  */
-class TimestampType extends AbstractFacadeType
+final class TimestampType extends AbstractFacadeType
 {
     use DateTimeHelper;
 

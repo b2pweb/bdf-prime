@@ -5,7 +5,7 @@ namespace Bdf\Prime\Cache;
 /**
  * ArrayCache
  */
-class ArrayCache implements CacheInterface
+final class ArrayCache implements CacheInterface
 {
     private array $data = [];
 

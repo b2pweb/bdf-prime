@@ -11,7 +11,7 @@ use Doctrine\DBAL\Types\Types;
 /**
  * Represents a GUID/UUID datatype in the database.
  */
-class SqlGuidType extends AbstractPlatformType
+final class SqlGuidType extends AbstractPlatformType
 {
     /**
      * {@inheritdoc}

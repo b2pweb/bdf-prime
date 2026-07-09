@@ -66,9 +66,8 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
     /**
      * {@inheritdoc}
      *
-     * @final
      */
-    public function collection()
+    final public function collection()
     {
         return $this->collection;
     }
@@ -77,9 +76,8 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
      * Get the query
      *
      * @return ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable
-     * @final
      */
-    public function query()
+    final public function query()
     {
         return $this->query;
     }

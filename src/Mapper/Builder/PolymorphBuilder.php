@@ -5,7 +5,7 @@ namespace Bdf\Prime\Mapper\Builder;
 /**
  * Field builder for polymorph embedded
  */
-class PolymorphBuilder extends FieldBuilder
+final class PolymorphBuilder extends FieldBuilder
 {
     /**
      * @var string

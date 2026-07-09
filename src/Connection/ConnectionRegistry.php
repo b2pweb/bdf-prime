@@ -13,7 +13,7 @@ use Bdf\Prime\Exception\DBALException;
 /**
  * ConnectionRegistry
  */
-class ConnectionRegistry implements ConnectionRegistryInterface
+final class ConnectionRegistry implements ConnectionRegistryInterface
 {
     /**
      * The connection factory

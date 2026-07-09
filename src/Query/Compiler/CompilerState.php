@@ -7,7 +7,7 @@ namespace Bdf\Prime\Query\Compiler;
  *
  * @internal
  */
-class CompilerState
+final class CompilerState
 {
     /**
      * The bind parameters

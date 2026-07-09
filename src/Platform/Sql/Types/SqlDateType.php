@@ -7,7 +7,7 @@ use Bdf\Prime\Platform\PlatformInterface;
 /**
  * Accept a date type (Y-m-d)
  */
-class SqlDateType extends AbstractSqlDateTimeType
+final class SqlDateType extends AbstractSqlDateTimeType
 {
     /**
      * {@inheritdoc}

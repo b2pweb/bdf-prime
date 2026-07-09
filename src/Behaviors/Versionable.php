@@ -19,19 +19,19 @@ use Bdf\Prime\Repository\RepositoryInterface;
  * @template E as object
  * @extends Behavior<E>
  */
-class Versionable extends Behavior
+final class Versionable extends Behavior
 {
     public const COLUMN_NAME = 'version';
 
     /**
      * The version repository className
      */
-    protected string $versionClass;
+    private string $versionClass;
 
     /**
      * Allow version deletion
      */
-    protected bool $allowDeletion;
+    private bool $allowDeletion;
 
     /**
      * Versionable constructor.

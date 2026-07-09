@@ -11,7 +11,7 @@ use Doctrine\DBAL\Types\Types;
 /**
  * Type that maps an SQL DECIMAL to a PHP string.
  */
-class SqlDecimalType extends AbstractPlatformType
+final class SqlDecimalType extends AbstractPlatformType
 {
     /**
      * {@inheritdoc}

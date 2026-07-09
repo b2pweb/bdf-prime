@@ -10,7 +10,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class InitCommand
  */
 #[AsCommand('prime:migration:init', 'Initialise this directory for use with migration')]
-class InitCommand extends AbstractCommand
+final class InitCommand extends AbstractCommand
 {
     protected static $defaultName = 'prime:migration:init';
 

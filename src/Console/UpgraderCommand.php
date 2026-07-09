@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * UpgraderCommand
  */
 #[AsCommand('prime:upgrade', 'Upgrade schema from mappers')]
-class UpgraderCommand extends Command
+final class UpgraderCommand extends Command
 {
     protected static $defaultName = 'prime:upgrade';
 

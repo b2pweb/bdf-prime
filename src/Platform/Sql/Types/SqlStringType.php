@@ -13,7 +13,7 @@ use Doctrine\DBAL\Types\Types;
  *
  * @todo Handle "static" CHAR type
  */
-class SqlStringType extends AbstractPlatformType
+final class SqlStringType extends AbstractPlatformType
 {
     /**
      * @var string[]

@@ -18,7 +18,7 @@ use Psr\Container\ContainerInterface;
 /**
  * ServiceLocator
  */
-class ServiceLocator
+final class ServiceLocator
 {
     private ConnectionManager $connectionManager;
 

@@ -21,7 +21,7 @@ use function is_object;
  *
  * @extends BelongsTo<L, R>
  */
-class MorphTo extends BelongsTo
+final class MorphTo extends BelongsTo
 {
     /**
      * {@inheritdoc}

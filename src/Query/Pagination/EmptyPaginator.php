@@ -10,7 +10,7 @@ use Bdf\Prime\Collection\ArrayCollection;
  * @template R as array|object
  * @extends Paginator<R>
  */
-class EmptyPaginator extends Paginator
+final class EmptyPaginator extends Paginator
 {
     /**
      * Create an empty paginator

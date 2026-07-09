@@ -13,7 +13,7 @@ use LogicException;
  *
  * doctrine dbal connection registry
  */
-class ConnectionManager implements ConnectionRegistryInterface
+final class ConnectionManager implements ConnectionRegistryInterface
 {
     /**
      * The connection registry

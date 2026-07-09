@@ -20,7 +20,7 @@ use function implode;
  * @extends AbstractCompiler<KeyValueQuery, \Doctrine\DBAL\Connection&\Bdf\Prime\Connection\ConnectionInterface>
  * @implements QuoteCompilerInterface<KeyValueQuery>
  */
-class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
+final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
 {
     /**
      * {@inheritdoc}

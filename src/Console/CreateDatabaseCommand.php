@@ -9,7 +9,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
  *
  */
 #[AsCommand('prime:database:create', 'Creates the database from the configuration')]
-class CreateDatabaseCommand extends DatabaseCommand
+final class CreateDatabaseCommand extends DatabaseCommand
 {
     protected static $defaultName = 'prime:database:create';
 

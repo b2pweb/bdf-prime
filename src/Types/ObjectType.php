@@ -5,7 +5,7 @@ namespace Bdf\Prime\Types;
 /**
  * Map to stdClass object
  */
-class ObjectType extends AbstractSerializeType
+final class ObjectType extends AbstractSerializeType
 {
     /**
      * {@inheritdoc}

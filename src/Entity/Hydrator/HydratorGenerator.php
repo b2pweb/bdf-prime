@@ -17,7 +17,7 @@ use Bdf\Prime\ServiceLocator;
 /**
  * Generator for hydrator classes
  */
-class HydratorGenerator
+final class HydratorGenerator
 {
     /**
      * The stub hydrator file name

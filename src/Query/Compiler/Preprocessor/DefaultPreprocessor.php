@@ -8,7 +8,7 @@ use Bdf\Prime\Query\CompilableClause;
  * Default preprocessor for Compiler.
  * Do nothing
  */
-class DefaultPreprocessor implements PreprocessorInterface
+final class DefaultPreprocessor implements PreprocessorInterface
 {
     /**
      * {@inheritdoc}

@@ -19,7 +19,7 @@ namespace Bdf\Prime\Query\Expression;
  * @see Raw For raw database expression
  * @see Value For bind value
  */
-class RawValue extends AbstractExpressionTransformer
+final class RawValue extends AbstractExpressionTransformer
 {
     /**
      * {@inheritdoc}

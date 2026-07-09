@@ -16,11 +16,11 @@ use Bdf\Prime\Query\Compiler\SqlCompiler;
  * @template Q as \Bdf\Prime\Query\CompilableClause&\Bdf\Prime\Query\SqlQueryInterface
  * @implements ExpressionInterface<Q, \Bdf\Prime\Query\Compiler\SqlCompiler>
  */
-class FullTextMatch implements ExpressionInterface
+final class FullTextMatch implements ExpressionInterface
 {
-    protected string $search;
-    protected mixed $value;
-    protected bool $booleanMode;
+    private string $search;
+    private mixed $value;
+    private bool $booleanMode;
 
     /**
      * Constructor

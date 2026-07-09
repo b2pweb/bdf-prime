@@ -27,7 +27,7 @@ use function json_last_error_msg;
  * @see FieldBuilder::useNativeJsonType() To set the schemaOption "use_native_json"
  * @see FieldBuilder::jsonObjectAsArray() To set the schemaOption "object_as_array"
  */
-class SqlJsonType extends AbstractPlatformType
+final class SqlJsonType extends AbstractPlatformType
 {
     public const OPTION_USE_NATIVE_JSON = 'use_native_json';
     public const OPTION_OBJECT_AS_ARRAY = 'object_as_array';

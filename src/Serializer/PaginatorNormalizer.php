@@ -19,7 +19,7 @@ use Bdf\Serializer\Type\Type;
  *
  * @implements NormalizerInterface<PaginatorInterface>
  */
-class PaginatorNormalizer implements NormalizerInterface, AutoRegisterInterface
+final class PaginatorNormalizer implements NormalizerInterface, AutoRegisterInterface
 {
     /**
      * {@inheritdoc}

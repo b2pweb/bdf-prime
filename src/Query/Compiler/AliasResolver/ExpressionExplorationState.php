@@ -7,7 +7,7 @@ use Bdf\Prime\Mapper\Metadata;
 /**
  * ExpressionExplorationState
  */
-class ExpressionExplorationState
+final class ExpressionExplorationState
 {
     public ?string $alias = null;
     public string $path = '';

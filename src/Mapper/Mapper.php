@@ -238,12 +238,11 @@ abstract class Mapper implements ClockAwareInterface
      * Get metadata
      *
      * @return Metadata
-     * @final
      *
      * @psalm-suppress InvalidNullableReturnType
      * @psalm-suppress NullableReturnStatement
      */
-    public function metadata(): Metadata
+    final public function metadata(): Metadata
     {
         return $this->metadata;
     }
@@ -252,9 +251,8 @@ abstract class Mapper implements ClockAwareInterface
      * Set property accessor class name
      *
      * @param class-string<PropertyAccessorInterface> $className
-     * @final
      */
-    public function setPropertyAccessorClass(string $className): void
+    final public function setPropertyAccessorClass(string $className): void
     {
         $this->propertyAccessorClass = $className;
     }
@@ -263,9 +261,8 @@ abstract class Mapper implements ClockAwareInterface
      * Get property accessor class name
      *
      * @return class-string<PropertyAccessorInterface>
-     * @final
      */
-    public function getPropertyAccessorClass(): string
+    final public function getPropertyAccessorClass(): string
     {
         return $this->propertyAccessorClass;
     }
@@ -274,9 +271,8 @@ abstract class Mapper implements ClockAwareInterface
      * Set repository class name
      *
      * @param class-string $className
-     * @final
      */
-    public function setRepositoryClass(string $className): void
+    final public function setRepositoryClass(string $className): void
     {
         $this->repositoryClass = $className;
     }
@@ -285,9 +281,8 @@ abstract class Mapper implements ClockAwareInterface
      * Get repository class name
      *
      * @return class-string
-     * @final
      */
-    public function getRepositoryClass(): string
+    final public function getRepositoryClass(): string
     {
         return $this->repositoryClass;
     }
@@ -296,9 +291,8 @@ abstract class Mapper implements ClockAwareInterface
      * Set the repository read only
      *
      * @param bool $flag
-     * @final
      */
-    public function setReadOnly(bool $flag): void
+    final public function setReadOnly(bool $flag): void
     {
         $this->readOnly = $flag;
     }
@@ -307,18 +301,16 @@ abstract class Mapper implements ClockAwareInterface
      * Get repository read only state
      *
      * @return bool
-     * @final
      */
-    public function isReadOnly(): bool
+    final public function isReadOnly(): bool
     {
         return $this->readOnly;
     }
 
     /**
      * Disable schema manager on repository
-     * @final
      */
-    public function disableSchemaManager(): void
+    final public function disableSchemaManager(): void
     {
         $this->useSchemaManager = false;
     }
@@ -327,9 +319,8 @@ abstract class Mapper implements ClockAwareInterface
      * Does repository have a schema manager
      *
      * @return bool
-     * @final
      */
-    public function hasSchemaManager(): bool
+    final public function hasSchemaManager(): bool
     {
         return $this->useSchemaManager;
     }
@@ -338,9 +329,8 @@ abstract class Mapper implements ClockAwareInterface
      * Set the query builder quote identifier
      *
      * @param bool $flag
-     * @final
      */
-    public function setQuoteIdentifier(bool $flag): void
+    final public function setQuoteIdentifier(bool $flag): void
     {
         $this->useQuoteIdentifier = $flag;
     }
@@ -349,9 +339,8 @@ abstract class Mapper implements ClockAwareInterface
      * Does query builder use quote identifier
      *
      * @return bool
-     * @final
      */
-    public function hasQuoteIdentifier(): bool
+    final public function hasQuoteIdentifier(): bool
     {
         return $this->useQuoteIdentifier;
     }
@@ -388,9 +377,8 @@ abstract class Mapper implements ClockAwareInterface
      * Set generator ID
      *
      * @param string|GeneratorInterface $generator
-     * @final
      */
-    public function setGenerator($generator): void
+    final public function setGenerator($generator): void
     {
         if (!is_string($generator) && !$generator instanceof GeneratorInterface) {
             throw new LogicException('Trying to set an invalid generator in "' . get_class($this) . '"');
@@ -407,9 +395,8 @@ abstract class Mapper implements ClockAwareInterface
      * Get generator ID
      *
      * @return GeneratorInterface
-     * @final
      */
-    public function generator(): GeneratorInterface
+    final public function generator(): GeneratorInterface
     {
         $generator = $this->generator;
 
@@ -439,12 +426,11 @@ abstract class Mapper implements ClockAwareInterface
 
     /**
      * @return MapperHydratorInterface<E>
-     * @final
      *
      * @psalm-suppress InvalidNullableReturnType
      * @psalm-suppress NullableReturnStatement
      */
-    public function hydrator(): MapperHydratorInterface
+    final public function hydrator(): MapperHydratorInterface
     {
         return $this->hydrator;
     }
@@ -453,9 +439,8 @@ abstract class Mapper implements ClockAwareInterface
      * @param MapperHydratorInterface<E> $hydrator
      *
      * @return $this
-     * @final
      */
-    public function setHydrator(MapperHydratorInterface $hydrator)
+    final public function setHydrator(MapperHydratorInterface $hydrator)
     {
         $this->hydrator = $hydrator;
         $this->hydrator->setPrimeInstantiator($this->serviceLocator->instantiator());
@@ -503,9 +488,8 @@ abstract class Mapper implements ClockAwareInterface
      * @param mixed $value
      *
      * @return void
-     * @final
      */
-    public function setId($entity, $value): void
+    final public function setId($entity, $value): void
     {
         $this->hydrateOne($entity, $this->metadata->primary['attributes'][0], $value);
     }
@@ -517,9 +501,8 @@ abstract class Mapper implements ClockAwareInterface
      * @param E $entity
      *
      * @return mixed
-     * @final
      */
-    public function getId($entity)
+    final public function getId($entity)
     {
         return $this->extractOne($entity, $this->metadata->primary['attributes'][0]);
     }
@@ -531,9 +514,8 @@ abstract class Mapper implements ClockAwareInterface
      * @param string $attribute
      *
      * @return mixed
-     * @final
      */
-    public function extractOne($entity, string $attribute)
+    final public function extractOne($entity, string $attribute)
     {
         return $this->hydrator->extractOne($entity, $attribute);
     }
@@ -546,9 +528,8 @@ abstract class Mapper implements ClockAwareInterface
      * @param mixed  $value
      *
      * @return void
-     * @final
      */
-    public function hydrateOne($entity, string $attribute, $value): void
+    final public function hydrateOne($entity, string $attribute, $value): void
     {
         $this->hydrator->hydrateOne($entity, $attribute, $value);
     }
@@ -559,9 +540,8 @@ abstract class Mapper implements ClockAwareInterface
      * @param E $entity
      *
      * @return array
-     * @final
      */
-    public function primaryCriteria($entity): array
+    final public function primaryCriteria($entity): array
     {
         return $this->hydrator->flatExtract($entity, array_flip($this->metadata->primary['attributes']));
     }
@@ -570,9 +550,8 @@ abstract class Mapper implements ClockAwareInterface
      * Instanciate the related class entity
      *
      * @return E
-     * @final
      */
-    public function instantiate()
+    final public function instantiate()
     {
         /** @var E */
         return $this->serviceLocator->instantiator()
@@ -585,9 +564,8 @@ abstract class Mapper implements ClockAwareInterface
      * @param array $data
      *
      * @return E
-     * @final
      */
-    public function entity(array $data)
+    final public function entity(array $data)
     {
         $entity = $this->instantiate();
 
@@ -609,9 +587,8 @@ abstract class Mapper implements ClockAwareInterface
      * @param array|null $attributes  Attribute should be flipped as ['key' => true]
      *
      * @return array
-     * @final
      */
-    public function prepareToRepository($entity, ?array $attributes = null): array
+    final public function prepareToRepository($entity, ?array $attributes = null): array
     {
         return $this->hydrator->flatExtract($entity, $attributes);
     }
@@ -644,9 +621,8 @@ abstract class Mapper implements ClockAwareInterface
      * Get the repository
      *
      * @return RepositoryInterface<E>
-     * @final
      */
-    public function repository(): RepositoryInterface
+    final public function repository(): RepositoryInterface
     {
         $className = $this->repositoryClass;
 
@@ -677,9 +653,8 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @return MapperInfo
      * @throws PrimeException
-     * @final
      */
-    public function info(): MapperInfo
+    final public function info(): MapperInfo
     {
         $platform = $this->serviceLocator->connection($this->metadata()->connection)->platform();
 
@@ -769,11 +744,8 @@ abstract class Mapper implements ClockAwareInterface
      * Gets repository fields builder
      *
      * @return iterable<string, FieldDefinition>
-     * @final
-     *
-     * @todo should be final
      */
-    public function fields(): iterable
+    final public function fields(): iterable
     {
         $builder = new FieldBuilder();
         $this->buildFields($builder);
@@ -792,10 +764,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @param FieldBuilder $builder
      */
-    public function buildFields(FieldBuilder $builder): void
-    {
-        throw new LogicException('Fields must be defined in mapper '.__CLASS__);
-    }
+    abstract public function buildFields(FieldBuilder $builder): void;
 
     /**
      * Sequence definition.
@@ -883,11 +852,8 @@ abstract class Mapper implements ClockAwareInterface
      * </code>
      *
      * @return array
-     * @final
-     *
-     * @todo Make final
      */
-    public function indexes(): array
+    final public function indexes(): array
     {
         $builder = new IndexBuilder();
 
@@ -1006,9 +972,8 @@ abstract class Mapper implements ClockAwareInterface
      * Register event on notifier
      *
      * @param RepositoryEventsSubscriberInterface<E> $notifier
-     * @final
      */
-    public function events(RepositoryEventsSubscriberInterface $notifier): void
+    final public function events(RepositoryEventsSubscriberInterface $notifier): void
     {
         $this->customEvents($notifier);
 
@@ -1075,7 +1040,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @todo should be final
      */
-    public function relations(): array
+    final public function relations(): array
     {
         if ($this->relationBuilder === null) {
             $this->relationBuilder = new RelationBuilder();

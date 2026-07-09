@@ -24,14 +24,14 @@ class TestPack
      *
      * @var static|null
      */
-    protected static ?self $pack = null;
+    private static ?self $pack = null;
 
     /**
      * Test data by group
      *
      * @var array{persistent:object[], non-persistent: object[]}
      */
-    protected array $testPacks = [
+    private array $testPacks = [
         'persistent'        => [],  // Entités créées non modifiables
         'non-persistent'    => []   // Entités créées et détruites aprés un test
     ];

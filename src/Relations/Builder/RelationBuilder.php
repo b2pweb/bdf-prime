@@ -36,7 +36,7 @@ use IteratorAggregate;
  * @implements ArrayAccess<string, RelationDefinition>
  * @implements IteratorAggregate<string, RelationDefinition>
  */
-class RelationBuilder implements ArrayAccess, IteratorAggregate
+final class RelationBuilder implements ArrayAccess, IteratorAggregate
 {
     public const MODE_EAGER = "EAGER";
     public const MODE_LAZY = "LAZY";
@@ -46,7 +46,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @var array<string, RelationDefinition>
      */
-    protected array $relations = [];
+    private array $relations = [];
 
     /**
      * The name of the current relation

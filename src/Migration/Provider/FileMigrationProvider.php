@@ -12,7 +12,7 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Migration file provider
  */
-class FileMigrationProvider implements MigrationProviderInterface
+final class FileMigrationProvider implements MigrationProviderInterface
 {
     /**
      * The migration factory

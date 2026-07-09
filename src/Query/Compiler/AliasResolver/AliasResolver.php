@@ -16,12 +16,12 @@ use InvalidArgumentException;
  *
  * @internal
  */
-class AliasResolver
+final class AliasResolver
 {
-    protected Metadata $metadata;
-    protected RepositoryInterface $repository;
-    protected TypesRegistryInterface $types;
-    protected (QueryInterface&EntityJoinable)|null $query = null;
+    private Metadata $metadata;
+    private RepositoryInterface $repository;
+    private TypesRegistryInterface $types;
+    private (QueryInterface&EntityJoinable)|null $query = null;
 
     /**
      * The counter of alias
@@ -37,7 +37,7 @@ class AliasResolver
      *
      * @var string[]
      */
-    protected array $relationAlias = [];
+    private array $relationAlias = [];
 
     /**
      * Array of path, indexed by alias
@@ -50,7 +50,7 @@ class AliasResolver
      *
      * @var array<string, string>
      */
-    protected array $aliasToPath = [];
+    private array $aliasToPath = [];
 
     /**
      * Array of metadata by alias
@@ -58,7 +58,7 @@ class AliasResolver
      *
      * @var array
      */
-    protected array $metadataByAlias = [];
+    private array $metadataByAlias = [];
 
     /**
      * Does the root repository (i.e. $this->repository) is already registered (i.e. has an alias)
@@ -233,7 +233,7 @@ class AliasResolver
      *
      * @todo find repository from table name
      */
-    protected function findRepository($search): ?RepositoryInterface
+    private function findRepository($search): ?RepositoryInterface
     {
         if ($this->metadata->table === $search) {
             return $this->repository;
@@ -249,7 +249,7 @@ class AliasResolver
      *
      * @return array{0: string|null, 1: string, 2: Metadata|null} The attribute name and the owner metadata
      */
-    protected function exploreExpression(string $expression): array
+    private function exploreExpression(string $expression): array
     {
         $tokens = ExpressionCompiler::instance()->compile($expression);
 
@@ -304,7 +304,7 @@ class AliasResolver
      *
      * @return void
      */
-    protected function resolveAlias(string $alias, ExpressionExplorationState $state): void
+    private function resolveAlias(string $alias, ExpressionExplorationState $state): void
     {
         $state->alias = $alias;
         $state->path = $this->getRealPath($alias);
@@ -321,7 +321,7 @@ class AliasResolver
      *
      * @return void
      */
-    protected function resolveStatic(string $expression, ExpressionExplorationState $state): void
+    private function resolveStatic(string $expression, ExpressionExplorationState $state): void
     {
         // Static expression not resolved yet
         if (!isset($this->relationAlias[$expression])) {
@@ -343,7 +343,7 @@ class AliasResolver
      *
      * @return void
      */
-    protected function resolveDynamic(array $expression, ExpressionExplorationState $state): void
+    private function resolveDynamic(array $expression, ExpressionExplorationState $state): void
     {
         $attribute = implode('.', $expression);
 
@@ -405,7 +405,7 @@ class AliasResolver
      *
      * @return void
      */
-    protected function declareRelation(string $relationName, ExpressionExplorationState $state): void
+    private function declareRelation(string $relationName, ExpressionExplorationState $state): void
     {
         // The path is an alias
         //  - Save the alias
@@ -476,7 +476,7 @@ class AliasResolver
      *
      * @return string
      */
-    protected function getRealPath(string $path): string
+    private function getRealPath(string $path): string
     {
         return $this->aliasToPath[$path] ?? $path;
     }
@@ -488,7 +488,7 @@ class AliasResolver
      *
      * @return string
      */
-    protected function getParentAlias(string $path): string
+    private function getParentAlias(string $path): string
     {
         $path = $this->getRealPath($path);
 

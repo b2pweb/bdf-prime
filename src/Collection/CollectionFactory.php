@@ -7,7 +7,7 @@ use Bdf\Prime\Repository\RepositoryInterface;
 /**
  * Factory for CollectionInterface
  */
-class CollectionFactory
+final class CollectionFactory
 {
     /**
      * Alias of known collection class

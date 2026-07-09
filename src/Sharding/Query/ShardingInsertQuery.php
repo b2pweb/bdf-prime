@@ -23,7 +23,7 @@ use Bdf\Prime\Sharding\ShardingConnection;
  *
  * @implements InsertQueryInterface<ShardingConnection>
  */
-class ShardingInsertQuery extends CompilableClause implements InsertQueryInterface, Cachable
+final class ShardingInsertQuery extends CompilableClause implements InsertQueryInterface, Cachable
 {
     use CachableTrait;
     use ShardPicker;

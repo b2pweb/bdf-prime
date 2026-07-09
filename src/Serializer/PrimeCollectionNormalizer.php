@@ -15,7 +15,7 @@ use Bdf\Serializer\Type\TypeFactory;
 /**
  * Class PrimeCollectionNormalizer
  */
-class PrimeCollectionNormalizer extends TraversableNormalizer implements AutoRegisterInterface
+final class PrimeCollectionNormalizer extends TraversableNormalizer implements AutoRegisterInterface
 {
     private ServiceLocator $prime;
 

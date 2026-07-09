@@ -115,7 +115,7 @@ use Bdf\Prime\Exception\QueryBuildingException;
  *              - Cannot ensure that the "right part" is an attribute
  *              - The real attribute is known
  */
-class ExpressionCompiler
+final class ExpressionCompiler
 {
     public const DYN_SEPARATOR    = '.';
     public const ATTR_IDENTIFIER  = '>';

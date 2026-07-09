@@ -19,7 +19,7 @@ use Doctrine\DBAL\Schema\Table as DoctrineTable;
  * @extends AbstractSchemaManager<\Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection>
  * @property \Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection $connection protected
  */
-class SchemaManager extends AbstractSchemaManager
+final class SchemaManager extends AbstractSchemaManager
 {
     /**
      * Queries to execute

@@ -11,7 +11,7 @@ use Doctrine\DBAL\Types\Types;
 /**
  * Basic float type for database
  */
-class SqlFloatType extends AbstractPlatformType
+final class SqlFloatType extends AbstractPlatformType
 {
     /**
      * {@inheritdoc}

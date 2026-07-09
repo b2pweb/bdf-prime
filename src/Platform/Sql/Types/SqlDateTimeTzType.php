@@ -7,7 +7,7 @@ use Bdf\Prime\Platform\PlatformInterface;
 /**
  * Accept a datetime type with timezone
  */
-class SqlDateTimeTzType extends AbstractSqlDateTimeType
+final class SqlDateTimeTzType extends AbstractSqlDateTimeType
 {
     /**
      * SqlDateTimeTzType constructor.

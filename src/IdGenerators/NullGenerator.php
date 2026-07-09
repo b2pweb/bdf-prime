@@ -11,7 +11,7 @@ use Bdf\Prime\ServiceLocator;
  * @template C as ConnectionInterface
  * @extends AbstractGenerator<C>
  */
-class NullGenerator extends AbstractGenerator
+final class NullGenerator extends AbstractGenerator
 {
     /**
      * {@inheritdoc}

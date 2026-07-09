@@ -8,7 +8,7 @@ use Bdf\Prime\Connection\ConnectionInterface;
 /**
  * ChainFactory
  */
-class ChainFactory implements ConnectionFactoryInterface
+final class ChainFactory implements ConnectionFactoryInterface
 {
     /**
      * The connection factories

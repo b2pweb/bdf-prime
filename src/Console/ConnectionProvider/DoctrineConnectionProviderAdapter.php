@@ -12,7 +12,7 @@ use Doctrine\DBAL\Tools\Console\ConnectionProvider;
 /**
  * The prime adapter for doctrine connection provider used by doctrine in console command
  */
-class DoctrineConnectionProviderAdapter implements ConnectionProvider
+final class DoctrineConnectionProviderAdapter implements ConnectionProvider
 {
     private ConnectionManager $connectionManager;
 

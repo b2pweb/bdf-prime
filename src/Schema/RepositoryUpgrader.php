@@ -19,13 +19,13 @@ use Doctrine\DBAL\Exception\TableNotFoundException;
  *
  * @todo gestion du renommage de champs dans le cas où d'autres attributs ont été changés
  */
-class RepositoryUpgrader implements StructureUpgraderInterface
+final class RepositoryUpgrader implements StructureUpgraderInterface
 {
-    protected ServiceLocator $service;
+    private ServiceLocator $service;
 
-    protected Metadata $metadata;
+    private Metadata $metadata;
 
-    protected ?SchemaManagerInterface $schema;
+    private ?SchemaManagerInterface $schema;
 
 
     /**

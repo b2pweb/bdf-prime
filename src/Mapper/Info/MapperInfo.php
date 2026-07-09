@@ -15,22 +15,22 @@ use Bdf\Prime\Types\TypesRegistryInterface;
  * @todo remonter les traitements des classes du package Info sur les metadata, et completer
  * Pourrait etre util pour un hydrator
  */
-class MapperInfo
+final class MapperInfo
 {
     /**
      * The mapper
      */
-    protected Mapper $mapper;
+    private Mapper $mapper;
 
     /**
      * The types registry
      */
-    protected ?TypesRegistryInterface $typesRegistry;
+    private ?TypesRegistryInterface $typesRegistry;
 
     /**
      * The metadata
      */
-    protected Metadata $metadata;
+    private Metadata $metadata;
 
     /**
      * The properties info

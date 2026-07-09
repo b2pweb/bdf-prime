@@ -12,7 +12,7 @@ use Bdf\Prime\ServiceLocator;
 /**
  * Resolve attributes and embedded objects from Mapper
  */
-class AttributesResolver
+final class AttributesResolver
 {
     private Mapper $mapper;
     private ServiceLocator $prime;

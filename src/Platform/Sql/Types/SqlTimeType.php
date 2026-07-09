@@ -7,7 +7,7 @@ use Bdf\Prime\Platform\PlatformInterface;
 /**
  * Accept a time type (H:i:s)
  */
-class SqlTimeType extends AbstractSqlDateTimeType
+final class SqlTimeType extends AbstractSqlDateTimeType
 {
     /**
      * {@inheritdoc}

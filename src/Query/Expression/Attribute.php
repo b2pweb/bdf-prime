@@ -14,10 +14,10 @@ use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
  *
  * @implements ExpressionInterface<CompilableClause&\Bdf\Prime\Query\Contract\Compilable, QuoteCompilerInterface>
  */
-class Attribute implements ExpressionInterface
+final class Attribute implements ExpressionInterface
 {
-    protected string $attribute;
-    protected string $pattern;
+    private string $attribute;
+    private string $pattern;
 
     /**
      * Set attribute as value

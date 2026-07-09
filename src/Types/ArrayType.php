@@ -15,7 +15,7 @@ namespace Bdf\Prime\Types;
  * - Regex : ".*,$search,.*"
  * - Like : "%,$search,%"
  */
-class ArrayType extends AbstractFacadeType
+final class ArrayType extends AbstractFacadeType
 {
     /**
      * {@inheritdoc}

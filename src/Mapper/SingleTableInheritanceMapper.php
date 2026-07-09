@@ -39,9 +39,8 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
     /**
      * @todo voir pour retirer le mapper factory: passer par les depots
      * {@inheritdoc}
-     * @final
      */
-    public function setMapperFactory(MapperFactoryInterface $mapperFactory): void
+    final public function setMapperFactory(MapperFactoryInterface $mapperFactory): void
     {
         $this->mapperFactory = $mapperFactory;
     }
@@ -88,9 +87,8 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      * Get the discriminator map of mappers
      *
      * @return array
-     * @final
      */
-    public function getDiscriminatorMap(): array
+    final public function getDiscriminatorMap(): array
     {
         return $this->discriminatorMap;
     }
@@ -99,9 +97,8 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      * Get the discriminator map of entities
      *
      * @return array<array-key, class-string>
-     * @final
      */
-    public function getEntityMap(): array
+    final public function getEntityMap(): array
     {
         $map = [];
         $resolver = $this->mapperFactory->getNameResolver();
@@ -117,9 +114,8 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      * Get the discriminator column
      *
      * @return string
-     * @final
      */
-    public function getDiscriminatorColumn(): string
+    final public function getDiscriminatorColumn(): string
     {
         return $this->discriminatorColumn;
     }
@@ -131,9 +127,8 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      *
      * @return Mapper<E>
      * @psalm-suppress InvalidNullableReturnType
-     * @final
      */
-    public function getMapperByDiscriminatorValue($value): Mapper
+    final public function getMapperByDiscriminatorValue($value): Mapper
     {
         /** @psalm-suppress NullableReturnStatement */
         return $this->mapperFactory->createMapper(
@@ -150,9 +145,8 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      * @return mixed
      *
      * @throws \Exception if discriminator field not present in $data
-     * @final
      */
-    public function getDiscriminatorValueByRawData(array $data)
+    final public function getDiscriminatorValueByRawData(array $data)
     {
         $discriminatorField = $this->metadata()->attributes[$this->discriminatorColumn]['field'];
 
@@ -171,9 +165,8 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      * @return class-string<Mapper>
      *
      * @throws \Exception if discriminator value is unknown
-     * @final
      */
-    public function getDiscriminatorType($discriminatorValue): string
+    final public function getDiscriminatorType($discriminatorValue): string
     {
         if (empty($this->discriminatorMap[$discriminatorValue])) {
             throw new \Exception('Unknown discriminator type "' . $discriminatorValue . '"');
@@ -201,9 +194,8 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      * Check whether the class is a discriminated mapper
      *
      * @return boolean
-     * @final
      */
-    protected function isDiscriminatedMapper(): bool
+    final protected function isDiscriminatedMapper(): bool
     {
         return in_array(static::class, $this->discriminatorMap);
     }

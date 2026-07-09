@@ -42,21 +42,21 @@ use function sprintf;
  * @mixin ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>
  * @psalm-no-seal-methods
  */
-class EntityRelation
+final class EntityRelation
 {
     /**
      * The entity owner of the relation
      *
      * @var E
      */
-    protected object $owner;
+    private object $owner;
 
     /**
      * The relation
      *
      * @var RelationInterface<E, R>
      */
-    protected RelationInterface $relation;
+    private RelationInterface $relation;
 
     /**
      * EntityRelation constructor.

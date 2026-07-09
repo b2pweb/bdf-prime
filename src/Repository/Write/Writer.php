@@ -24,7 +24,7 @@ use LogicException;
  * @template E as object
  * @implements WriterInterface<E>
  */
-class Writer implements WriterInterface
+final class Writer implements WriterInterface
 {
     /**
      * @var RepositoryInterface<E>&RepositoryEventsSubscriberInterface<E>

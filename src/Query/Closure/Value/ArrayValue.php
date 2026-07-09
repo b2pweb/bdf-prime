@@ -8,7 +8,7 @@ use ReflectionFunction;
 /**
  * Handle array expression value
  */
-class ArrayValue implements ComparisonValueInterface
+final class ArrayValue implements ComparisonValueInterface
 {
     /**
      * @var array<array-key, ComparisonValueInterface>

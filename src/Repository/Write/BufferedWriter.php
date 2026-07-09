@@ -35,7 +35,7 @@ use Bdf\Prime\Repository\RepositoryInterface;
  * @template E as object
  * @implements BufferedWriterInterface<E>
  */
-class BufferedWriter implements BufferedWriterInterface
+final class BufferedWriter implements BufferedWriterInterface
 {
     /**
      * @var RepositoryInterface<E>&RepositoryEventsSubscriberInterface

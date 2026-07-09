@@ -7,7 +7,7 @@ use ReflectionProperty;
 /**
  * Store info about attribute
  */
-class AttributeInfo
+final class AttributeInfo
 {
     private string $name;
     private array $metadata;

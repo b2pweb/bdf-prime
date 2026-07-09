@@ -5,7 +5,7 @@ namespace Bdf\Prime\Entity\Hydrator\Generator;
 /**
  * Resolve accessor for embedded (or not) attributes / objects
  */
-class AccessorResolver
+final class AccessorResolver
 {
     private ClassAccessor $baseAccessor;
 

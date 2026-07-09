@@ -5,13 +5,13 @@ namespace Bdf\Prime\Entity\Instantiator;
 /**
  * RegistryInstantiator
  */
-class RegistryInstantiator implements InstantiatorInterface
+final class RegistryInstantiator implements InstantiatorInterface
 {
     /**
      * @var InstantiatorInterface[]
      */
-    protected array $registry = [];
-    protected ?InstantiatorInterface $defaultInstantiator;
+    private array $registry = [];
+    private ?InstantiatorInterface $defaultInstantiator;
 
     /**
      * Instantiator constructor.

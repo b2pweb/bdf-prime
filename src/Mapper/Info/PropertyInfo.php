@@ -11,22 +11,22 @@ use DateTimeInterface;
 /**
  * PropertyInfo
  */
-class PropertyInfo implements InfoInterface
+final class PropertyInfo implements InfoInterface
 {
     /**
      * The property name
      */
-    protected string $name;
+    private string $name;
 
     /**
      * The metadata from the metadata object
      */
-    protected array $metadata;
+    private array $metadata;
 
     /**
      * The types registry
      */
-    protected ?TypesRegistryInterface $typesRegistry;
+    private ?TypesRegistryInterface $typesRegistry;
 
 
     /**

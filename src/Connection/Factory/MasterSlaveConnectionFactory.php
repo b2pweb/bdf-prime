@@ -9,7 +9,7 @@ use Bdf\Prime\Connection\MasterSlaveConnection;
 /**
  * MasterSlaveConnectionLoader
  */
-class MasterSlaveConnectionFactory implements ConnectionFactoryInterface
+final class MasterSlaveConnectionFactory implements ConnectionFactoryInterface
 {
     /**
      * The delegated connectionFactory

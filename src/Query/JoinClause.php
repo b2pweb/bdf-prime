@@ -9,7 +9,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
  *
  * @package Bdf\Prime\Query
  */
-class JoinClause extends Clause
+final class JoinClause extends Clause
 {
     /**
      * Add an "on" clause to the join.

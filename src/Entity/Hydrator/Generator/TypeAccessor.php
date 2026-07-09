@@ -5,7 +5,7 @@ namespace Bdf\Prime\Entity\Hydrator\Generator;
 /**
  * Generates accessors to the type registry
  */
-class TypeAccessor
+final class TypeAccessor
 {
     private CodeGenerator $code;
     private string $registryVariableName;

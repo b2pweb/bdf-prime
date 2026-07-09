@@ -12,7 +12,7 @@ namespace Bdf\Prime\Mapper\Builder;
  * ;
  * </code>
  */
-class IndexBuilder
+final class IndexBuilder
 {
     /**
      * Store formatted indexes

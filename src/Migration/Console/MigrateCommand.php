@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class MigrateCommand
  */
 #[AsCommand('prime:migration:migrate', 'Run all migrations')]
-class MigrateCommand extends AbstractCommand
+final class MigrateCommand extends AbstractCommand
 {
     protected static $defaultName = 'prime:migration:migrate';
 

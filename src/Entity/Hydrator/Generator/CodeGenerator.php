@@ -7,7 +7,7 @@ namespace Bdf\Prime\Entity\Hydrator\Generator;
  *
  * @todo Handle use and simplify FQN
  */
-class CodeGenerator
+final class CodeGenerator
 {
     private string $eol = "\n";
     private string $tab = '    ';

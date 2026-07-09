@@ -4,6 +4,7 @@ namespace Bdf\Prime;
 
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Entity\Model;
+use Bdf\Prime\Mapper\Builder\IndexBuilder;
 use Bdf\Prime\Mapper\Mapper;
 
 class TestEmbeddedEntity extends Model
@@ -72,15 +73,13 @@ class TestEmbeddedEntityMapper extends Mapper
                 ->nillable()
         ;
     }
-    
+
     /**
      * {@inheritdoc}
      */
-    public function indexes(): array
+    public function buildIndexes(IndexBuilder $builder): void
     {
-        return [
-            ['name'],
-            'id_name' => ['id', 'name'],
-        ];
+        $builder->add()->on('name');
+        $builder->add('id_name')->on(['id', 'name']);
     }
 }

@@ -12,7 +12,7 @@ use Ramsey\Uuid\Uuid;
  *
  * @extends AbstractGenerator<\Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection>
  */
-class GuidGenerator extends AbstractGenerator
+final class GuidGenerator extends AbstractGenerator
 {
     /**
      * {@inheritdoc}

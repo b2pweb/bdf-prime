@@ -26,7 +26,7 @@ use function is_string;
  * @template E as object
  * @implements BehaviorInterface<E>
  */
-class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
+final class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
 {
     /**
      * The deleted at info.
@@ -35,7 +35,7 @@ class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
      * @var array{name: string, alias?: string}
      * @private
      */
-    protected array $deleted;
+    private array $deleted;
 
     /**
      * The property type
@@ -43,7 +43,7 @@ class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
      * @var string
      * @private
      */
-    protected string $type;
+    private string $type;
 
     private ClockInterface $clock;
 

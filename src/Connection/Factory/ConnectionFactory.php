@@ -17,7 +17,7 @@ use Doctrine\DBAL\DriverManager;
  *
  * Create simple connection instance
  */
-class ConnectionFactory implements ConnectionFactoryInterface
+final class ConnectionFactory implements ConnectionFactoryInterface
 {
     /**
      * The drivers map

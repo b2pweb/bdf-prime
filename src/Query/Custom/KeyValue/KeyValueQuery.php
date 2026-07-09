@@ -41,7 +41,7 @@ use Bdf\Prime\Query\Extension\ProjectionableTrait;
  * @implements Paginable<R>
  * @extends AbstractReadCommand<C, R>
  */
-class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterface, Compilable, Paginable, Limitable
+final class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterface, Compilable, Paginable, Limitable
 {
     use CompilableTrait;
     use LimitableTrait;

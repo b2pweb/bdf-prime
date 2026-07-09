@@ -12,7 +12,7 @@ use Bdf\Prime\Schema\Manager\TableManagerInterface;
  *
  * Contains the version of all upgraded migration
  */
-class DbVersionRepository implements VersionRepositoryInterface
+final class DbVersionRepository implements VersionRepositoryInterface
 {
     /**
      * The db connection

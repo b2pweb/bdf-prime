@@ -22,10 +22,10 @@ use TypeError;
  * @template E as object
  * @implements MapperHydratorInterface<E>
  */
-class MapperHydrator implements MapperHydratorInterface
+final class MapperHydrator implements MapperHydratorInterface
 {
-    protected InstantiatorInterface $instantiator;
-    protected Metadata $metadata;
+    private InstantiatorInterface $instantiator;
+    private Metadata $metadata;
 
     /**
      * Property accessors, indexed by attribute name

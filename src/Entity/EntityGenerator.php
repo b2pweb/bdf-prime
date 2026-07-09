@@ -37,7 +37,7 @@ use function class_exists;
  *     $generator->setUpdateEntityIfExists(true);
  *     $generator->generate($mapper, '/path/to/generate/entities');
  */
-class EntityGenerator
+final class EntityGenerator
 {
     // @todo should not be there : should be on PhpTypeInterface
     /**
@@ -1020,7 +1020,7 @@ class EntityGenerator
 /**
  * @internal
  */
-class PropertyGenerator
+final class PropertyGenerator
 {
     private string $name;
     private ?string $typeHint = null;
@@ -1167,7 +1167,7 @@ class PropertyGenerator
 /**
  * @internal
  */
-class ConfigurableEntityPrinter extends Printer
+final class ConfigurableEntityPrinter extends Printer
 {
     public function __construct(EntityGenerator $generator)
     {
@@ -1190,7 +1190,7 @@ class ConfigurableEntityPrinter extends Printer
 /**
  * @internal
  */
-class EntityClassGenerator
+final class EntityClassGenerator
 {
     private ClassType $class;
     private PhpNamespace $namespace;

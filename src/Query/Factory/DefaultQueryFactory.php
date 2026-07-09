@@ -11,7 +11,7 @@ use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
  * Base query factory
  * This factory can register query aliases
  */
-class DefaultQueryFactory implements QueryFactoryInterface
+final class DefaultQueryFactory implements QueryFactoryInterface
 {
     private ConnectionInterface $connection;
     private object $defaultCompiler;

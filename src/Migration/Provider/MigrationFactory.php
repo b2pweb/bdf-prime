@@ -10,7 +10,7 @@ use Psr\Container\ContainerInterface;
 /**
  * Instantiate a Migration class
  */
-class MigrationFactory implements MigrationFactoryInterface
+final class MigrationFactory implements MigrationFactoryInterface
 {
     private ContainerInterface $container;
 

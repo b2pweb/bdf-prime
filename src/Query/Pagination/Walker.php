@@ -31,7 +31,7 @@ use LogicException;
  * @implements PaginatorInterface<R>
  * @implements Iterator<array-key, R>
  */
-class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
+final class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
 {
     public const DEFAULT_PAGE  = 1;
     public const DEFAULT_LIMIT = 150;
@@ -41,14 +41,14 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
      *
      * @var int
      */
-    protected $startPage;
+    private $startPage;
 
     /**
      * The current offset
      *
      * @var int|null
      */
-    protected $offset;
+    private $offset;
 
     /**
      * @var R[]

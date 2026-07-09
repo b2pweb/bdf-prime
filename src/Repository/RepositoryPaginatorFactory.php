@@ -14,7 +14,7 @@ use Bdf\Prime\Query\ReadCommandInterface;
  *
  * @template E as object
  */
-class RepositoryPaginatorFactory extends PaginatorFactory
+final class RepositoryPaginatorFactory extends PaginatorFactory
 {
     /**
      * @var RepositoryInterface<E>

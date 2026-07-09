@@ -13,11 +13,11 @@ use Bdf\Prime\Types\ArrayType;
  * $query->where('name', (new Like('John'))->startsWith()); // name LIKE 'John%'
  * </code>
  */
-class Like extends AbstractExpressionTransformer
+final class Like extends AbstractExpressionTransformer
 {
-    protected string $start = '';
-    protected string $end = '';
-    protected bool $escape = false;
+    private string $start = '';
+    private string $end = '';
+    private bool $escape = false;
 
 
     /**

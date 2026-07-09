@@ -31,6 +31,8 @@ use function sprintf;
  * @template C as \Doctrine\DBAL\Connection
  * @extends AbstractCompiler<\Bdf\Prime\Query\SqlQueryInterface&CompilableClause, \Doctrine\DBAL\Connection&\Bdf\Prime\Connection\ConnectionInterface>
  * @implements QuoteCompilerInterface<\Bdf\Prime\Query\SqlQueryInterface&CompilableClause>
+ *
+ * @final
  */
 class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
 {

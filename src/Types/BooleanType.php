@@ -5,7 +5,7 @@ namespace Bdf\Prime\Types;
 /**
  * Facade boolean type for database
  */
-class BooleanType extends AbstractFacadeType
+final class BooleanType extends AbstractFacadeType
 {
     /**
      * {@inheritdoc}

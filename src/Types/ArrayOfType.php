@@ -8,7 +8,7 @@ use Bdf\Prime\Platform\PlatformTypeInterface;
 /**
  * Typed array database type
  */
-class ArrayOfType implements FacadeTypeInterface
+final class ArrayOfType implements FacadeTypeInterface
 {
     private string $name;
 

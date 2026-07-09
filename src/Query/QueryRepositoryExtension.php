@@ -33,23 +33,23 @@ use function is_array;
  *
  * @template E as object
  */
-class QueryRepositoryExtension extends QueryCompatExtension implements RecordHydratorInterface
+final class QueryRepositoryExtension extends QueryCompatExtension implements RecordHydratorInterface
 {
     /**
      * @var RepositoryInterface<E>
      */
-    protected RepositoryInterface $repository;
-    protected Metadata $metadata;
+    private RepositoryInterface $repository;
+    private Metadata $metadata;
 
     /**
      * @var Mapper<E>
      */
-    protected Mapper $mapper;
+    private Mapper $mapper;
 
     /**
      * @var ClosureCompiler<E>|null
      */
-    protected ?ClosureCompiler $closureCompiler;
+    private ?ClosureCompiler $closureCompiler;
 
     /**
      * Array of relations to associate on entities
@@ -58,21 +58,21 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
      *
      * @var array
      */
-    protected array $withRelations = [];
+    private array $withRelations = [];
 
     /**
      * Array of relations to discard
      *
      * @var array
      */
-    protected array $withoutRelations = [];
+    private array $withoutRelations = [];
 
     /**
      * Collect entities by attribute
      */
-    protected ?array $byOptions = null;
+    private ?array $byOptions = null;
 
-    protected RepositoryRecordHydrator $recordManager;
+    private RepositoryRecordHydrator $recordManager;
 
 
     /**

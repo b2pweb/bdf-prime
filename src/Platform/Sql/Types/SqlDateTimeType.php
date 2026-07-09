@@ -7,7 +7,7 @@ use Bdf\Prime\Platform\PlatformInterface;
 /**
  * Accept a datetime type
  */
-class SqlDateTimeType extends AbstractSqlDateTimeType
+final class SqlDateTimeType extends AbstractSqlDateTimeType
 {
     /**
      * SqlDateTimeType constructor.

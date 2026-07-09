@@ -5,7 +5,7 @@ namespace Bdf\Prime\Relations\Util;
 /**
  * Wrap entity keys for handle composite keys
  */
-class EntityKeys
+final class EntityKeys
 {
     /**
      * @var list<string>

@@ -15,7 +15,7 @@ use Bdf\Prime\Query\Compiler\CompilerInterface;
  *
  * @implements ExpressionInterface<CompilableClause&\Bdf\Prime\Query\Contract\Compilable, CompilerInterface>
  */
-class Now implements ExpressionInterface
+final class Now implements ExpressionInterface
 {
     /**
      * {@inheritdoc}

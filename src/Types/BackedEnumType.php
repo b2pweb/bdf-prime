@@ -7,7 +7,7 @@ use LogicException;
 
 use function is_subclass_of;
 
-class BackedEnumType extends AbstractFacadeType
+final class BackedEnumType extends AbstractFacadeType
 {
     public const INT_ENUM = 'int_enum';
     public const STRING_ENUM = 'string_enum';

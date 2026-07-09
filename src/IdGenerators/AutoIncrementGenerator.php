@@ -9,7 +9,7 @@ use Bdf\Prime\ServiceLocator;
  *
  * @extends AbstractGenerator<\Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection>
  */
-class AutoIncrementGenerator extends AbstractGenerator
+final class AutoIncrementGenerator extends AbstractGenerator
 {
     /**
      * {@inheritdoc}

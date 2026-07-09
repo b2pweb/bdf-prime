@@ -14,10 +14,10 @@ use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
  *
  * @implements ExpressionInterface<CompilableClause&\Bdf\Prime\Query\Contract\Compilable, QuoteCompilerInterface>
  */
-class Field implements ExpressionInterface
+final class Field implements ExpressionInterface
 {
-    protected string $search;
-    protected array $values;
+    private string $search;
+    private array $values;
 
     /**
      * Constructor
