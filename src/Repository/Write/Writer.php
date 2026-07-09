@@ -5,7 +5,6 @@ namespace Bdf\Prime\Repository\Write;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\WriteOperation;
-use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\Event\AfterDelete;
@@ -30,31 +29,17 @@ class Writer implements WriterInterface
     /**
      * @var RepositoryInterface<E>&RepositoryEventsSubscriberInterface<E>
      */
-    private $repository;
+    private RepositoryInterface $repository;
 
-    /**
-     * @var ServiceLocator
-     */
-    private $serviceLocator;
+    private ServiceLocator $serviceLocator;
 
     //==================
     // Prepared queries
     //==================
 
-    /**
-     * @var InsertQueryInterface
-     */
-    private $insertQuery;
-
-    /**
-     * @var KeyValueQueryInterface|QueryInterface
-     */
-    private $deleteQuery;
-
-    /**
-     * @var KeyValueQuery|QueryInterface
-     */
-    private $updateQuery;
+    private ?InsertQueryInterface $insertQuery = null;
+    private KeyValueQueryInterface|QueryInterface|null $deleteQuery = null;
+    private KeyValueQueryInterface|QueryInterface|null $updateQuery = null;
 
 
     /**

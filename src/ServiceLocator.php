@@ -12,6 +12,7 @@ use Bdf\Prime\Mapper\MapperFactoryInterface;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Serializer\SerializerInterface;
+use Closure;
 use Psr\Container\ContainerInterface;
 
 /**
@@ -19,47 +20,18 @@ use Psr\Container\ContainerInterface;
  */
 class ServiceLocator
 {
-    /**
-     * @var ConnectionManager
-     */
-    private $connectionManager;
+    private ConnectionManager $connectionManager;
 
     /**
      * @var class-string-map<T, RepositoryInterface<T>>
      */
-    private $repositories = [];
-
-    /**
-     * @var MapperFactoryInterface
-     */
-    private $mapperFactory;
-
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-
-    /**
-     * @var \Closure
-     */
-    private $serializerResolver;
-
-    /**
-     * @var HydratorRegistry
-     */
-    private $hydrators;
-
-    /**
-     * @var InstantiatorInterface
-     */
-    private $instantiator;
-
-    /**
-     * DI container
-     *
-     * @var ContainerInterface
-     */
-    private $di;
+    private array $repositories = [];
+    private MapperFactoryInterface $mapperFactory;
+    private SerializerInterface $serializer;
+    private ?Closure $serializerResolver = null;
+    private HydratorRegistry $hydrators;
+    private InstantiatorInterface $instantiator;
+    private ?ContainerInterface $di = null;
 
     /**
      * SericeLocator constructor.
@@ -183,13 +155,13 @@ class ServiceLocator
     /**
      * Set the serializer
      *
-     * @param \Closure|SerializerInterface $serializer
+     * @param Closure|SerializerInterface $serializer
      *
      * @return $this
      */
     public function setSerializer($serializer)
     {
-        if ($serializer instanceof \Closure) {
+        if ($serializer instanceof Closure) {
             $this->serializerResolver = $serializer;
         } elseif ($serializer instanceof SerializerInterface) {
             $this->serializer = $serializer;
@@ -253,7 +225,7 @@ class ServiceLocator
     /**
      * DI accessor
      *
-     * @return ContainerInterface
+     * @return ContainerInterface|null
      */
     public function di()
     {

@@ -26,20 +26,9 @@ class HydratorGenerationCommand extends Command
 {
     protected static $defaultName = 'prime:hydrator';
 
-    /**
-     * @var ServiceLocator
-     */
-    private $locator;
-
-    /**
-     * @var string
-     */
-    private $outputDir;
-
-    /**
-     * @var string
-     */
-    private $loaderFile;
+    private ServiceLocator $locator;
+    private ?string $outputDir = null;
+    private ?string $loaderFile;
 
     /**
      * HydratorGenerationCommand constructor.

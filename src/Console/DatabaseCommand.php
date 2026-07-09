@@ -26,20 +26,9 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 abstract class DatabaseCommand extends Command
 {
-    /**
-     * @var ConnectionRegistryInterface
-     */
-    private $registry;
-
-    /**
-     * @var ConnectionFactoryInterface
-     */
-    private $connectionFactory;
-
-    /**
-     * @var BdfStyle
-     */
-    protected $io;
+    private ConnectionRegistryInterface $registry;
+    private ?ConnectionFactoryInterface $connectionFactory = null;
+    protected BdfStyle $io;
 
     /**
      * DatabaseCommand constructor.

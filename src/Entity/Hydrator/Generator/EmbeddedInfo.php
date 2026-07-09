@@ -7,20 +7,9 @@ namespace Bdf\Prime\Entity\Hydrator\Generator;
  */
 class EmbeddedInfo
 {
-    /**
-     * @var string
-     */
-    private $path;
-
-    /**
-     * @var array
-     */
-    private $metadata;
-
-    /**
-     * @var AttributesResolver
-     */
-    private $resolver;
+    private string $path;
+    private array $metadata;
+    private AttributesResolver $resolver;
 
 
     /**

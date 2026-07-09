@@ -32,25 +32,19 @@ class Blameable extends Behavior
     /**
      * The created by info.
      * Contains keys 'name' and 'alias'
-     *
-     * @var array
      */
-    protected $createdBy;
+    protected ?array $createdBy;
 
     /**
      * The updated by info.
      * Contains keys 'name' and 'alias'
-     *
-     * @var array
      */
-    protected $updatedBy;
+    protected ?array $updatedBy;
 
     /**
      * The property type
-     *
-     * @var string
      */
-    protected $type;
+    protected string $type;
 
     /**
      * Blameable constructor.

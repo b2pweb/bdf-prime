@@ -8,10 +8,7 @@ namespace Bdf\Prime\Schema\Comparator;
  */
 class ReplaceIndexSetComparator implements IndexSetComparatorInterface
 {
-    /**
-     * @var IndexSetComparatorInterface
-     */
-    private $comparator;
+    private IndexSetComparatorInterface $comparator;
 
 
     /**

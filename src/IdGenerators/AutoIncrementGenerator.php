@@ -14,15 +14,17 @@ class AutoIncrementGenerator extends AbstractGenerator
     /**
      * {@inheritdoc}
      */
-    protected function doGenerate($property, array &$data, ServiceLocator $serviceLocator)
+    protected function doGenerate($property, array &$data, ServiceLocator $serviceLocator): string|int|null
     {
         unset($data[$property]);
+
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    protected function lastGeneratedId()
+    protected function lastGeneratedId(): string|int|null
     {
         return (string) $this->connection()->lastInsertId();
     }

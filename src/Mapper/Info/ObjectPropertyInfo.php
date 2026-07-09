@@ -4,6 +4,8 @@ namespace Bdf\Prime\Mapper\Info;
 
 use Bdf\Prime\Relations\RelationInterface;
 
+use function assert;
+
 /**
  * ObjectPropertyInfo
  *
@@ -13,24 +15,18 @@ class ObjectPropertyInfo implements InfoInterface
 {
     /**
      * The property name
-     *
-     * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
      * The metadata from the metadata object
-     *
-     * @var array
      */
-    protected $metadata;
+    protected array $metadata;
 
     /**
      * The metadata from the metadata object
-     *
-     * @var array
      */
-    protected $relation;
+    protected ?array $relation = null;
 
 
     /**
@@ -161,6 +157,7 @@ class ObjectPropertyInfo implements InfoInterface
      */
     public function relationKey(): string
     {
+        assert(isset($this->relation['localKey']));
         return $this->relation['localKey'];
     }
 

@@ -49,14 +49,14 @@ class EntityRelation
      *
      * @var E
      */
-    protected $owner;
+    protected object $owner;
 
     /**
      * The relation
      *
      * @var RelationInterface<E, R>
      */
-    protected $relation;
+    protected RelationInterface $relation;
 
     /**
      * EntityRelation constructor.

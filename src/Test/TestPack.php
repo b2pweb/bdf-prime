@@ -24,32 +24,29 @@ class TestPack
      *
      * @var static|null
      */
-    protected static $pack;
+    protected static ?self $pack = null;
 
     /**
      * Test data by group
      *
      * @var array{persistent:object[], non-persistent: object[]}
      */
-    protected $testPacks = [
+    protected array $testPacks = [
         'persistent'        => [],  // Entités créées non modifiables
         'non-persistent'    => []   // Entités créées et détruites aprés un test
     ];
 
-    /**
-     * @var bool
-     */
-    private $initialized = false;
+    private bool $initialized = false;
 
     /**
      * @var class-string[]
      */
-    private $entityClasses = [];
+    private array $entityClasses = [];
 
     /**
      * @var array<string, object>
      */
-    private $entities = [];
+    private array $entities = [];
 
 
     /**

@@ -18,10 +18,8 @@ class Comparator extends BaseComparator
 {
     /**
      * Allow diff to list drop column
-     *
-     * @var bool
      */
-    protected $listDropColumn = true;
+    protected bool $listDropColumn = true;
 
     /**
      * Set flag that allowed diff to list drop columns

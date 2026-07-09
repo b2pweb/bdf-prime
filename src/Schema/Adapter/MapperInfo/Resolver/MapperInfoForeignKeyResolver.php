@@ -12,10 +12,7 @@ use Bdf\Prime\ServiceLocator;
  */
 final class MapperInfoForeignKeyResolver implements MapperInfoResolverInterface
 {
-    /**
-     * @var ServiceLocator
-     */
-    private $service;
+    private ServiceLocator $service;
 
 
     /**

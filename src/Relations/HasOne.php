@@ -25,7 +25,7 @@ class HasOne extends OneOrMany
      *
      * @var KeyValueQuery<\Bdf\Prime\Connection\ConnectionInterface, R>|null
      */
-    private $relationQuery;
+    private ?KeyValueQuery $relationQuery = null;
 
 
     /**

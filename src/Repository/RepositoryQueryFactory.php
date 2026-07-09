@@ -32,65 +32,53 @@ class RepositoryQueryFactory
     /**
      * @var RepositoryInterface<E>
      */
-    private $repository;
+    private RepositoryInterface $repository;
 
-    /**
-     * @var Metadata
-     */
-    private $metadata;
+    private Metadata $metadata;
 
     /**
      * @var callable[]
      */
-    private $queries;
+    private array $queries;
 
     /**
      * Query result cache
-     *
-     * @var CacheInterface
      */
-    private $resultCache;
+    private ?CacheInterface $resultCache = null;
 
-    /**
-     * @var Psr16Cache|null
-     */
-    private $metadataCache;
+    private ?Psr16Cache $metadataCache = null;
 
     /**
      * Check if the repository can support optimised KeyValue query
      * If this value is false, keyValue() must returns null
-     *
-     * @var bool
      */
-    private $supportsKeyValue;
+    private bool $supportsKeyValue;
 
     //===============//
     // Optimisations //
     //===============//
 
     /**
-     * @var KeyValueQueryInterface<ConnectionInterface, E>
+     * @var KeyValueQueryInterface<ConnectionInterface, E>|null
      */
-    private $findByIdQuery;
+    private ?KeyValueQueryInterface $findByIdQuery = null;
 
     /**
      * @var array<array-key, KeyValueQueryInterface<ConnectionInterface, E>|null>
      */
-    private $countKeyValueQueries;
+    private ?array $countKeyValueQueries = null;
 
     /**
      * Save extension instance for optimisation
      *
-     * @var QueryRepositoryExtension<E>
+     * @var QueryRepositoryExtension<E>|null
      */
-    private $extension;
+    private ?QueryRepositoryExtension $extension = null;
 
     /**
      * Save paginator factory instance for optimisation
-     *
-     * @var PaginatorFactory
      */
-    private $paginatorFactory;
+    private ?RepositoryPaginatorFactory $paginatorFactory = null;
 
 
     /**

@@ -14,11 +14,7 @@ use Bdf\Prime\Types\TypeInterface;
  */
 class Value extends AbstractExpressionTransformer implements TypedExpressionInterface
 {
-    /**
-     * @var TypeInterface
-     */
-    protected $type;
-
+    protected ?TypeInterface $type = null;
 
     /**
      * {@inheritdoc}

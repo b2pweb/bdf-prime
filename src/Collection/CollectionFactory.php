@@ -14,7 +14,7 @@ class CollectionFactory
      *
      * @var array<string, class-string<CollectionInterface>|callable(array):CollectionInterface>
      */
-    private $aliases = [
+    private array $aliases = [
         'array' => ArrayCollection::class,
     ];
 
@@ -23,7 +23,7 @@ class CollectionFactory
      *
      * @var array<class-string<CollectionInterface>, callable(array):CollectionInterface>
      */
-    private $factories = [];
+    private array $factories = [];
 
 
     /**

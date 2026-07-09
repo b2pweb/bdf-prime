@@ -16,7 +16,7 @@ class SqlIntegerType extends AbstractPlatformType
     /**
      * @var string[]
      */
-    private static $doctrineTypeMap = [
+    private static array $doctrineTypeMap = [
         self::INTEGER  => Types::INTEGER,
         self::SMALLINT => Types::SMALLINT,
         self::TINYINT  => Types::SMALLINT,

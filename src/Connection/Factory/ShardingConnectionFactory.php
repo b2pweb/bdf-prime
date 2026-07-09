@@ -13,10 +13,8 @@ class ShardingConnectionFactory implements ConnectionFactoryInterface
 {
     /**
      * The delegated loader
-     *
-     * @var ConnectionFactoryInterface
      */
-    private $connectionFactory;
+    private ConnectionFactoryInterface $connectionFactory;
 
     /**
      * Set default configuration

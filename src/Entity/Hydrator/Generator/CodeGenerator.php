@@ -9,20 +9,9 @@ namespace Bdf\Prime\Entity\Hydrator\Generator;
  */
 class CodeGenerator
 {
-    /**
-     * @var string
-     */
-    private $eol = "\n";
-
-    /**
-     * @var string
-     */
-    private $tab = '    ';
-
-    /**
-     * @var int
-     */
-    private $tmpVarCount = 0;
+    private string $eol = "\n";
+    private string $tab = '    ';
+    private int $tmpVarCount = 0;
 
 
     /**

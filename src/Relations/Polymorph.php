@@ -16,21 +16,17 @@ trait Polymorph
      *
      * @var array
      */
-    protected $map = [];
+    protected array $map = [];
 
     /**
      * The discriminator property name for polymorphic relation
-     *
-     * @var string
      */
-    protected $discriminator;
+    protected ?string $discriminator = null;
 
     /**
      * The discriminator value for polymorphic relation
-     *
-     * @var int|string|null
      */
-    protected $discriminatorValue;
+    protected int|string|null $discriminatorValue = null;
 
     /**
      * Set the polymorphic map
@@ -102,6 +98,7 @@ trait Polymorph
      * Is the relation polymorphic
      *
      * @return bool
+     * @psalm-assert-if-true !null $this->discriminator
      */
     public function isPolymorphic()
     {

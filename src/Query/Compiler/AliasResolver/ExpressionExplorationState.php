@@ -9,23 +9,8 @@ use Bdf\Prime\Mapper\Metadata;
  */
 class ExpressionExplorationState
 {
-    /**
-     * @var string
-     */
-    public $alias;
-
-    /**
-     * @var string
-     */
-    public $path = '';
-
-    /**
-     * @var Metadata
-     */
-    public $metadata;
-
-    /**
-     * @var string
-     */
-    public $attribute;
+    public ?string $alias = null;
+    public string $path = '';
+    public Metadata $metadata;
+    public ?string $attribute = null;
 }

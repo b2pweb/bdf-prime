@@ -16,24 +16,18 @@ class IndexBuilder
 {
     /**
      * Store formatted indexes
-     *
-     * @var array
      */
-    private $indexes = [];
+    private array $indexes = [];
 
     /**
      * The current index name or offset
-     *
-     * @var string|integer
      */
-    private $current;
+    private string|int $current;
 
     /**
      * Last index offset for auto-generated names
-     *
-     * @var int
      */
-    private $index = 0;
+    private int $index = 0;
 
 
     /**

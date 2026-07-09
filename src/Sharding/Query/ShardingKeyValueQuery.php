@@ -22,8 +22,6 @@ use Bdf\Prime\Sharding\ShardingConnection;
  * If the distribution key is found on the filters, the corresponding sharding query is used
  * In other case, all shards will be queried on
  *
- * @property ShardingConnection $connection
- *
  * @template R as object|array
  *
  * @implements KeyValueQueryInterface<ShardingConnection, R>
@@ -39,7 +37,7 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     /**
      * @var KeyValueQueryInterface[]
      */
-    private $queries = [];
+    private array $queries = [];
 
 
     /**

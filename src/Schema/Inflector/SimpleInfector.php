@@ -4,6 +4,7 @@ namespace Bdf\Prime\Schema\Inflector;
 
 use Doctrine\Inflector\Inflector as InflectorObject;
 use Doctrine\Inflector\InflectorFactory;
+use Doctrine\Inflector\Inflector;
 
 /**
  * SimpleInfector
@@ -12,10 +13,8 @@ class SimpleInfector implements InflectorInterface
 {
     /**
      * The inflector instance
-     *
-     * @var InflectorObject
      */
-    private $inflector;
+    private Inflector $inflector;
 
     public function __construct(?InflectorObject $inflector = null)
     {

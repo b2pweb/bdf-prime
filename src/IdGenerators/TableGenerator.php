@@ -25,7 +25,7 @@ class TableGenerator extends AbstractGenerator
     /**
      * {@inheritdoc}
      */
-    protected function doGenerate($property, array &$data, ServiceLocator $serviceLocator)
+    protected function doGenerate($property, array &$data, ServiceLocator $serviceLocator): string|int|null
     {
         $metadata = $this->mapper()->metadata();
 
@@ -49,7 +49,7 @@ class TableGenerator extends AbstractGenerator
      * @return string  Return the new sequence id
      * @throws PrimeException
      */
-    protected function incrementSequence(ConnectionInterface $connection, Metadata $metadata)
+    protected function incrementSequence(ConnectionInterface $connection, Metadata $metadata): string
     {
         $table = $metadata->sequence['table'];
         $column = $metadata->sequence['column'];

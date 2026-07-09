@@ -14,70 +14,37 @@ use Bdf\Prime\Schema\IndexInterface;
  */
 final class ColumnBuilder implements ColumnBuilderInterface
 {
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
-    /**
-     * @var PlatformTypeInterface
-     */
-    private $type;
+    private PlatformTypeInterface $type;
 
     /**
      * @var mixed
      */
     private $defaultValue;
 
-    /**
-     * @var int|null
-     */
-    private $length;
+    private ?int $length = null;
 
-    /**
-     * @var bool
-     */
-    private $autoIncrement = false;
+    private bool $autoIncrement = false;
 
-    /**
-     * @var bool
-     */
-    private $unsigned = false;
+    private bool $unsigned = false;
 
-    /**
-     * @var bool
-     */
-    private $fixed = false;
+    private bool $fixed = false;
 
-    /**
-     * @var bool
-     */
-    private $nillable = false;
+    private bool $nillable = false;
 
-    /**
-     * @var string|null
-     */
-    private $comment;
+    private ?string $comment = null;
 
-    /**
-     * @var int|null
-     */
-    private $precision;
+    private ?int $precision = null;
 
-    /**
-     * @var int|null
-     */
-    private $scale;
+    private ?int $scale = null;
 
     /**
      * @var IndexInterface::TYPE_*[]
      */
-    private $indexes = [];
+    private array $indexes = [];
 
-    /**
-     * @var array
-     */
-    private $options = [];
+    private array $options = [];
 
 
     /**

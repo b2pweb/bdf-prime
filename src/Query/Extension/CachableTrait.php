@@ -21,15 +21,8 @@ use Bdf\Util\Arr;
  */
 trait CachableTrait
 {
-    /**
-     * @var null|CacheInterface
-     */
-    protected $cache;
-
-    /**
-     * @var CacheKey
-     */
-    protected $cacheKey = null;
+    protected ?CacheInterface $cache = null;
+    protected ?CacheKey $cacheKey = null;
 
 
     /**

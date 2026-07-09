@@ -14,10 +14,9 @@ use Doctrine\DBAL\Result;
 final class ListDoctrineFetch implements DoctrineFetchStrategyInterface
 {
     /**
-     * @var ListDoctrineFetch
      * @readonly
      */
-    private static $instance;
+    private static ?ListDoctrineFetch $instance = null;
 
     /**
      * {@inheritdoc}

@@ -24,11 +24,7 @@ use function implode;
 class JsonFunction implements ExpressionInterface
 {
     private string $function;
-
-    /**
-     * @var string|ExpressionInterface
-     */
-    private $document;
+    private string|ExpressionInterface $document;
 
     /**
      * @var array<scalar|ExpressionInterface>

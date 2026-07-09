@@ -14,10 +14,7 @@ use Doctrine\DBAL\Tools\Console\ConnectionProvider;
  */
 class DoctrineConnectionProviderAdapter implements ConnectionProvider
 {
-    /**
-     * @var ConnectionManager
-     */
-    private $connectionManager;
+    private ConnectionManager $connectionManager;
 
     /**
      * @param ConnectionManager $connectionManager

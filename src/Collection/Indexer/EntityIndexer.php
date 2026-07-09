@@ -15,14 +15,14 @@ final class EntityIndexer implements EntityIndexerInterface
     /**
      * @var Mapper<E>
      */
-    private $mapper;
+    private Mapper $mapper;
 
     /**
      * All indexed entities
      *
      * @var E[]
      */
-    private $entities = [];
+    private array $entities = [];
 
     /**
      * Map of indexes
@@ -30,7 +30,7 @@ final class EntityIndexer implements EntityIndexerInterface
      *
      * @var E[][][]
      */
-    private $indexed = [];
+    private array $indexed = [];
 
 
     /**

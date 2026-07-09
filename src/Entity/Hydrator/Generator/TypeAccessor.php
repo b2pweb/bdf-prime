@@ -7,20 +7,13 @@ namespace Bdf\Prime\Entity\Hydrator\Generator;
  */
 class TypeAccessor
 {
-    /**
-     * @var CodeGenerator
-     */
-    private $code;
-
-    /**
-     * @var string
-     */
-    private $registryVariableName;
+    private CodeGenerator $code;
+    private string $registryVariableName;
 
     /**
      * @var string[]
      */
-    private $declaredTypes = [];
+    private array $declaredTypes = [];
 
     /**
      * TypeAccessor constructor.

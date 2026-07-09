@@ -15,21 +15,21 @@ final class EntitySetIndexer implements EntityIndexerInterface
     /**
      * @var Mapper<E>
      */
-    private $mapper;
+    private Mapper $mapper;
 
     /**
      * All entities, indexing by there object hash
      *
      * @var E[]
      */
-    private $entities = [];
+    private array $entities = [];
 
     /**
      * The inner indexer
      *
      * @var EntityIndexer<E>|null
      */
-    private $indexer;
+    private ?EntityIndexer $indexer = null;
 
 
     /**

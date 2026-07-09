@@ -40,27 +40,27 @@ class BufferedWriter implements BufferedWriterInterface
     /**
      * @var RepositoryInterface<E>&RepositoryEventsSubscriberInterface
      */
-    private $repository;
+    private RepositoryInterface $repository;
 
     /**
      * @var WriterInterface<E>
      */
-    private $writer;
+    private WriterInterface $writer;
 
     /**
      * @var array<list{E, array}>
      */
-    private $insert = [];
+    private array $insert = [];
 
     /**
      * @var array<list{E, array}>
      */
-    private $update = [];
+    private array $update = [];
 
     /**
      * @var array<list{E, array}>
      */
-    private $delete = [];
+    private array $delete = [];
 
 
     /**

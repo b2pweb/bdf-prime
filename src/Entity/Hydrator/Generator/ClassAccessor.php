@@ -24,7 +24,7 @@ class ClassAccessor
     /**
      * @var string[]
      */
-    private $subClasses;
+    private array $subClasses;
 
     /**
      * The scope which accessor will be called
@@ -33,10 +33,7 @@ class ClassAccessor
      */
     private $scope;
 
-    /**
-     * @var \ReflectionClass
-     */
-    private $reflection;
+    private \ReflectionClass $reflection;
 
 
     /**

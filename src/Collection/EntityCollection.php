@@ -41,12 +41,12 @@ class EntityCollection implements IteratorAggregate, CollectionInterface, Import
     /**
      * @var RepositoryInterface<E>
      */
-    private $repository;
+    private RepositoryInterface $repository;
 
     /**
      * @var CollectionInterface<E>
      */
-    private $storage;
+    private CollectionInterface $storage;
 
 
     /**

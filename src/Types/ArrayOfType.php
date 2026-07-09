@@ -10,20 +10,11 @@ use Bdf\Prime\Platform\PlatformTypeInterface;
  */
 class ArrayOfType implements FacadeTypeInterface
 {
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
-    /**
-     * @var TypeInterface
-     */
-    private $baseArray;
+    private TypeInterface $baseArray;
 
-    /**
-     * @var TypeInterface
-     */
-    private $innerType;
+    private TypeInterface $innerType;
 
 
     /**

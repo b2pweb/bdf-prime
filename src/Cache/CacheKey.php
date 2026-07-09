@@ -10,17 +10,14 @@ final class CacheKey
     /**
      * @var string|callable
      */
-    private $namespace;
+    private mixed $namespace;
 
     /**
      * @var string|callable
      */
-    private $key;
+    private mixed $key;
 
-    /**
-     * @var integer
-     */
-    private $lifetime = 0;
+    private int $lifetime = 0;
 
     /**
      * CacheKey constructor.

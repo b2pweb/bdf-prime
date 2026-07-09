@@ -14,35 +14,35 @@ class CompilerState
      *
      * @var array
      */
-    public $bindings = [];
+    public array $bindings = [];
 
     /**
      * The current part in processing for bindings
      *
      * @var string|int
      */
-    public $currentPart;
+    public string|int $currentPart;
 
     /**
      * The compiled sql parts
      *
      * @var array
      */
-    public $compiledParts = [];
+    public array $compiledParts = [];
 
     /**
      * The compiled query
      *
      * @var mixed
      */
-    public $compiled;
+    public mixed $compiled;
 
     /**
      * Does the query is compiling ?
      *
      * @var bool
      */
-    public $compiling = false;
+    public bool $compiling = false;
 
     /**
      * Invalidate compiled parts
@@ -99,8 +99,8 @@ class CompilerState
      */
     public function __destruct()
     {
-        $this->bindings = null;
-        $this->compiledParts = null;
+        unset($this->bindings);
+        unset($this->compiledParts);
         $this->compiled = null;
     }
 }

@@ -17,24 +17,20 @@ class ConnectionManager implements ConnectionRegistryInterface
 {
     /**
      * The connection registry
-     *
-     * @var ConnectionRegistryInterface
      */
-    private $registry;
+    private ConnectionRegistryInterface $registry;
 
     /**
      * Connections list
      *
      * @var ConnectionInterface[]
      */
-    private $connections = [];
+    private array $connections = [];
 
     /**
      * Default connection to use
-     *
-     * @var string|null
      */
-    private $defaultConnection;
+    private ?string $defaultConnection = null;
 
 
     /**

@@ -9,25 +9,14 @@ use Bdf\Prime\Entity\Hydrator\Exception\HydratorGenerationException;
  */
 class EmbeddedAccessor
 {
-    /**
-     * @var CodeGenerator
-     */
-    private $code;
-
-    /**
-     * @var EmbeddedInfo
-     */
-    private $embedded;
+    private CodeGenerator $code;
+    private EmbeddedInfo $embedded;
 
     /**
      * @var ClassAccessor[]
      */
-    private $accessors;
-
-    /**
-     * @var EmbeddedAccessor|ClassAccessor
-     */
-    private $parentAccessor;
+    private array $accessors;
+    private EmbeddedAccessor|ClassAccessor $parentAccessor;
 
 
     /**

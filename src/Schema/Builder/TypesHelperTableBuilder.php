@@ -26,15 +26,9 @@ use Bdf\Prime\Types\TypesHelperInterface;
  */
 final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelperInterface
 {
-    /**
-     * @var TableBuilderInterface
-     */
-    private $builder;
+    private TableBuilderInterface $builder;
 
-    /**
-     * @var PlatformTypesInterface
-     */
-    private $types;
+    private PlatformTypesInterface $types;
 
 
     /**

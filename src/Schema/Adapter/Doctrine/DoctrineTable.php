@@ -20,15 +20,9 @@ use function array_map;
  */
 final class DoctrineTable implements TableInterface
 {
-    /**
-     * @var Table
-     */
-    private $table;
+    private Table $table;
 
-    /**
-     * @var TypesRegistryInterface
-     */
-    private $types;
+    private TypesRegistryInterface $types;
 
 
     /**

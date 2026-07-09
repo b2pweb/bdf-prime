@@ -14,7 +14,7 @@ trait ShardPicker
     /**
      * @var null|string
      */
-    private $shardId;
+    private ?string $shardId = null;
 
     /**
      * Pick up a shard manually from the distribution value

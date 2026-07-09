@@ -7,10 +7,7 @@ namespace Bdf\Prime\Cache;
  */
 class ArrayCache implements CacheInterface
 {
-    /**
-     * @var array
-     */
-    private $data = [];
+    private array $data = [];
 
     /**
      * {@inheritDoc}

@@ -24,33 +24,17 @@ use function is_string;
  */
 class OrmPreprocessor implements PreprocessorInterface
 {
-    /**
-     * @var AliasResolver
-     */
-    protected $aliasResolver;
-
-    /**
-     * @var Metadata
-     */
-    protected $metadata;
+    protected ?AliasResolver $aliasResolver = null;
+    protected Metadata $metadata;
 
     /**
      * The query repository
      *
-     * @var RepositoryInterface
      * @internal
      */
-    private $repository;
-
-    /**
-     * @var string
-     */
-    protected $type;
-
-    /**
-     * @var PlatformInterface
-     */
-    protected $platform;
+    private RepositoryInterface $repository;
+    protected string $type = '';
+    protected PlatformInterface $platform;
     private bool $allowUnknownAttribute = false;
 
 

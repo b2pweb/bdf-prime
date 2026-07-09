@@ -13,10 +13,9 @@ namespace Bdf\Prime\Connection\Result\FetchStrategy;
 final class AssociativeArrayFetch implements ArrayFetchStrategyInterface
 {
     /**
-     * @var AssociativeArrayFetch
      * @readonly
      */
-    private static $instance;
+    private static ?AssociativeArrayFetch $instance = null;
 
     /**
      * {@inheritdoc}

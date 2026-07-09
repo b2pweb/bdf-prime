@@ -21,20 +21,11 @@ use Doctrine\DBAL\Exception\TableNotFoundException;
  */
 class RepositoryUpgrader implements StructureUpgraderInterface
 {
-    /**
-     * @var ServiceLocator
-     */
-    protected $service;
+    protected ServiceLocator $service;
 
-    /**
-     * @var Metadata
-     */
-    protected $metadata;
+    protected Metadata $metadata;
 
-    /**
-     * @var SchemaManagerInterface
-     */
-    protected $schema;
+    protected ?SchemaManagerInterface $schema;
 
 
     /**

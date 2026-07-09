@@ -10,17 +10,9 @@ class EntityKeys
     /**
      * @var list<string>
      */
-    private $keys = [];
-
-    /**
-     * @var mixed
-     */
-    private $entity;
-
-    /**
-     * @var int|null
-     */
-    private $hash = null;
+    private array $keys = [];
+    private mixed $entity;
+    private ?int $hash = null;
 
 
     /**

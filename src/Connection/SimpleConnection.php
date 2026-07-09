@@ -56,24 +56,16 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      *
      * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
      * The schema manager.
-     *
-     * @var SchemaManager
      */
-    private $schema;
+    private ?SchemaManager $schema = null;
 
-    /**
-     * @var SqlPlatform
-     */
-    private $platform;
+    private ?SqlPlatform $platform = null;
 
-    /**
-     * @var QueryFactoryInterface
-     */
-    private $factory;
+    private DefaultQueryFactory $factory;
 
     /**
      * List of listeners to call when the connection is closed,

@@ -7,25 +7,10 @@ namespace Bdf\Prime\Query\Expression;
  */
 abstract class AbstractExpressionTransformer implements ExpressionTransformerInterface
 {
-    /**
-     * @var mixed
-     */
-    protected $value;
-
-    /**
-     * @var object
-     */
-    protected $compiler;
-
-    /**
-     * @var string
-     */
-    protected $column;
-
-    /**
-     * @var string
-     */
-    protected $operator;
+    protected mixed $value;
+    protected object $compiler;
+    protected string $column;
+    protected string $operator;
 
 
     /**

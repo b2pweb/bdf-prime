@@ -14,39 +14,32 @@ use Bdf\Prime\ServiceLocator;
  */
 class AttributesResolver
 {
-    /**
-     * @var Mapper
-     */
-    private $mapper;
-
-    /**
-     * @var ServiceLocator
-     */
-    private $prime;
+    private Mapper $mapper;
+    private ServiceLocator $prime;
 
     /**
      * List of all attributes of the entity
      *
      * @var AttributeInfo[]
      */
-    private $attributes = [];
+    private array $attributes = [];
 
     /**
      * List of all embedded entities
      *
      * @var EmbeddedInfo[]
      */
-    private $embeddeds = [];
+    private array $embeddeds = [];
 
     /**
      * @var AttributeInfo[]
      */
-    private $rootAttributes = [];
+    private array $rootAttributes = [];
 
     /**
      * @var EmbeddedInfo[]
      */
-    private $rootEmbeddeds = [];
+    private array $rootEmbeddeds = [];
 
 
     /**

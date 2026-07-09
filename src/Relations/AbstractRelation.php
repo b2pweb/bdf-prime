@@ -33,42 +33,38 @@ abstract class AbstractRelation implements RelationInterface
      *
      * @var string
      */
-    protected $attributeAim;
+    protected string $attributeAim;
 
     /**
      * The local repository of this relation
      *
      * @var RepositoryInterface<L>
      */
-    protected $local;
+    protected RepositoryInterface $local;
 
     /**
      * The local alias
-     *
-     * @var string|null
      */
-    protected $localAlias;
+    protected ?string $localAlias = null;
 
     /**
      * The distant repository
      *
      * @var RepositoryInterface<R>|null
      */
-    protected $distant;
+    protected ?RepositoryInterface $distant;
 
     /**
      * Global constraints for this relation
      *
      * @var array
      */
-    protected $constraints = [];
+    protected array $constraints = [];
 
     /**
      * Is the relation not embedded in entity
-     *
-     * @var bool
      */
-    protected $isDetached = false;
+    protected bool $isDetached = false;
 
     /**
      * The query's result wrapper
@@ -78,12 +74,8 @@ abstract class AbstractRelation implements RelationInterface
      * @see Query::wrapAs()
      * @see RelationBuilder::wrapAs()
      */
-    protected $wrapper;
-
-    /**
-     * @var RelationInfoInterface
-     */
-    protected $relationInfo;
+    protected mixed $wrapper = null;
+    protected RelationInfoInterface $relationInfo;
 
 
     /**
@@ -267,7 +259,7 @@ abstract class AbstractRelation implements RelationInterface
      */
     protected function applyConstraints(ReadCommandInterface $query, $constraints = [], $context = null): ReadCommandInterface
     {
-        if (is_array($constraints) && is_array($this->constraints)) {
+        if (is_array($constraints)) {
             $query->where($this->applyContext($context, $constraints + $this->constraints));
         } else {
             $query->where($this->applyContext($context, $this->constraints));

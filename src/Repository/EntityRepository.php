@@ -79,55 +79,45 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
     /**
      * @var Mapper<E>
      */
-    protected $mapper;
-
-    /**
-     * @var ServiceLocator
-     */
-    protected $serviceLocator;
+    protected Mapper $mapper;
+    protected ServiceLocator $serviceLocator;
 
     /**
      * Query result cache
-     *
-     * @var CacheInterface
      */
-    protected $resultCache;
+    protected ?CacheInterface $resultCache;
 
     /**
      * Disable the global constraints for one query
      *
      * @var bool
      */
-    protected $withoutConstraints = false;
+    protected bool $withoutConstraints = false;
 
     /**
      * Cache of relation instance
      *
      * @var array<string, RelationInterface<E, object>>
      */
-    protected $relations = [];
+    protected array $relations = [];
 
     /**
      * The collection factory
      *
      * @var CollectionFactory
      */
-    protected $collectionFactory;
+    protected CollectionFactory $collectionFactory;
 
     /**
      * @var RepositoryQueryFactory<E>
      */
-    protected $queries;
+    protected RepositoryQueryFactory $queries;
 
     /**
      * @var WriterInterface<E>
      */
-    protected $writer;
-
-    /**
-     * @var ConnectionInterface|null
-     */
-    protected $connection;
+    protected WriterInterface $writer;
+    protected ?ConnectionInterface $connection = null;
 
     /**
      * @var Closure(ConnectionInterface):void
@@ -463,7 +453,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
 
         $constraints = $this->metadata()->constraints;
 
-        if ($context && is_array($constraints)) {
+        if ($context) {
             $context .= '.';
             foreach ($constraints as $key => $value) {
                 $constraints[$context.$key] = $value;
@@ -1062,14 +1052,14 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
             $this->connection = null;
         }
 
-        $this->serviceLocator = null;
-        $this->queries = null;
-        $this->writer = null;
+        unset($this->serviceLocator);
+        unset($this->queries);
+        unset($this->writer);
         $this->relations = [];
-        $this->collectionFactory = null;
+        unset($this->collectionFactory);
 
         $this->mapper->destroy();
-        $this->mapper = null;
+        unset($this->mapper);
 
         if ($this->resultCache) {
             $this->resultCache->clear();

@@ -132,7 +132,7 @@ class ExpressionCompiler
     /**
      * @var static
      */
-    private static $instance;
+    private static ?self $instance = null;
 
     /**
      * Compile the expression to expression tokens

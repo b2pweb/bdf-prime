@@ -24,7 +24,7 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
      *
      * @internal resolve use this for its optimisation
      */
-    private $interfaceTypes = [
+    private array $interfaceTypes = [
         \DateTimeInterface::class => TypeInterface::DATETIME,
         BackedEnum::class => BackedEnumType::STRING_ENUM,
         UnitEnum::class => UnitEnumType::UNIT_ENUM,
@@ -37,21 +37,14 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
      *
      * @internal resolve use this for its optimisation
      */
-    private $classTypes = [
+    private array $classTypes = [
         \DateTime::class          => TypeInterface::DATETIME,
         \DateTimeImmutable::class => TypeInterface::DATETIME,
         \stdClass::class          => TypeInterface::OBJECT,
     ];
 
-    /**
-     * @var PlatformInterface
-     */
-    private $platform;
-
-    /**
-     * @var TypesRegistryInterface
-     */
-    private $commons;
+    private PlatformInterface $platform;
+    private TypesRegistryInterface $commons;
 
 
     /**

@@ -19,10 +19,7 @@ class CacheCommand extends Command
 {
     protected static $defaultName = 'prime:cache';
 
-    /**
-     * @var ServiceLocator
-     */
-    private $locator;
+    private ServiceLocator $locator;
 
     /**
      * CacheCommand constructor.

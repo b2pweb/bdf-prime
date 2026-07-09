@@ -19,7 +19,7 @@ class RepositoryPaginatorFactory extends PaginatorFactory
     /**
      * @var RepositoryInterface<E>
      */
-    private $repository;
+    private RepositoryInterface $repository;
 
     /**
      * RepositoryPaginatorFactory constructor.

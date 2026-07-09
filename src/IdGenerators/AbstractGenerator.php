@@ -19,24 +19,20 @@ abstract class AbstractGenerator implements GeneratorInterface
 {
     /**
      * The associated mapper
-     *
-     * @var Mapper
      */
-    private $mapper;
+    private ?Mapper $mapper = null;
 
     /**
      * The active connection
      *
      * @var C
      */
-    private $connection;
+    private ?ConnectionInterface $connection = null;
 
     /**
      * The last generated id
-     *
-     * @var string
      */
-    protected $lastGeneratedId;
+    protected string|int|null $lastGeneratedId;
 
     /**
      * Le primary attribute n'est effacé que s'il est vide.
@@ -59,7 +55,7 @@ abstract class AbstractGenerator implements GeneratorInterface
     /**
      * Get the mapper
      *
-     * @return Mapper
+     * @return Mapper|null
      */
     public function mapper()
     {
@@ -106,12 +102,13 @@ abstract class AbstractGenerator implements GeneratorInterface
      * @param array            $data            By reference
      * @param ServiceLocator   $serviceLocator
      *
-     * @return string|null   Returns the generated id
+     * @return string|int|null Returns the generated id
      * @throws PrimeException
      */
-    protected function doGenerate($property, array &$data, ServiceLocator $serviceLocator)
+    protected function doGenerate($property, array &$data, ServiceLocator $serviceLocator): string|int|null
     {
         // to overload
+        return null;
     }
 
     /**
@@ -136,10 +133,8 @@ abstract class AbstractGenerator implements GeneratorInterface
 
     /**
      * Get the last generated id
-     *
-     * @return string
      */
-    protected function lastGeneratedId()
+    protected function lastGeneratedId(): string|int|null
     {
         return $this->lastGeneratedId;
     }

@@ -16,7 +16,7 @@ final class LocalHashTableRelationInfo implements RelationInfoInterface
      *
      * @var \WeakMap<object, bool>
      */
-    private $loaded;
+    private \WeakMap $loaded;
 
     public function __construct()
     {

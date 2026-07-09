@@ -22,7 +22,7 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
      *
      * @var E[]
      */
-    private $items = [];
+    private array $items = [];
 
 
     /**

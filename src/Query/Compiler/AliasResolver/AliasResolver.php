@@ -18,33 +18,17 @@ use InvalidArgumentException;
  */
 class AliasResolver
 {
-    /**
-     * @var Metadata
-     */
-    protected $metadata;
-
-    /**
-     * @var RepositoryInterface
-     */
-    protected $repository;
-
-    /**
-     * @var TypesRegistryInterface
-     */
-    protected $types;
-
-    /**
-     * @var QueryInterface&EntityJoinable
-     */
-    protected $query;
+    protected Metadata $metadata;
+    protected RepositoryInterface $repository;
+    protected TypesRegistryInterface $types;
+    protected (QueryInterface&EntityJoinable)|null $query = null;
 
     /**
      * The counter of alias
      *
-     * @var integer
      * @internal
      */
-    private $counter = 0;
+    private int $counter = 0;
 
     /**
      * Array of alias for relations
@@ -53,7 +37,7 @@ class AliasResolver
      *
      * @var string[]
      */
-    protected $relationAlias = [];
+    protected array $relationAlias = [];
 
     /**
      * Array of path, indexed by alias
@@ -66,7 +50,7 @@ class AliasResolver
      *
      * @var array<string, string>
      */
-    protected $aliasToPath = [];
+    protected array $aliasToPath = [];
 
     /**
      * Array of metadata by alias
@@ -74,15 +58,13 @@ class AliasResolver
      *
      * @var array
      */
-    protected $metadataByAlias = [];
+    protected array $metadataByAlias = [];
 
     /**
      * Does the root repository (i.e. $this->repository) is already registered (i.e. has an alias)
      * The root alias must be defined before resolving any fields, so use this field to auto register the repository if not yet done
-     *
-     * @var bool
      */
-    private $rootRepositoryRegistered = false;
+    private bool $rootRepositoryRegistered = false;
 
     /**
      * Allow usage of unknown attribute

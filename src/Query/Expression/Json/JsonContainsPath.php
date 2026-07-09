@@ -28,10 +28,7 @@ use LogicException;
  */
 final class JsonContainsPath extends AbstractPlatformSpecificExpression
 {
-    /**
-     * @var string|ExpressionInterface
-     */
-    private $target;
+    private string|ExpressionInterface $target;
     private string $path;
 
     /**

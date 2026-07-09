@@ -15,10 +15,7 @@ use function array_change_key_case;
  */
 final class MetadataIndexSet implements IndexSetInterface
 {
-    /**
-     * @var Metadata
-     */
-    private $metadata;
+    private Metadata $metadata;
 
 
     /**

@@ -34,14 +34,12 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
      *
      * @var C
      */
-    protected $connection;
+    protected ConnectionInterface $connection;
 
     /**
      * The collection class name that wrap query result
-     *
-     * @var string
      */
-    protected $wrapper;
+    protected ?string $wrapper = null;
 
     /**
      * The listeners processor.
@@ -51,28 +49,17 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
      *    each: callable(array<string, mixed>):mixed|null
      * }
      */
-    protected $listeners = [
+    protected array $listeners = [
         'post' => null,
         'each' => null,
     ];
 
     /**
      * The SQL compiler
-     *
-     * @var object
      */
-    protected $compiler;
-
-    /**
-     * @var CollectionFactory
-     */
-    private $collectionFactory;
-
-    /**
-     * @var object
-     */
-    protected $extension;
-
+    protected object $compiler;
+    private ?CollectionFactory $collectionFactory = null;
+    protected ?object $extension = null;
     protected ?string $recordClassName = null;
     protected ?RecordHydratorInterface $recordHydrator = null;
 

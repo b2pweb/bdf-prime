@@ -19,32 +19,24 @@ class DbVersionRepository implements VersionRepositoryInterface
      *
      * @var ConnectionInterface&\Doctrine\DBAL\Connection
      */
-    private $connection;
+    private ConnectionInterface $connection;
 
     /**
      * The table name
-     *
-     * @var string
      */
-    private $tableName;
+    private string $tableName;
 
     /**
      * Check whether the table exists
-     *
-     * @var boolean
-     *
      * @internal
      */
-    private $hasSchema;
+    private ?bool $hasSchema = null;
 
     /**
      * Cache of version
-     *
-     * @var array
-     *
      * @internal
      */
-    private $cached;
+    private ?array $cached = null;
 
     /**
      * Constructor

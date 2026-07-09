@@ -33,10 +33,7 @@ class EntityCommand extends Command
 {
     protected static $defaultName = 'prime:entity';
 
-    /**
-     * @var ServiceLocator
-     */
-    private $locator;
+    private ServiceLocator $locator;
 
     /**
      * EntityCommand constructor.

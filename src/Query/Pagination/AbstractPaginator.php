@@ -38,35 +38,29 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
      *
      * @var ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable
      */
-    protected $query;
+    protected ReadCommandInterface&Limitable&Orderable&Paginable $query;
 
     /**
      * Current collection
      *
      * @var R[]|CollectionInterface<R>
      */
-    protected $collection = [];
+    protected array|CollectionInterface $collection = [];
 
     /**
      * Total size of the collection
-     *
-     * @var int
      */
-    protected $size;
+    protected ?int $size = null;
 
     /**
      * Current page
-     *
-     * @var int
      */
-    protected $page;
+    protected ?int $page = null;
 
     /**
      * Number of entities loaded in the collection
-     *
-     * @var int
      */
-    protected $maxRows;
+    protected ?int $maxRows = null;
 
 
     /**
@@ -97,12 +91,14 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
      */
     protected function loadCollection(): void
     {
-        /** @var ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable $this->query */
+        /** @var ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable $query */
+        $query = $this->query;
+
         if ($this->maxRows > -1) {
-            $this->query->limitPage($this->page, $this->maxRows);
+            $query->limitPage($this->page, $this->maxRows);
         }
 
-        $this->collection = $this->query->all();
+        $this->collection = $query->all();
     }
 
     /**
@@ -165,6 +161,8 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
 
     /**
      * Find size of the collection
+     *
+     * @psalm-assert !null $this->size
      */
     protected function buildSize(): void
     {

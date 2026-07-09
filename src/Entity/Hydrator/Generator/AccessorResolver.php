@@ -7,25 +7,16 @@ namespace Bdf\Prime\Entity\Hydrator\Generator;
  */
 class AccessorResolver
 {
-    /**
-     * @var ClassAccessor
-     */
-    private $baseAccessor;
+    private ClassAccessor $baseAccessor;
 
-    /**
-     * @var AttributesResolver
-     */
-    private $resolver;
+    private AttributesResolver $resolver;
 
-    /**
-     * @var CodeGenerator
-     */
-    private $code;
+    private CodeGenerator $code;
 
     /**
      * @var ClassAccessor[]
      */
-    private $accessors = [];
+    private array $accessors = [];
 
 
     /**

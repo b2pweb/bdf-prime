@@ -10,7 +10,7 @@ class PolymorphBuilder extends FieldBuilder
     /**
      * @var string
      */
-    private $discriminator;
+    private string $discriminator;
 
     /**
      * Set the current field as type discriminator

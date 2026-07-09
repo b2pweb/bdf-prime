@@ -15,20 +15,9 @@ use Bdf\Prime\Types\ArrayType;
  */
 class Like extends AbstractExpressionTransformer
 {
-    /**
-     * @var string
-     */
-    protected $start = '';
-
-    /**
-     * @var string
-     */
-    protected $end = '';
-
-    /**
-     * @var bool
-     */
-    protected $escape = false;
+    protected string $start = '';
+    protected string $end = '';
+    protected bool $escape = false;
 
 
     /**

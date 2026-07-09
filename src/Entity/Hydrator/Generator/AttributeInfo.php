@@ -9,25 +9,10 @@ use ReflectionProperty;
  */
 class AttributeInfo
 {
-    /**
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @var array
-     */
-    private $metadata;
-
-    /**
-     * @var AttributesResolver
-     */
-    private $resolver;
-
-    /**
-     * @var ReflectionProperty|null
-     */
-    private $reflection;
+    private string $name;
+    private array $metadata;
+    private AttributesResolver $resolver;
+    private ?ReflectionProperty $reflection = null;
 
 
     /**

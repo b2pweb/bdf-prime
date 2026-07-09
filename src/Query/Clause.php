@@ -25,21 +25,21 @@ class Clause implements ClauseInterface
      *
      * @var array<string,callable(static,mixed):void>
      */
-    protected $customFilters = [];
+    protected array $customFilters = [];
 
     /**
      * The clause statements
      *
      * @var array<string,mixed>
      */
-    public $statements = [];
+    public array $statements = [];
 
     /**
      * Available operators
      *
      * @var array<string, true>
      */
-    protected $operators = [
+    protected array $operators = [
         '<'             => true,
         ':lt'           => true,
         '<='            => true,

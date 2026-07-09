@@ -12,12 +12,9 @@ class ConfigurationResolver implements ConfigurationResolverInterface
     /**
      * @var Configuration[]
      */
-    private $configurations;
+    private array $configurations;
 
-    /**
-     * @var Configuration|null
-     */
-    private $default;
+    private ?Configuration $default = null;
 
     /**
      * ConfigurationResolver constructor.

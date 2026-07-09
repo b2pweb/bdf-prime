@@ -61,28 +61,22 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      *
      * @var SimpleConnection[]
      */
-    private $connections = [];
+    private array $connections = [];
 
     /**
      * The shard choser
-     *
-     * @var ShardChoserInterface
      */
-    private $shardChoser;
+    private ShardChoserInterface $shardChoser;
 
     /**
      * The id of current shard. Null means all shards
-     *
-     * @var string
      */
-    private $currentShardId;
+    private ?string $currentShardId = null;
 
     /**
      * The distribution key
-     *
-     * @var string
      */
-    private $distributionKey;
+    private string $distributionKey;
 
     /**
      * Initializes a new instance of the Connection class.
@@ -167,7 +161,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * Get the current shard
      *
-     * @return string
+     * @return string|null
      */
     public function getCurrentShardId()
     {

@@ -16,24 +16,20 @@ class FileMigrationProvider implements MigrationProviderInterface
 {
     /**
      * The migration factory
-     *
-     * @var MigrationFactoryInterface
      */
-    private $factory;
+    private MigrationFactoryInterface $factory;
 
     /**
      * The path to migration files
-     *
-     * @var string
      */
-    private $path;
+    private string $path;
 
     /**
      * The collection of migration name by version
      *
      * @var MigrationInterface[]
      */
-    private $migrations = [];
+    private array $migrations = [];
 
     /**
      * Locator constructor

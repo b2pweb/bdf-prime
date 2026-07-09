@@ -12,65 +12,22 @@ use Bdf\Prime\Schema\ColumnInterface;
  */
 final class Column implements ColumnInterface
 {
-    /**
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @var PlatformTypeInterface
-     */
-    private $type;
-
-    /**
-     * @var mixed
-     */
-    private $defaultValue;
-
-    /**
-     * @var int|null
-     */
-    private $length;
-
-    /**
-     * @var bool
-     */
-    private $autoIncrement;
-
-    /**
-     * @var bool
-     */
-    private $unsigned;
-
-    /**
-     * @var bool
-     */
-    private $fixed;
-
-    /**
-     * @var bool
-     */
-    private $nillable;
-
-    /**
-     * @var string|null
-     */
-    private $comment;
-
-    /**
-     * @var int|null
-     */
-    private $precision;
-
-    /**
-     * @var int|null
-     */
-    private $scale;
+    private string $name;
+    private PlatformTypeInterface $type;
+    private mixed $defaultValue = null;
+    private ?int $length = null;
+    private bool $autoIncrement;
+    private bool $unsigned;
+    private bool $fixed;
+    private bool $nillable;
+    private ?string $comment = null;
+    private ?int $precision = null;
+    private ?int $scale = null;
 
     /**
      * @var array<string, mixed>
      */
-    private $options;
+    private array $options;
 
 
     /**

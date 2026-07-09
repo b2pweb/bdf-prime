@@ -13,29 +13,22 @@ use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
  */
 class DefaultQueryFactory implements QueryFactoryInterface
 {
-    /**
-     * @var ConnectionInterface
-     */
-    private $connection;
-
-    /**
-     * @var object
-     */
-    private $defaultCompiler;
+    private ConnectionInterface $connection;
+    private object $defaultCompiler;
 
     /**
      * Map query class name to compiler instance or class name
      *
      * @var array<class-string<CommandInterface>, class-string|object>
      */
-    private $compilers = [];
+    private array $compilers;
 
     /**
      * Map query name to query class name
      *
      * @var class-string-map<Q as CommandInterface, class-string<Q>>
      */
-    private $alias = [];
+    private array $alias = [];
 
 
     /**

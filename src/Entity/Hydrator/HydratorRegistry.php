@@ -7,20 +7,17 @@ namespace Bdf\Prime\Entity\Hydrator;
  */
 class HydratorRegistry
 {
-    /**
-     * @var HydratorInterface
-     */
-    protected $baseHydrator;
+    protected ?HydratorInterface $baseHydrator = null;
 
     /**
      * @var HydratorInterface[]
      */
-    protected $hydrators = [];
+    protected array $hydrators = [];
 
     /**
      * @var callable[]
      */
-    protected $factories = [];
+    protected array $factories = [];
 
     /**
      * Set the base hydrator.

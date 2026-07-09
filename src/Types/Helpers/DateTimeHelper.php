@@ -14,33 +14,27 @@ trait DateTimeHelper
 {
     /**
      * The date format
-     *
-     * @var string
      */
-    protected $format;
+    protected string $format;
 
     /**
      * The date timezone
      *
      * Let null manage default timezone
-     *
-     * @var null|DateTimeZone
      */
-    protected $timezone;
+    protected ?DateTimeZone $timezone = null;
 
     /**
      * Date class name
      *
-     * @var string
+     * @var class-string<DateTimeInterface>
      */
-    protected $className = DateTime::class;
+    protected string $className = DateTime::class;
 
     /**
      * Should reset the other fields of the format
-     *
-     * @var bool
      */
-    protected $resetFields = false;
+    protected bool $resetFields = false;
 
     /**
      * {@inheritdoc}
@@ -60,6 +54,7 @@ trait DateTimeHelper
         $className = $fieldOptions['className'] ?? $this->className;
         $timezone = isset($fieldOptions['timezone']) ? new DateTimeZone($fieldOptions['timezone']) : $this->timezone;
 
+        /** @psalm-suppress UndefinedMethod */
         $date = $className::createFromFormat($format, $value, $timezone);
 
         if ($timezone && $date) {

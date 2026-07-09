@@ -36,15 +36,8 @@ use function json_encode;
  */
 final class JsonContains extends AbstractPlatformSpecificExpression
 {
-    /**
-     * @var string|ExpressionInterface
-     */
-    private $target;
-
-    /**
-     * @var scalar
-     */
-    private $candidate;
+    private string|ExpressionInterface $target;
+    private string|int|float|bool $candidate;
 
     /**
      * @param ExpressionInterface|string $target The JSON document or array to search in. Can be an attribute name, or a SQL expression. The value should not be unquoted.

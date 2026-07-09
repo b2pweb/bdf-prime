@@ -56,29 +56,26 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     private $collection = [];
 
     /**
-     * @var WalkStrategyInterface<R>
+     * @var WalkStrategyInterface<R>|null
      */
-    private $strategy;
+    private ?WalkStrategyInterface $strategy = null;
 
     /**
-     * @var WalkCursor<R>
+     * @var WalkCursor<R>|null
      */
-    private $cursor;
+    private ?WalkCursor $cursor = null;
 
     /**
      * @var ReadCommandInterface<ConnectionInterface, R>
      */
-    private $query;
+    private ReadCommandInterface $query;
+
+    private int $page;
 
     /**
      * @var int
      */
-    private $page;
-
-    /**
-     * @var int
-     */
-    private $maxRows;
+    private int $maxRows;
 
     /**
      * Create a query walker

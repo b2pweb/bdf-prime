@@ -28,15 +28,8 @@ use Doctrine\DBAL\Platforms\SQLitePlatform;
  */
 class SqlPlatform implements PlatformInterface
 {
-    /**
-     * @var AbstractPlatform
-     */
-    private $grammar;
-
-    /**
-     * @var TypesRegistryInterface
-     */
-    private $types;
+    private AbstractPlatform $grammar;
+    private PlatformTypes $types;
 
 
     /**

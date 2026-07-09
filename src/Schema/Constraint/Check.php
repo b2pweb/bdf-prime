@@ -12,12 +12,9 @@ final class Check implements CheckInterface
     /**
      * @var mixed
      */
-    private $expression;
+    private mixed $expression;
 
-    /**
-     * @var string|null
-     */
-    private $name;
+    private ?string $name;
 
 
     /**

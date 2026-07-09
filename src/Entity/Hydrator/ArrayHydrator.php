@@ -28,7 +28,7 @@ class ArrayHydrator implements HydratorInterface
     /**
      * @var array<class-string, callable(object, array)>
      */
-    private $hydratorsCache = [];
+    private array $hydratorsCache = [];
 
     /**
      * {@inheritdoc}

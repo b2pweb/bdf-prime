@@ -24,22 +24,15 @@ use TypeError;
  */
 class MapperHydrator implements MapperHydratorInterface
 {
-    /**
-     * @var InstantiatorInterface
-     */
-    protected $instantiator;
-
-    /**
-     * @var Metadata
-     */
-    protected $metadata;
+    protected InstantiatorInterface $instantiator;
+    protected Metadata $metadata;
 
     /**
      * Property accessors, indexed by attribute name
      *
      * @var ReflectionProperty[][]
      */
-    private $reflectionProperties = [];
+    private array $reflectionProperties = [];
 
     /**
      * {@inheritdoc}

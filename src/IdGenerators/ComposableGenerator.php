@@ -16,7 +16,7 @@ class ComposableGenerator implements GeneratorInterface
     /**
      * @var GeneratorInterface[]
      */
-    private $generators;
+    private array $generators;
 
     /**
      * ComposableGenerator constructor.

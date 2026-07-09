@@ -11,10 +11,7 @@ use Throwable;
  */
 class TypeException extends LogicException implements PrimeException
 {
-    /**
-     * @var string
-     */
-    private $type;
+    private string $type;
 
 
     /**

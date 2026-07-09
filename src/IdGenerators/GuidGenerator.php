@@ -17,7 +17,7 @@ class GuidGenerator extends AbstractGenerator
     /**
      * {@inheritdoc}
      */
-    protected function doGenerate($property, array &$data, ServiceLocator $serviceLocator)
+    protected function doGenerate($property, array &$data, ServiceLocator $serviceLocator): string
     {
         return $data[$property] = Uuid::uuid4()->toString();
     }

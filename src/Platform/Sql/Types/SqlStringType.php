@@ -18,7 +18,7 @@ class SqlStringType extends AbstractPlatformType
     /**
      * @var string[]
      */
-    private static $doctrineTypeMap = [
+    private static array $doctrineTypeMap = [
         self::STRING => Types::STRING,
         self::TEXT   => Types::TEXT,
         self::BIGINT => Types::BIGINT,

@@ -15,7 +15,7 @@ class ChainFactory implements ConnectionFactoryInterface
      *
      * @var ConnectionFactoryInterface[]
      */
-    private $factories;
+    private array $factories;
 
     public function __construct(array $connectionFactories)
     {

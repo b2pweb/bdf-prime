@@ -7,15 +7,8 @@ namespace Bdf\Prime\Platform;
  */
 abstract class AbstractPlatformType implements PlatformTypeInterface
 {
-    /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var PlatformInterface
-     */
-    protected $platform;
+    protected string $name;
+    protected PlatformInterface $platform;
 
 
     /**

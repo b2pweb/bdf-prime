@@ -10,7 +10,7 @@ namespace Bdf\Prime\Relations\Info;
  */
 final class NullRelationInfo implements RelationInfoInterface
 {
-    private static $instance;
+    private static ?NullRelationInfo $instance = null;
 
     /**
      * {@inheritdoc}

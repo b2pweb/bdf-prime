@@ -13,15 +13,9 @@ use Doctrine\DBAL\Types\Type;
  */
 final class DoctrineColumn implements ColumnInterface
 {
-    /**
-     * @var Column
-     */
-    private $column;
+    private Column $column;
 
-    /**
-     * @var TypesRegistryInterface
-     */
-    private $types;
+    private TypesRegistryInterface $types;
 
 
     /**

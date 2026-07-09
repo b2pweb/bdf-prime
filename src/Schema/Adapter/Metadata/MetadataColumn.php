@@ -12,15 +12,9 @@ use Bdf\Prime\Schema\ColumnInterface;
  */
 final class MetadataColumn implements ColumnInterface
 {
-    /**
-     * @var array
-     */
-    private $metadata;
+    private array $metadata;
 
-    /**
-     * @var PlatformTypesInterface
-     */
-    private $types;
+    private PlatformTypesInterface $types;
 
 
     /**

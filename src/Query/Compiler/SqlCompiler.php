@@ -13,6 +13,7 @@ use Bdf\Prime\Query\Query;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\SqlQueryInterface;
 use Bdf\Prime\Types\TypeInterface;
+use Closure;
 use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 use UnexpectedValueException;
@@ -20,6 +21,7 @@ use UnexpectedValueException;
 use function array_map;
 use function explode;
 use function implode;
+use function is_array;
 use function is_string;
 use function sprintf;
 
@@ -576,7 +578,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
             return '';
         }
 
-        return ' WHERE '.$this->compileCompilableClauses($query, $query->statements['where']);
+        return ' WHERE '.$this->compileCompilableClauses($query, static fn () => $query->statements['where']);
     }
 
     /**
@@ -598,25 +600,30 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
 
     /**
      * @param SqlQueryInterface&CompilableClause $query
-     * @param array $clauses
+     * @param array|Closure():array $clauses Array of clauses to compiled, or a getter to it if it can change during compilation (e.g. relations constraints)
      *
      * @return string
      * @throws PrimeException
      */
-    protected function compileCompilableClauses(CompilableClause $query, array &$clauses)
+    protected function compileCompilableClauses(CompilableClause $query, array|Closure $clauses)
     {
+        $arrClauses = is_array($clauses) ? $clauses : $clauses();
         $sql = [];
         $i = 0;
 
         // Permet de retirer le niveau du nested
-        if (count($clauses) === 1 && isset($clauses[0]['nested'])) {
-            $result = $this->compileCompilableClauses($query, $clauses[0]['nested']);
+        if (count($arrClauses) === 1 && isset($arrClauses[0]['nested'])) {
+            $result = $this->compileCompilableClauses($query, $arrClauses[0]['nested']);
             /*
-             * We check he if where expression has added constraints (from relation).
+             * We check if where expression has added constraints (from relation).
              * If we still have one clause, we return the compiled sql
              * Otherwise we start the loop of clauses.
              */
-            if (count($clauses) === 1) {
+            if ($clauses instanceof Closure) {
+                $arrClauses = $clauses();
+            }
+
+            if (count($arrClauses) === 1) {
                 return $result;
             }
 
@@ -625,25 +632,36 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
             $i = 1;
         }
 
-        $clauses[0]['glue'] = null;
-
         //Cannot use foreach because where expression can add new relations with constraints
-        for (; isset($clauses[$i]); ++$i) {
-            $part = $clauses[$i];
+        for (;; ++$i) {
+            $clause = $arrClauses[$i] ?? null;
 
-            if ($part['glue'] !== null) {
-                $part['glue'] .= ' ';
+            if ($clause === null && $clauses instanceof Closure) {
+                $arrClauses = $clauses();
             }
 
-            $part = $query->preprocessor()->expression($part);
+            $clause = $arrClauses[$i] ?? null;
+
+            if ($clause === null) {
+                break;
+            }
+
+            $part = $query->preprocessor()->expression($clause);
+            $partSql = '';
+
+            if ($i !== 0 && $part['glue'] !== null) {
+                $partSql = $part['glue'] . ' ';
+            }
 
             if (isset($part['nested'])) {
-                $sql[] = $part['glue'].'('.$this->compileCompilableClauses($query, $part['nested']).')';
+                $partSql .= '('.$this->compileCompilableClauses($query, $part['nested']).')';
             } elseif (!isset($part['raw'])) {
-                $sql[] = $part['glue'].$this->compileExpression($query, $part['column'], $part['operator'], $part['value'], $part['converted'] ?? false);
+                $partSql .= $this->compileExpression($query, $part['column'], $part['operator'], $part['value'], $part['converted'] ?? false);
             } else {
-                $sql[] = $part['glue'].$this->compileRawValue($query, $part['raw']);
+                $partSql .= $this->compileRawValue($query, $part['raw']);
             }
+
+            $sql[] = $partSql;
         }
 
         return implode(' ', $sql);

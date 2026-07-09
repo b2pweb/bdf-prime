@@ -38,22 +38,18 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
     /**
      * @var RepositoryInterface<E>
      */
-    protected $repository;
-
-    /**
-     * @var Metadata
-     */
-    protected $metadata;
+    protected RepositoryInterface $repository;
+    protected Metadata $metadata;
 
     /**
      * @var Mapper<E>
      */
-    protected $mapper;
+    protected Mapper $mapper;
 
     /**
      * @var ClosureCompiler<E>|null
      */
-    protected $closureCompiler;
+    protected ?ClosureCompiler $closureCompiler;
 
     /**
      * Array of relations to associate on entities
@@ -62,21 +58,19 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
      *
      * @var array
      */
-    protected $withRelations = [];
+    protected array $withRelations = [];
 
     /**
      * Array of relations to discard
      *
      * @var array
      */
-    protected $withoutRelations = [];
+    protected array $withoutRelations = [];
 
     /**
      * Collect entities by attribute
-     *
-     * @var array
      */
-    protected $byOptions;
+    protected ?array $byOptions = null;
 
     protected RepositoryRecordHydrator $recordManager;
 

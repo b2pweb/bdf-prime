@@ -25,24 +25,13 @@ class Versionable extends Behavior
 
     /**
      * The version repository className
-     *
-     * @var string
      */
-    protected $versionClass;
+    protected string $versionClass;
 
     /**
      * Allow version deletion
-     *
-     * @var boolean
      */
-    protected $allowDeletion;
-
-    /**
-     * Version table name
-     *
-     * @var string
-     */
-    protected $tableName;
+    protected bool $allowDeletion;
 
     /**
      * Versionable constructor.

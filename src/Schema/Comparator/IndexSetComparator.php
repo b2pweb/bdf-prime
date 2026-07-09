@@ -13,15 +13,9 @@ use Bdf\Prime\Schema\IndexSetInterface;
  */
 class IndexSetComparator implements IndexSetComparatorInterface
 {
-    /**
-     * @var IndexSetInterface
-     */
-    private $from;
+    private IndexSetInterface $from;
 
-    /**
-     * @var IndexSetInterface
-     */
-    private $to;
+    private IndexSetInterface $to;
 
 
     /**

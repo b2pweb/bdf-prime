@@ -21,38 +21,34 @@ class Migration implements MigrationInterface
 {
     /**
      * The migration version
-     *
-     * @var string
      */
-    private $version;
+    private string $version;
 
     /**
      * The application container
-     *
-     * @var ContainerInterface
      */
-    protected $di;
+    protected ContainerInterface $di;
 
     /**
      * The console input.
      *
      * @var InputInterface|null
      */
-    protected $input = null;
+    protected ?InputInterface $input = null;
 
     /**
      * The console output.
      *
      * @var OutputInterface|null
      */
-    protected $output = null;
+    protected ?OutputInterface $output = null;
 
     /**
      * The console helper.
      *
      * @var HelperSet|null
      */
-    protected $helperSet = null;
+    protected ?HelperSet $helperSet = null;
 
     /**
      * Migration constructor

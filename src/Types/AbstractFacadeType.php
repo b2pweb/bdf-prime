@@ -10,10 +10,7 @@ use Bdf\Prime\Platform\PlatformTypeInterface;
  */
 abstract class AbstractFacadeType implements FacadeTypeInterface
 {
-    /**
-     * @var string
-     */
-    protected $type;
+    protected string $type;
 
 
     /**

@@ -15,22 +15,16 @@ final class Index extends AbstractIndex
     /**
      * @var array<string, array>
      */
-    private $fields;
+    private array $fields;
 
     /**
      * @var IndexInterface::TYPE_*
      */
-    private $type;
+    private int $type;
 
-    /**
-     * @var string|null
-     */
-    private $name;
+    private ?string $name = null;
 
-    /**
-     * @var array
-     */
-    private $options;
+    private array $options;
 
 
     /**

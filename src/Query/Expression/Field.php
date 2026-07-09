@@ -16,15 +16,8 @@ use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
  */
 class Field implements ExpressionInterface
 {
-    /**
-     * @var string
-     */
-    protected $search;
-
-    /**
-     * @var array
-     */
-    protected $values;
+    protected string $search;
+    protected array $values;
 
     /**
      * Constructor

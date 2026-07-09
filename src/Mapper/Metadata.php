@@ -75,14 +75,14 @@ class Metadata
      *
      * @var class-string
      */
-    public $entityName;
+    public string $entityName;
 
     /**
      * The instantiator hint
      *
      * @var int|null
      */
-    public $instantiatorHint;
+    public ?int $instantiatorHint;
 
     /**
      * The class name to use
@@ -91,7 +91,7 @@ class Metadata
      *
      * @var class-string
      */
-    public $entityClass;
+    public string $entityClass;
 
     /**
      * The property accessor class name to use
@@ -99,32 +99,32 @@ class Metadata
      *
      * @var class-string
      */
-    public $propertyAccessorClass;
+    public string $propertyAccessorClass;
 
     /**
      * @var string
      */
-    public $connection;
+    public string $connection;
 
     /**
      * @var string|null
      */
-    public $database;
+    public ?string $database;
 
     /**
      * @var string
      */
-    public $table;
+    public string $table;
 
     /**
      * @var boolean
      */
-    public $useQuoteIdentifier;
+    public bool $useQuoteIdentifier;
 
     /**
      * @var array<string, string>
      */
-    public $tableOptions = [];
+    public array $tableOptions = [];
 
     /**
      * The indexes
@@ -154,12 +154,12 @@ class Metadata
      *
      * @var IndexMetadata[]
      */
-    public $indexes = [];
+    public array $indexes = [];
 
     /**
      * @var SequenceMetadata
      */
-    public $sequence = [
+    public array $sequence = [
         'connection' => null,
         'table'      => null,
         'column'     => null,
@@ -171,19 +171,19 @@ class Metadata
      *
      * @var array<string, FieldMetadata>
      */
-    public $fields = [];
+    public array $fields = [];
 
     /**
      * List of entity columns, indexed by the entity property name
      *
      * @var array<string, FieldMetadata>
      */
-    public $attributes = [];
+    public array $attributes = [];
 
     /**
      * @var array<string, EmbeddedMetadata>
      */
-    public $embeddeds = [];
+    public array $embeddeds = [];
 
     /**
      * @var array{
@@ -192,7 +192,7 @@ class Metadata
      *     fields: list<string>
      * }
      */
-    public $primary = [
+    public array $primary = [
         'type'          => self::PK_AUTO,
         'attributes'    => [],
         'fields'        => [],
@@ -203,21 +203,21 @@ class Metadata
      *
      * @var array
      */
-    public $constraints = [];
+    public array $constraints = [];
 
     /**
      * Flag indiquant que le meta a déjà été construit
      *
      * @var bool
      */
-    protected $built = false;
+    protected bool $built = false;
 
     /**
      * Relations that must be loaded eagerly
      *
      * @var array
      */
-    public $eagerRelations = [];
+    public array $eagerRelations = [];
 
     /**
      * List of mapper configurators

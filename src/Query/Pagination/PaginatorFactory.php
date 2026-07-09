@@ -10,17 +10,14 @@ use Bdf\Prime\Query\ReadCommandInterface;
  */
 class PaginatorFactory
 {
-    /**
-     * @var PaginatorFactory
-     */
-    private static $instance;
+    private static ?PaginatorFactory $instance = null;
 
     /**
      * Mapping for paginator classes
      *
      * @var string[]
      */
-    private $paginatorAliases = [
+    private array $paginatorAliases = [
         'walker'    => Walker::class,
         'paginator' => Paginator::class,
     ];
@@ -31,7 +28,7 @@ class PaginatorFactory
      *
      * @var callable[]
      */
-    private $paginatorFactories = [];
+    private array $paginatorFactories = [];
 
     /**
      * Register an alias for a paginator class

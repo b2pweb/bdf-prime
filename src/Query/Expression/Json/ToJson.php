@@ -39,7 +39,7 @@ final class ToJson extends AbstractPlatformSpecificExpression
     /**
      * @var mixed|ExpressionInterface
      */
-    private $value;
+    private mixed $value;
 
     /**
      * @param ExpressionInterface|mixed $value The value to convert. Can be a PHP value, or a raw SQL expression when using ExpressionInterface.

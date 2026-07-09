@@ -16,15 +16,8 @@ use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
  */
 class Attribute implements ExpressionInterface
 {
-    /**
-     * @var string
-     */
-    protected $attribute;
-
-    /**
-     * @var string
-     */
-    protected $pattern;
+    protected string $attribute;
+    protected string $pattern;
 
     /**
      * Set attribute as value

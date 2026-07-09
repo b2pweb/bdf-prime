@@ -15,7 +15,7 @@ final class MapperPrimaryKey implements KeyInterface
     /**
      * @var Mapper<E>
      */
-    private $mapper;
+    private Mapper $mapper;
 
     /**
      * EntityPrimaryKey constructor.

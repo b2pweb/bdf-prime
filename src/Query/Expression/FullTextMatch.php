@@ -18,20 +18,9 @@ use Bdf\Prime\Query\Compiler\SqlCompiler;
  */
 class FullTextMatch implements ExpressionInterface
 {
-    /**
-     * @var string
-     */
-    protected $search;
-
-    /**
-     * @var mixed
-     */
-    protected $value;
-
-    /**
-     * @var bool
-     */
-    protected $booleanMode;
+    protected string $search;
+    protected mixed $value;
+    protected bool $booleanMode;
 
     /**
      * Constructor

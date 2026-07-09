@@ -7,10 +7,7 @@ namespace Bdf\Prime\Mapper\NameResolver;
  */
 class SuffixResolver implements ResolverInterface
 {
-    /**
-     * @var string
-     */
-    protected $suffix;
+    protected string $suffix;
 
     /**
      * @param string $suffix

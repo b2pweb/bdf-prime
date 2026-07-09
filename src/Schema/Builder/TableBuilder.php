@@ -26,36 +26,26 @@ use Bdf\Prime\Schema\TableInterface;
  */
 final class TableBuilder implements TableBuilderInterface
 {
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
-    /**
-     * @var array
-     */
-    private $options = [];
+    private array $options = [];
 
-    /**
-     * @var array
-     */
-    private $indexes = [];
+    private array $indexes = [];
 
     /**
      * @var ColumnBuilderInterface[]
      */
-    private $columns = [];
+    private array $columns = [];
 
     /**
      * @var ForeignKeyInterface[]
      */
-    private $foreignKeys = [];
+    private array $foreignKeys = [];
 
     /**
-     * @var string
      * @internal
      */
-    private $current;
+    private ?string $current = null;
 
 
     /**

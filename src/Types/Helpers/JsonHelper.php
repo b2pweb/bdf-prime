@@ -11,10 +11,8 @@ trait JsonHelper
 {
     /**
      * Transform data to array
-     *
-     * @var boolean
      */
-    protected $toArray;
+    protected bool $toArray = false;
 
     /**
      * {@inheritdoc}

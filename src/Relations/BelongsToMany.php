@@ -49,35 +49,35 @@ class BelongsToMany extends Relation
      *
      * @var EntityRepository
      */
-    protected $through;
+    protected RepositoryInterface $through;
 
     /**
      * Through local key
      *
      * @var string
      */
-    protected $throughLocal;
+    protected string $throughLocal;
 
     /**
      * Through distant key
      *
      * @var string
      */
-    protected $throughDistant;
+    protected string $throughDistant;
 
     /**
      * The through global constraints
      *
      * @var array
      */
-    protected $throughConstraints = [];
+    protected array $throughConstraints = [];
 
     /**
      * Merge of all constraints
      *
      * @var array
      */
-    protected $allConstraints = [];
+    protected array $allConstraints = [];
 
     /**
      * {@inheritdoc}
@@ -88,15 +88,8 @@ class BelongsToMany extends Relation
     // Save queries for optimisation
     //===============================
 
-    /**
-     * @var KeyValueQuery
-     */
-    private $throughQuery;
-
-    /**
-     * @var KeyValueQuery
-     */
-    private $relationQuery;
+    private ?KeyValueQuery $throughQuery = null;
+    private ?KeyValueQuery $relationQuery = null;
 
 
     /**

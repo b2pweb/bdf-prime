@@ -19,24 +19,18 @@ class MapperInfo
 {
     /**
      * The mapper
-     *
-     * @var Mapper
      */
-    protected $mapper;
+    protected Mapper $mapper;
 
     /**
      * The types registry
-     *
-     * @var TypesRegistryInterface
      */
-    protected $typesRegistry;
+    protected ?TypesRegistryInterface $typesRegistry;
 
     /**
      * The metadata
-     *
-     * @var Metadata
      */
-    protected $metadata;
+    protected Metadata $metadata;
 
     /**
      * The properties info
@@ -44,14 +38,14 @@ class MapperInfo
      *
      * @var null|PropertyInfo[]
      */
-    private $properties;
+    private ?array $properties = null;
 
     /**
      * The primary properties
      *
      * @var null|PropertyInfo[]
      */
-    private $primaries;
+    private ?array $primaries = null;
 
     /**
      * The properties info
@@ -59,7 +53,7 @@ class MapperInfo
      *
      * @var null|PropertyInfo[]
      */
-    private $embedded;
+    private ?array $embedded = null;
 
     /**
      * The properties info
@@ -67,7 +61,7 @@ class MapperInfo
      *
      * @var null|ObjectPropertyInfo[]
      */
-    private $objects;
+    private ?array $objects = null;
 
     /**
      * Constructor

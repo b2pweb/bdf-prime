@@ -30,42 +30,34 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
 
     /**
      * The DBAL Connection.
-     *
-     * @var ShardingConnection
      */
-    private $connection;
+    private ShardingConnection $connection;
 
-    /**
-     * @var string
-     */
-    private $table;
+    private ?string $table = null;
 
     /**
      * @var string[]
      */
-    private $columns = [];
+    private array $columns = [];
 
     /**
      * @var InsertQueryInterface::MODE_*
      */
-    private $mode = self::MODE_INSERT;
+    private string $mode = self::MODE_INSERT;
 
-    /**
-     * @var array
-     */
-    private $values = [];
+    private array $values = [];
 
     /**
      * Queries indexed by shard id
      *
      * @var BulkInsertQuery[]
      */
-    private $queries = [];
+    private array $queries = [];
 
     /**
      * @var BulkInsertQuery|null
      */
-    private $currentQuery;
+    private ?BulkInsertQuery $currentQuery = null;
 
 
     /**

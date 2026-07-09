@@ -15,12 +15,12 @@ final class SingleEntityIndexer implements EntityIndexerInterface
     /**
      * @var Mapper<E>
      */
-    private $mapper;
+    private Mapper $mapper;
 
     /**
      * @var E
      */
-    private $entity;
+    private object $entity;
 
 
     /**

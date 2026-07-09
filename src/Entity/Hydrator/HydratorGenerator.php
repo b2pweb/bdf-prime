@@ -21,55 +21,17 @@ class HydratorGenerator
 {
     /**
      * The stub hydrator file name
-     *
-     * @var string
      */
-    private $stub = __DIR__.'/Generator/stubs/hydrator.php.stub';
-
-    /**
-     * @var CodeGenerator
-     */
-    private $code;
-
-    /**
-     * @var ClassAccessor
-     */
-    private $accessor;
-
-    /**
-     * @var AccessorResolver
-     */
-    private $accessors;
-
-    /**
-     * @var AttributesResolver
-     */
-    private $resolver;
-
-    /**
-     * @var ServiceLocator
-     */
-    private $prime;
-
-    /**
-     * @var Mapper
-     */
-    private $mapper;
-
-    /**
-     * @var string
-     */
-    private $className;
-
-    /**
-     * @var string
-     */
-    private $interface = HydratorGeneratedInterface::class;
-
-    /**
-     * @var array
-     */
-    private $embeddedHydrators = [];
+    private string $stub = __DIR__.'/Generator/stubs/hydrator.php.stub';
+    private CodeGenerator $code;
+    private ClassAccessor $accessor;
+    private AccessorResolver $accessors;
+    private AttributesResolver $resolver;
+    private ServiceLocator $prime;
+    private Mapper $mapper;
+    private string $className;
+    private string $interface = HydratorGeneratedInterface::class;
+    private array $embeddedHydrators = [];
 
 
     /**

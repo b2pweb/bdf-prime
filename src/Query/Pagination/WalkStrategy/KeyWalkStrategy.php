@@ -30,7 +30,7 @@ final class KeyWalkStrategy implements WalkStrategyInterface
     /**
      * @var KeyInterface<E>
      */
-    private $key;
+    private KeyInterface $key;
 
     /**
      * PrimaryKeyWalkStrategy constructor.

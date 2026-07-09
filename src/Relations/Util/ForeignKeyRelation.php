@@ -24,17 +24,13 @@ trait ForeignKeyRelation
 {
     /**
      * The local property for the relation
-     *
-     * @var string
      */
-    protected $localKey;
+    protected ?string $localKey = null;
 
     /**
      * The distant key
-     *
-     * @var string
      */
-    protected $distantKey;
+    protected ?string $distantKey = null;
 
 
     /**

@@ -16,7 +16,7 @@ use function is_array;
 final class Operator implements ExpressionTransformerInterface, TypedExpressionInterface
 {
     private string $operator;
-    private $value;
+    private mixed $value;
     private string $column;
     private ?TypeInterface $type = null;
     private ?PlatformInterface $platform = null;

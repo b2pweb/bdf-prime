@@ -17,32 +17,24 @@ class ConnectionRegistry implements ConnectionRegistryInterface
 {
     /**
      * The connection factory
-     *
-     * @var ConnectionFactoryInterface
      */
-    private $connectionFactory;
+    private ConnectionFactoryInterface $connectionFactory;
 
     /**
      * The configuration resolver
-     *
-     * @var ConfigurationResolverInterface
      */
-    private $configResolver;
+    private ConfigurationResolverInterface $configResolver;
 
     /**
      * The configuration map
      * Contains configuration of some connections
-     *
-     * @var array
      */
-    private $parametersMap;
+    private array $parametersMap;
 
     /**
      * The drive name alias
-     *
-     * @var array
      */
-    private static $driverSchemeAliases = [
+    private static array $driverSchemeAliases = [
         'db2'        => 'ibm_db2',
         'mssql'      => 'pdo_sqlsrv',
         'mysql'      => 'pdo_mysql',

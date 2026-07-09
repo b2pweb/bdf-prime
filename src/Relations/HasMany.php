@@ -22,10 +22,8 @@ class HasMany extends OneOrMany
 
     /**
      * Store the relation query for optimisation purpose
-     *
-     * @var KeyValueQuery
      */
-    private $relationQuery;
+    private ?KeyValueQuery $relationQuery = null;
 
     /**
      * {@inheritdoc}

@@ -16,15 +16,9 @@ use Bdf\Prime\Schema\TableInterface;
  */
 final class MetadataTable implements TableInterface
 {
-    /**
-     * @var Metadata
-     */
-    private $metadata;
+    private Metadata $metadata;
 
-    /**
-     * @var PlatformTypesInterface
-     */
-    private $types;
+    private PlatformTypesInterface $types;
 
 
     /**

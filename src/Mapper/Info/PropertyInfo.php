@@ -15,31 +15,18 @@ class PropertyInfo implements InfoInterface
 {
     /**
      * The property name
-     *
-     * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
      * The metadata from the metadata object
-     *
-     * @var array
      */
-    protected $metadata;
-
-    /**
-     * The metadata from the metadata object
-     *
-     * @var array
-     */
-    protected $relation;
+    protected array $metadata;
 
     /**
      * The types registry
-     *
-     * @var TypesRegistryInterface
      */
-    protected $typesRegistry;
+    protected ?TypesRegistryInterface $typesRegistry;
 
 
     /**

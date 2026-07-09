@@ -10,12 +10,8 @@ class RegistryInstantiator implements InstantiatorInterface
     /**
      * @var InstantiatorInterface[]
      */
-    protected $registry = [];
-
-    /**
-     * @var InstantiatorInterface
-     */
-    protected $defaultInstantiator;
+    protected array $registry = [];
+    protected ?InstantiatorInterface $defaultInstantiator;
 
     /**
      * Instantiator constructor.

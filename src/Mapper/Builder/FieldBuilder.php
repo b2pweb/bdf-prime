@@ -55,14 +55,12 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @var array<string, FieldDefinition>
      */
-    protected $fields = [];
+    protected array $fields = [];
 
     /**
      * The name of the current field
-     *
-     * @var string
      */
-    protected $current;
+    protected string $current;
 
 
     /**

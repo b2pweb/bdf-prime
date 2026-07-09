@@ -19,7 +19,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      *
      * @var MapperFactoryInterface
      */
-    protected $mapperFactory;
+    protected MapperFactoryInterface $mapperFactory;
 
     /**
      * The discriminator column

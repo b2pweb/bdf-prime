@@ -71,7 +71,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @var false|CacheInterface
      */
-    protected $resultCache;
+    protected ?CacheInterface $resultCache;
 
     /**
      * @var Metadata|null
@@ -86,7 +86,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @var GeneratorInterface|class-string<GeneratorInterface>|null
      */
-    protected $generator;
+    protected GeneratorInterface|string|null $generator = null;
 
     /**
      * @var class-string

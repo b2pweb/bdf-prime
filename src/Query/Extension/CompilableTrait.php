@@ -23,7 +23,7 @@ trait CompilableTrait
     /**
      * @var Compilable::TYPE_*
      */
-    protected $type = Compilable::TYPE_SELECT;
+    protected string $type = Compilable::TYPE_SELECT;
 
     /**
      * {@inheritdoc}

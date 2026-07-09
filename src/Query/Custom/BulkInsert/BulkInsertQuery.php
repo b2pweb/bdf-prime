@@ -57,14 +57,14 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
      *
      * @var C
      */
-    protected $connection;
+    protected ConnectionInterface $connection;
 
     /**
      * The SQL compiler
      *
      * @var CompilerInterface<BulkInsertQuery>&QuoteCompilerInterface
      */
-    protected $compiler;
+    protected CompilerInterface $compiler;
 
 
     /**

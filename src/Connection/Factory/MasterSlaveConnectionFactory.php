@@ -13,10 +13,8 @@ class MasterSlaveConnectionFactory implements ConnectionFactoryInterface
 {
     /**
      * The delegated connectionFactory
-     *
-     * @var ConnectionFactoryInterface
      */
-    private $connectionFactory;
+    private ConnectionFactoryInterface $connectionFactory;
 
     /**
      * Set default configuration
