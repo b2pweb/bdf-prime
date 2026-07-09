@@ -22,7 +22,6 @@ use function explode;
 use function implode;
 use function is_string;
 use function sprintf;
-use function trigger_error;
 
 /**
  * Base compiler for SQL queries
@@ -421,9 +420,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
             case 'sum'  :      return "SUM($column) AS aggregate";
 
             default:
-                @trigger_error(sprintf('Using unknown aggregate expression "%s" is deprecated since Prime 2.3, and will be removed in 3.0. Use select with expression instead.', $function));
-                $method = 'get'.ucfirst($function).'Expression';
-                return $this->platform()->grammar()->{$method}($column).' AS aggregate';
+                throw new QueryBuildingException(sprintf('Unknown aggregate expression "%s"', $function));
         }
     }
 

@@ -54,8 +54,7 @@ final class DoctrineResultSet implements ResultSetInterface
     /**
      * {@inheritdoc}
      */
-    #[\ReturnTypeWillChange]
-    public function current()
+    public function current(): mixed
     {
         if ($this->current === null) {
             $this->rewind();
@@ -77,8 +76,7 @@ final class DoctrineResultSet implements ResultSetInterface
     /**
      * {@inheritdoc}
      */
-    #[\ReturnTypeWillChange]
-    public function key()
+    public function key(): int
     {
         return $this->key;
     }
@@ -89,34 +87,6 @@ final class DoctrineResultSet implements ResultSetInterface
     public function valid(): bool
     {
         return $this->current !== false;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @psalm-suppress DeprecatedConstant
-     */
-    public function fetchMode($mode, $options = null)
-    {
-        switch ($mode) {
-            case self::FETCH_ASSOC:
-                return $this->asAssociative();
-
-            case self::FETCH_NUM:
-                return $this->asList();
-
-            case self::FETCH_OBJECT:
-                return $this->asObject();
-
-            case self::FETCH_COLUMN:
-                return $this->asColumn($options ?? 0);
-
-            case self::FETCH_CLASS:
-                return $this->asClass($options);
-
-            default:
-                throw new DBALException('Unsupported fetch mode '.$mode);
-        }
     }
 
     /**

@@ -139,13 +139,11 @@ class ClassAccessor
                 return false;
             }
 
-            /** @psalm-suppress RedundantCondition */
-            if ($setter && method_exists($propertyReflection, 'isPrivateSet') && $propertyReflection->isPrivateSet()) {
+            if ($setter && $propertyReflection->isPrivateSet()) {
                 return false;
             }
 
-            /** @psalm-suppress TypeDoesNotContainType */
-            if ($propertyReflection->isPublic() && (!$setter || !method_exists($propertyReflection, 'isProtectedSet') || !$propertyReflection->isProtectedSet())) {
+            if ($propertyReflection->isPublic() && (!$setter || !$propertyReflection->isProtectedSet())) {
                 return true;
             }
 

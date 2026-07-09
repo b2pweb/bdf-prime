@@ -93,7 +93,7 @@ class BlameableTest extends TestCase
         $entity->id = 1;
         $entity->insert();
         $entity->update(['name']);
-        $entity = BlameableEntity::get(1);
+        $entity = BlameableEntity::findById(1);
 
         $this->assertEquals(1, $entity->updatedBy);
     }

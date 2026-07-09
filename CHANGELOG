@@ -27,6 +27,25 @@ BC Breaks:
 * Change: use `LockMode` enum instead of int constant on `Bdf\Prime\Query\Contract\Lockable` methods
 * Change: `Bdf\Prime\Connection\ShardingConnection::getDatabase()` now return the database name of the default connection instead of empty string
 
+Removal of deprecated APIs:
+* Remove: `Bdf\Prime\Cache\DoctrineCacheAdapter`. Use `Bdf\Prime\Cache\SimpleCacheAdapter` or `Bdf\Prime\Cache\CachePoolAdapter` instead.
+* Remove: `Bdf\Prime\Events` and its event name constants. Use the event classes of `Bdf\Prime\Repository\Event` instead.
+* Remove: `Bdf\Prime\Mapper\NameResolver\CallbackResolver`. Use an anonymous class implementing `Bdf\Prime\Mapper\NameResolver\ResolverInterface` instead.
+* Remove: `Bdf\Prime\Schema\NullResolver`, `Bdf\Prime\Schema\Resolver` and `Bdf\Prime\Schema\ResolverInterface`. Use `Bdf\Prime\Schema\NullStructureUpgrader`, `Bdf\Prime\Schema\RepositoryUpgrader` and `Bdf\Prime\Schema\StructureUpgraderInterface` instead.
+* Remove: `Bdf\Prime\Query\QueryRepositoryExtension::get()`, `getOrFail()` and `getOrNew()` (and the matching `Query::get()`/`getOrFail()`/`getOrNew()`). Use `findById()`, `findByIdOrFail()` and `findByIdOrNew()` instead.
+* Remove: `Bdf\Prime\Query\QueryRepositoryExtension::processEntities()`. Use a `RecordHydratorInterface` registered with `ReadCommandInterface::setRecordHydrator()` instead.
+* Remove: `Bdf\Prime\Platform\PlatformInterface::name()`. Use `PlatformInterface::apply()` instead.
+* Remove: `Bdf\Prime\Query\Expression\Raw::__toString()`. A `Raw` expression can no longer be cast to string.
+* Remove: fetch mode constants (`FETCH_ASSOC`, `FETCH_NUM`, `FETCH_COLUMN`, `FETCH_OBJECT`, `FETCH_CLASS`) and `fetchMode()` on `Bdf\Prime\Connection\Result\ResultSetInterface`. Use `asAssociative()`, `asList()`, `asColumn()`, `asObject()` or `asClass()` instead.
+* Remove: `hasTable()` on schema managers (`Bdf\Prime\Schema\AbstractSchemaManager`, `Bdf\Prime\Schema\Manager\DatabaseManagerInterface`). Use `has()` instead. `DatabaseManagerInterface::loadTable()` is removed too, use `DatabaseStructureManagerInterface::load()` instead.
+* Remove: `Bdf\Prime\Relations\RelationInterface::clearInfo()` without replacement (internal relation info handling).
+* Remove: `Bdf\Prime\Repository\EntityRepository::free()` (no-op) and `Bdf\Prime\Entity\Model::__destruct()`.
+* Remove: `Bdf\Prime\Repository\EntityRepository::getSubscribedEvents()` and the second `$args` parameter of `EntityRepository::notify()`. Pass the event object as single argument.
+* Change: Using an unknown attribute on a query now throws an exception instead of emitting a deprecation. Use `Bdf\Prime\Mapper\Mapper::allowUnknownAttribute()` to allow it (disabled by default).
+* Change: Formalize (enforce) on the interfaces the methods and parameters that were soft-added in 2.x for BC reasons:
+    * `$queryClass` parameter on `Bdf\Prime\Relations\RelationInterface::link()` and `Bdf\Prime\Repository\RepositoryInterface::query()`
+    * `string|ExpressionInterface` support on `Bdf\Prime\Query\Contract\Whereable::whereNull()`/`whereNotNull()`/`orWhereNull()`/`orWhereNotNull()`, their `having*` equivalents, and `Bdf\Prime\Query\ReadCommandInterface::inRow()`/`inRows()`
+
 v2.3.0
 ------
 

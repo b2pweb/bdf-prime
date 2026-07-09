@@ -11,7 +11,6 @@ use Bdf\Prime\Collection\Indexer\SingleEntityIndexer;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\TransactionManagerInterface;
 use Bdf\Prime\Entity\Criteria;
-use Bdf\Prime\Events;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
@@ -37,7 +36,6 @@ use Bdf\Prime\Repository\Event\BeforeInsert;
 use Bdf\Prime\Repository\Event\BeforeSave;
 use Bdf\Prime\Repository\Event\BeforeUpdate;
 use Bdf\Prime\Repository\Event\EventNotifierTrait;
-use Bdf\Prime\Repository\Event\RepositoryEventInterface;
 use Bdf\Prime\Repository\Write\Writer;
 use Bdf\Prime\Repository\Write\WriterInterface;
 use Bdf\Prime\Schema\NullStructureUpgrader;
@@ -50,7 +48,6 @@ use Doctrine\DBAL\Connection;
 use Exception;
 
 use function assert;
-use function method_exists;
 
 /**
  * Db repository
@@ -68,12 +65,11 @@ use function method_exists;
  * @mixin RepositoryQueryFactory<E>
  * @mixin QueryInterface<ConnectionInterface, E>
  *
- * @method E|null get(mixed $key)
- * @method E getOrFail(mixed $key)
- * @method E getOrNew(mixed $key)
+ * @method E|null findById(mixed $key)
+ * @method E findByIdOrFail(mixed $key)
+ * @method E findByIdOrNew(mixed $key)
  * @method QueryInterface<ConnectionInterface, E> filter(Closure $filter)
  *
- * @psalm-suppress DeprecatedInterface
  * @psalm-no-seal-methods
  */
 class EntityRepository implements RepositoryInterface, RepositoryEventsSubscriberInterface
@@ -563,7 +559,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function count($criteria = [], $attributes = null): int
+    public function count(iterable|callable $criteria = [], string|array|null $attributes = null): int
     {
         $query = $this->queries->builder()->where($criteria);
         assert($query instanceof Aggregatable);
@@ -763,7 +759,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      */
     public function schema(bool $force = false): StructureUpgraderInterface
     {
-        $ignore = !$this->mapper->hasSchemaManager() || (method_exists($this->connection(), 'getParameters') && ($this->connection()->getParameters()['ignore'] ?? false));
+        $ignore = !$this->mapper->hasSchemaManager() || ($this->connection()->getParameters()['ignore'] ?? false);
 
         if ($ignore && !$force) {
             return new NullStructureUpgrader();
@@ -799,7 +795,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      */
     public function loaded(callable $listener, bool $once = false)
     {
-        $eventName = $this->isLegacyListener($listener) ? Events::POST_LOAD : AfterLoad::class;
+        $eventName = AfterLoad::class;
 
         if ($once) {
             $this->once($eventName, $listener);
@@ -815,7 +811,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      */
     public function saving(callable $listener, bool $once = false)
     {
-        $eventName = $this->isLegacyListener($listener) ? Events::PRE_SAVE : BeforeSave::class;
+        $eventName = BeforeSave::class;
 
         if ($once) {
             $this->once($eventName, $listener);
@@ -831,7 +827,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      */
     public function saved(callable $listener, bool $once = false)
     {
-        $eventName = $this->isLegacyListener($listener) ? Events::POST_SAVE : AfterSave::class;
+        $eventName = AfterSave::class;
 
         if ($once) {
             $this->once($eventName, $listener);
@@ -847,7 +843,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      */
     public function inserting(callable $listener, bool $once = false)
     {
-        $eventName = $this->isLegacyListener($listener) ? Events::PRE_INSERT : BeforeInsert::class;
+        $eventName = BeforeInsert::class;
 
         if ($once) {
             $this->once($eventName, $listener);
@@ -863,7 +859,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      */
     public function inserted(callable $listener, bool $once = false)
     {
-        $eventName = $this->isLegacyListener($listener) ? Events::POST_INSERT : AfterInsert::class;
+        $eventName = AfterInsert::class;
 
         if ($once) {
             $this->once($eventName, $listener);
@@ -879,7 +875,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      */
     public function updating(callable $listener, bool $once = false)
     {
-        $eventName = $this->isLegacyListener($listener) ? Events::PRE_UPDATE : BeforeUpdate::class;
+        $eventName = BeforeUpdate::class;
 
         if ($once) {
             $this->once($eventName, $listener);
@@ -895,7 +891,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      */
     public function updated(callable $listener, bool $once = false)
     {
-        $eventName = $this->isLegacyListener($listener) ? Events::POST_UPDATE : AfterUpdate::class;
+        $eventName = AfterUpdate::class;
 
         if ($once) {
             $this->once($eventName, $listener);
@@ -911,7 +907,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      */
     public function deleting(callable $listener, bool $once = false)
     {
-        $eventName = $this->isLegacyListener($listener) ? Events::PRE_DELETE : BeforeDelete::class;
+        $eventName = BeforeDelete::class;
 
         if ($once) {
             $this->once($eventName, $listener);
@@ -927,7 +923,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      */
     public function deleted(callable $listener, bool $once = false)
     {
-        $eventName = $this->isLegacyListener($listener) ? Events::POST_DELETE : AfterDelete::class;
+        $eventName = AfterDelete::class;
 
         if ($once) {
             $this->once($eventName, $listener);
@@ -936,38 +932,6 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
         }
 
         return $this;
-    }
-
-    /**
-     * Check if the given listener is a legacy listener
-     * This method should be removed in 3.0, when the legacy event system will be removed
-     */
-    private function isLegacyListener(callable $listener): bool
-    {
-        if (is_array($listener)) {
-            $reflection = new \ReflectionMethod($listener[0], $listener[1]);
-        } else {
-            $reflection = new \ReflectionFunction($listener);
-        }
-
-        $argsCount = $reflection->getNumberOfParameters();
-
-        // Doesn't take any parameters: can be used in both legacy and new event system
-        // So we consider it as a new event listener
-        if ($argsCount === 0) {
-            return false;
-        }
-
-        // New listeners takes only the event object as parameter
-        // So if the listener takes more than one parameter, it's a legacy listener
-        if ($argsCount > 1) {
-            return true;
-        }
-
-        $argType = $reflection->getParameters()[0]->getType();
-
-        // Consider the listener as new only if the parameter is typehinted with the event class
-        return !$argType instanceof \ReflectionNamedType || !is_subclass_of($argType->getName(), RepositoryEventInterface::class);
     }
 
     /**
@@ -1081,20 +1045,6 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
     public function onConnectionClosed()
     {
         $this->reset();
-    }
-
-    /**
-     * Free metadata information on the given entity
-     * Note: This method is called by the model destructor
-     *
-     * @param E $entity
-     *
-     * @return void
-     * @deprecated This is a no-op method. Will be removed in 3.0.
-     */
-    public function free($entity)
-    {
-        // No-op
     }
 
     /**

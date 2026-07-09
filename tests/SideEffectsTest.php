@@ -70,7 +70,7 @@ class SideEffectsTest extends TestCase
         }
 
         // Perform a read query : a statement will be prepared and stored into repository
-        TestEntity::with('foreign')->get(1)->deleteAll('foreign');
+        TestEntity::with('foreign')->findById(1)->deleteAll('foreign');
 
         // Close connection
         $connection->close();
@@ -79,7 +79,7 @@ class SideEffectsTest extends TestCase
         Faction::repository()->schema()->migrate();
 
         // Perform the two delete operations into a transaction
-        TestEntity::with('foreign')->get(2)->deleteAll('foreign');
+        TestEntity::with('foreign')->findById(2)->deleteAll('foreign');
 
         unlink($file);
     }

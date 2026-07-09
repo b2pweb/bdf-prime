@@ -350,7 +350,7 @@ class SimpleConnectionTest extends TestCase
         $result = $this->connection->execute($query);
         $this->assertSame(1, $result->count());
         $this->assertInstanceOf(UpdateResultSet::class, $result);
-        $this->assertSame($result, $result->fetchMode(ResultSetInterface::FETCH_OBJECT));
+        $this->assertSame($result, $result->asObject());
         $this->assertSame([], $result->all());
         $this->assertSame([], iterator_to_array($result));
 

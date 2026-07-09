@@ -118,7 +118,7 @@ class ByInheritanceTest extends TestCase
      */
     public function test_child_relation()
     {
-        $task = CustomerControlTask::with('target')->get(11);
+        $task = CustomerControlTask::with('target')->findById(11);
 
         $this->assertEquals('John ind.', $task->target->name);
     }
@@ -129,7 +129,7 @@ class ByInheritanceTest extends TestCase
     public function test_with_sub_relation()
     {
         $user = $this->pack()->get('user');
-        $task = Task::with('target#DocumentControl.uploader')->get(10);
+        $task = Task::with('target#DocumentControl.uploader')->findById(10);
 
         $this->assertEquals($user->name, $task->target->uploader->name);
     }
@@ -140,7 +140,7 @@ class ByInheritanceTest extends TestCase
     public function test_with_complex_sub_relation()
     {
         $customer = $this->pack()->get('customer');
-        $task = Task::with('target#DocumentControl.uploader#user.customer')->get(10);
+        $task = Task::with('target#DocumentControl.uploader#user.customer')->findById(10);
 
         $this->assertEquals($customer->name, $task->target->uploader->customer->name);
     }
@@ -238,12 +238,12 @@ class ByInheritanceTest extends TestCase
      */
     public function test_save_all()
     {
-        $task = Task::with('target#DocumentControl.uploader')->get(10);
+        $task = Task::with('target#DocumentControl.uploader')->findById(10);
         $task->target->uploader->name = 'save all';
 
         Task::repository()->saveAll($task, 'target#DocumentControl.uploader');
 
-        $user = User::get($task->target->uploader->id);
+        $user = User::findById($task->target->uploader->id);
 
         $this->assertEquals('save all', $user->name);
     }
@@ -253,13 +253,13 @@ class ByInheritanceTest extends TestCase
      */
     public function test_delete_all()
     {
-        $task = Task::with('target#DocumentControl.uploader')->get(10);
+        $task = Task::with('target#DocumentControl.uploader')->findById(10);
 
         Task::repository()->deleteAll($task, 'target#DocumentControl.uploader');
 
-        $this->assertNull(User::get($task->target->uploader->id));
-        $this->assertNull(Document::get($task->target->id));
-        $this->assertNull(Task::get($task->id));
+        $this->assertNull(User::findById($task->target->uploader->id));
+        $this->assertNull(Document::findById($task->target->id));
+        $this->assertNull(Task::findById($task->id));
     }
 
     /**
@@ -267,7 +267,7 @@ class ByInheritanceTest extends TestCase
      */
     public function test_eager_relation()
     {
-        $task = Task::get(11);
+        $task = Task::findById(11);
 
         $this->assertEquals('John ind.', $task->targetEager->name);
         $this->assertTrue($task->relation('targetEager')->isLoaded());
@@ -278,7 +278,7 @@ class ByInheritanceTest extends TestCase
      */
     public function test_without_on_eager_relation()
     {
-        $task = Task::without('targetEager')->get(10);
+        $task = Task::without('targetEager')->findById(10);
 
         $this->assertNull($task->targetEager);
         $this->assertFalse($task->relation('targetEager')->isLoaded());
@@ -309,7 +309,7 @@ class ByInheritanceTest extends TestCase
     {
         $repository = Prime::repository(Task::class);
 
-        $task = $repository->without('targetEager')->get(100);
+        $task = $repository->without('targetEager')->findById(100);
 
         $relation = $repository->relation('targetEager');
         $relation->load(new SingleEntityIndexer(Task::mapper(), $task), [], [], ['uploader']);

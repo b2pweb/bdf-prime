@@ -2,7 +2,6 @@
 
 namespace Bdf\Prime\Repository\Write;
 
-use Bdf\Prime\Events;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Repository\EntityRepository;

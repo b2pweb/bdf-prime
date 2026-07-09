@@ -164,6 +164,8 @@ class OrmPreprocessorTest extends TestCase
         $this->assertEquals('name_', $this->preprocessor->field('name', $type));
         $this->assertInstanceOf(SqlStringType::class, $type);
 
+        Faction::repository()->mapper()->setAllowUnknownAttribute(true);
+        $this->preprocessor = new OrmPreprocessor(Prime::repository(Faction::class));
         $this->assertEquals('not_found', $this->preprocessor->field('not_found'));
     }
 

@@ -7,8 +7,6 @@ require_once __DIR__ . '/../_files/BenchData.php';
 use Bdf\Prime\Bench\BenchData;
 use Bdf\Prime\Bench\User as BenchUser;
 use Bdf\Prime\Cache\ArrayCache;
-use Bdf\Prime\Connection\ConnectionConfig;
-use Bdf\Prime\ConnectionManager;
 use Bdf\Prime\Locatorizable;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\ServiceLocator;

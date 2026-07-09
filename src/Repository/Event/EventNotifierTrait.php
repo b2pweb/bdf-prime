@@ -2,12 +2,6 @@
 
 namespace Bdf\Prime\Repository\Event;
 
-use BadMethodCallException;
-use Bdf\Prime\Events;
-
-use function get_class;
-use function sprintf;
-
 trait EventNotifierTrait
 {
     /**
@@ -16,11 +10,10 @@ trait EventNotifierTrait
      * The search listener item is an array with the following structure:
      * - 0: The listener callable
      * - 1: The listener is a 'once' listener (if true, it will be removed after the first call)
-     * - 2: The listener is a legacy listener (take array of arguments instead of the event object)
      *
      * The key is always the event class name. So if a legacy event name is used, it should be converted to the class name.
      *
-     * @var array<string, array<list{callable, bool, bool}>>
+     * @var array<string, array<list{callable, bool}>>
      */
     private array $listeners = [];
 
@@ -86,13 +79,13 @@ trait EventNotifierTrait
     /**
      * Check if there are listeners on this event
      *
-     * @param string $eventName
+     * @param class-string<RepositoryEventInterface> $eventName
      *
      * @return bool
      */
     public function hasListeners(string $eventName): bool
     {
-        return isset($this->listeners[$eventName]) || isset($this->listeners[Events::eventNameToClass($eventName)]);
+        return isset($this->listeners[$eventName]);
     }
 
     /**
@@ -126,36 +119,24 @@ trait EventNotifierTrait
      * true: ok
      * false: interrupted
      *
-     * @param string|RepositoryEventInterface $event
-     * @param mixed  $args
+     * @param RepositoryEventInterface $event
      *
      * @return bool
      */
-    public function notify($event, array $args = []): bool
+    public function notify(RepositoryEventInterface $event): bool
     {
         if ($this->enableEventNotifier === false) {
             return true;
         }
 
-        if (is_string($event)) {
-            $eventClass = Events::eventNameToClass($event);
-            @trigger_error(sprintf('Using legacy event name "%s" is deprecated since Prime 2.2, and will be removed in Prime 3.0. Use the event class name "%s" instead.', $event, $eventClass), E_USER_DEPRECATED);
+        $eventClass = $event::class;
 
-            $event = new $eventClass(...$args);
-        } else {
-            $eventClass = get_class($event);
-
-            if ($args !== []) {
-                throw new BadMethodCallException('Cannot use $args argument when $event is an object');
-            }
-        }
-
-        foreach ($this->listeners[$eventClass] ?? [] as $index => [$listener, $once, $isLegacy]) {
+        foreach ($this->listeners[$eventClass] ?? [] as $index => [$listener, $once]) {
             if ($once) {
                 unset($this->listeners[$eventClass][$index]);
             }
 
-            $ret = $isLegacy ? $listener(...$event->legacyArgs()) : $listener($event);
+            $ret = $listener($event);
 
             if ($ret === false) {
                 return false;
@@ -178,16 +159,7 @@ trait EventNotifierTrait
      */
     private function register(string $eventName, callable $listener, bool $once): self
     {
-        if (!class_exists($eventName)) {
-            $eventClass = Events::eventNameToClass($eventName);
-            @trigger_error(sprintf('Using legacy event name "%s" is deprecated since Prime 2.2, and will be removed in Prime 3.0. Use the event class name "%s" instead.', $eventName, $eventClass), E_USER_DEPRECATED);
-            $eventName = $eventClass;
-            $isLegacy = true;
-        } else {
-            $isLegacy = false;
-        }
-
-        $this->listeners[$eventName][] = [$listener, $once, $isLegacy];
+        $this->listeners[$eventName][] = [$listener, $once];
 
         return $this;
     }

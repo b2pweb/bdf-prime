@@ -179,12 +179,4 @@ final class NullRelation implements RelationInterface
     {
         return true;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function clearInfo($entity): void
-    {
-        // No-op
-    }
 }

@@ -239,11 +239,11 @@ class WriterTest extends TestCase
         $updated->name = 'new name';
         $this->assertEquals(0, $writer->update($updated));
         $this->assertEquals(0, $writer->delete($f1));
-        $this->assertEquals($f1, Faction::repository()->withoutConstraints()->get(1));
+        $this->assertEquals($f1, Faction::repository()->withoutConstraints()->findById(1));
 
         $f2->name = 'new name';
         $this->assertEquals(1, $writer->update($f2));
         $this->assertEquals(1, $writer->delete($f2));
-        $this->assertNull(Faction::get(2));
+        $this->assertNull(Faction::findById(2));
     }
 }

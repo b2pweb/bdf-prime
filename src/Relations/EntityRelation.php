@@ -33,9 +33,6 @@ use function sprintf;
  * @psalm-method QueryInterface<\Bdf\Prime\Connection\ConnectionInterface, R> with(string|string[] $relations) Relations to load
  * @psalm-method QueryInterface<\Bdf\Prime\Connection\ConnectionInterface, R> by(string $attribute, bool $combine = false) Indexing entities by an attribute value. Use combine for multiple entities with same attribute value
  * @psalm-method QueryInterface<\Bdf\Prime\Connection\ConnectionInterface, R> where(string|array|callable $column, mixed|null $operator = null, mixed $value = null)
- * @psalm-method R|null get($pk) Get one entity by its identifier
- * @psalm-method R getOrFail($pk) Get one entity or throws when entity is not found
- * @psalm-method R getOrNew($pk) Get one entity or return a new one if not found in repository
  * @psalm-method R|null findById(mixed|array $pk) Get one entity by its primary key or null if not found in repository
  * @psalm-method R findByIdOrFail(mixed|array $pk) Get one entity by its primary key or throws if not found in repository
  * @psalm-method R findByIdOrNew(mixed|array $pk) Get one entity by its primary key or instantiate a new one, using where clause criteria if not found in repository

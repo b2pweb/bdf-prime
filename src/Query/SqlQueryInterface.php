@@ -97,11 +97,8 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * @param string $type
      *
      * @return $this This Query instance.
-     *
-     * @psalm-suppress MismatchingDocblockParamType
-     * @todo change column type hint on prime 3.0
      */
-    public function havingNull(string/*|ExpressionInterface*/ $column, string $type = CompositeExpression::TYPE_AND);
+    public function havingNull(string|ExpressionInterface $column, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add having IS NOT NULL expression
@@ -110,11 +107,8 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * @param string $type
      *
      * @return $this This Query instance.
-     *
-     * @psalm-suppress MismatchingDocblockParamType
-     * @todo change column type hint on prime 3.0
      */
-    public function havingNotNull(string/*|ExpressionInterface*/ $column, string $type = CompositeExpression::TYPE_AND);
+    public function havingNotNull(string|ExpressionInterface $column, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add OR having IS NULL expression
@@ -122,11 +116,8 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * @param string|ExpressionInterface $column
      *
      * @return $this This Query instance.
-     *
-     * @psalm-suppress MismatchingDocblockParamType
-     * @todo change column type hint on prime 3.0
      */
-    public function orHavingNull(string/*|ExpressionInterface*/ $column);
+    public function orHavingNull(string|ExpressionInterface $column);
 
     /**
      * Add OR having IS NOT NULL expression
@@ -134,11 +125,8 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      * @param string|ExpressionInterface $column
      *
      * @return $this This Query instance.
-     *
-     * @psalm-suppress MismatchingDocblockParamType
-     * @todo change column type hint on prime 3.0
      */
-    public function orHavingNotNull(string/*|ExpressionInterface*/ $column);
+    public function orHavingNotNull(string|ExpressionInterface $column);
 
     /**
      * Add having SQL expression

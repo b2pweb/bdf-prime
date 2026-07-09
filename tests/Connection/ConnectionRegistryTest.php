@@ -5,6 +5,7 @@ namespace Bdf\Prime\Connection;
 use Bdf\Prime\Configuration;
 use Bdf\Prime\Connection\Configuration\ConfigurationResolver;
 use Bdf\Prime\Exception\DBALException;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -34,7 +35,7 @@ class ConnectionRegistryTest extends TestCase
 
         $connection = $registry->getConnection('test');
         
-        $this->assertEquals('sqlite', $connection->platform()->name());
+        $this->assertInstanceOf(SQLitePlatform::class, $connection->platform()->grammar());
     }
 
     /**

@@ -237,8 +237,6 @@ class NullRelationTest extends TestCase
         $this->assertEquals($backup, $query);
         $this->assertEmpty($relation->joinRepositories($query, 'foo'));
         $this->assertEquals(0, $relation->add(new User(), new \stdClass()));
-
-        $relation->clearInfo(new \stdClass());
     }
 
     public function test_relationRepository_error()

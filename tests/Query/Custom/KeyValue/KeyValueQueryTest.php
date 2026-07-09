@@ -4,7 +4,6 @@ namespace Bdf\Prime\Query\Custom\KeyValue;
 
 use Bdf\Prime\Cache\ArrayCache;
 use Bdf\Prime\Cache\CacheKey;
-use Bdf\Prime\Cache\DoctrineCacheAdapter;
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Customer;
 use Bdf\Prime\Exception\DBALException;
@@ -556,7 +555,7 @@ class KeyValueQueryTest extends TestCase
         (new QueryRepositoryExtension(User::repository()))->apply($query);
 
         $this->assertEquals([$user], $query->all());
-        $this->assertEquals($user, $query->get(1));
+        $this->assertEquals($user, $query->findById(1));
     }
 
     /**

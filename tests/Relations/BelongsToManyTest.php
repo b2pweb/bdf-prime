@@ -146,7 +146,7 @@ class BelongsToManyTest extends TestCase
 
         $customer = Prime::repository('Bdf\Prime\Customer')
             ->with('packs')
-            ->get('123');
+            ->findById('123');
 
         $this->assertEquals([$pack, $pack2], $customer->packs);
         $this->assertTrue($this->relation->isLoaded($customer));
@@ -228,7 +228,7 @@ class BelongsToManyTest extends TestCase
     {
         $customer = Prime::repository('Bdf\Prime\Customer')
             ->with(['packs' => ['id' => 2]])
-            ->get('123');
+            ->findById('123');
 
         $this->assertEquals([$this->getTestPack()->get('pack-classic')], $customer->packs);
         $this->assertTrue($this->relation->isLoaded($customer));
@@ -241,7 +241,7 @@ class BelongsToManyTest extends TestCase
     {
         $customer = Prime::repository('Bdf\Prime\Customer')
             ->with(['packs' => ['packsThrough.packId' => 2]])
-            ->get('123');
+            ->findById('123');
 
         $this->assertEquals([$this->getTestPack()->get('pack-classic')], $customer->packs);
         $this->assertTrue($this->relation->isLoaded($customer));
@@ -358,7 +358,7 @@ class BelongsToManyTest extends TestCase
         $this->assertEquals('testPack', $pack->label);
         $this->assertTrue(Prime::exists($pack));
 
-        $expected = $customer->relation('packs')->get($pack->id);
+        $expected = $customer->relation('packs')->findById($pack->id);
         $this->assertEquals($expected, $pack);
         $this->assertFalse($this->relation->isLoaded($customer));
     }
@@ -518,7 +518,7 @@ class BelongsToManyTest extends TestCase
 
         $repository = Prime::repository('Bdf\Prime\Integrator');
 
-        $integrator = $repository->get(1);
+        $integrator = $repository->findById(1);
 
         $relation = $repository->relation('projects');
         $this->assertFalse($relation->isLoaded($integrator));

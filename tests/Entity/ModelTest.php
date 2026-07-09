@@ -72,14 +72,14 @@ class ModelTest extends TestCase
     {
         $user = Admin::entity(['name' => 'test', 'roles' => []]);
         $user->insert();
-        $this->assertEquals($user, Admin::get(1));
+        $this->assertEquals($user, Admin::findById(1));
         
         $user->name = 'replaced';
         $user->update();
-        $this->assertEquals($user, Admin::get(1));
+        $this->assertEquals($user, Admin::findById(1));
         
         $user->delete();
-        $this->assertEquals(null, Admin::get(1));
+        $this->assertEquals(null, Admin::findById(1));
     }
 
     /**
@@ -359,11 +359,11 @@ class ModelTest extends TestCase
     {
         $user = Admin::entity(['name' => 'test', 'roles' => []]);
         $user->save();
-        $this->assertEquals($user, Admin::get(1));
+        $this->assertEquals($user, Admin::findById(1));
         
         $user->name = 'replaced';
         $user->save();
-        $this->assertEquals($user, Admin::get(1));
+        $this->assertEquals($user, Admin::findById(1));
     }
 
     /**
@@ -373,11 +373,11 @@ class ModelTest extends TestCase
     {
         $user = Admin::entity(['name' => 'test', 'roles' => []]);
         $user->replace();
-        $this->assertEquals($user, Admin::get(1));
+        $this->assertEquals($user, Admin::findById(1));
         
         $user->name = 'replaced';
         $user->replace();
-        $this->assertEquals($user, Admin::get(1));
+        $this->assertEquals($user, Admin::findById(1));
     }
 
     /**
@@ -404,7 +404,7 @@ class ModelTest extends TestCase
         Admin::loaded(function() use(&$event) {
             $event++;
         });
-        Admin::get(1);
+        Admin::findById(1);
         
         $this->assertEquals(1, $event);
     }
@@ -424,27 +424,7 @@ class ModelTest extends TestCase
             $this->assertInstanceOf(Admin::class, $evt->entity);
             $this->assertSame(Admin::repository(), $evt->repository);
         });
-        Admin::get(1);
-
-        $this->assertEquals(1, $event);
-    }
-
-    /**
-     *
-     */
-    public function test_load_event_legacy()
-    {
-        $event = 0;
-        $user = Admin::entity(['name' => 'test', 'roles' => []]);
-        $user->save();
-
-        Admin::loaded(function($entity, EntityRepository $repository) use(&$event) {
-            $event++;
-
-            $this->assertInstanceOf(Admin::class, $entity);
-            $this->assertSame(Admin::repository(), $repository);
-        });
-        Admin::get(1);
+        Admin::findById(1);
 
         $this->assertEquals(1, $event);
     }
@@ -495,32 +475,6 @@ class ModelTest extends TestCase
     /**
      *
      */
-    public function test_save_event_legacy()
-    {
-        $event = 0;
-        $user = Admin::entity(['name' => 'test', 'roles' => []]);
-        $user->saving(function($entity, $repository, $isNew) use(&$event) {
-            $this->assertInstanceOf(Admin::class, $entity);
-            $this->assertSame(Admin::repository(), $repository);
-            $this->assertTrue($isNew);
-
-            $event++;
-        });
-        $user->saved(function($entity, $repository, $count, $isNew) use(&$event) {
-            $this->assertInstanceOf(Admin::class, $entity);
-            $this->assertSame(Admin::repository(), $repository);
-            $this->assertTrue($isNew);
-            $this->assertSame(1, $count);
-
-            $event++;
-        });
-        $user->save();
-        $this->assertEquals(2, $event);
-    }
-
-    /**
-     *
-     */
     public function test_insert_event()
     {
         $event = 0;
@@ -552,30 +506,6 @@ class ModelTest extends TestCase
             $this->assertInstanceOf(Admin::class, $evt->entity);
             $this->assertSame(Admin::repository(), $evt->repository);
             $this->assertSame(1, $evt->affectedRows);
-
-            $event++;
-        });
-        $user->insert();
-        $this->assertEquals(2, $event);
-    }
-
-    /**
-     *
-     */
-    public function test_insert_event_legacy()
-    {
-        $event = 0;
-        $user = Admin::entity(['name' => 'test', 'roles' => []]);
-        $user->inserting(function($entity, $repository) use(&$event) {
-            $this->assertInstanceOf(Admin::class, $entity);
-            $this->assertSame(Admin::repository(), $repository);
-
-            $event++;
-        });
-        $user->inserted(function($entity, $repository, $count) use(&$event) {
-            $this->assertInstanceOf(Admin::class, $entity);
-            $this->assertSame(Admin::repository(), $repository);
-            $this->assertSame(1, $count);
 
             $event++;
         });
@@ -628,31 +558,6 @@ class ModelTest extends TestCase
     /**
      *
      */
-    public function test_update_event_legacy()
-    {
-        $event = 0;
-        $user = Admin::entity(['name' => 'test', 'roles' => []]);
-        $user->updating(function($entity, $repository, $attributes) use(&$event) {
-            $this->assertInstanceOf(Admin::class, $entity);
-            $this->assertSame(Admin::repository(), $repository);
-            $this->assertNull($attributes);
-
-            $event++;
-        });
-        $user->updated(function($entity, $repository, $count) use(&$event) {
-            $this->assertInstanceOf(Admin::class, $entity);
-            $this->assertSame(Admin::repository(), $repository);
-            $this->assertSame(0, $count);
-
-            $event++;
-        });
-        $user->update();
-        $this->assertEquals(2, $event);
-    }
-
-    /**
-     *
-     */
     public function test_delete_event()
     {
         $event = 0;
@@ -694,30 +599,6 @@ class ModelTest extends TestCase
     /**
      *
      */
-    public function test_delete_event_legacy()
-    {
-        $event = 0;
-        $user = Admin::entity(['name' => 'test', 'roles' => []]);
-        $user->deleting(function($entity, $repository) use(&$event) {
-            $this->assertInstanceOf(Admin::class, $entity);
-            $this->assertSame(Admin::repository(), $repository);
-
-            $event++;
-        });
-        $user->deleted(function($entity, $repository, $count) use(&$event) {
-            $this->assertInstanceOf(Admin::class, $entity);
-            $this->assertSame(Admin::repository(), $repository);
-            $this->assertSame(0, $count);
-
-            $event++;
-        });
-        $user->delete();
-        $this->assertEquals(2, $event);
-    }
-
-    /**
-     *
-     */
     public function test_load_relation()
     {
         $customer = Customer::entity([
@@ -735,7 +616,7 @@ class ModelTest extends TestCase
         ])->insert();
         
         
-        $user = User::get(1);
+        $user = User::findById(1);
         $this->assertEquals(null, $user->customer->name);
         
         $user->load('customer');
@@ -762,7 +643,7 @@ class ModelTest extends TestCase
         ])->insert();
 
 
-        $user = User::get(1);
+        $user = User::findById(1);
         $this->assertEquals(null, $user->customer->name);
 
         $user->load(Customer::class);
@@ -789,7 +670,7 @@ class ModelTest extends TestCase
         ])->insert();
 
 
-        $user = User::with('customer')->get(1);
+        $user = User::with('customer')->findById(1);
 
         $loadedCustomer = $user->customer;
         $user->load('customer');
@@ -845,7 +726,7 @@ class ModelTest extends TestCase
         ])->insert();
 
 
-        $user = User::get(1);
+        $user = User::findById(1);
 
         $user->reload('customer');
         $this->assertEquals('customer', $user->customer->name);
@@ -879,7 +760,7 @@ class ModelTest extends TestCase
         ])->insert();
 
 
-        $user = User::get(1);
+        $user = User::findById(1);
 
         $user->reload(Customer::class);
         $this->assertEquals('customer', $user->customer->name);
@@ -1219,7 +1100,7 @@ class ModelTest extends TestCase
         ]))->insert();
 
 
-        $user = User::get(1);
+        $user = User::findById(1);
 
         $user->load('customer');
         $this->assertTrue($user->relation('customer')->isLoaded());

@@ -27,14 +27,6 @@ class DummyPlatform implements PlatformInterface
     /**
      * @inheritDoc
      */
-    public function name(): string
-    {
-        return $this->platform->name();
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function types(): PlatformTypesInterface
     {
         return $this->platform->types();

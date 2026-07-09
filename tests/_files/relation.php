@@ -5,6 +5,8 @@ namespace Bdf\Prime;
 use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Mapper\Builder\PolymorphBuilder;
+use Bdf\Prime\Query\Expression\Raw;
+use Bdf\Prime\Repository\Event\AfterLoad;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Serializer\Metadata\Builder\ClassMetadataBuilder;
 use DateTimeImmutable;
@@ -325,9 +327,9 @@ class UserMapper extends Mapper
      */
     public function customEvents(RepositoryEventsSubscriberInterface $notifier): void
     {
-        $notifier->listen('afterLoad', function($entity) {
-            if ($entity->name === 'TEST1 to check event') {
-                $entity->name = 'TEST1 afterLoad';
+        $notifier->listen(AfterLoad::class, function(AfterLoad $event) {
+            if ($event->entity->name === 'TEST1 to check event') {
+                $event->entity->name = 'TEST1 afterLoad';
             }
         });
     }
@@ -351,7 +353,7 @@ class UserMapper extends Mapper
     {
         return [
             'testScope' => function($query, $value) {
-                return $query->limit(1)->execute(['test' => $value])->all();
+                return $query->limit(1)->execute(['test' => new Raw($value)])->all();
             }
         ];
     }

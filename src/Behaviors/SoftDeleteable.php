@@ -5,7 +5,6 @@ namespace Bdf\Prime\Behaviors;
 use Bdf\Prime\Clock\ClockAwareInterface;
 use Bdf\Prime\Clock\Converter;
 use Bdf\Prime\Clock\NativeClock;
-use Bdf\Prime\Events;
 use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\Event\AfterDelete;

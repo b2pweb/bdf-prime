@@ -30,14 +30,6 @@ final class UpdateResultSet extends \EmptyIterator implements ResultSetInterface
     /**
      * {@inheritdoc}
      */
-    public function fetchMode($mode, $options = null)
-    {
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function asAssociative(): ResultSetInterface
     {
         return $this;

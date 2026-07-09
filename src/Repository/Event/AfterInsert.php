@@ -31,12 +31,4 @@ final class AfterInsert implements RepositoryEventInterface
         $this->repository = $repository;
         $this->affectedRows = $affectedRows;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function legacyArgs(): array
-    {
-        return [$this->entity, $this->repository, $this->affectedRows];
-    }
 }

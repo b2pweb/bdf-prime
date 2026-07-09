@@ -115,7 +115,7 @@ class TestPackTest extends TestCase
         $this->pack->clear();
 
         $this->assertEquals(0, Prime::repository('Bdf\Prime\User')->count(), 'user should be removed');
-        $this->assertEquals($this->basicCustomer->name, Prime::repository('Bdf\Prime\Customer')->get(1)->name, 'customer has changed');
+        $this->assertEquals($this->basicCustomer->name, Prime::repository('Bdf\Prime\Customer')->findById(1)->name, 'customer has changed');
     }
     
     /**

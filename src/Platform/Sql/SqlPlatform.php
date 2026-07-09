@@ -77,18 +77,6 @@ class SqlPlatform implements PlatformInterface
     /**
      * {@inheritdoc}
      */
-    public function name(): string
-    {
-        return match (true) {
-            $this->grammar instanceof AbstractMySQLPlatform => 'mysql',
-            $this->grammar instanceof SQLitePlatform => 'sqlite',
-            default => 'generic_sql',
-        };
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function types(): PlatformTypesInterface
     {
         return $this->types;

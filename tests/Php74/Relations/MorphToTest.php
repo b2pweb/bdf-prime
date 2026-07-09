@@ -96,7 +96,7 @@ class MorphToTest extends TestCase
     {
         $admin = TestPack::pack()->get('admin');
         
-        $document = Prime::repository(Document::class)->with('uploader')->get(10);
+        $document = Prime::repository(Document::class)->with('uploader')->findById(10);
 
         $this->assertEquals(get_class($admin), get_class($document->uploader));
         $this->assertEquals($admin->name, $document->uploader->name);
@@ -128,7 +128,7 @@ class MorphToTest extends TestCase
     {
         $user = TestPack::pack()->get('user');
         
-        $document = Document::with('uploader')->get(20);
+        $document = Document::with('uploader')->findById(20);
         
         $this->assertEquals(get_class($user), get_class($document->uploader));
         $this->assertEquals($user->name, $document->uploader->name);
@@ -142,7 +142,7 @@ class MorphToTest extends TestCase
     {
         $user = TestPack::pack()->get('user');
 
-        $document = Document::with('uploader#user.customer')->get(20);
+        $document = Document::with('uploader#user.customer')->findById(20);
 
         $this->assertEquals($user->customer->name, $document->uploader->customer->name);
     }
@@ -344,12 +344,12 @@ class MorphToTest extends TestCase
      */
     public function test_save_all()
     {
-        $document = Document::with('uploader.customer')->get(20);
+        $document = Document::with('uploader.customer')->findById(20);
         $document->uploader->customer->name = 'save all';
 
         $document->saveAll('uploader.customer');
 
-        $customer = Customer::get($document->uploader->customer->id);
+        $customer = Customer::findById($document->uploader->customer->id);
 
         $this->assertEquals('save all', $customer->name);
     }
@@ -359,7 +359,7 @@ class MorphToTest extends TestCase
      */
     public function test_save_all_with_discriminator()
     {
-        $document = Document::with('uploader.customer')->get(20);
+        $document = Document::with('uploader.customer')->findById(20);
         $document->uploader->customer->name = 'save all';
 
         $document->saveAll([
@@ -367,7 +367,7 @@ class MorphToTest extends TestCase
             'uploader#admin.faction',
         ]);
 
-        $customer = Customer::get($document->uploader->customer->id);
+        $customer = Customer::findById($document->uploader->customer->id);
 
         $this->assertEquals('save all', $customer->name);
     }
@@ -382,7 +382,7 @@ class MorphToTest extends TestCase
 
         $affected = $document->relation('uploader')->deleteAll();
 
-        $uploader = User::get($document->uploader->id);
+        $uploader = User::findById($document->uploader->id);
 
         $this->assertEquals(1, $affected);
         $this->assertEquals(null, $uploader);
@@ -393,12 +393,12 @@ class MorphToTest extends TestCase
      */
     public function test_delete_all()
     {
-        $document = Document::with('uploader.customer')->get(20);
+        $document = Document::with('uploader.customer')->findById(20);
         $document->deleteAll('uploader.customer');
 
-        $this->assertNull(Customer::get($document->uploader->customer->id));
-        $this->assertNull(User::get($document->uploader->id));
-        $this->assertNull(Document::get($document->id));
+        $this->assertNull(Customer::findById($document->uploader->customer->id));
+        $this->assertNull(User::findById($document->uploader->id));
+        $this->assertNull(Document::findById($document->id));
     }
 
     /**
@@ -406,15 +406,15 @@ class MorphToTest extends TestCase
      */
     public function test_delete_all_with_discriminator()
     {
-        $document = Document::with('uploader.customer')->get(20);
+        $document = Document::with('uploader.customer')->findById(20);
         $document->deleteAll([
             'uploader#user.customer',
             'uploader#admin.faction',
         ]);
 
-        $this->assertNull(Customer::get($document->uploader->customer->id));
-        $this->assertNull(User::get($document->uploader->id));
-        $this->assertNull(Document::get($document->id));
+        $this->assertNull(Customer::findById($document->uploader->customer->id));
+        $this->assertNull(User::findById($document->uploader->id));
+        $this->assertNull(Document::findById($document->id));
     }
 
     /**
@@ -497,7 +497,7 @@ class MorphToTest extends TestCase
 
         $repository = Prime::repository(Commit::class);
 
-        $commit = $repository->without('author')->get(1);
+        $commit = $repository->without('author')->findById(1);
 
         $relation = $repository->relation('author');
         $relation->load(new SingleEntityIndexer(Commit::mapper(), $commit), [], [], ['company']);

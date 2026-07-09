@@ -51,7 +51,7 @@ class OrmPreprocessor implements PreprocessorInterface
      * @var PlatformInterface
      */
     protected $platform;
-    private ?bool $allowUnknownAttribute;
+    private bool $allowUnknownAttribute = false;
 
 
     /**
@@ -132,10 +132,7 @@ class OrmPreprocessor implements PreprocessorInterface
             }
 
             $this->aliasResolver->setQuery($compilerQuery);
-
-            if (method_exists($compilerQuery, 'isAllowUnknownAttribute')) {
-                $this->aliasResolver->setAllowUnknownAttribute($compilerQuery->isAllowUnknownAttribute());
-            }
+            $this->aliasResolver->setAllowUnknownAttribute($compilerQuery->isAllowUnknownAttribute());
 
             if ($needReset) {
                 $this->aliasResolver->reset();
@@ -180,12 +177,6 @@ class OrmPreprocessor implements PreprocessorInterface
         // @fixme Throw exception if wants to write on undefined attribute ?
         if (!isset($this->metadata->attributes[$attribute])) {
             if ($this->allowUnknownAttribute) {
-                return $attribute;
-            }
-
-            if ($this->allowUnknownAttribute === null) {
-                @trigger_error('Using unknown attribute "'.$attribute.'" on on entity "'.$this->repository->entityName().'" is deprecated, and will raise an exception on Prime 3. Please use Mapper::allowUnknownAttribute() to enable this feature.', E_USER_DEPRECATED);
-
                 return $attribute;
             }
 

@@ -7,7 +7,6 @@ use Bdf\Prime\Customer;
 use Bdf\Prime\CustomerCriteria;
 use Bdf\Prime\Entity\Criteria;
 use Bdf\Prime\Entity\Model;
-use Bdf\Prime\Events;
 use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\QueryBuildingException;
 use Bdf\Prime\Mapper\Mapper;
@@ -19,6 +18,7 @@ use Bdf\Prime\Query\Expression\Like;
 use Bdf\Prime\Query\Query;
 use Bdf\Prime\Relations\Exceptions\RelationNotFoundException;
 use Bdf\Prime\Repository\Event\AfterLoad;
+use Bdf\Prime\Repository\Event\BeforeUpdate;
 use Bdf\Prime\Right;
 use Bdf\Prime\Schema\NullStructureUpgrader;
 use Bdf\Prime\Schema\RepositoryUpgrader;
@@ -204,8 +204,8 @@ class EntityRepositoryTest extends TestCase
         
         $repository = Prime::repository('Bdf\Prime\TestEntity');
         
-        $this->assertSameEntity($expected, $repository->get(1));
-        $this->assertNull($repository->get('unknow'));
+        $this->assertSameEntity($expected, $repository->findById(1));
+        $this->assertNull($repository->findById('unknow'));
     }
     
     /**
@@ -213,8 +213,8 @@ class EntityRepositoryTest extends TestCase
      */
     public function test_find_with_invalid_id()
     {
-        $this->assertNull(Prime::repository('Bdf\Prime\TestEntity')->get(null));
-        $this->assertNull(Prime::repository('Bdf\Prime\TestEntity')->get(0));
+        $this->assertNull(Prime::repository('Bdf\Prime\TestEntity')->findById(null));
+        $this->assertNull(Prime::repository('Bdf\Prime\TestEntity')->findById(0));
     }
     
     /**
@@ -226,7 +226,7 @@ class EntityRepositoryTest extends TestCase
         
         $repository = Prime::repository('Bdf\Prime\TestEntity');
         
-        $this->assertSameEntity($expected, $repository->get(['id' => 1]));
+        $this->assertSameEntity($expected, $repository->findById(['id' => 1]));
     }
 
     public function test_criteria()
@@ -234,34 +234,6 @@ class EntityRepositoryTest extends TestCase
         $this->assertEquals(new Criteria(), Prime::repository(TestEntity::class)->criteria());
         $this->assertEquals(new CustomerCriteria(), Prime::repository(Customer::class)->criteria());
         $this->assertEquals(new CustomerCriteria(['id' => 5]), Prime::repository(Customer::class)->criteria(['id' => 5]));
-    }
-    
-    /**
-     * 
-     */
-    public function test_get_or_fail()
-    {
-        $expected = $this->getTestPack()->get('entity');
-        
-        $repository = Prime::repository('Bdf\Prime\TestEntity');
-        
-        $this->assertSameEntity($expected, $repository->getOrFail(1));
-        
-        $this->expectException('Bdf\Prime\Exception\EntityNotFoundException');
-        $repository->getOrFail('unknow');
-    }
-    
-    /**
-     * 
-     */
-    public function test_get_or_new()
-    {
-        $expected = $this->getTestPack()->get('entity');
-        
-        $repository = Prime::repository('Bdf\Prime\TestEntity');
-        
-        $this->assertSameEntity($expected, $repository->getOrNew(1));
-        $this->assertSameEntity(new TestEntity(), $repository->getOrNew('unknow'));
     }
 
     public function test_firstOrFail_success()
@@ -474,8 +446,8 @@ class EntityRepositoryTest extends TestCase
      */
     public function test_update_event_can_update_attribute()
     {
-        TestEntity::updating(function($entity, $repository, $attributes)  {
-            $attributes[] = 'name';
+        TestEntity::updating(function(BeforeUpdate $event)  {
+            $event->attributes[] = 'name';
         });
 
         $entity = TestEntity::entity(['id' => 21, 'name' => 'test']);
@@ -510,28 +482,6 @@ class EntityRepositoryTest extends TestCase
         $this->assertTrue($eventTrigered, 'event has trigered');
     }
 
-    /**
-     *
-     */
-    public function test_load_event_legacy()
-    {
-        $eventTrigered = false;
-
-        $repository = Prime::repository('Bdf\Prime\TestEntity');
-
-        $repository->once(Events::POST_LOAD, function($entity) use(&$eventTrigered) {
-            $eventTrigered = true;
-            $this->assertEquals(1, $entity->id);
-        });
-
-        $this->assertTrue($repository->hasListeners(Events::POST_LOAD), 'has load listener');
-
-        $repository->findOne([
-            'id' => 1,
-        ]);
-
-        $this->assertTrue($eventTrigered, 'event has trigered');
-    }
 
     /**
      * 
@@ -696,7 +646,7 @@ class EntityRepositoryTest extends TestCase
 
         $repository = Prime::repository('Bdf\Prime\TestEntity');
 
-        $entity = $repository->get(21);
+        $entity = $repository->findById(21);
         $foreign = $repository->onRelation('foreign', $entity)->first();
 
         $this->assertEquals(20, $foreign->id);
@@ -720,7 +670,7 @@ class EntityRepositoryTest extends TestCase
 
         $repository = Prime::repository(TestEntity::class);
 
-        $entity = $repository->get(21);
+        $entity = $repository->findById(21);
         $foreign = $repository->onRelation(TestEmbeddedEntity::class, $entity)->query()->first();
 
         $this->assertEquals(20, $foreign->id);
@@ -812,7 +762,7 @@ class EntityRepositoryTest extends TestCase
             Prime::create('Bdf\Prime\TestEntity', true);
             Prime::push($expectedOnSlave);
             
-            $result = $repository->get(10);
+            $result = $repository->findById(10);
             
             Prime::drop('Bdf\Prime\TestEntity', true);
             
@@ -822,7 +772,7 @@ class EntityRepositoryTest extends TestCase
         Prime::service()->connections()->removeConnection('slave');
 
         $this->assertSameEntity($expectedOnSlave, $result);
-        $this->assertSameEntity($expectedOnDefault, $repository->get(1), 'connection should be the default one');
+        $this->assertSameEntity($expectedOnDefault, $repository->findById(1), 'connection should be the default one');
     }
     
     /**
@@ -842,7 +792,7 @@ class EntityRepositoryTest extends TestCase
         
         try {
             $repository->on('slave', function($repository) {
-                return $repository->get(10);
+                return $repository->findById(10);
             });
         } catch (\Exception $e) {
             $failureOk = true;
@@ -851,7 +801,7 @@ class EntityRepositoryTest extends TestCase
         Prime::service()->connections()->removeConnection('slave');
 
         $this->assertTrue($failureOk);
-        $this->assertSameEntity($expectedOnDefault, $repository->get(1), 'connection should be the default one');
+        $this->assertSameEntity($expectedOnDefault, $repository->findById(1), 'connection should be the default one');
     }
 
     /**
@@ -958,7 +908,7 @@ class EntityRepositoryTest extends TestCase
 
         $entity = Prime::repository('Bdf\Prime\TestEntity')
             ->with('foreign')
-            ->get($entity->id);
+            ->findById($entity->id);
 
         $this->assertEquals(2, $nb);
         $this->assertEquals('saveAll', $entity->name);
@@ -978,7 +928,7 @@ class EntityRepositoryTest extends TestCase
 
         $entity = Prime::repository(TestEntity::class)
             ->with('foreign')
-            ->get($entity->id);
+            ->findById($entity->id);
 
         $this->assertEquals(2, $nb);
         $this->assertEquals('saveAll', $entity->name);
@@ -1088,7 +1038,6 @@ class EntityRepositoryTest extends TestCase
         $this->assertNotContains('lazytest', $this->prime()->connections()->getCurrentConnectionNames());
 
         $entity = new TestLazyLoadingConnection();
-        $respository->free($entity);
 
         $this->assertNotContains('lazytest', $this->prime()->connections()->getCurrentConnectionNames());
 
@@ -1122,7 +1071,6 @@ class EntityRepositoryTest extends TestCase
 
         $queries = TestEntity::repository()->queries();
         $r = new \ReflectionProperty($queries, 'metadataCache');
-        PHP_VERSION_ID >= 80100 or $r->setAccessible(true);
 
         $this->assertSame($cache, $r->getValue($queries));
     }

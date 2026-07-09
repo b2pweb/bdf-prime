@@ -111,14 +111,7 @@ final class ClosureCompiler
         $parameter = $reflection->getParameters()[0];
         $this->checkParameterType($parameter->getType());
 
-        if (self::$parser === null) {
-            if (method_exists(ParserFactory::class, 'createForHostVersion')) {
-                self::$parser = (new ParserFactory())->createForHostVersion();
-            } else {
-                /** @psalm-suppress UndefinedConstant */
-                self::$parser = (new ParserFactory())->create(ParserFactory::ONLY_PHP7);
-            }
-        }
+        self::$parser ??= new ParserFactory()->createForHostVersion();
 
         $ast = self::$parser->parse(file_get_contents($reflection->getFileName()));
         $traverser = new NodeTraverser();

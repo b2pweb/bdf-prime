@@ -225,7 +225,7 @@ class Migration implements MigrationInterface
     {
         $conn = $this->connection($connectionName);
 
-        if (method_exists($conn, 'getParameters') && ($conn->getParameters()['ignore'] ?? false)) {
+        if ($conn->getParameters()['ignore'] ?? false) {
             $logger = $this->log();
 
             if ($logger) {
@@ -250,7 +250,7 @@ class Migration implements MigrationInterface
     {
         $conn = $this->connection($connectionName);
 
-        return method_exists($conn, 'getParameters') && ($conn->getParameters()['ignore'] ?? false);
+        return $conn->getParameters()['ignore'] ?? false;
     }
 
     /**

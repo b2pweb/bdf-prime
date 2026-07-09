@@ -293,7 +293,7 @@ class HasOneTest extends TestCase
 
         $affected = $customer->relation('location')->deleteAll();
 
-        $location = Location::get($customer->location->id);
+        $location = Location::findById($customer->location->id);
 
         $this->assertEquals(1, $affected);
         $this->assertEquals(null, $location);
@@ -377,7 +377,7 @@ class HasOneTest extends TestCase
 
         $repository = Prime::repository('Bdf\Prime\Project');
 
-        $project = $repository->without('creator')->get(1);
+        $project = $repository->without('creator')->findById(1);
 
         $relation = $repository->relation('creator');
         $relation->load(new SingleEntityIndexer(Project::mapper(), $project), [], [], ['company']);

@@ -77,12 +77,26 @@ class ConfigurationTest extends TestCase
     /**
      *
      */
-    public function test_set_parameters_from_constructor()
+    public function test_set_parameters_from_constructor_legacy()
     {
         $configuration = new Configuration([
             'autoCommit' => false,
         ]);
         
+        $this->assertFalse($configuration->getAutoCommit());
+    }
+
+    /**
+     *
+     */
+    public function test_set_parameters_from_constructor()
+    {
+        $configuration = new Configuration(
+            name: 'foo',
+            autoCommit: false,
+        );
+
+        $this->assertSame('foo', $configuration->getName());
         $this->assertFalse($configuration->getAutoCommit());
     }
 

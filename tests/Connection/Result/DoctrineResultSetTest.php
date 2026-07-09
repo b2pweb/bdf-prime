@@ -92,13 +92,13 @@ class DoctrineResultSetTest extends TestCase
         $stmt = $this->connection->prepare('SELECT id, name FROM test_');
 
         $resultSet = new DoctrineResultSet($stmt->executeQuery());
-        $resultSet->fetchMode(ResultSetInterface::FETCH_COLUMN);
+        $resultSet->asColumn();
         $this->assertEquals([1, 2], $resultSet->all());
 
         unset($resultSet); // Close the cursor
 
         $resultSet = new DoctrineResultSet($stmt->executeQuery());
-        $resultSet->fetchMode(ResultSetInterface::FETCH_COLUMN, 1);
+        $resultSet->asColumn(1);
         $this->assertEquals(['John', 'Mickey'], $resultSet->all());
 
         unset($resultSet); // Close the cursor
@@ -122,7 +122,7 @@ class DoctrineResultSetTest extends TestCase
         $stmt = $this->connection->prepare('SELECT id, name FROM test_');
 
         $resultSet = new DoctrineResultSet($stmt->executeQuery());
-        $resultSet->fetchMode(ResultSetInterface::FETCH_NUM);
+        $resultSet->asList();
 
         $this->assertEquals([
             [1, 'John'],
@@ -148,7 +148,7 @@ class DoctrineResultSetTest extends TestCase
         $stmt = $this->connection->prepare('SELECT id, name FROM test_');
 
         $resultSet = new DoctrineResultSet($stmt->executeQuery());
-        $resultSet->fetchMode(ResultSetInterface::FETCH_OBJECT);
+        $resultSet->asObject();
 
         $this->assertEquals([
             (object) [
@@ -186,7 +186,7 @@ class DoctrineResultSetTest extends TestCase
         $stmt = $this->connection->prepare('SELECT id, name FROM test_');
 
         $resultSet = new DoctrineResultSet($stmt->executeQuery());
-        $resultSet->fetchMode(ResultSetInterface::FETCH_CLASS, TestEntity::class);
+        $resultSet->asClass(TestEntity::class);
 
         $this->assertEquals([
             new TestEntity([
@@ -263,7 +263,7 @@ class DoctrineResultSetTest extends TestCase
         $stmt = $this->connection->prepare('SELECT id, name FROM test_');
 
         $resultSet = new DoctrineResultSet($stmt->executeQuery());
-        $resultSet->fetchMode(DoctrineResultSet::FETCH_COLUMN, 1);
+        $resultSet->asColumn(1);
 
         $this->assertEquals('John', $resultSet->current());
 

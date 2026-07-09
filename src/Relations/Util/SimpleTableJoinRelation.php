@@ -64,9 +64,8 @@ trait SimpleTableJoinRelation
 
     /**
      * @see AbstractRelation::query()
-     * @todo Use the queryClass parameter in Prime 3.0
      */
-    abstract protected function query($value, $constraints = []/*, ?string $queryClass = null*/): ReadCommandInterface;
+    abstract protected function query($value, $constraints = [], ?string $queryClass = null): ReadCommandInterface;
 
     /**
      * @see AbstractRelation::applyConstraints()

@@ -79,13 +79,6 @@ trait RepositoryAssertion
     */
     public function assertEntities($expectedEntities, $actualEntities, $dateTimeDelta = 5, $message = '')
     {
-        if (is_string($dateTimeDelta)) {
-            $message = $dateTimeDelta;
-            $dateTimeDelta = 5;
-
-            @trigger_error('The assertEntities interface change. Use message as 4th parameter.', E_USER_DEPRECATED);
-        }
-
         $this->assertEquals(
             count($expectedEntities),
             count($actualEntities),
@@ -111,13 +104,6 @@ trait RepositoryAssertion
      */
     public function assertEntity($expected, $entity, $dateTimeDelta = 5, $message = '')
     {
-        if (is_string($dateTimeDelta)) {
-            $message = $dateTimeDelta;
-            $dateTimeDelta = 5;
-
-            @trigger_error('The assertEntity interface change. Use message as 4th parameter.', E_USER_DEPRECATED);
-        }
-
         $this->compareEntity(get_class($expected), $expected, $entity, $dateTimeDelta, $message);
     }
 
@@ -165,13 +151,6 @@ trait RepositoryAssertion
      */
     private function compareEntity($expectedClass, $expected, $entity, $dateTimeDelta = 0, $message = '')
     {
-        if (is_string($dateTimeDelta)) {
-            $message = $dateTimeDelta;
-            $dateTimeDelta = 5;
-
-            @trigger_error('The compareEntity interface change. Use message as 4th parameter.', E_USER_DEPRECATED);
-        }
-
         if ($message == '') {
             $message = $expectedClass;
         }

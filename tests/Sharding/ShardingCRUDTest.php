@@ -294,7 +294,7 @@ class ShardingCRUDTest extends TestCase
             ])
         );
 
-        $document = Document::get(1);
+        $document = Document::findById(1);
 
         $this->assertInstanceOf('Bdf\Prime\Contact', $document->contact);
         $this->assertInstanceOf('Bdf\Prime\Location', $document->contact->location);

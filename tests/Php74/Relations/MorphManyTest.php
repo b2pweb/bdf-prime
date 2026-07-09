@@ -83,7 +83,7 @@ class MorphManyTest extends TestCase
      */
     public function test_one_morph()
     {
-        $admin = Admin::with('documents')->get('10');
+        $admin = Admin::with('documents')->findById('10');
         
         $this->assertEquals(1, count($admin->documents));
         $this->assertEquals('10', $admin->documents[0]->id);
@@ -96,7 +96,7 @@ class MorphManyTest extends TestCase
      */
     public function test_one_morph_user()
     {
-        $user = User::with('documents')->get('321');
+        $user = User::with('documents')->findById('321');
         
         $this->assertEquals(1, count($user->documents));
         $this->assertEquals('20', $user->documents[0]->id);

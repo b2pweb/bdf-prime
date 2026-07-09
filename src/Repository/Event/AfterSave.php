@@ -34,12 +34,4 @@ final class AfterSave implements RepositoryEventInterface
         $this->affectedRows = $affectedRows;
         $this->isNew = $isNew;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function legacyArgs(): array
-    {
-        return [$this->entity, $this->repository, $this->affectedRows, $this->isNew];
-    }
 }

@@ -108,7 +108,7 @@ class VersionableTest extends TestCase
 
         $book->title = '1984';
         $book->update(['title']);
-        $book = Book::get(1);
+        $book = Book::findById(1);
 
         $this->assertEquals(2, $book->version);
 

@@ -92,14 +92,6 @@ class ShardingBench extends \BenchCaseAdapter
     }
 
     /**
-     * @Groups({"findById"})
-     */
-    public function bench_builder_get()
-    {
-        return $this->repository->builder()->get('23000123');
-    }
-
-    /**
      * @Groups({"search"})
      */
     public function bench_search_keyValue()

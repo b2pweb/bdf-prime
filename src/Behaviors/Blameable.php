@@ -159,7 +159,8 @@ class Blameable extends Behavior
     public function beforeUpdate(BeforeUpdate $event): void
     {
         if ($event->attributes !== null) {
-            $event->attributes->append($this->updatedBy['name']);
+            /** @psalm-suppress NullArgument */
+            $event->attributes[] = $this->updatedBy['name'];
         }
 
         $resolver = $this->userResolver;

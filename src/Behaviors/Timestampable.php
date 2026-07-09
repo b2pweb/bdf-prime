@@ -163,7 +163,8 @@ final class Timestampable extends Behavior implements ClockAwareInterface
     public function beforeUpdate(BeforeUpdate $event): void
     {
         if ($event->attributes !== null) {
-            $event->attributes->append($this->updatedAt['name']);
+            /** @psalm-suppress NullArgument */
+            $event->attributes[] = $this->updatedAt['name'];
         }
 
         $now = $this->createDate($this->updatedAt['name'], $event->repository);

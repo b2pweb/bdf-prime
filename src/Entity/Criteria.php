@@ -182,8 +182,6 @@ class Criteria implements ArrayAccess, IteratorAggregate
     /**
      * Get criteria only
      *
-     * @todo trigger "Using deprecated language feature PHP4 constructor"
-     *
      * @return array
      */
     public function criteria()

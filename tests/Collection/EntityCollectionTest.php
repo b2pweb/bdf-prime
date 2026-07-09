@@ -10,6 +10,7 @@ use Bdf\Prime\Document;
 use Bdf\Prime\Faction;
 use Bdf\Prime\Pack;
 use Bdf\Prime\Query\QueryInterface;
+use Bdf\Prime\Repository\Event\BeforeDelete;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\TestFile;
 use Bdf\Prime\Folder;
@@ -168,9 +169,9 @@ class EntityCollectionTest extends TestCase
 
         $collection->refresh();
 
-        $this->assertSameEntity(Customer::get('123'), $collection->get(0));
-        $this->assertSameEntity(Customer::get('456'), $collection->get(1));
-        $this->assertSameEntity(Customer::get('789'), $collection->get(2));
+        $this->assertSameEntity(Customer::findById('123'), $collection->get(0));
+        $this->assertSameEntity(Customer::findById('456'), $collection->get(1));
+        $this->assertSameEntity(Customer::findById('789'), $collection->get(2));
     }
 
     /**
@@ -277,10 +278,10 @@ class EntityCollectionTest extends TestCase
 
         $entities = [];
 
-        Customer::repository()->deleting(function ($entity, $repository) use (&$count, &$entities) {
-            $entities[] = $entity;
+        Customer::repository()->deleting(function (BeforeDelete $event) use (&$count, &$entities) {
+            $entities[] = $event->entity;
 
-            $this->assertSame(Customer::repository(), $repository);
+            $this->assertSame(Customer::repository(), $event->repository);
 
             return false;
         });
@@ -301,8 +302,8 @@ class EntityCollectionTest extends TestCase
             Customer::all()
         );
 
-        Customer::repository()->deleting(function ($entity) {
-            return $entity->id != 123;
+        Customer::repository()->deleting(function (BeforeDelete $event) {
+            return $event->entity->id != 123;
         });
 
         $collection->delete();
@@ -447,9 +448,9 @@ class EntityCollectionTest extends TestCase
 
         $collection->save();
 
-        $this->assertEntity($collection->get(0), Customer::get(1));
-        $this->assertEntity($collection->get(1), Customer::get(2));
-        $this->assertEntity($collection->get(2), Customer::get(3));
+        $this->assertEntity($collection->get(0), Customer::findById(1));
+        $this->assertEntity($collection->get(1), Customer::findById(2));
+        $this->assertEntity($collection->get(2), Customer::findById(3));
     }
 
     /**
@@ -517,7 +518,7 @@ class EntityCollectionTest extends TestCase
 
         foreach ($collection as $customer) {
             $this->assertEquals('42', $customer->parentId);
-            $this->assertEquals('42', Customer::get($customer->id)->parentId);
+            $this->assertEquals('42', Customer::findById($customer->id)->parentId);
         }
     }
 
@@ -654,11 +655,11 @@ class EntityCollectionTest extends TestCase
 
         $this->assertEquals(6, $collection->saveAll('faction'));
 
-        $this->assertEquals($collection[0]->faction, Faction::get(1));
-        $this->assertEquals($collection[1]->faction, Faction::get(2));
+        $this->assertEquals($collection[0]->faction, Faction::findById(1));
+        $this->assertEquals($collection[1]->faction, Faction::findById(2));
 
-        $this->assertEquals($collection[0]->name, User::get(321)->name);
-        $this->assertEquals($collection[1]->name, User::get(741)->name);
+        $this->assertEquals($collection[0]->name, User::findById(321)->name);
+        $this->assertEquals($collection[1]->name, User::findById(741)->name);
     }
 
     /**
@@ -676,7 +677,7 @@ class EntityCollectionTest extends TestCase
         $collection->refresh();
         $this->assertTrue($collection->isEmpty());
 
-        $this->assertNull(Document::get(2));
+        $this->assertNull(Document::findById(2));
     }
 
     /**

@@ -149,7 +149,7 @@ class HasManyTest extends TestCase
     {
         $customer = Prime::repository('Bdf\Prime\Customer')
             ->with('documents.uploader')
-            ->get('123');
+            ->findById('123');
 
         $this->assertEquals($this->getTestPack()->get('admin')->name, $customer->documents[0]->uploader->name);
     }
@@ -161,7 +161,7 @@ class HasManyTest extends TestCase
     {
         $customer = Prime::repository('Bdf\Prime\Customer')
             ->with(['documents' => ['id' => 1]])
-            ->get('123');
+            ->findById('123');
 
         $this->assertEquals([$this->getTestPack()->get('document-admin')], $customer->documents, 'documents on customer');
         $this->assertTrue($customer->relation('documents')->isLoaded());
@@ -319,7 +319,7 @@ class HasManyTest extends TestCase
      */
     public function test_delete_relation()
     {
-        $customer = Prime::repository('Bdf\Prime\Customer')->with('documents')->get('123');
+        $customer = Prime::repository('Bdf\Prime\Customer')->with('documents')->findById('123');
 
         $affected = Prime::repository('Bdf\Prime\Customer')
             ->relation('documents')
@@ -411,7 +411,7 @@ class HasManyTest extends TestCase
 
         $repository = Prime::repository('Bdf\Prime\Developer');
 
-        $developer = $repository->get(1);
+        $developer = $repository->findById(1);
 
         $relation = $repository->relation('commits');
         $relation->load(new SingleEntityIndexer(Developer::mapper(), $developer), [], [], ['author']);

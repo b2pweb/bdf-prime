@@ -77,21 +77,6 @@ class ArrayResultSetTest extends TestCase
                 'last_name'  => 'Duck'
             ],
         ], $this->resultSet->asAssociative()->all());
-
-        $this->assertEquals([
-            [
-                'first_name' => 'John',
-                'last_name'  => 'Doe'
-            ],
-            [
-                'first_name' => 'John',
-                'last_name'  => 'Smith'
-            ],
-            [
-                'first_name' => 'Donald',
-                'last_name'  => 'Duck'
-            ],
-        ], $this->resultSet->fetchMode(ResultSetInterface::FETCH_ASSOC)->all());
     }
 
     /**
@@ -99,11 +84,6 @@ class ArrayResultSetTest extends TestCase
      */
     public function test_all_num()
     {
-        $this->assertEquals([
-            ['John', 'Doe'],
-            ['John', 'Smith'],
-            ['Donald', 'Duck'],
-        ], $this->resultSet->fetchMode(ResultSetInterface::FETCH_NUM)->all());
         $this->assertEquals([
             ['John', 'Doe'],
             ['John', 'Smith'],
@@ -117,8 +97,7 @@ class ArrayResultSetTest extends TestCase
     public function test_all_column()
     {
         $this->assertEquals(['Doe', 'Smith', 'Duck'], $this->resultSet->asColumn(1)->all());
-        $this->assertEquals(['John', 'John', 'Donald'], $this->resultSet->fetchMode(ResultSetInterface::FETCH_COLUMN)->all());
-        $this->assertEquals(['Doe', 'Smith', 'Duck'], $this->resultSet->fetchMode(ResultSetInterface::FETCH_COLUMN, 1)->all());
+        $this->assertEquals(['John', 'John', 'Donald'], $this->resultSet->asColumn()->all());
     }
 
     /**
@@ -140,20 +119,6 @@ class ArrayResultSetTest extends TestCase
                 'last_name'  => 'Duck'
             ],
         ], $this->resultSet->asObject()->all());
-        $this->assertEquals([
-            (object) [
-                'first_name' => 'John',
-                'last_name'  => 'Doe'
-            ],
-            (object) [
-                'first_name' => 'John',
-                'last_name'  => 'Smith'
-            ],
-            (object) [
-                'first_name' => 'Donald',
-                'last_name'  => 'Duck'
-            ],
-        ], $this->resultSet->fetchMode(ResultSetInterface::FETCH_OBJECT)->all());
     }
 
     /**
@@ -166,11 +131,6 @@ class ArrayResultSetTest extends TestCase
             new ArrayResultTestClass('John', 'Smith'),
             new ArrayResultTestClass('Donald', 'Duck'),
         ], $this->resultSet->asClass(ArrayResultTestClass::class)->all());
-        $this->assertEquals([
-            new ArrayResultTestClass('John', 'Doe'),
-            new ArrayResultTestClass('John', 'Smith'),
-            new ArrayResultTestClass('Donald', 'Duck'),
-        ], $this->resultSet->fetchMode(ResultSetInterface::FETCH_CLASS, ArrayResultTestClass::class)->all());
     }
 
     /**
@@ -234,7 +194,7 @@ class ArrayResultSetTest extends TestCase
      */
     public function test_current_column()
     {
-        $this->resultSet->fetchMode(ResultSetInterface::FETCH_COLUMN);
+        $this->resultSet->asColumn();
 
         $this->assertEquals('John', $this->resultSet->current());
 

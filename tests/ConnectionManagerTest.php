@@ -6,6 +6,7 @@ use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\ConnectionRegistry;
 use Bdf\Prime\Connection\SimpleConnection;
 use Bdf\Prime\Exception\DBALException;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -143,7 +144,7 @@ class ConnectionManagerTest extends TestCase
 
         $connection = $manager->getConnection('test');
         
-        $this->assertEquals('sqlite', $connection->platform()->name());
+        $this->assertInstanceOf(SQLitePlatform::class, $connection->platform()->grammar());
     }
 
     /**

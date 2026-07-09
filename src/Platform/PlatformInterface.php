@@ -10,14 +10,6 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 interface PlatformInterface
 {
     /**
-     * Get the platform name
-     *
-     * @return string
-     * @deprecated Since 2.2. Use {@see PlatformInterface::apply()} to discriminate platform.
-     */
-    public function name(): string;
-
-    /**
      * Get the platform dependant types
      *
      * Types used by related compiler SHOULD be present into.

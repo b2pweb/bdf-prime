@@ -67,18 +67,10 @@ class SqlJsonType extends AbstractPlatformType
      */
     public function declaration(ColumnInterface $column)
     {
-        $useNativeJson = $column->options()[self::OPTION_USE_NATIVE_JSON] ?? null;
+        $useNativeJson = $column->options()[self::OPTION_USE_NATIVE_JSON] ?? true;
 
-        if ($useNativeJson === true) {
+        if ($useNativeJson) {
             return Types::JSON;
-        }
-
-        if ($useNativeJson === null) {
-            @trigger_error(
-                'Since prime 2.2, when using SQL "json" type the schemaOption "use_native_json" should be set to true to use native JSON column type, 
-                or false to keep the the legacy behavior using TEXT column type. The current default value is false, but will be changed to true in prime 3.0.',
-                E_USER_DEPRECATED
-            );
         }
 
         return Types::TEXT;

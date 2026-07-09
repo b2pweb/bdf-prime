@@ -5,16 +5,16 @@ namespace Bdf\Prime\Mapper;
 use _files\TestClock;
 use Bdf\Prime\Entity\Hydrator\HydratorGeneratedInterface;
 use Bdf\Prime\Entity\Hydrator\MapperHydrator;
-use Bdf\Prime\Mapper\NameResolver\CallbackResolver;
 use Bdf\Prime\Mapper\NameResolver\ResolverInterface;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\TestEntity;
-use Cache\Adapter\PHPArray\ArrayCachePool;
 use PHPUnit\Framework\TestCase;
 use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Psr16Cache;
+
+use function str_replace;
 
 /**
  *
@@ -126,12 +126,17 @@ class MapperFactoryTest extends TestCase
      */
     public function test_createMapper_reverse_entity_name()
     {
-        $factory = new MapperFactory(new CallbackResolver(
-            function($className) {},
-            function($className) {
-                return str_replace('EntityMapper', '', $className);
+        $factory = new MapperFactory(new class implements ResolverInterface {
+            public function resolve(string $entityClass): string
+            {
+                return $entityClass;
             }
-        ));
+
+            public function reverse(string $mapperClass): string
+            {
+                return str_replace('EntityMapper', '', $mapperClass);
+            }
+        });
         
         $mapper = $factory->createMapper(Prime::service(), 'Bdf\Prime\TestEntityMapper');
         
