@@ -406,6 +406,8 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
 
     /**
      * {@inheritdoc}
+     *
+     * @return $this
      */
     public function distinct(bool $flag = true): static
     {

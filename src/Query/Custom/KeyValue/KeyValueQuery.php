@@ -89,6 +89,8 @@ final class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryIn
 
     /**
      * {@inheritdoc}
+     *
+     * @return $this
      */
     public function where($field, $value = null): static
     {

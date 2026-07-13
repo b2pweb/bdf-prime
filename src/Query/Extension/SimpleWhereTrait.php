@@ -21,6 +21,7 @@ trait SimpleWhereTrait
      * {@inheritdoc}
      *
      * @see Whereable::where()
+     * @return $this
      */
     public function where($column, $operator = null, $value = null)
     {
