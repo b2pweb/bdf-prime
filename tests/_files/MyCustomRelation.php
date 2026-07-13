@@ -89,7 +89,7 @@ class MyCustomRelation extends AbstractRelation implements CustomRelationInterfa
     protected function getLocalKeyValue($entity)
     {
         if (is_array($entity)) {
-            return array_map([$this, 'getLocalKeyValue'], $entity);
+            return array_map($this->getLocalKeyValue(...), $entity);
         }
 
         $keys = [];

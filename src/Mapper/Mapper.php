@@ -31,7 +31,6 @@ use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\ServiceLocator;
 use Bdf\Serializer\PropertyAccessor\PropertyAccessorInterface;
 use Bdf\Serializer\PropertyAccessor\ReflectionAccessor;
-use Closure;
 use LogicException;
 use Psr\Clock\ClockInterface;
 use ReflectionAttribute;
@@ -1241,11 +1240,7 @@ abstract class Mapper implements ClockAwareInterface
                     throw new LogicException('The method "' . static::class . '::' . $method->getName() . '" must be public or protected to be used with attribute ' . $attributeClass);
                 }
 
-                if ($method->isPublic()) {
-                    $functions[$name] = [$this, $method->getName()];
-                } else {
-                    $functions[$name] = Closure::fromCallable([$this, $method->getName()]);
-                }
+                $functions[$name] = $this->{$method->getName()}(...);
             }
         }
 

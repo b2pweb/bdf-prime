@@ -126,7 +126,7 @@ final class Like extends AbstractExpressionTransformer
     public function getValue(): string|array
     {
         if (is_array($this->value)) {
-            return array_map([$this, 'generate'], $this->value);
+            return array_map($this->generate(...), $this->value);
         }
 
         return $this->generate($this->value);

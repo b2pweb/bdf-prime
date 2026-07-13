@@ -125,7 +125,7 @@ final class CollectionFactory
     public static function forRepository(RepositoryInterface $repository): self
     {
         $factory = new static();
-        $factory->registerWrapperAlias('collection', EntityCollection::class, [$repository, 'collection']);
+        $factory->registerWrapperAlias('collection', EntityCollection::class, $repository->collection(...));
 
         return $factory;
     }

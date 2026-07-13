@@ -144,14 +144,14 @@ final class Versionable extends Behavior
      */
     public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
     {
-        $notifier->inserting([$this, 'beforeInsert']);
-        $notifier->inserted([$this, 'afterInsert']);
+        $notifier->inserting($this->beforeInsert(...));
+        $notifier->inserted($this->afterInsert(...));
 
-        $notifier->updating([$this, 'beforeUpdate']);
-        $notifier->updated([$this, 'afterUpdate']);
+        $notifier->updating($this->beforeUpdate(...));
+        $notifier->updated($this->afterUpdate(...));
 
         if ($this->allowDeletion) {
-            $notifier->deleted([$this, 'deleteAllVersions']);
+            $notifier->deleted($this->deleteAllVersions(...));
         }
     }
 

@@ -467,7 +467,7 @@ class JsonFunctionalTest extends TestCase
     protected function normalizeWithJson($data)
     {
         if (is_array($data)) {
-            return array_map([$this, 'normalizeWithJson'], $data);
+            return array_map($this->normalizeWithJson(...), $data);
         }
 
         if (!is_string($data)) {

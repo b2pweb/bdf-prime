@@ -68,7 +68,7 @@ final class Operator implements ExpressionTransformerInterface, TypedExpressionI
             return $type->toDatabase($this->value);
         }
 
-        return array_map([$type, 'toDatabase'], $this->value);
+        return array_map($type->toDatabase(...), $this->value);
     }
 
     /**

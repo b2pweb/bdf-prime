@@ -65,7 +65,7 @@ final class AccessorResolver
         return new EmbeddedAccessor(
             $this->code,
             $embedded,
-            array_values(array_map([$this, 'get'], $embedded->classes())),
+            array_values(array_map($this->get(...), $embedded->classes())),
             $embedded->isRoot()
                 ? $this->baseAccessor
                 : $this->embedded($embedded->parent())

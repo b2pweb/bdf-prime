@@ -168,7 +168,7 @@ final class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
      */
     public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
     {
-        $notifier->deleting([$this, 'beforeDelete']);
+        $notifier->deleting($this->beforeDelete(...));
     }
 
     /**

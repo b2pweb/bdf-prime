@@ -30,7 +30,7 @@ final class RepositoryPaginatorFactory extends PaginatorFactory
     {
         $this->repository = $repository;
 
-        $this->addFactory(Walker::class, [$this, 'createWalker']);
+        $this->addFactory(Walker::class, $this->createWalker(...));
     }
 
     /**
@@ -50,6 +50,7 @@ final class RepositoryPaginatorFactory extends PaginatorFactory
             !$this->repository->metadata()->isCompositePrimaryKey()
             && KeyWalkStrategy::supports($query, $page, $this->repository->metadata()->primary['attributes'][0])
         ) {
+            /** @psalm-suppress InvalidArgument Psalm loses the E template when the method is referenced as first-class callable */
             $walker->setStrategy(new KeyWalkStrategy(new MapperPrimaryKey($this->repository->mapper())));
         }
 

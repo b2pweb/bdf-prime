@@ -214,7 +214,7 @@ PHP;
 
         // Indexed array
         if (is_array($value) && array_values($value) === $value) {
-            return '['.implode(', ', array_map([$this, 'export'], $value)).']';
+            return '['.implode(', ', array_map($this->export(...), $value)).']';
         }
 
         return var_export($value, true);

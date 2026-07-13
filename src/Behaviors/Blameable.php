@@ -167,11 +167,11 @@ final class Blameable extends Behavior
     public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
     {
         if ($this->createdBy !== null) {
-            $notifier->inserting([$this, 'beforeInsert']);
+            $notifier->inserting($this->beforeInsert(...));
         }
 
         if ($this->updatedBy !== null) {
-            $notifier->updating([$this, 'beforeUpdate']);
+            $notifier->updating($this->beforeUpdate(...));
         }
     }
 }

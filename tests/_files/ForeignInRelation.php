@@ -100,7 +100,7 @@ class ForeignInRelation extends AbstractRelation implements CustomRelationInterf
     protected function getLocalKeyValue($entity)
     {
         if (is_array($entity)) {
-            return array_map([$this, 'getLocalKeyValue'], $entity);
+            return array_map($this->getLocalKeyValue(...), $entity);
         }
 
         $keys = [];

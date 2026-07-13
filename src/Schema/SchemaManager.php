@@ -125,7 +125,7 @@ final class SchemaManager extends AbstractSchemaManager
             throw new DBALException($e->getMessage(), $e->getCode(), $e);
         }
 
-        return in_array(strtolower($database), array_map('strtolower', $databases));
+        return in_array(strtolower($database), array_map(strtolower(...), $databases));
     }
 
     /**

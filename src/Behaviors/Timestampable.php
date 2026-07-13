@@ -199,11 +199,11 @@ final class Timestampable extends Behavior implements ClockAwareInterface
     public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
     {
         if ($this->createdAt !== null) {
-            $notifier->inserting([$this, 'beforeInsert']);
+            $notifier->inserting($this->beforeInsert(...));
         }
 
         if ($this->updatedAt !== null) {
-            $notifier->updating([$this, 'beforeUpdate']);
+            $notifier->updating($this->beforeUpdate(...));
         }
     }
 }
