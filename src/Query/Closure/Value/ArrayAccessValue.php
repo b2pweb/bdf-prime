@@ -25,7 +25,7 @@ final class ArrayAccessValue implements ComparisonValueInterface
     /**
      * {@inheritdoc}
      */
-    public function get(ReflectionFunction $reflection)
+    public function get(ReflectionFunction $reflection): mixed
     {
         $value = $this->value->get($reflection);
         $key = $this->key->get($reflection);

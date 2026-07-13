@@ -38,7 +38,7 @@ final class Field implements ExpressionInterface
      *
      * @todo gestion de la platform
      */
-    public function build(CompilableClause $query, object $compiler)
+    public function build(CompilableClause $query, object $compiler): string
     {
         // @todo only mysql ?
         return 'FIELD('.$compiler->quoteIdentifier($query, $query->preprocessor()->field($this->search)).','.implode(',', $this->values).')';

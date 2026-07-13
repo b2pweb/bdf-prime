@@ -98,7 +98,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      *
      * @return RepositoryInterface|null
      */
-    public function repository(ReadCommandInterface $query, $name = null)
+    public function repository(ReadCommandInterface $query, $name = null): ?RepositoryInterface
     {
         if ($name === null) {
             return $this->repository;
@@ -284,7 +284,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      *
      * @return ReadCommandInterface<ConnectionInterface, E>
      */
-    public function filter(ReadCommandInterface $query, Closure $predicate)
+    public function filter(ReadCommandInterface $query, Closure $predicate): ReadCommandInterface
     {
         if (!$this->closureCompiler) {
             throw new BadMethodCallException('Closure filter is not enabled.');
@@ -318,7 +318,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      *
      * @return ReadCommandInterface<ConnectionInterface, E>
      */
-    public function with(ReadCommandInterface $query, $relations)
+    public function with(ReadCommandInterface $query, $relations): ReadCommandInterface
     {
         $this->withRelations = Relation::sanitizeRelations((array)$relations);
 
@@ -333,7 +333,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      *
      * @return ReadCommandInterface<ConnectionInterface, E>
      */
-    public function without(ReadCommandInterface $query, $relations)
+    public function without(ReadCommandInterface $query, $relations): ReadCommandInterface
     {
         $this->withoutRelations = Relation::sanitizeWithoutRelations((array)$relations);
 
@@ -350,7 +350,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      *
      * @return ReadCommandInterface<ConnectionInterface, E>
      */
-    public function by(ReadCommandInterface $query, $attribute, $combine = false)
+    public function by(ReadCommandInterface $query, $attribute, $combine = false): ReadCommandInterface
     {
         $this->byOptions = [
             'attribute' => $attribute,
@@ -512,7 +512,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      *
      * @return mixed
      */
-    public function __call($name, $arguments)
+    public function __call($name, $arguments): mixed
     {
         /** @var EntityRepository $this->repository */
         $scopes = $this->repository->scopes();

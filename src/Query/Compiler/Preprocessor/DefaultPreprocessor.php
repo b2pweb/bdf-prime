@@ -13,7 +13,7 @@ final class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function forInsert(CompilableClause $clause)
+    public function forInsert(CompilableClause $clause): CompilableClause
     {
         return $clause;
     }
@@ -21,7 +21,7 @@ final class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function forUpdate(CompilableClause $clause)
+    public function forUpdate(CompilableClause $clause): CompilableClause
     {
         return $clause;
     }
@@ -29,7 +29,7 @@ final class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function forDelete(CompilableClause $clause)
+    public function forDelete(CompilableClause $clause): CompilableClause
     {
         return $clause;
     }
@@ -37,7 +37,7 @@ final class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function forSelect(CompilableClause $clause)
+    public function forSelect(CompilableClause $clause): CompilableClause
     {
         return $clause;
     }

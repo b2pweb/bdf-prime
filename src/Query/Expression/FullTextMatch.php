@@ -6,6 +6,8 @@ use Bdf\Prime\Query\CompilableClause;
 use Bdf\Prime\Query\Compiler\CompilerInterface;
 use Bdf\Prime\Query\Compiler\SqlCompiler;
 
+use function sprintf;
+
 /**
  * FullTextMatch
  *
@@ -42,16 +44,13 @@ final class FullTextMatch implements ExpressionInterface
      * @param Q $query
      * @param SqlCompiler $compiler
      */
-    public function build(CompilableClause $query, object $compiler)
+    public function build(CompilableClause $query, object $compiler): string
     {
-        $sql = 'MATCH('.$compiler->quoteIdentifier($query, $query->preprocessor()->field($this->search)).' AGAINST('.(string) $compiler->quote($this->value).')';
-
-        if ($this->booleanMode) {
-            $sql .= ' IN BOOLEAN MODE)';
-        } else {
-            $sql .= ')';
-        }
-
-        return $sql;
+        return sprintf(
+            'MATCH(%s AGAINST(%s)%s)',
+            $compiler->quoteIdentifier($query, $query->preprocessor()->field($this->search)),
+            $compiler->quote($this->value),
+            $this->booleanMode ? ' IN BOOLEAN MODE' : '',
+        );
     }
 }

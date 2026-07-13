@@ -53,7 +53,7 @@ final class RegistryInstantiator implements InstantiatorInterface
      *
      * @return InstantiatorInterface
      */
-    public function getDefaultInstantiator()
+    public function getDefaultInstantiator(): InstantiatorInterface
     {
         if ($this->defaultInstantiator === null) {
             $this->defaultInstantiator = new Instantiator();

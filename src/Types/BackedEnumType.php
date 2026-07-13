@@ -27,7 +27,7 @@ final class BackedEnumType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase($value, array $fieldOptions = []): ?BackedEnum
     {
         if ($value === null) {
             return null;
@@ -45,7 +45,7 @@ final class BackedEnumType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase($value): mixed
     {
         if (!$value instanceof BackedEnum) {
             return $value;

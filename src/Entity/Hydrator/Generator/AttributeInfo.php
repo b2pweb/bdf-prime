@@ -34,7 +34,7 @@ final class AttributeInfo
      *
      * @return bool
      */
-    public function isEmbedded()
+    public function isEmbedded(): bool
     {
         return isset($this->metadata['embedded'])
             // If the attribute is a root attribute, check only for root embedded entities
@@ -47,7 +47,7 @@ final class AttributeInfo
      *
      * @return EmbeddedInfo
      */
-    public function embedded()
+    public function embedded(): EmbeddedInfo
     {
         return empty($this->metadata['root'])
             ? $this->resolver->embedded($this->metadata['embedded'])
@@ -60,7 +60,7 @@ final class AttributeInfo
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return $this->name;
     }
@@ -70,7 +70,7 @@ final class AttributeInfo
      *
      * @return string
      */
-    public function property()
+    public function property(): string
     {
         $finalAttribute = explode('.', $this->name);
 
@@ -83,7 +83,7 @@ final class AttributeInfo
      *
      * @return string|null
      */
-    public function type()
+    public function type(): ?string
     {
         return $this->metadata['type'] ?? null;
     }
@@ -93,7 +93,7 @@ final class AttributeInfo
      *
      * @return string
      */
-    public function field()
+    public function field(): string
     {
         return $this->metadata['field'];
     }

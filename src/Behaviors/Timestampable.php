@@ -11,6 +11,7 @@ use Bdf\Prime\Repository\Event\BeforeUpdate;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
+use DateTimeInterface;
 use Psr\Clock\ClockInterface;
 
 use function is_string;
@@ -177,9 +178,9 @@ final class Timestampable extends Behavior implements ClockAwareInterface
      * @param string $name
      * @param RepositoryInterface<E> $repository
      *
-     * @return int|\DateTimeInterface
+     * @return int|DateTimeInterface
      */
-    private function createDate(string $name, RepositoryInterface $repository)
+    private function createDate(string $name, RepositoryInterface $repository): int|DateTimeInterface
     {
         $date = $this->clock->now();
 

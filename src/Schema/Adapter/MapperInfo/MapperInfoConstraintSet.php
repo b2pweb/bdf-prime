@@ -39,7 +39,7 @@ final class MapperInfoConstraintSet implements ConstraintSetInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(ConstraintVisitorInterface $visitor)
+    public function apply(ConstraintVisitorInterface $visitor): static
     {
         $this->loadConstraints()->apply($visitor);
 

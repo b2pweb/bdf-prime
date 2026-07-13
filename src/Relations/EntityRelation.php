@@ -110,7 +110,7 @@ final class EntityRelation
      *
      * @return E Returns the owner entity instance
      */
-    public function associate($entity)
+    public function associate($entity): object
     {
         return $this->relation->associate($this->owner, $entity);
     }
@@ -126,7 +126,7 @@ final class EntityRelation
      *
      * @return E Returns the owner entity instance
      */
-    public function dissociate()
+    public function dissociate(): object
     {
         return $this->relation->dissociate($this->owner);
     }
@@ -149,7 +149,7 @@ final class EntityRelation
      *
      * @return R Returns the related entity instance
      */
-    public function create(array $data = [])
+    public function create(array $data = []): object
     {
         return $this->relation->create($this->owner, $data);
     }
@@ -325,7 +325,7 @@ final class EntityRelation
      *
      * @return mixed
      */
-    public function __call(string $name, array $arguments)
+    public function __call(string $name, array $arguments): mixed
     {
         return $this->query()->$name(...$arguments);
     }

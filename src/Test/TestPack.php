@@ -68,7 +68,7 @@ class TestPack
      *
      * @return bool Return true if testPack is initialized
      */
-    public function isInitialized()
+    public function isInitialized(): bool
     {
         return $this->initialized;
     }
@@ -287,7 +287,7 @@ class TestPack
      *
      * @return object|null
      */
-    public function get($name)
+    public function get($name): ?object
     {
         if (isset($this->entities[$name])) {
             return $this->entities[$name];
@@ -379,7 +379,7 @@ class TestPack
      *
      * @return SimpleConnection[]
      */
-    private function getActiveConnections()
+    private function getActiveConnections(): array
     {
         /** @var SimpleConnection[] */
         return Prime::service()->connections()->connections();

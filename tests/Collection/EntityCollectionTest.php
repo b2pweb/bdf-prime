@@ -542,7 +542,11 @@ class EntityCollectionTest extends TestCase
      */
     public function test_delegation($method, array $arguments, $retType)
     {
-        $retVal = new stdClass();
+        $retVal = match ($method) {
+            'all', 'keys', 'toArray' => ['rtrn'],
+            'has', 'isEmpty', 'contains' => true,
+            default => new stdClass(),
+        };
         $storage = $this->createMock(CollectionInterface::class);
         $storage->expects($this->once())
             ->method($method)

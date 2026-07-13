@@ -34,7 +34,7 @@ final class SqlIntegerType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase($value, array $fieldOptions = []): ?int
     {
         return $value === null ? null : (int) $value;
     }
@@ -42,7 +42,7 @@ final class SqlIntegerType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function declaration(ColumnInterface $column)
+    public function declaration(ColumnInterface $column): string
     {
         return self::$doctrineTypeMap[$this->name] ?? Types::INTEGER;
     }
@@ -52,7 +52,7 @@ final class SqlIntegerType extends AbstractPlatformType
      *
      * @return string[]
      */
-    public static function typeNames()
+    public static function typeNames(): array
     {
         return array_keys(self::$doctrineTypeMap);
     }

@@ -81,7 +81,7 @@ final class MapperInfo
      *
      * @return Mapper
      */
-    public function mapper()
+    public function mapper(): Mapper
     {
         return $this->mapper;
     }
@@ -91,7 +91,7 @@ final class MapperInfo
      *
      * @return Metadata
      */
-    public function metadata()
+    public function metadata(): Metadata
     {
         return $this->metadata;
     }
@@ -101,7 +101,7 @@ final class MapperInfo
      *
      * @return string|null
      */
-    public function connection()
+    public function connection(): ?string
     {
         return $this->metadata->connection;
     }
@@ -111,7 +111,7 @@ final class MapperInfo
      *
      * @return string
      */
-    public function className()
+    public function className(): string
     {
         return $this->metadata->entityName;
     }
@@ -121,7 +121,7 @@ final class MapperInfo
      *
      * @return PropertyInfo[]
      */
-    public function properties()
+    public function properties(): array
     {
         if ($this->properties === null) {
             $this->buildProperties();
@@ -135,7 +135,7 @@ final class MapperInfo
      *
      * @return PropertyInfo[]
      */
-    public function primaries()
+    public function primaries(): array
     {
         if ($this->primaries === null) {
             $this->buildProperties();
@@ -149,7 +149,7 @@ final class MapperInfo
      *
      * @return PropertyInfo[]
      */
-    public function embedded()
+    public function embedded(): array
     {
         if ($this->embedded === null) {
             $this->buildProperties();
@@ -208,7 +208,7 @@ final class MapperInfo
      *
      * @return ObjectPropertyInfo[]
      */
-    public function objects()
+    public function objects(): array
     {
         if ($this->objects === null) {
             $this->buildObjectProperties();
@@ -258,7 +258,7 @@ final class MapperInfo
      *
      * @return ObjectPropertyInfo[]
      */
-    public function relations()
+    public function relations(): array
     {
         $relations = [];
 
@@ -275,7 +275,7 @@ final class MapperInfo
      *
      * @return InfoInterface[]
      */
-    public function all()
+    public function all(): array
     {
         return $this->properties() + $this->objects();
     }
@@ -287,7 +287,7 @@ final class MapperInfo
      *
      * @return null|InfoInterface
      */
-    public function property($name)
+    public function property($name): ?InfoInterface
     {
         return $this->properties[$name]
             ?? $this->objects[$name]

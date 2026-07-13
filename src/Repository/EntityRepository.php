@@ -19,6 +19,7 @@ use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
+use Bdf\Prime\Query\Pagination\PaginatorInterface;
 use Bdf\Prime\Query\Query;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\QueryRepositoryExtension;
@@ -189,7 +190,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
     /**
      * {@inheritdoc}
      */
-    public function entity(array $data = [])
+    public function entity(array $data = []): object
     {
         return $this->mapper->entity($data);
     }
@@ -252,7 +253,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      *
      * @see Mapper::extractOne()
      */
-    public function extractOne($entity, string $property)
+    public function extractOne($entity, string $property): mixed
     {
         return $this->mapper->extractOne($entity, $property);
     }
@@ -282,7 +283,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      *
      * @return $this|mixed  Returns the work result if set or the instance if not set
      */
-    public function on($connection, ?Closure $work = null)
+    public function on($connection, ?Closure $work = null): mixed
     {
         $original = $this->changeActiveConnection($connection);
 
@@ -308,7 +309,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      *
      * @template R
      */
-    public function transaction(callable $work)
+    public function transaction(callable $work): mixed
     {
         $connection = $this->connection();
 
@@ -470,7 +471,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      *
      * @return $this
      */
-    public function withoutConstraints()
+    public function withoutConstraints(): static
     {
         $this->withoutConstraints = true;
 
@@ -492,7 +493,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      *
      * @return QueryInterface<ConnectionInterface, E>
      */
-    public function builder()
+    public function builder(): QueryInterface
     {
         return $this->queries->builder();
     }
@@ -570,7 +571,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function refresh($entity, array $criteria = [])
+    public function refresh($entity, array $criteria = []): ?object
     {
         if (empty($criteria)) {
             return $this->queries->findById($this->mapper()->primaryCriteria($entity));
@@ -763,7 +764,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      *
      * @return array
      */
-    public function filters()
+    public function filters(): array
     {
         return $this->mapper->filters();
     }
@@ -773,7 +774,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      *
      * @return array<string, callable(\Bdf\Prime\Query\QueryInterface,mixed...):mixed>
      */
-    public function scopes()
+    public function scopes(): array
     {
         return $this->mapper->scopes();
     }
@@ -783,7 +784,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
     /**
      * {@inheritdoc}
      */
-    public function loaded(callable $listener, bool $once = false)
+    public function loaded(callable $listener, bool $once = false): static
     {
         $eventName = AfterLoad::class;
 
@@ -799,7 +800,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
     /**
      * {@inheritdoc}
      */
-    public function saving(callable $listener, bool $once = false)
+    public function saving(callable $listener, bool $once = false): static
     {
         $eventName = BeforeSave::class;
 
@@ -815,7 +816,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
     /**
      * {@inheritdoc}
      */
-    public function saved(callable $listener, bool $once = false)
+    public function saved(callable $listener, bool $once = false): static
     {
         $eventName = AfterSave::class;
 
@@ -831,7 +832,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
     /**
      * {@inheritdoc}
      */
-    public function inserting(callable $listener, bool $once = false)
+    public function inserting(callable $listener, bool $once = false): static
     {
         $eventName = BeforeInsert::class;
 
@@ -847,7 +848,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
     /**
      * {@inheritdoc}
      */
-    public function inserted(callable $listener, bool $once = false)
+    public function inserted(callable $listener, bool $once = false): static
     {
         $eventName = AfterInsert::class;
 
@@ -863,7 +864,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
     /**
      * {@inheritdoc}
      */
-    public function updating(callable $listener, bool $once = false)
+    public function updating(callable $listener, bool $once = false): static
     {
         $eventName = BeforeUpdate::class;
 
@@ -879,7 +880,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
     /**
      * {@inheritdoc}
      */
-    public function updated(callable $listener, bool $once = false)
+    public function updated(callable $listener, bool $once = false): static
     {
         $eventName = AfterUpdate::class;
 
@@ -895,7 +896,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
     /**
      * {@inheritdoc}
      */
-    public function deleting(callable $listener, bool $once = false)
+    public function deleting(callable $listener, bool $once = false): static
     {
         $eventName = BeforeDelete::class;
 
@@ -911,7 +912,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
     /**
      * {@inheritdoc}
      */
-    public function deleted(callable $listener, bool $once = false)
+    public function deleted(callable $listener, bool $once = false): static
     {
         $eventName = AfterDelete::class;
 
@@ -933,7 +934,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      *
      * @return int|QueryInterface|array|E
      */
-    public function __call($name, $arguments)
+    public function __call($name, $arguments): mixed
     {
         return $this->queries->$name(...$arguments);
     }
@@ -947,7 +948,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      *
      * @return QueryInterface<ConnectionInterface, E>
      */
-    public function with($relations)
+    public function with($relations): QueryInterface
     {
         return $this->builder()->with($relations);
     }
@@ -959,7 +960,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      *
      * @return QueryInterface<ConnectionInterface, E>
      */
-    public function without($relations)
+    public function without($relations): QueryInterface
     {
         return $this->builder()->without($relations);
     }
@@ -972,7 +973,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      *
      * @return QueryInterface<ConnectionInterface, E>
      */
-    public function by($attribute, $combine = false)
+    public function by($attribute, $combine = false): QueryInterface
     {
         return $this->builder()->by($attribute, $combine);
     }
@@ -984,7 +985,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      *
      * @return QueryInterface<ConnectionInterface, E>
      */
-    public function wrapAs($wrapperClass)
+    public function wrapAs($wrapperClass): QueryInterface
     {
         return $this->builder()->wrapAs($wrapperClass);
     }
@@ -997,7 +998,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function find(array $criteria, $attributes = null)
+    public function find(array $criteria, $attributes = null): array|CollectionInterface|PaginatorInterface
     {
         return $this->builder()->find($criteria, $attributes);
     }
@@ -1010,7 +1011,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function findOne(array $criteria, $attributes = null)
+    public function findOne(array $criteria, $attributes = null): ?object
     {
         return $this->builder()->findOne($criteria, $attributes);
     }
@@ -1024,17 +1025,9 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      *
      * @return QueryInterface<ConnectionInterface, E>
      */
-    public function where($column, $operator = null, $value = null)
+    public function where($column, $operator = null, $value = null): QueryInterface
     {
         return $this->builder()->where($column, $operator, $value);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function onConnectionClosed()
-    {
-        $this->reset();
     }
 
     /**
@@ -1077,7 +1070,7 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
      *
      * @return string The last active connection name
      */
-    private function changeActiveConnection($connectionName)
+    private function changeActiveConnection($connectionName): string
     {
         $this->reset();
 

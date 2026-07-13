@@ -48,7 +48,7 @@ final class EmbeddedAccessor
      *
      * @throws HydratorGenerationException
      */
-    public function getEmbedded($target, $instantiate = true, $rawDataVarName = null)
+    public function getEmbedded($target, $instantiate = true, $rawDataVarName = null): string
     {
         return <<<PHP
 { //START accessor for {$this->embedded->path()}
@@ -70,7 +70,7 @@ PHP;
      *
      * @throws HydratorGenerationException When the attribute is not readable
      */
-    public function getter($varName, $attribute)
+    public function getter($varName, $attribute): string
     {
         if (count($this->accessors) === 1) {
             $getter = $this->accessors[0]->getter($varName, $attribute);
@@ -106,7 +106,7 @@ PHP;
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    public function setter($varName, $attribute, $value, $useSetterInPriority = true)
+    public function setter($varName, $attribute, $value, $useSetterInPriority = true): string
     {
         if (count($this->accessors) === 1) {
             $setter = $this->accessors[0]->setter($varName, $attribute, $value, $useSetterInPriority);
@@ -141,7 +141,7 @@ PHP;
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    public function fullSetter($attribute, $value, $tmpVarName = '$__owner', $rawDataVarName = null)
+    public function fullSetter($attribute, $value, $tmpVarName = '$__owner', $rawDataVarName = null): string
     {
         return $this->code->lines([
             $this->getEmbedded($tmpVarName, true, $rawDataVarName),
@@ -160,7 +160,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    private function recursiveGetEmbedded($parent, $target, $instantiate = true, $rawDataVarName = null, &$nillable = false)
+    private function recursiveGetEmbedded($parent, $target, $instantiate = true, $rawDataVarName = null, &$nillable = false): string
     {
         $accessor = '';
         $lastVar = $parent;
@@ -201,7 +201,7 @@ PHP;
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    private function getOrInstantiate($parent, $target, $instantiate, $rawDataVarName)
+    private function getOrInstantiate($parent, $target, $instantiate, $rawDataVarName): string
     {
         $accessorsSwitch = [];
 
@@ -265,7 +265,7 @@ PHP;
      *
      * @return ClassAccessor[]
      */
-    private function ownerAccessors()
+    private function ownerAccessors(): array
     {
         if ($this->parentAccessor instanceof EmbeddedAccessor) {
             return $this->parentAccessor->accessors;
@@ -279,7 +279,7 @@ PHP;
      *
      * @return bool
      */
-    private function nillable()
+    private function nillable(): bool
     {
         if ($this->embedded->isPolymorph()) {
             return true;

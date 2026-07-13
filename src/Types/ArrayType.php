@@ -28,9 +28,9 @@ final class ArrayType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase($value, array $fieldOptions = []): array
     {
-        if (empty($value)) {
+        if ($value === '' || $value === null) {
             return [];
         }
 
@@ -49,13 +49,13 @@ final class ArrayType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase($value): ?string
     {
         if ($value === null) {
             return null;
         }
 
-        if (empty($value)) {
+        if ($value === []) {
             return '';
         }
 
@@ -69,7 +69,7 @@ final class ArrayType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    protected function defaultType()
+    protected function defaultType(): string
     {
         return self::TEXT;
     }

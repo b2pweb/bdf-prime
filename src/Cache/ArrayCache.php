@@ -12,7 +12,7 @@ final class ArrayCache implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function get(CacheKey $key)
+    public function get(CacheKey $key): mixed
     {
         if (!isset($this->data[$key->namespace()][$key->key()])) {
             return null;

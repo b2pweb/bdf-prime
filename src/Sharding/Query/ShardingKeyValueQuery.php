@@ -66,7 +66,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
     /**
      * {@inheritdoc}
      */
-    public function on(ConnectionInterface $connection)
+    public function on(ConnectionInterface $connection): static
     {
         $this->connection = $connection;
         $this->queries    = [];
@@ -77,7 +77,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
     /**
      * {@inheritdoc}
      */
-    public function project($columns = null)
+    public function project($columns = null): static
     {
         $this->statements['columns'] = (array) $columns;
 
@@ -87,7 +87,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
     /**
      * {@inheritdoc}
      */
-    public function select($columns = null)
+    public function select($columns = null): static
     {
         return $this->project($columns);
     }
@@ -95,7 +95,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
     /**
      * {@inheritdoc}
      */
-    public function addSelect($columns)
+    public function addSelect($columns): static
     {
         $this->statements['columns'] = array_merge($this->statements['columns'], $columns);
 
@@ -105,7 +105,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
     /**
      * {@inheritdoc}
      */
-    public function from(string $from, ?string $alias = null)
+    public function from(string $from, ?string $alias = null): static
     {
         $this->statements['table'] = $from;
 
@@ -115,7 +115,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
     /**
      * {@inheritdoc}
      */
-    public function where($field, $value = null)
+    public function where($field, $value = null): static
     {
         if (is_array($field)) {
             $this->statements['where'] = $field + $this->statements['where'];
@@ -129,7 +129,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
     /**
      * {@inheritdoc}
      */
-    public function values(array $values = [], array $types = [])
+    public function values(array $values = [], array $types = []): static
     {
         $this->statements['values'] = [
             'data'  => $values,
@@ -146,7 +146,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
      *
      * @return static<R>
      */
-    public function limit(?int $limit, ?int $offset = null)
+    public function limit(?int $limit, ?int $offset = null): static
     {
         $this->statements['limit'] = $limit;
 
@@ -177,7 +177,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function min(?string $column = null)
+    public function min(?string $column = null): float|int|string
     {
         return min($this->aggregate(__FUNCTION__, $column));
     }
@@ -186,7 +186,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function max(?string $column = null)
+    public function max(?string $column = null): float|int|string
     {
         return max($this->aggregate(__FUNCTION__, $column));
     }
@@ -329,7 +329,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
      *
      * @throws ShardingException
      */
-    private function getQueryByShard($shardId)
+    private function getQueryByShard($shardId): KeyValueQueryInterface
     {
         if (isset($this->queries[$shardId])) {
             $query = $this->queries[$shardId];

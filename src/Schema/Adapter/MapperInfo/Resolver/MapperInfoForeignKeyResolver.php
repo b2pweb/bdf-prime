@@ -28,7 +28,7 @@ final class MapperInfoForeignKeyResolver implements MapperInfoResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function fromRelation(MapperInfo $info, ObjectPropertyInfo $relation)
+    public function fromRelation(MapperInfo $info, ObjectPropertyInfo $relation): array
     {
         list($entity, $foreignKey) = $relation->foreignInfos();
 

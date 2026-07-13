@@ -30,7 +30,7 @@ final class TimestampType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase($value): mixed
     {
         if ($value === null) {
             return null;
@@ -47,7 +47,7 @@ final class TimestampType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    protected function defaultType()
+    protected function defaultType(): string
     {
         return self::INTEGER;
     }

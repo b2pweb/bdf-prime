@@ -183,7 +183,7 @@ class Migration implements MigrationInterface
      *
      * @return HelperSet A HelperSet instance
      */
-    public function getHelperSet()
+    public function getHelperSet(): HelperSet
     {
         if ($this->helperSet === null) {
             throw new \LogicException('Console helper set is not set.');
@@ -217,7 +217,7 @@ class Migration implements MigrationInterface
      * @return int
      * @throws PrimeException
      */
-    public function update($sql, array $params = [], $connectionName = null)
+    public function update($sql, array $params = [], $connectionName = null): int
     {
         $conn = $this->connection($connectionName);
 
@@ -257,7 +257,7 @@ class Migration implements MigrationInterface
      * @return SchemaManager
      * @throws PrimeException
      */
-    public function schema($connectionName = null)
+    public function schema($connectionName = null): SchemaManager
     {
         return new SchemaManager($this->connection($connectionName));
     }
@@ -269,7 +269,7 @@ class Migration implements MigrationInterface
      *
      * @return ConnectionInterface&\Doctrine\DBAL\Connection
      */
-    public function connection($connectionName = null)
+    public function connection($connectionName = null): ConnectionInterface
     {
         /** @var ConnectionInterface&\Doctrine\DBAL\Connection */
         return $this->prime()->connection($connectionName);
@@ -284,7 +284,7 @@ class Migration implements MigrationInterface
      *
      * @template E as object
      */
-    public function repository($entity)
+    public function repository($entity): RepositoryInterface
     {
         return $this->prime()->repository($entity);
     }
@@ -294,7 +294,7 @@ class Migration implements MigrationInterface
      *
      * @return ServiceLocator
      */
-    public function prime()
+    public function prime(): ServiceLocator
     {
         return $this->di->get('prime');
     }
@@ -302,9 +302,9 @@ class Migration implements MigrationInterface
     /**
      * Logger extension accessor
      *
-     * @return LoggerInterface
+     * @return LoggerInterface|null
      */
-    public function log()
+    public function log(): ?LoggerInterface
     {
         return $this->di->get('logger');
     }

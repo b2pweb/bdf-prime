@@ -207,7 +207,7 @@ final class PropertyInfo implements InfoInterface
      *
      * @return mixed
      */
-    public function getDefault()
+    public function getDefault(): mixed
     {
         return $this->metadata['default'];
     }
@@ -221,7 +221,7 @@ final class PropertyInfo implements InfoInterface
      *
      * @return mixed
      */
-    public function convert($value, bool $toPhp = true, array $fieldOptions = [])
+    public function convert($value, bool $toPhp = true, array $fieldOptions = []): mixed
     {
         if ($toPhp) {
             return $this->getType()->fromDatabase($value, $fieldOptions);
@@ -235,7 +235,7 @@ final class PropertyInfo implements InfoInterface
      *
      * @return TypeInterface
      */
-    protected function getType()
+    protected function getType(): TypeInterface
     {
         return $this->typesRegistry->get($this->type());
     }

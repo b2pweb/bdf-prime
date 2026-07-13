@@ -221,7 +221,7 @@ JSON
      *
      * @return string
      */
-    private function getHydratorFilename($hydratorClassname)
+    private function getHydratorFilename($hydratorClassname): string
     {
         return $this->outputDir.$hydratorClassname.'.php';
     }
@@ -231,7 +231,7 @@ JSON
      *
      * @return ClassFileLocator|array
      */
-    private function getClassIterator($path)
+    private function getClassIterator($path): ClassFileLocator|array
     {
         if (is_dir($path)) {
             return new ClassFileLocator($path);

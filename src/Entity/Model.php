@@ -132,7 +132,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      *
      * @return EntityRepository<static>
      */
-    public static function repository()
+    public static function repository(): EntityRepository
     {
         return self::locator()->repository(static::class);
     }
@@ -145,7 +145,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      *
      * @return EntityRepository|QueryInterface|mixed
      */
-    public static function __callStatic($name, $arguments)
+    public static function __callStatic($name, $arguments): mixed
     {
         return static::repository()->$name(...$arguments);
     }
@@ -241,7 +241,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @see Model::reload() For force loading
      */
     #[ReadOperation]
-    public function load($relations)
+    public function load($relations): static
     {
         static::repository()->loadRelations($this, $relations);
 
@@ -257,7 +257,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function reload($relations)
+    public function reload($relations): static
     {
         static::repository()->reloadRelations($this, $relations);
 

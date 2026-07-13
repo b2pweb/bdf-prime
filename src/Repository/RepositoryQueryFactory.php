@@ -104,7 +104,7 @@ final class RepositoryQueryFactory
      *
      * @return QueryInterface<ConnectionInterface, E>
      */
-    public function builder()
+    public function builder(): QueryInterface
     {
         return $this->fromAlias();
     }
@@ -118,7 +118,7 @@ final class RepositoryQueryFactory
      *
      * @throws PrimeException
      */
-    public function fromAlias(?string $alias = null)
+    public function fromAlias(?string $alias = null): QueryInterface
     {
         return $this->configure($this->repository->connection()->builder(new OrmPreprocessor($this->repository)), $alias);
     }
@@ -131,12 +131,11 @@ final class RepositoryQueryFactory
      * @return Q
      * @throws PrimeException When cannot create the query
      *
-     * @template Q as object
+     * @template Q as CommandInterface
      *
-     * @todo typehint with CommandInterface
      * @psalm-suppress InvalidReturnType
      */
-    public function make(string $query)
+    public function make(string $query): CommandInterface
     {
         /** @psalm-suppress InvalidReturnStatement */
         return $this->configure($this->repository->connection()->make($query, new OrmPreprocessor($this->repository)));
@@ -156,7 +155,7 @@ final class RepositoryQueryFactory
      * @throws PrimeException When query fail
      */
     #[ReadOperation]
-    public function findById($id)
+    public function findById($id): ?object
     {
         // Create a new query if cache is disabled
         if (!$this->supportsKeyValue) {
@@ -205,7 +204,7 @@ final class RepositoryQueryFactory
      *
      * @return KeyValueQueryInterface<ConnectionInterface, E>|null The query, or null if not supported
      */
-    public function keyValue($attribute = null, $value = null)
+    public function keyValue($attribute = null, $value = null): ?KeyValueQueryInterface
     {
         if (!$this->supportsKeyValue) {
             return null;
@@ -242,7 +241,7 @@ final class RepositoryQueryFactory
      * @throws PrimeException When query fail
      */
     #[ReadOperation]
-    public function countKeyValue($attribute = null, $value = null)
+    public function countKeyValue($attribute = null, $value = null): int
     {
         if (!$this->supportsKeyValue) {
             $query = $this->builder();
@@ -283,7 +282,7 @@ final class RepositoryQueryFactory
      *
      * @return QueryInterface<ConnectionInterface, E>
      */
-    public function entities(array $entities)
+    public function entities(array $entities): QueryInterface
     {
         $query = $this->builder();
         $mapper = $this->repository->mapper();
@@ -314,7 +313,7 @@ final class RepositoryQueryFactory
      *
      * @return mixed
      */
-    public function __call($name, $arguments)
+    public function __call($name, $arguments): mixed
     {
         if (isset($this->queries[$name])) {
             return $this->queries[$name]($this->repository, ...$arguments);
@@ -335,7 +334,7 @@ final class RepositoryQueryFactory
      * @psalm-param Q $query
      * @psalm-return Q
      */
-    private function configure(CommandInterface $query, ?string $alias = null)
+    private function configure(CommandInterface $query, ?string $alias = null): CommandInterface
     {
         if ($this->metadata->useQuoteIdentifier) {
             $query->useQuoteIdentifier();
@@ -367,7 +366,7 @@ final class RepositoryQueryFactory
      *
      * @return QueryRepositoryExtension<E>
      */
-    private function extension()
+    private function extension(): QueryRepositoryExtension
     {
         if (!$this->extension) {
             $this->extension = new QueryRepositoryExtension(

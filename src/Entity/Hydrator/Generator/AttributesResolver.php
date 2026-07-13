@@ -71,7 +71,7 @@ final class AttributesResolver
     /**
      * @return AttributeInfo[]
      */
-    public function attributes()
+    public function attributes(): array
     {
         return $this->attributes;
     }
@@ -82,7 +82,7 @@ final class AttributesResolver
      *
      * @return AttributeInfo
      */
-    public function attribute($name)
+    public function attribute($name): AttributeInfo
     {
         return $this->attributes[$name];
     }
@@ -90,7 +90,7 @@ final class AttributesResolver
     /**
      * @return EmbeddedInfo[]
      */
-    public function embeddeds()
+    public function embeddeds(): array
     {
         return $this->embeddeds;
     }
@@ -102,7 +102,7 @@ final class AttributesResolver
      *
      * @return EmbeddedInfo
      */
-    public function embedded($attribute)
+    public function embedded($attribute): EmbeddedInfo
     {
         return $this->embeddeds[$attribute];
     }
@@ -114,7 +114,7 @@ final class AttributesResolver
      *
      * @return EmbeddedInfo
      */
-    public function rootEmbedded($attribute)
+    public function rootEmbedded($attribute): EmbeddedInfo
     {
         return $this->rootEmbeddeds[$attribute];
     }
@@ -124,7 +124,7 @@ final class AttributesResolver
      *
      * @return EmbeddedInfo[]
      */
-    public function rootEmbeddeds()
+    public function rootEmbeddeds(): array
     {
         return $this->rootEmbeddeds;
     }
@@ -136,7 +136,7 @@ final class AttributesResolver
      *
      * @return bool
      */
-    public function hasRootEmbedded($attribute)
+    public function hasRootEmbedded($attribute): bool
     {
         return isset($this->rootEmbeddeds[$attribute]);
     }
@@ -146,7 +146,7 @@ final class AttributesResolver
      *
      * @return AttributeInfo[]
      */
-    public function rootAttributes()
+    public function rootAttributes(): array
     {
         return $this->rootAttributes;
     }
@@ -159,7 +159,7 @@ final class AttributesResolver
      *
      * @return bool
      */
-    public function isEntity($class)
+    public function isEntity($class): bool
     {
         return $this->prime->mappers()->isEntity($class);
     }
@@ -171,7 +171,7 @@ final class AttributesResolver
      *
      * @return bool
      */
-    public function isImportable($class)
+    public function isImportable($class): bool
     {
         return is_subclass_of($class, ImportableInterface::class);
     }

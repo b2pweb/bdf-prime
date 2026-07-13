@@ -101,7 +101,7 @@ final class Table implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function option(string $name)
+    public function option(string $name): mixed
     {
         return $this->options[$name];
     }

@@ -84,7 +84,7 @@ class ShardingQuery extends Query
      *
      * @return boolean Returns true if a shard has been selected
      */
-    private function explodeQueryClauses(array $clauses, $distributionKey)
+    private function explodeQueryClauses(array $clauses, $distributionKey): bool
     {
         foreach ($clauses as $clause) {
             if (isset($clause['nested'])) {
@@ -157,7 +157,7 @@ class ShardingQuery extends Query
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function min(?string $column = null)
+    public function min(?string $column = null): int|float|string
     {
         return min($this->aggregate(__FUNCTION__, $column));
     }
@@ -166,7 +166,7 @@ class ShardingQuery extends Query
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function max(?string $column = null)
+    public function max(?string $column = null): int|float|string
     {
         return max($this->aggregate(__FUNCTION__, $column));
     }

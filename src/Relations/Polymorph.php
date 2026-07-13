@@ -35,7 +35,7 @@ trait Polymorph
      *
      * @return $this
      */
-    public function setMap(array $map)
+    public function setMap(array $map): static
     {
         $this->map = $map;
 
@@ -73,7 +73,7 @@ trait Polymorph
      *
      * @return $this
      */
-    public function setDiscriminator($discriminator)
+    public function setDiscriminator($discriminator): static
     {
         $this->discriminator = $discriminator;
 
@@ -87,7 +87,7 @@ trait Polymorph
      *
      * @return $this
      */
-    public function setDiscriminatorValue($value)
+    public function setDiscriminatorValue($value): static
     {
         $this->discriminatorValue = $value;
 
@@ -100,7 +100,7 @@ trait Polymorph
      * @return bool
      * @psalm-assert-if-true !null $this->discriminator
      */
-    public function isPolymorphic()
+    public function isPolymorphic(): bool
     {
         return $this->discriminator !== null;
     }
@@ -114,7 +114,7 @@ trait Polymorph
      *
      * @throws InvalidArgumentException   If the class name has no discriminator
      */
-    public function discriminator($className)
+    public function discriminator($className): string|int
     {
         foreach ($this->map as $type => &$value) {
             $this->resolveEntity($value);

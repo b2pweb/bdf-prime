@@ -42,7 +42,7 @@ final class SchemaManager extends AbstractSchemaManager
      *
      * @return array
      */
-    public function toSql()
+    public function toSql(): array
     {
         return $this->queries;
     }
@@ -58,7 +58,7 @@ final class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): static
     {
         $this->queries = [];
 
@@ -85,7 +85,7 @@ final class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function schema($tables = [])
+    public function schema($tables = []): DoctrineSchema
     {
         if (!is_array($tables)) {
             $tables = [$tables];
@@ -93,7 +93,7 @@ final class SchemaManager extends AbstractSchemaManager
 
         $tables = array_map(function ($table) {
             if ($table instanceof TableInterface) {
-                return (new TableTransformer($table))->toDoctrine();
+                return new TableTransformer($table)->toDoctrine();
             }
 
             return $table;
@@ -108,7 +108,7 @@ final class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function loadSchema()
+    public function loadSchema(): DoctrineSchema
     {
         return $this->getDoctrineManager()->introspectSchema();
     }
@@ -144,7 +144,7 @@ final class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function createDatabase(string $database)
+    public function createDatabase(string $database): static
     {
         try {
             return $this->push(
@@ -159,7 +159,7 @@ final class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function dropDatabase(string $database)
+    public function dropDatabase(string $database): static
     {
         try {
             return $this->push(
@@ -211,7 +211,7 @@ final class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function drop(string $tableName)
+    public function drop(string $tableName): static
     {
         if ($this->generateRollback) {
             $this->pushRollback($this->schema($this->load($tableName)));
@@ -230,7 +230,7 @@ final class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function truncate(string $tableName, bool $cascade = false)
+    public function truncate(string $tableName, bool $cascade = false): static
     {
         try {
             return $this->push(
@@ -245,7 +245,7 @@ final class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function diff($new, $old)
+    public function diff($new, $old): mixed
     {
         /** @psalm-suppress InternalMethod */
         $comparator = new Comparator(
@@ -263,7 +263,7 @@ final class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function rename(string $from, string $to)
+    public function rename(string $from, string $to): static
     {
         try {
             if ($this->generateRollback) {
@@ -282,7 +282,7 @@ final class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function push($queries)
+    public function push($queries): static
     {
         if ($queries instanceof DoctrineSchemaDiff) {
             $queries = $this->platform->grammar()->getAlterSchemaSQL($queries);

@@ -140,7 +140,7 @@ final class PlatformTypes extends TypesRegistry implements PlatformTypesInterfac
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value, $type = null)
+    public function toDatabase($value, $type = null): mixed
     {
         //ORM optimisation: type is most of the type provides
         if ($type instanceof TypeInterface) {
@@ -161,7 +161,7 @@ final class PlatformTypes extends TypesRegistry implements PlatformTypesInterfac
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, $type = null, array $fieldOptions = [])
+    public function fromDatabase($value, $type = null, array $fieldOptions = []): mixed
     {
         //ORM optimisation: type is most of the type provides
         if ($type instanceof TypeInterface) {
@@ -188,7 +188,7 @@ final class PlatformTypes extends TypesRegistry implements PlatformTypesInterfac
      *
      * @return PlatformTypeInterface
      */
-    protected function instantiate($class, $name)
+    protected function instantiate($class, $name): PlatformTypeInterface
     {
         return new $class($this->platform, $name);
     }

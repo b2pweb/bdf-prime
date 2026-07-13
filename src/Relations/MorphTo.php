@@ -122,7 +122,7 @@ final class MorphTo extends BelongsTo
     /**
      * {@inheritdoc}
      */
-    public function associate($owner, $entity)
+    public function associate($owner, $entity): object
     {
         $this->loadDistantFromType($this->discriminator(get_class($entity)));
 

@@ -100,7 +100,7 @@ abstract class Relation extends AbstractRelation
      *
      * @return $this
      */
-    public function setSaveStrategy(int $strategy)
+    public function setSaveStrategy(int $strategy): static
     {
         $this->saveStrategy = $strategy;
 

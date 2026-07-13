@@ -38,7 +38,7 @@ abstract class AbstractFacadeType implements FacadeTypeInterface
      *
      * @return string
      */
-    abstract protected function defaultType();
+    abstract protected function defaultType(): string;
 
     /**
      * {@inheritdoc}

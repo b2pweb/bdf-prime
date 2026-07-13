@@ -51,7 +51,7 @@ final class DoctrineColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function defaultValue()
+    public function defaultValue(): mixed
     {
         return $this->column->getDefault();
     }
@@ -131,7 +131,7 @@ final class DoctrineColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function option(string $name)
+    public function option(string $name): mixed
     {
         return $this->column->getPlatformOption($name);
     }

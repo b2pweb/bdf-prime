@@ -26,7 +26,7 @@ final class ObjectType extends AbstractSerializeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase($value): ?string
     {
         if (!is_object($value)) {
             return $value;

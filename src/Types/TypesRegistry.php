@@ -99,7 +99,7 @@ class TypesRegistry implements TypesRegistryInterface
      *
      * @return TypeInterface
      */
-    protected function instantiate($class, $name)
+    protected function instantiate($class, $name): TypeInterface
     {
         return new $class($name);
     }

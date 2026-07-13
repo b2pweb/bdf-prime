@@ -16,7 +16,7 @@ class QueryCompatExtension
      *
      * @return QueryInterface
      */
-    public function ignore(QueryInterface $query, $flag = true)
+    public function ignore(QueryInterface $query, $flag = true): QueryInterface
     {
         return $query;
     }
@@ -29,7 +29,7 @@ class QueryCompatExtension
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function count(QueryInterface $query, $attributes = null)
+    public function count(QueryInterface $query, $attributes = null): int
     {
         return count($query->all($attributes));
     }

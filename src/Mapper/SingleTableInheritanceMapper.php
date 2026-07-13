@@ -74,7 +74,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
     /**
      * {@inheritDoc}
      */
-    public function prepareFromRepository(array $data, PlatformInterface $platform)
+    public function prepareFromRepository(array $data, PlatformInterface $platform): object
     {
         if ($this->isDiscriminatedMapper()) {
             return parent::prepareFromRepository($data, $platform);
@@ -146,7 +146,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      *
      * @throws \Exception if discriminator field not present in $data
      */
-    final public function getDiscriminatorValueByRawData(array $data)
+    final public function getDiscriminatorValueByRawData(array $data): mixed
     {
         $discriminatorField = $this->metadata()->attributes[$this->discriminatorColumn]['field'];
 

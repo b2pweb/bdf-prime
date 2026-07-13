@@ -84,7 +84,7 @@ final class TypeAccessor
      *
      * @return string
      */
-    private function getValidVariableName(string $typeName)
+    private function getValidVariableName(string $typeName): string
     {
         return str_replace([' ', '\\', '-', '.', ':', '/', '[', ']'], '', $typeName);
     }

@@ -80,7 +80,7 @@ final class MetadataIndexSet implements IndexSetInterface
      *
      * @return array<string, NamedIndex>
      */
-    private function extractIndexes(array $indexes)
+    private function extractIndexes(array $indexes): array
     {
         $output = [];
 

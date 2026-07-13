@@ -73,7 +73,7 @@ final class JsonContainsPath extends AbstractPlatformSpecificExpression
      * @return string
      * @throws \Bdf\Prime\Exception\PrimeException
      */
-    private function target(CompilableClause $query, CompilerInterface $compiler)
+    private function target(CompilableClause $query, CompilerInterface $compiler): string
     {
         return $this->target instanceof ExpressionInterface
             ? $this->target->build($query, $compiler)
@@ -90,7 +90,7 @@ final class JsonContainsPath extends AbstractPlatformSpecificExpression
      */
     private static function getSqliteExpression(QuoteCompilerInterface $compiler, string $target, string $path): string
     {
-        return (string) $compiler->quote($path) . ' IN (SELECT fullkey FROM json_tree(' . $target . '))';
+        return $compiler->quote($path) . ' IN (SELECT fullkey FROM json_tree(' . $target . '))';
     }
 
     /**
@@ -102,6 +102,6 @@ final class JsonContainsPath extends AbstractPlatformSpecificExpression
      */
     private static function getDefaultExpression(CompilerInterface $compiler, string $target, string $path): string
     {
-        return 'JSON_CONTAINS_PATH(' . $target . ', "all", ' . (string) $compiler->quote($path) . ')';
+        return 'JSON_CONTAINS_PATH(' . $target . ', "all", ' . $compiler->quote($path) . ')';
     }
 }

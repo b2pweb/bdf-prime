@@ -79,7 +79,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
      * @todo Faut-il utiliser loadIfNotLoaded ?
      */
     #[ReadOperation]
-    public function load($relations)
+    public function load($relations): static
     {
         foreach (Relation::sanitizeRelations((array)$relations) as $relationName => $meta) {
             $this->repository->relation($relationName)->load(
@@ -117,7 +117,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
      * @template R as object
      * @fixme Works with Polymorph
      */
-    public function link(string $relationClass, ?string $relationName = null)
+    public function link(string $relationClass, ?string $relationName = null): QueryInterface
     {
         /** @var QueryInterface<ConnectionInterface, R> */
         return $this->repository
@@ -134,7 +134,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
      *
      * @return QueryInterface<ConnectionInterface, E>
      */
-    public function query()
+    public function query(): QueryInterface
     {
         return $this->repository->queries()->entities($this->all());
     }
@@ -148,7 +148,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function delete()
+    public function delete(): static
     {
         $this->repository->transaction(function (RepositoryInterface $repository) {
             /** @var RepositoryInterface&RepositoryEventsSubscriberInterface $repository */
@@ -171,7 +171,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function save()
+    public function save(): static
     {
         $this->repository->transaction(function (RepositoryInterface $repository) {
             foreach ($this as $entity) {
@@ -192,7 +192,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function saveAll($relations)
+    public function saveAll($relations): int
     {
         $relations = Relation::sanitizeRelations((array)$relations);
 
@@ -221,7 +221,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function deleteAll($relations)
+    public function deleteAll($relations): int
     {
         $relations = Relation::sanitizeRelations((array)$relations);
 
@@ -267,7 +267,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function update(array $data)
+    public function update(array $data): static
     {
         foreach ($this as $entity) {
             $entity->import($data);
@@ -289,7 +289,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function refresh()
+    public function refresh(): static
     {
         $this->pushAll($this->query()->all());
 
@@ -301,7 +301,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
      *
      * @return RepositoryInterface<E>
      */
-    public function repository()
+    public function repository(): RepositoryInterface
     {
         return $this->repository;
     }
@@ -357,7 +357,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function pushAll(array $items)
+    public function pushAll(array $items): static
     {
         $this->storage->pushAll($items);
 
@@ -367,7 +367,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function push($item)
+    public function push($item): static
     {
         $this->storage->push($item);
 
@@ -377,7 +377,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function put($key, $item)
+    public function put($key, $item): static
     {
         $this->storage->put($key, $item);
 
@@ -387,7 +387,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function all(): array
     {
         return $this->storage->all();
     }
@@ -403,7 +403,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function has($key)
+    public function has($key): bool
     {
         return $this->storage->has($key);
     }
@@ -411,7 +411,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function remove($key)
+    public function remove($key): static
     {
         $this->storage->remove($key);
 
@@ -421,7 +421,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): static
     {
         $this->storage->clear();
 
@@ -431,7 +431,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function keys()
+    public function keys(): array
     {
         return $this->storage->keys();
     }
@@ -439,7 +439,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         return $this->storage->isEmpty();
     }
@@ -450,7 +450,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
      * @psalm-suppress InvalidReturnType
      * @psalm-suppress InvalidArgument
      */
-    public function map($callback)
+    public function map($callback): self
     {
         // @fixme does return static make sense ?
         /** @psalm-suppress InvalidReturnStatement */
@@ -460,7 +460,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function filter($callback = null)
+    public function filter($callback = null): static
     {
         return new static($this->repository, $this->storage->filter($callback));
     }
@@ -468,7 +468,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function groupBy($groupBy, $mode = self::GROUPBY)
+    public function groupBy($groupBy, $mode = self::GROUPBY): self
     {
         return new static($this->repository, $this->storage->groupBy($groupBy, $mode));
     }
@@ -476,7 +476,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function contains($element)
+    public function contains($element): bool
     {
         return $this->storage->contains($element);
     }
@@ -492,7 +492,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function merge($items)
+    public function merge($items): self
     {
         return new static($this->repository, $this->storage->merge($items));
     }
@@ -500,7 +500,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function sort(?callable $callback = null)
+    public function sort(?callable $callback = null): self
     {
         return new static($this->repository, $this->storage->sort($callback));
     }
@@ -508,7 +508,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->storage->toArray();
     }
@@ -524,8 +524,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
     /**
      * {@inheritdoc}
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->storage->offsetGet($offset);
     }

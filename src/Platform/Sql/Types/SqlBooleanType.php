@@ -24,7 +24,7 @@ final class SqlBooleanType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase($value, array $fieldOptions = []): ?bool
     {
         return $value === null ? null : $this->platform->grammar()->convertFromBoolean($value);
     }
@@ -32,7 +32,7 @@ final class SqlBooleanType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase($value): mixed
     {
         return $value === null ? null : $this->platform->grammar()->convertBooleans($value);
     }
@@ -40,7 +40,7 @@ final class SqlBooleanType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function declaration(ColumnInterface $column)
+    public function declaration(ColumnInterface $column): string
     {
         return Types::BOOLEAN;
     }

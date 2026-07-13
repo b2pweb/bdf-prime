@@ -59,7 +59,7 @@ final class ClassAccessor
      *
      * @return string
      */
-    public function className()
+    public function className(): string
     {
         return $this->className;
     }
@@ -74,9 +74,9 @@ final class ClassAccessor
      *
      * @throws HydratorGenerationException When the attribute is not readable
      */
-    public function getter($varName, $attribute)
+    public function getter($varName, $attribute): string
     {
-        if ($this->isPropertyAccessible($attribute, /*setter: */false)) {
+        if ($this->isPropertyAccessible($attribute, setter: false)) {
             return $varName.'->'.$attribute;
         }
 
@@ -101,7 +101,7 @@ final class ClassAccessor
      *
      * @throws HydratorGenerationException When the attribute is not accessible
      */
-    public function setter($varName, $attribute, $value, $useSetterInPriority = true)
+    public function setter($varName, $attribute, $value, $useSetterInPriority = true): string
     {
         if ($useSetterInPriority && method_exists($this->className, 'set'.ucfirst($attribute))) {
             return $varName.'->set'.ucfirst($attribute).'('.$value.')';
@@ -127,7 +127,7 @@ final class ClassAccessor
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    public function isPropertyAccessible($prop, bool $setter = true)
+    public function isPropertyAccessible($prop, bool $setter = true): bool
     {
         try {
             $propertyReflection = $this->reflection->getProperty($prop);

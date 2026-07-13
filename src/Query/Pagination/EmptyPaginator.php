@@ -23,7 +23,7 @@ final class EmptyPaginator extends Paginator
     /**
      * {@inheritdoc}
      */
-    public function size()
+    public function size(): int
     {
         return 0;
     }
@@ -55,7 +55,7 @@ final class EmptyPaginator extends Paginator
     /**
      * {@inheritdoc}
      */
-    public function page()
+    public function page(): int
     {
         return 1;
     }
@@ -63,7 +63,7 @@ final class EmptyPaginator extends Paginator
     /**
      * {@inheritdoc}
      */
-    public function pageMaxRows()
+    public function pageMaxRows(): int
     {
         return 0;
     }

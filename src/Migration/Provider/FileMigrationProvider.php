@@ -210,7 +210,7 @@ final class FileMigrationProvider implements MigrationProviderInterface
      *
      * @throws InvalidArgumentException
      */
-    private function parseFilename($filename)
+    private function parseFilename($filename): array
     {
         if (!preg_match('/^([0-9]+)_(.+)\.php/', basename($filename), $matches)) {
             throw new InvalidArgumentException(sprintf('The file "%s" does not have a valid migration filename', $filename));
@@ -230,7 +230,7 @@ final class FileMigrationProvider implements MigrationProviderInterface
      *
      * @return string  The file name
      */
-    private function createFilename($version, $className)
+    private function createFilename($version, $className): string
     {
         return $this->path . DIRECTORY_SEPARATOR . $version . '_' . $className . '.php';
     }
@@ -242,7 +242,7 @@ final class FileMigrationProvider implements MigrationProviderInterface
      *
      * @return string
      */
-    private function normalizeName($name)
+    private function normalizeName($name): string
     {
         $name = str_replace(['_', '.'], ' ', $name);
         $name = ucwords($name);

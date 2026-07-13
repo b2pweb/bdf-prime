@@ -29,7 +29,7 @@ final class CachePoolAdapter implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function get(CacheKey $key)
+    public function get(CacheKey $key): mixed
     {
         $item = $this->getItem($key);
 

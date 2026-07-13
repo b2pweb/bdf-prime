@@ -166,7 +166,7 @@ final class Writer implements WriterInterface
      *
      * @return KeyValueQueryInterface|QueryInterface
      */
-    private function deleteQuery()
+    private function deleteQuery(): KeyValueQueryInterface|QueryInterface
     {
         if ($this->deleteQuery) {
             return $this->deleteQuery;
@@ -182,7 +182,7 @@ final class Writer implements WriterInterface
      *
      * @return KeyValueQueryInterface|QueryInterface
      */
-    private function updateQuery()
+    private function updateQuery(): KeyValueQueryInterface|QueryInterface
     {
         if ($this->updateQuery) {
             return $this->updateQuery;

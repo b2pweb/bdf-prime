@@ -237,7 +237,7 @@ final class RepositoryUpgrader implements StructureUpgraderInterface
      * @return SchemaManagerInterface
      * @throws PrimeException
      */
-    protected function schema()
+    protected function schema(): SchemaManagerInterface
     {
         if ($this->schema !== null) {
             return $this->schema;
@@ -252,7 +252,7 @@ final class RepositoryUpgrader implements StructureUpgraderInterface
      * @return SchemaManagerInterface|null
      * @throws PrimeException
      */
-    protected function schemaSequence()
+    protected function schemaSequence(): ?SchemaManagerInterface
     {
         if (!$this->metadata->isSequencePrimaryKey()) {
             return null;
@@ -272,7 +272,7 @@ final class RepositoryUpgrader implements StructureUpgraderInterface
      *
      * @return ConnectionInterface
      */
-    protected function connection($profile = null)
+    protected function connection($profile = null): ConnectionInterface
     {
         return $this->service->connection($profile ?: $this->metadata->connection);
     }

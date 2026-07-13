@@ -44,7 +44,7 @@ final class Check implements CheckInterface
     /**
      * {@inheritdoc}
      */
-    public function expression()
+    public function expression(): mixed
     {
         return $this->expression;
     }

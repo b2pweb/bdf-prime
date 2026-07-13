@@ -35,7 +35,7 @@ final class SqlJsonType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase($value, array $fieldOptions = []): mixed
     {
         if ($value === null) {
             return null;
@@ -53,7 +53,7 @@ final class SqlJsonType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase($value): mixed
     {
         if ($value === null) {
             return null;
@@ -65,7 +65,7 @@ final class SqlJsonType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function declaration(ColumnInterface $column)
+    public function declaration(ColumnInterface $column): mixed
     {
         $useNativeJson = $column->options()[self::OPTION_USE_NATIVE_JSON] ?? true;
 

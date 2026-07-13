@@ -114,7 +114,7 @@ final class DbVersionRepository implements VersionRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function add(string $version)
+    public function add(string $version): static
     {
         $this->prepare();
 
@@ -130,7 +130,7 @@ final class DbVersionRepository implements VersionRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function remove(string $version)
+    public function remove(string $version): static
     {
         $this->prepare();
 
@@ -175,7 +175,7 @@ final class DbVersionRepository implements VersionRepositoryInterface
      * @return $this
      * @throws PrimeException
      */
-    public function createSchema()
+    public function createSchema(): static
     {
         $schemaManager = $this->connection->schema();
 

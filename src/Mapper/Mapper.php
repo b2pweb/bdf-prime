@@ -440,7 +440,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @return $this
      */
-    final public function setHydrator(MapperHydratorInterface $hydrator)
+    final public function setHydrator(MapperHydratorInterface $hydrator): static
     {
         $this->hydrator = $hydrator;
         $this->hydrator->setPrimeInstantiator($this->serviceLocator->instantiator());
@@ -502,7 +502,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @return mixed
      */
-    final public function getId($entity)
+    final public function getId($entity): mixed
     {
         return $this->extractOne($entity, $this->metadata->primary['attributes'][0]);
     }
@@ -515,7 +515,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @return mixed
      */
-    final public function extractOne($entity, string $attribute)
+    final public function extractOne($entity, string $attribute): mixed
     {
         return $this->hydrator->extractOne($entity, $attribute);
     }
@@ -551,7 +551,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @return E
      */
-    final public function instantiate()
+    final public function instantiate(): object
     {
         /** @var E */
         return $this->serviceLocator->instantiator()
@@ -565,7 +565,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @return E
      */
-    final public function entity(array $data)
+    final public function entity(array $data): object
     {
         $entity = $this->instantiate();
 
@@ -608,7 +608,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @return E
      */
-    public function prepareFromRepository(array $data, PlatformInterface $platform)
+    public function prepareFromRepository(array $data, PlatformInterface $platform): object
     {
         $entity = $this->instantiate();
 

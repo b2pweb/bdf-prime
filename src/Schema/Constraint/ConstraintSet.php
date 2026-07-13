@@ -35,7 +35,7 @@ final class ConstraintSet implements ConstraintSetInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(ConstraintVisitorInterface $visitor)
+    public function apply(ConstraintVisitorInterface $visitor): static
     {
         foreach ($this->constraints as $constraint) {
             $constraint->visit($visitor);

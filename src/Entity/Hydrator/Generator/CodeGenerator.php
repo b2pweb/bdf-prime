@@ -21,7 +21,7 @@ final class CodeGenerator
      *
      * @return string
      */
-    public function namespace($namespace)
+    public function namespace($namespace): string
     {
         if (empty($namespace)) {
             return '';
@@ -38,7 +38,7 @@ final class CodeGenerator
      *
      * @return string
      */
-    public function properties(array $names, $visibility = 'private')
+    public function properties(array $names, $visibility = 'private'): string
     {
         $out = '';
 
@@ -56,7 +56,7 @@ final class CodeGenerator
      *
      * @return string
      */
-    public function simpleConstructor($properties)
+    public function simpleConstructor($properties): string
     {
         $parameters = implode(', ', array_map(function ($p) {
             return '$'.$p;
@@ -88,7 +88,7 @@ CTR;
      *
      * @return string
      */
-    public function indent($code, $tabs)
+    public function indent($code, $tabs): string
     {
         $spaces = str_repeat($this->tab, $tabs);
 
@@ -100,7 +100,7 @@ CTR;
      *
      * @return string
      */
-    public function eol()
+    public function eol(): string
     {
         return $this->eol;
     }
@@ -112,7 +112,7 @@ CTR;
      *
      * @return string
      */
-    public function lines(array $lines)
+    public function lines(array $lines): string
     {
         return implode($this->eol, $lines);
     }
@@ -125,7 +125,7 @@ CTR;
      *
      * @return string
      */
-    public function switchIntanceOf($varName, array $cases)
+    public function switchIntanceOf($varName, array $cases): string
     {
         $out = [];
 
@@ -149,7 +149,7 @@ PHP;
      *
      * @return string
      */
-    public function switch($varName, array $cases, $default = null)
+    public function switch($varName, array $cases, $default = null): string
     {
         $code = 'switch ('.$varName.') {'.$this->eol;
 
@@ -180,7 +180,7 @@ PHP;
      *
      * @return string
      */
-    public function tmpVar()
+    public function tmpVar(): string
     {
         return '$__tmp_'.$this->tmpVarCount++;
     }
@@ -192,7 +192,7 @@ PHP;
      *
      * @return string
      */
-    public function className($name)
+    public function className($name): string
     {
         return '\\'.ltrim($name, '\\');
     }
@@ -206,7 +206,7 @@ PHP;
      *
      * @see var_export()
      */
-    public function export($value)
+    public function export($value): string
     {
         if ($value === null) {
             return 'null';
@@ -228,7 +228,7 @@ PHP;
      *
      * @return string
      */
-    public function generate($template, array $placeholders)
+    public function generate($template, array $placeholders): string
     {
         /** @var string $file */
         $file = file_get_contents($template);

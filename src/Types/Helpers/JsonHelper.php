@@ -17,7 +17,7 @@ trait JsonHelper
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase($value): ?string
     {
         if ($value === null) {
             return null;
@@ -29,7 +29,7 @@ trait JsonHelper
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase($value, array $fieldOptions = []): mixed
     {
         if ($value === null) {
             return null;

@@ -25,7 +25,7 @@ final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompile
     /**
      * {@inheritdoc}
      */
-    protected function doCompileInsert(CompilableClause $query)
+    protected function doCompileInsert(CompilableClause $query): mixed
     {
         throw new \BadMethodCallException('INSERT operation is not supported on key value query');
     }
@@ -33,7 +33,7 @@ final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompile
     /**
      * {@inheritdoc}
      */
-    protected function doCompileUpdate(CompilableClause $query)
+    protected function doCompileUpdate(CompilableClause $query): mixed
     {
         return $this->prepare($query, 'UPDATE '.$this->quoteIdentifier($query, $query->statements['table']).$this->compileValues($query).$this->compileWhere($query));
     }
@@ -41,7 +41,7 @@ final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompile
     /**
      * {@inheritdoc}
      */
-    protected function doCompileDelete(CompilableClause $query)
+    protected function doCompileDelete(CompilableClause $query): mixed
     {
         return $this->prepare($query, 'DELETE FROM '.$this->quoteIdentifier($query, $query->statements['table']).$this->compileWhere($query));
     }
@@ -49,7 +49,7 @@ final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompile
     /**
      * {@inheritdoc}
      */
-    protected function doCompileSelect(CompilableClause $query)
+    protected function doCompileSelect(CompilableClause $query): mixed
     {
         $sql = 'SELECT '.$this->compileProjection($query).' FROM '.$this->quoteIdentifier($query, $query->statements['table']).$this->compileWhere($query).$this->compileLimit($query);
 
@@ -77,7 +77,7 @@ final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompile
     /**
      * {@inheritdoc}
      */
-    public function quote($value)
+    public function quote($value): string
     {
         return $this->connection->quote($value);
     }
@@ -115,7 +115,7 @@ final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompile
      * @return string
      * @throws PrimeException
      */
-    private function compileWhere(CompilableClause $query)
+    private function compileWhere(CompilableClause $query): string
     {
         if (isset($query->state()->compiledParts['where'])) {
             return $query->state()->compiledParts['where'];
@@ -156,7 +156,7 @@ final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompile
      * @return string
      * @throws PrimeException
      */
-    private function compileProjection(CompilableClause $query)
+    private function compileProjection(CompilableClause $query): string
     {
         if (!empty($query->statements['aggregate'])) {
             return $this->compileAggregate($query, $query->statements['aggregate'][0], $query->statements['aggregate'][1]);
@@ -185,7 +185,7 @@ final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompile
      * @return string
      * @throws PrimeException
      */
-    private function compileAggregate(CompilableClause $query, $function, $column)
+    private function compileAggregate(CompilableClause $query, $function, $column): string
     {
         if ($column !== '*') {
             $column = $query->preprocessor()->field($column);
@@ -216,7 +216,7 @@ final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompile
      * @return string
      * @throws PrimeException
      */
-    private function compileExpressionColumn(CompilableClause $query, $column, $alias = null)
+    private function compileExpressionColumn(CompilableClause $query, $column, $alias = null): string
     {
         if ($column instanceof ExpressionInterface) {
             return $alias !== null
@@ -246,7 +246,7 @@ final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompile
      * @return string
      * @throws PrimeException
      */
-    private function compileLimit(CompilableClause $query)
+    private function compileLimit(CompilableClause $query): string
     {
         if (!isset($query->statements['limit']) && !isset($query->statements['offset'])) {
             return '';
@@ -313,7 +313,7 @@ final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompile
      *
      * @return Statement
      */
-    private function prepare(CompilableClause $query, $sql)
+    private function prepare(CompilableClause $query, $sql): Statement
     {
         $query->state()->compiledParts['sql'] = $sql;
 

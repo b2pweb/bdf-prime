@@ -94,7 +94,7 @@ final class MetadataTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function option(string $name)
+    public function option(string $name): mixed
     {
         return $this->metadata->tableOptions()[$name];
     }

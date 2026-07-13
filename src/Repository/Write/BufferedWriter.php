@@ -140,7 +140,7 @@ final class BufferedWriter implements BufferedWriterInterface
      * @return int
      * @throws PrimeException
      */
-    private function flushInsert()
+    private function flushInsert(): int
     {
         $count = 0;
 
@@ -155,7 +155,7 @@ final class BufferedWriter implements BufferedWriterInterface
      * @return int
      * @throws PrimeException
      */
-    private function flushUpdate()
+    private function flushUpdate(): int
     {
         $count = 0;
 
@@ -170,7 +170,7 @@ final class BufferedWriter implements BufferedWriterInterface
      * @return int
      * @throws PrimeException
      */
-    private function flushDelete()
+    private function flushDelete(): int
     {
         /** @var EntityRepository<E> $this->repository */
         if (empty($this->delete)) {

@@ -134,7 +134,7 @@ final class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
-    public function associate($owner, $entity)
+    public function associate($owner, $entity): object
     {
         $this->updateDiscriminatorValue($owner);
 
@@ -144,7 +144,7 @@ final class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
-    public function dissociate($owner)
+    public function dissociate($owner): object
     {
         $this->updateDiscriminatorValue($owner);
 
@@ -154,7 +154,7 @@ final class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
-    public function create($owner, array $data = [])
+    public function create($owner, array $data = []): object
     {
         $this->updateDiscriminatorValue($owner);
 

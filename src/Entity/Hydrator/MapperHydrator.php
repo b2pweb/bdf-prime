@@ -144,7 +144,7 @@ final class MapperHydrator implements MapperHydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function extractOne($object, string $attribute)
+    public function extractOne($object, string $attribute): mixed
     {
         if (!isset($this->metadata->attributes[$attribute])) {
             if (!isset($this->metadata->embeddeds[$attribute])) {
@@ -195,7 +195,7 @@ final class MapperHydrator implements MapperHydratorInterface
      *
      * @return object|null The object, or null if cannot be instantiated (polymorph)
      */
-    protected function getOwnerObject($entity, array $metadata)
+    protected function getOwnerObject($entity, array $metadata): ?object
     {
         if (!isset($metadata['embedded'])) {
             return $entity;
@@ -245,7 +245,7 @@ final class MapperHydrator implements MapperHydratorInterface
      * @throws ReflectionException When property do not exist on the object
      * @throws UninitializedPropertyException When the property is not initialized
      */
-    protected function readFromAttribute($entity, array $metadata)
+    protected function readFromAttribute($entity, array $metadata): mixed
     {
         $attribute = $metadata['attribute'];
         $class = get_class($entity);
@@ -278,7 +278,7 @@ final class MapperHydrator implements MapperHydratorInterface
      * @throws ReflectionException When property do not exist on the object
      * @throws UninitializedPropertyException When the property is not initialized
      */
-    protected function readFromEmbedded($entity, array $metadata)
+    protected function readFromEmbedded($entity, array $metadata): mixed
     {
         $attribute = $metadata['path'];
         $class = get_class($entity);
@@ -307,7 +307,7 @@ final class MapperHydrator implements MapperHydratorInterface
      *
      * @return void
      */
-    protected function writeToAttribute($entity, array $metadata, $value, bool $skipInvalid)
+    protected function writeToAttribute($entity, array $metadata, $value, bool $skipInvalid): void
     {
         $attribute = $metadata['attribute'];
         $class = get_class($entity);
@@ -340,7 +340,7 @@ final class MapperHydrator implements MapperHydratorInterface
      *
      * @return void
      */
-    protected function writeToEmbedded($entity, array $metadata, $value, bool $skipInvalid)
+    protected function writeToEmbedded($entity, array $metadata, $value, bool $skipInvalid): void
     {
         $attribute = $metadata['path'];
         $class = get_class($entity);
@@ -378,7 +378,7 @@ final class MapperHydrator implements MapperHydratorInterface
      * @throws ReflectionException
      * @throws UninitializedPropertyException
      */
-    private function readFromProperty(string $class, string $property, string $attribute, $entity)
+    private function readFromProperty(string $class, string $property, string $attribute, $entity): mixed
     {
         if ($class === stdClass::class) {
             return $entity->$property ?? null;

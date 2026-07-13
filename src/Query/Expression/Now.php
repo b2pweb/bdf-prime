@@ -22,7 +22,7 @@ final class Now implements ExpressionInterface
      *
      * @param CompilerInterface $compiler
      */
-    public function build(CompilableClause $query, object $compiler)
+    public function build(CompilableClause $query, object $compiler): string
     {
         return $compiler->platform()->grammar()->getCurrentDateSQL();
     }

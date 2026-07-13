@@ -75,7 +75,7 @@ final class HydratorGenerator
      *
      * @return string
      */
-    public function hydratorNamespace()
+    public function hydratorNamespace(): string
     {
         return implode('\\', array_slice(explode('\\', $this->className), 0, -1));
     }
@@ -85,7 +85,7 @@ final class HydratorGenerator
      *
      * @return string
      */
-    public function hydratorClassName()
+    public function hydratorClassName(): string
     {
         return 'Hydrator_' . str_replace('\\', '_', $this->className);
     }
@@ -95,7 +95,7 @@ final class HydratorGenerator
      *
      * @return string
      */
-    public function hydratorFullClassName()
+    public function hydratorFullClassName(): string
     {
         return $this->hydratorNamespace() . '\\' . $this->hydratorClassName();
     }
@@ -105,7 +105,7 @@ final class HydratorGenerator
      *
      * @return string
      */
-    public function generate()
+    public function generate(): string
     {
         $this->resolveHydrators();
 
@@ -145,7 +145,7 @@ final class HydratorGenerator
      *
      * @throws HydratorGenerationException
      */
-    protected function hydratorTemplate()
+    protected function hydratorTemplate(): string
     {
         return $this->code->generate($this->stub, [
             'namespace'                 => $this->code->namespace($this->hydratorNamespace()),
@@ -172,7 +172,7 @@ final class HydratorGenerator
      *
      * @throws HydratorGenerationException
      */
-    protected function generateHydrateBody()
+    protected function generateHydrateBody(): string
     {
         $out = '';
 
@@ -202,7 +202,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateAttributeHydrate(AttributeInfo $attribute)
+    protected function generateAttributeHydrate(AttributeInfo $attribute): string
     {
         $out = '';
 
@@ -238,7 +238,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateEmbeddedHydrate(AttributeInfo $attribute)
+    protected function generateEmbeddedHydrate(AttributeInfo $attribute): string
     {
         // We can have multiple entity classes for one attribute : morph
         $varName = '$__rel_' . str_replace('.', '_', $attribute->name());
@@ -269,7 +269,7 @@ PHP;
      *
      * @return string
      */
-    protected function generateEmbeddedHydrator($class)
+    protected function generateEmbeddedHydrator($class): string
     {
         if ($class === $this->className) {
             return '$this';
@@ -285,7 +285,7 @@ PHP;
      *
      * @return string
      */
-    protected function normalizeClassName($className)
+    protected function normalizeClassName($className): string
     {
         return '\\' . ltrim($className, '\\');
     }
@@ -295,7 +295,7 @@ PHP;
      *
      * @return string
      */
-    protected function generateEmbeddedClasses()
+    protected function generateEmbeddedClasses(): string
     {
         return $this->code->export(array_keys($this->embeddedHydrators));
     }
@@ -307,7 +307,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateExtractBody()
+    protected function generateExtractBody(): string
     {
         return <<<PHP
 if (empty(\$attributes)) {
@@ -325,7 +325,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateExtractAll()
+    protected function generateExtractAll(): string
     {
         $lines = [];
         $possiblyNotInitialized = [];
@@ -355,7 +355,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateExtractSelected()
+    protected function generateExtractSelected(): string
     {
         $extracts = '';
 
@@ -399,7 +399,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateExtractValue(AttributeInfo $attribute)
+    protected function generateExtractValue(AttributeInfo $attribute): string
     {
         $line = '';
 
@@ -434,7 +434,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateFlatExtract()
+    protected function generateFlatExtract(): string
     {
         return <<<PHP
 if (empty(\$attributes)) {
@@ -452,7 +452,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateFlatExtractAll()
+    protected function generateFlatExtractAll(): string
     {
         $simpleArray = [];
         $extractors = [];
@@ -507,7 +507,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateFlatExtractSelected()
+    protected function generateFlatExtractSelected(): string
     {
         $lines = '';
 
@@ -547,7 +547,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateFlatHydrate()
+    protected function generateFlatHydrate(): string
     {
         $types = new TypeAccessor($this->code);
 
@@ -589,7 +589,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateAttributeFlatHydrate(AttributeInfo $attribute, array $relationKeys, TypeAccessor $types)
+    protected function generateAttributeFlatHydrate(AttributeInfo $attribute, array $relationKeys, TypeAccessor $types): string
     {
         $options = '';
         if ($attribute->phpOptions()) {
@@ -636,7 +636,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateExtractOneBody()
+    protected function generateExtractOneBody(): string
     {
         $cases = [];
 
@@ -666,7 +666,7 @@ PHP
      *
      * @throws HydratorGenerationException
      */
-    protected function generateExtractOneCaseAttribute(AttributeInfo $attribute)
+    protected function generateExtractOneCaseAttribute(AttributeInfo $attribute): string
     {
         if ($attribute->isEmbedded()) {
             $accessor = $this->accessors->embedded($attribute->embedded());
@@ -698,7 +698,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateExtractOneCaseEmbedded(EmbeddedInfo $embedded)
+    protected function generateExtractOneCaseEmbedded(EmbeddedInfo $embedded): string
     {
         $varName = '$__' . str_replace('.', '_', $embedded->path());
         $code = $this->accessors->embedded($embedded)->getEmbedded($varName, false);
@@ -720,7 +720,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateHydrateOneBody()
+    protected function generateHydrateOneBody(): string
     {
         $cases = [];
 
@@ -754,7 +754,7 @@ PHP
      *
      * @throws HydratorGenerationException
      */
-    protected function generateHydrateOneCaseAttribute($attribute)
+    protected function generateHydrateOneCaseAttribute($attribute): string
     {
         if ($attribute->isEmbedded()) {
             $code = $this->accessors
@@ -784,7 +784,7 @@ PHP;
      *
      * @throws HydratorGenerationException
      */
-    protected function generateHydrateOneCaseEmbedded(EmbeddedInfo $embedded)
+    protected function generateHydrateOneCaseEmbedded(EmbeddedInfo $embedded): string
     {
         if ($embedded->isRoot()) {
             return $this->accessor->setter('$object', $embedded->path(), '$value', false).';';

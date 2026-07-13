@@ -12,6 +12,7 @@ use Bdf\Prime\Repository\Event\BeforeDelete;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
+use DateTimeInterface;
 use Psr\Clock\ClockInterface;
 
 use function is_string;
@@ -146,9 +147,9 @@ final class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
      * @param string $name
      * @param RepositoryInterface<E> $repository
      *
-     * @return \DateTimeInterface|int
+     * @return DateTimeInterface|int
      */
-    private function createDate(string $name, RepositoryInterface $repository)
+    private function createDate(string $name, RepositoryInterface $repository): DateTimeInterface|int
     {
         $date = $this->clock->now();
 

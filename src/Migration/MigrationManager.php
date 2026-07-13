@@ -362,7 +362,7 @@ final class MigrationManager
      *
      * @return void
      */
-    private function applyConsoleContext(MigrationInterface $migration)
+    private function applyConsoleContext(MigrationInterface $migration): void
     {
         if (!$migration instanceof Migration) {
             return;

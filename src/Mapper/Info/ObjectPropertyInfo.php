@@ -93,7 +93,7 @@ final class ObjectPropertyInfo implements InfoInterface
      *
      * @return string|callable|null The wrapper, or null if not set
      */
-    public function wrapper()
+    public function wrapper(): string|callable|null
     {
         return empty($this->relation['wrapper']) ? null : $this->relation['wrapper'];
     }

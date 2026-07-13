@@ -107,7 +107,7 @@ EOF
      *
      * @return ClassFileLocator|array
      */
-    protected function getClassIterator($path)
+    protected function getClassIterator($path): ClassFileLocator|array
     {
         if (is_dir($path)) {
             return new ClassFileLocator($path);
@@ -127,7 +127,7 @@ EOF
      *
      * @return void
      */
-    protected function runUserActions($io, $generator, $mapper, $classInfo)
+    protected function runUserActions($io, $generator, $mapper, $classInfo): void
     {
         //TODO AAAAAAAAAAAAAAAAAAAAH !!!!!!!
         $fileName  = str_replace('Mapper', '', $classInfo->getRealPath());

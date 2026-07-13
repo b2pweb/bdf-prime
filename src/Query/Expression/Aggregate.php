@@ -41,7 +41,7 @@ abstract class Aggregate implements ExpressionInterface
      *
      * @param CompilerInterface&QuoteCompilerInterface $compiler
      */
-    final public function build(CompilableClause $query, object $compiler)
+    final public function build(CompilableClause $query, object $compiler): string
     {
         $attribute = $this->attribute;
 

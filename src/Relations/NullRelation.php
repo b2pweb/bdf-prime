@@ -61,7 +61,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function setLocalAlias(?string $localAlias)
+    public function setLocalAlias(?string $localAlias): static
     {
         return $this;
     }
@@ -69,7 +69,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): static
     {
         return $this;
     }
@@ -125,7 +125,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function associate($owner, $entity)
+    public function associate($owner, $entity): object
     {
         // No-op
         return $owner;
@@ -134,7 +134,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function dissociate($owner)
+    public function dissociate($owner): object
     {
         // No-op
         return $owner;
@@ -151,7 +151,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function create($owner, array $data = [])
+    public function create($owner, array $data = []): object
     {
         throw new \BadMethodCallException('There is no linked entity on relation entity');
     }

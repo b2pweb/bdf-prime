@@ -24,7 +24,7 @@ final class SqlGuidType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function declaration(ColumnInterface $column)
+    public function declaration(ColumnInterface $column): mixed
     {
         return Types::GUID;
     }

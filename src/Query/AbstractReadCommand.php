@@ -130,7 +130,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * {@inheritdoc}
      */
-    public function post(callable $processor, bool $forEach = true)
+    public function post(callable $processor, bool $forEach = true): static
     {
         $this->listeners[$forEach ? 'each' : 'post'] = $processor;
 
@@ -140,7 +140,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * {@inheritdoc}
      */
-    public function wrapAs(string $wrapperClass)
+    public function wrapAs(string $wrapperClass): static
     {
         $this->wrapper = $wrapperClass;
 
@@ -169,7 +169,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
      * @psalm-suppress InvalidReturnType
      * @psalm-suppress InvalidReturnStatement
      */
-    public function as(string $recordClassName)
+    public function as(string $recordClassName): static
     {
         $this->recordClassName = $recordClassName;
 
@@ -239,7 +239,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
      *
      * @return mixed
      */
-    public function __call($name, $arguments)
+    public function __call($name, $arguments): mixed
     {
         return $this->extension->$name($this, ...$arguments);
     }

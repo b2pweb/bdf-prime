@@ -30,7 +30,7 @@ final class Value extends AbstractExpressionTransformer implements TypedExpressi
     /**
      * {@inheritdoc}
      */
-    public function setType(TypeInterface $type)
+    public function setType(TypeInterface $type): static
     {
         $this->type = $type;
 

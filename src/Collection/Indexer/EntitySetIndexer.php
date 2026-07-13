@@ -103,7 +103,7 @@ final class EntitySetIndexer implements EntityIndexerInterface
      * @return EntityIndexer<E>
      * @psalm-assert EntityIndexer<E> $this->indexer
      */
-    private function indexer()
+    private function indexer(): EntityIndexer
     {
         if ($this->indexer) {
             return $this->indexer;

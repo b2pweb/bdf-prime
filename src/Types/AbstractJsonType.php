@@ -14,7 +14,7 @@ abstract class AbstractJsonType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    protected function defaultType()
+    protected function defaultType(): string
     {
         return self::TEXT;
     }

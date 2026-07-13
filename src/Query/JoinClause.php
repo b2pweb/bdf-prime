@@ -29,7 +29,7 @@ final class JoinClause extends Clause
      *
      * @return $this
      */
-    public function on($key, $operator = null, $foreign = null)
+    public function on($key, $operator = null, $foreign = null): self
     {
         if ($key instanceof \Closure) {
             $this->nested($key, $operator ?: CompositeExpression::TYPE_AND);
@@ -49,7 +49,7 @@ final class JoinClause extends Clause
      *
      * @return $this
      */
-    public function orOn($key, $operator = null, $foreign = null)
+    public function orOn($key, $operator = null, $foreign = null): self
     {
         if ($key instanceof \Closure) {
             $this->nested($key, $operator ?: CompositeExpression::TYPE_OR);
@@ -68,7 +68,7 @@ final class JoinClause extends Clause
      *
      * @return $this This Query instance.
      */
-    public function onNull($column, $type = CompositeExpression::TYPE_AND)
+    public function onNull($column, $type = CompositeExpression::TYPE_AND): self
     {
         return $this->buildClause('on', $column, '=', null, $type);
     }
@@ -81,7 +81,7 @@ final class JoinClause extends Clause
      *
      * @return $this This Query instance.
      */
-    public function onNotNull($column, $type = CompositeExpression::TYPE_AND)
+    public function onNotNull($column, $type = CompositeExpression::TYPE_AND): self
     {
         return $this->buildClause('on', $column, '!=', null, $type);
     }
@@ -93,7 +93,7 @@ final class JoinClause extends Clause
      *
      * @return $this This Query instance.
      */
-    public function orOnNull($column)
+    public function orOnNull($column): self
     {
         return $this->onNull($column, CompositeExpression::TYPE_OR);
     }
@@ -105,7 +105,7 @@ final class JoinClause extends Clause
      *
      * @return $this This Query instance.
      */
-    public function orOnNotNull($column)
+    public function orOnNotNull($column): self
     {
         return $this->onNotNull($column, CompositeExpression::TYPE_OR);
     }
@@ -118,7 +118,7 @@ final class JoinClause extends Clause
      *
      * @return $this This Query instance.
      */
-    public function onRaw($raw, $type = CompositeExpression::TYPE_AND)
+    public function onRaw($raw, $type = CompositeExpression::TYPE_AND): self
     {
         return $this->buildRaw('on', $raw, $type);
     }
@@ -130,7 +130,7 @@ final class JoinClause extends Clause
      *
      * @return $this This Query instance.
      */
-    public function orOnRaw($raw)
+    public function orOnRaw($raw): self
     {
         return $this->onRaw($raw, CompositeExpression::TYPE_OR);
     }
@@ -143,7 +143,7 @@ final class JoinClause extends Clause
      *
      * @return $this This Query instance.
      */
-    public function nested(\Closure $callback, $type = CompositeExpression::TYPE_AND)
+    public function nested(\Closure $callback, $type = CompositeExpression::TYPE_AND): self
     {
         return $this->buildNested('on', $callback, $type);
     }
@@ -153,7 +153,7 @@ final class JoinClause extends Clause
      *
      * @return array
      */
-    public function clauses()
+    public function clauses(): array
     {
         return $this->statement('on');
     }

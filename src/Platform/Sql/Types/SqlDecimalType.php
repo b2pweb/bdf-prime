@@ -24,7 +24,7 @@ final class SqlDecimalType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function declaration(ColumnInterface $column)
+    public function declaration(ColumnInterface $column): string
     {
         return Types::DECIMAL;
     }

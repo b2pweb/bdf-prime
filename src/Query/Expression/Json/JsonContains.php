@@ -118,6 +118,6 @@ final class JsonContains extends AbstractPlatformSpecificExpression
     {
         $candidate = $compiler->quote(json_encode($candidate));
 
-        return 'JSON_CONTAINS(' . $target . ', ' . (string) $candidate . ')';
+        return 'JSON_CONTAINS(' . $target . ', ' . $candidate . ')';
     }
 }

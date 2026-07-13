@@ -78,7 +78,7 @@ final class SqlPlatform implements PlatformInterface
     /**
      * {@inheritdoc}
      */
-    public function grammar()
+    public function grammar(): AbstractPlatform
     {
         return $this->grammar;
     }
@@ -86,7 +86,7 @@ final class SqlPlatform implements PlatformInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(PlatformSpecificOperationInterface $operation)
+    public function apply(PlatformSpecificOperationInterface $operation): mixed
     {
         $grammar = $this->grammar;
 

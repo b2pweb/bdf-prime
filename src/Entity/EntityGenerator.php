@@ -192,7 +192,7 @@ final class EntityGenerator
      *
      * @api
      */
-    public function generate(Mapper $mapper, ?string $file = null)
+    public function generate(Mapper $mapper, ?string $file = null): string|false
     {
         $this->isNew = !$file || !file_exists($file) || $this->regenerateEntityIfExists;
 
@@ -898,8 +898,10 @@ final class EntityGenerator
 
     /**
      * Get the field visibility
+     *
+     * @return self::FIELD_*
      */
-    public function getFieldVisibility()
+    public function getFieldVisibility(): Visibility
     {
         return $this->fieldVisibility;
     }
@@ -967,7 +969,7 @@ final class EntityGenerator
      *
      * @api
      */
-    public function useGetShortcutMethod(bool $flag = true)
+    public function useGetShortcutMethod(bool $flag = true): void
     {
         $this->useGetShortcutMethod = $flag;
     }

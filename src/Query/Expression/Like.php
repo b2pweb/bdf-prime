@@ -27,7 +27,7 @@ final class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function start($start = '%')
+    public function start($start = '%'): self
     {
         $this->start = (string) $start;
 
@@ -41,7 +41,7 @@ final class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function end($end = '%')
+    public function end($end = '%'): self
     {
         $this->end = (string) $end;
 
@@ -55,7 +55,7 @@ final class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function enclose($char = '%')
+    public function enclose($char = '%'): self
     {
         $this->start = $char;
         $this->end   = $char;
@@ -70,7 +70,7 @@ final class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function escape($escape = true)
+    public function escape($escape = true): self
     {
         $this->escape = (bool) $escape;
 
@@ -82,7 +82,7 @@ final class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function contains()
+    public function contains(): self
     {
         return $this->enclose('%');
     }
@@ -92,7 +92,7 @@ final class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function startsWith()
+    public function startsWith(): self
     {
         return $this->end('%');
     }
@@ -102,7 +102,7 @@ final class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function endsWith()
+    public function endsWith(): self
     {
         return $this->start('%');
     }
@@ -112,7 +112,7 @@ final class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function searchableArray()
+    public function searchableArray(): self
     {
         $this->start = '%,';
         $this->end   = ',%';
@@ -123,7 +123,7 @@ final class Like extends AbstractExpressionTransformer
     /**
      * {@inheritdoc}
      */
-    public function getValue()
+    public function getValue(): string|array
     {
         if (is_array($this->value)) {
             return array_map([$this, 'generate'], $this->value);
@@ -147,7 +147,7 @@ final class Like extends AbstractExpressionTransformer
      *
      * @return string
      */
-    public function generate($value)
+    public function generate($value): string
     {
         if ($this->escape) {
             $value = addcslashes($value, '%_');

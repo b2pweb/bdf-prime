@@ -42,7 +42,7 @@ final class EntityKeys
      *
      * @return mixed
      */
-    public function get()
+    public function get(): mixed
     {
         return $this->entity;
     }

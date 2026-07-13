@@ -30,7 +30,7 @@ final class PolymorphBuilder extends FieldBuilder
      *
      * @return string
      */
-    public function getDiscriminatorField()
+    public function getDiscriminatorField(): string
     {
         return $this[$this->discriminator]['alias'] ?? $this->discriminator;
     }
@@ -40,7 +40,7 @@ final class PolymorphBuilder extends FieldBuilder
      *
      * @return string
      */
-    public function getDiscriminatorAttribute()
+    public function getDiscriminatorAttribute(): string
     {
         return $this->discriminator;
     }

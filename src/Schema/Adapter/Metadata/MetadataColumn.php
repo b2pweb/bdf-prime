@@ -51,7 +51,7 @@ final class MetadataColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function defaultValue()
+    public function defaultValue(): mixed
     {
         return $this->types->native($this->metadata['type'])->toDatabase($this->metadata['default']);
     }
@@ -131,7 +131,7 @@ final class MetadataColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function option(string $name)
+    public function option(string $name): mixed
     {
         return $this->metadata['customSchemaOptions'][$name];
     }

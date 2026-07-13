@@ -71,7 +71,7 @@ final class DefaultQueryFactory implements QueryFactoryInterface
      * @template C as ConnectionInterface
      * @template Q as CommandInterface<C>
      */
-    public function alias(string $alias, string $query)
+    public function alias(string $alias, string $query): void
     {
         $this->alias[$alias] = $query;
     }

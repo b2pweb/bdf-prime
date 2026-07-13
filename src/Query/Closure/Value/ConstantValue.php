@@ -29,7 +29,7 @@ final class ConstantValue implements ComparisonValueInterface
      *
      * @return mixed
      */
-    public function value()
+    public function value(): mixed
     {
         return $this->value;
     }
@@ -37,7 +37,7 @@ final class ConstantValue implements ComparisonValueInterface
     /**
      * {@inheritdoc}
      */
-    public function get(ReflectionFunction $reflection)
+    public function get(ReflectionFunction $reflection): mixed
     {
         return $this->value;
     }

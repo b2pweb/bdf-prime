@@ -81,7 +81,7 @@ final class Column implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function defaultValue()
+    public function defaultValue(): mixed
     {
         return $this->defaultValue;
     }
@@ -161,7 +161,7 @@ final class Column implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function option(string $name)
+    public function option(string $name): mixed
     {
         return $this->options[$name];
     }

@@ -29,7 +29,7 @@ final class EmbeddedInfo
     /**
      * @return string
      */
-    public function path()
+    public function path(): string
     {
         return $this->metadata['path'];
     }
@@ -37,7 +37,7 @@ final class EmbeddedInfo
     /**
      * @return array
      */
-    public function paths()
+    public function paths(): array
     {
         return $this->metadata['paths'];
     }
@@ -47,7 +47,7 @@ final class EmbeddedInfo
      *
      * @return string
      */
-    public function rootAttribute()
+    public function rootAttribute(): string
     {
         return $this->paths()[0];
     }
@@ -57,7 +57,7 @@ final class EmbeddedInfo
      *
      * @return bool
      */
-    public function isRoot()
+    public function isRoot(): bool
     {
         return $this->metadata['parentPath'] === 'root';
     }
@@ -67,7 +67,7 @@ final class EmbeddedInfo
      *
      * @return bool
      */
-    public function isEntity()
+    public function isEntity(): bool
     {
         foreach ($this->classes() as $class) {
             if (!$this->resolver->isEntity($class)) {
@@ -83,7 +83,7 @@ final class EmbeddedInfo
      *
      * @return bool
      */
-    public function isImportable()
+    public function isImportable(): bool
     {
         foreach ($this->classes() as $class) {
             if (!$this->resolver->isImportable($class)) {
@@ -99,7 +99,7 @@ final class EmbeddedInfo
      *
      * @return string[]
      */
-    public function classes()
+    public function classes(): array
     {
         if (!empty($this->metadata['polymorph'])) {
             return $this->metadata['class_map'];
@@ -111,7 +111,7 @@ final class EmbeddedInfo
     /**
      * @return string
      */
-    public function class()
+    public function class(): string
     {
         $classes = $this->classes();
 
@@ -126,7 +126,7 @@ final class EmbeddedInfo
      *
      * @return mixed
      */
-    public function hint($className = null)
+    public function hint($className = null): mixed
     {
         if ($this->isPolymorph()) {
             return $this->metadata['hints'][$className];
@@ -140,7 +140,7 @@ final class EmbeddedInfo
      *
      * @return string
      */
-    public function discriminatorField()
+    public function discriminatorField(): string
     {
         return $this->metadata['discriminator_field'];
     }
@@ -150,7 +150,7 @@ final class EmbeddedInfo
      *
      * @return bool
      */
-    public function isPolymorph()
+    public function isPolymorph(): bool
     {
         return !empty($this->metadata['polymorph']);
     }
@@ -158,7 +158,7 @@ final class EmbeddedInfo
     /**
      * @return array
      */
-    public function metadata()
+    public function metadata(): array
     {
         return $this->metadata;
     }
@@ -168,7 +168,7 @@ final class EmbeddedInfo
      *
      * @return EmbeddedInfo
      */
-    public function parent()
+    public function parent(): self
     {
         return $this->resolver->embedded($this->metadata['parentPath']);
     }
@@ -178,7 +178,7 @@ final class EmbeddedInfo
      *
      * @return string
      */
-    public function property()
+    public function property(): string
     {
         if ($this->isRoot()) {
             return $this->path;

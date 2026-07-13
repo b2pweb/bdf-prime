@@ -117,7 +117,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function associate($owner, $entity)
+    public function associate($owner, $entity): object
     {
         if (!$this->isForeignKeyBarrier($owner)) {
             throw new InvalidArgumentException('The local entity is not the foreign key barrier.');
@@ -136,7 +136,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function dissociate($owner)
+    public function dissociate($owner): object
     {
         if (!$this->isForeignKeyBarrier($owner)) {
             throw new InvalidArgumentException('The local entity is not the foreign key barrier.');
@@ -156,7 +156,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function create($owner, array $data = [])
+    public function create($owner, array $data = []): object
     {
         if ($this->isForeignKeyBarrier($owner)) {
             throw new InvalidArgumentException('The local entity is not the primary key barrier.');

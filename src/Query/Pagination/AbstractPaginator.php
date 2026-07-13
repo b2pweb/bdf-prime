@@ -67,7 +67,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
      * {@inheritdoc}
      *
      */
-    final public function collection()
+    final public function collection(): array|CollectionInterface
     {
         return $this->collection;
     }
@@ -77,7 +77,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
      *
      * @return ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable
      */
-    final public function query()
+    final public function query(): ReadCommandInterface&Limitable&Orderable&Paginable
     {
         return $this->query;
     }
@@ -266,8 +266,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
     /**
      * {@inheritdoc}
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($key)
+    public function offsetGet($key): mixed
     {
         return $this->collection[$key];
     }

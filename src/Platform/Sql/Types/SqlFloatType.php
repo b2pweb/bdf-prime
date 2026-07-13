@@ -24,7 +24,7 @@ final class SqlFloatType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase($value, array $fieldOptions = []): ?float
     {
         return $value === null ? null : (float) $value;
     }
@@ -32,7 +32,7 @@ final class SqlFloatType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function declaration(ColumnInterface $column)
+    public function declaration(ColumnInterface $column): string
     {
         return Types::FLOAT;
     }

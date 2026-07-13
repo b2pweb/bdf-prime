@@ -64,7 +64,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function autoincrement(bool $flag = true)
+    public function autoincrement(bool $flag = true): static
     {
         $this->autoIncrement = $flag;
 
@@ -74,7 +74,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function length(?int $length)
+    public function length(?int $length): static
     {
         $this->length = $length;
 
@@ -84,7 +84,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function comment(?string $comment)
+    public function comment(?string $comment): static
     {
         $this->comment = $comment;
 
@@ -94,7 +94,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setDefault($value)
+    public function setDefault($value): static
     {
         $this->defaultValue = $value;
 
@@ -104,7 +104,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function precision(?int $precision, ?int $scale = 0)
+    public function precision(?int $precision, ?int $scale = 0): static
     {
         $this->precision = $precision;
         $this->scale     = $scale;
@@ -115,7 +115,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function nillable(bool $flag = true)
+    public function nillable(bool $flag = true): static
     {
         $this->nillable = $flag;
 
@@ -125,7 +125,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function unsigned(bool $flag = true)
+    public function unsigned(bool $flag = true): static
     {
         $this->unsigned = $flag;
 
@@ -135,7 +135,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function unique($index = true)
+    public function unique($index = true): static
     {
         if (is_string($index)) {
             $this->indexes[$index] = IndexInterface::TYPE_UNIQUE;
@@ -149,7 +149,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function fixed(bool $flag = true)
+    public function fixed(bool $flag = true): static
     {
         $this->fixed = $flag;
 
@@ -159,7 +159,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function name(string $name)
+    public function name(string $name): static
     {
         $this->name = $name;
 
@@ -169,7 +169,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function options(array $options)
+    public function options(array $options): static
     {
         $this->options = $options;
 
@@ -179,7 +179,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function type(PlatformTypeInterface $type)
+    public function type(PlatformTypeInterface $type): static
     {
         $this->type = $type;
 

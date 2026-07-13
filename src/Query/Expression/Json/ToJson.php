@@ -124,7 +124,7 @@ final class ToJson extends AbstractPlatformSpecificExpression
     private function convertValue(QuoteCompilerInterface $compiler, $value): string
     {
         if (is_string($value)) {
-            return (string) $compiler->quote($value);
+            return $compiler->quote($value);
         }
 
         if (is_int($value) || is_float($value)) {

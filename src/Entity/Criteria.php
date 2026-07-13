@@ -61,9 +61,9 @@ class Criteria implements ArrayAccess, IteratorAggregate
      *
      * @param array $filters
      *
-     * @return self
+     * @return $this
      */
-    public function import($filters)
+    public function import($filters): static
     {
         foreach ($filters as $filter => $value) {
             $this->add($filter, $value);
@@ -79,9 +79,9 @@ class Criteria implements ArrayAccess, IteratorAggregate
      * @param mixed  $value
      * @param bool   $replace
      *
-     * @return self
+     * @return $this
      */
-    public function add($filter, $value, $replace = false)
+    public function add($filter, $value, $replace = false): static
     {
         if ($filter[0] === ':') {
             $this->specials[$filter] = $value;
@@ -103,9 +103,9 @@ class Criteria implements ArrayAccess, IteratorAggregate
      * Remove criterion
      *
      * @param string $filter   criterion to remove. Could be a alias
-     * @return self
+     * @return $this
      */
-    public function remove($filter)
+    public function remove($filter): static
     {
         list($attribute) = explode(' ', trim($filter));
 
@@ -128,7 +128,7 @@ class Criteria implements ArrayAccess, IteratorAggregate
      * @param string $filter    criterion exists. Could be a alias
      * @return bool
      */
-    public function exists($filter)
+    public function exists($filter): bool
     {
         return isset($this->criteria[$filter]) || isset($this->inputs[$filter]);
     }
@@ -141,7 +141,7 @@ class Criteria implements ArrayAccess, IteratorAggregate
      *
      * @return mixed
      */
-    public function get($filter, $default = null)
+    public function get($filter, $default = null): mixed
     {
         if (isset($this->criteria[$filter])) {
             return $this->criteria[$filter];
@@ -162,7 +162,7 @@ class Criteria implements ArrayAccess, IteratorAggregate
      *
      * @return mixed
      */
-    public function special($filter, $default = null)
+    public function special($filter, $default = null): mixed
     {
         return isset($this->specials[$filter])
             ? $this->specials[$filter]
@@ -174,7 +174,7 @@ class Criteria implements ArrayAccess, IteratorAggregate
      *
      * @return array
      */
-    public function all()
+    public function all(): array
     {
         return $this->criteria + $this->specials;
     }
@@ -184,7 +184,7 @@ class Criteria implements ArrayAccess, IteratorAggregate
      *
      * @return array
      */
-    public function criteria()
+    public function criteria(): array
     {
         return $this->criteria;
     }
@@ -194,7 +194,7 @@ class Criteria implements ArrayAccess, IteratorAggregate
      *
      * @return array
      */
-    public function specials()
+    public function specials(): array
     {
         return $this->specials;
     }
@@ -218,7 +218,7 @@ class Criteria implements ArrayAccess, IteratorAggregate
      * @param string $attribute
      * @return string|null  Returns attribute order type. Null if not found
      */
-    public function orderType($attribute)
+    public function orderType($attribute): ?string
     {
         return isset($this->specials[':order'][$attribute])
             ? $this->specials[':order'][$attribute]
@@ -304,8 +304,7 @@ class Criteria implements ArrayAccess, IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($offset)
+    public function offsetGet($offset): mixed
     {
         return $this->get($offset);
     }

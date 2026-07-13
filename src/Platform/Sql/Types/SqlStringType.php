@@ -39,7 +39,7 @@ final class SqlStringType extends AbstractPlatformType
      *
      * @todo can we remove this transformation for string value ?
      */
-    public function toDatabase($value)
+    public function toDatabase($value): ?string
     {
         return $value === null ? null : (string) $value;
     }
@@ -47,7 +47,7 @@ final class SqlStringType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase($value, array $fieldOptions = []): ?string
     {
         return $value === null ? null : (string) $value;
     }
@@ -55,9 +55,9 @@ final class SqlStringType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function declaration(ColumnInterface $column)
+    public function declaration(ColumnInterface $column): string
     {
-        return isset(self::$doctrineTypeMap[$this->name]) ? self::$doctrineTypeMap[$this->name] : Types::TEXT;
+        return self::$doctrineTypeMap[$this->name] ?? Types::TEXT;
     }
 
     /**
@@ -65,7 +65,7 @@ final class SqlStringType extends AbstractPlatformType
      *
      * @return string[]
      */
-    public static function typeNames()
+    public static function typeNames(): array
     {
         return array_keys(self::$doctrineTypeMap);
     }

@@ -53,7 +53,7 @@ final class ServiceLocator
      *
      * @return ConnectionManager
      */
-    public function connections()
+    public function connections(): ConnectionManager
     {
         return $this->connectionManager;
     }
@@ -75,7 +75,7 @@ final class ServiceLocator
      *
      * @return ConnectionInterface
      */
-    public function connection($name = null)
+    public function connection($name = null): ConnectionInterface
     {
         return $this->connectionManager->getConnection($name);
     }
@@ -147,7 +147,7 @@ final class ServiceLocator
      *
      * @return array
      */
-    public function repositoryNames()
+    public function repositoryNames(): array
     {
         return array_keys($this->repositories);
     }
@@ -159,7 +159,7 @@ final class ServiceLocator
      *
      * @return $this
      */
-    public function setSerializer($serializer)
+    public function setSerializer($serializer): static
     {
         if ($serializer instanceof Closure) {
             $this->serializerResolver = $serializer;
@@ -175,7 +175,7 @@ final class ServiceLocator
      *
      * @return SerializerInterface
      */
-    public function serializer()
+    public function serializer(): SerializerInterface
     {
         if ($this->serializerResolver !== null) {
             $resolver = $this->serializerResolver;
@@ -191,7 +191,7 @@ final class ServiceLocator
      *
      * @return HydratorRegistry
      */
-    public function hydrators()
+    public function hydrators(): HydratorRegistry
     {
         return $this->hydrators;
     }
@@ -203,7 +203,7 @@ final class ServiceLocator
      *
      * @return HydratorInterface
      */
-    public function hydrator($entity)
+    public function hydrator($entity): HydratorInterface
     {
         if (is_object($entity)) {
             $entity = get_class($entity);
@@ -217,7 +217,7 @@ final class ServiceLocator
      *
      * @return InstantiatorInterface
      */
-    public function instantiator()
+    public function instantiator(): InstantiatorInterface
     {
         return $this->instantiator;
     }
@@ -227,7 +227,7 @@ final class ServiceLocator
      *
      * @return ContainerInterface|null
      */
-    public function di()
+    public function di(): ?ContainerInterface
     {
         return $this->di;
     }
@@ -239,7 +239,7 @@ final class ServiceLocator
      *
      * @return $this
      */
-    public function setDI(ContainerInterface $di)
+    public function setDI(ContainerInterface $di): static
     {
         $this->di = $di;
 

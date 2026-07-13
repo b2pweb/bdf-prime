@@ -26,7 +26,7 @@ final class ArrayObjectType extends AbstractSerializeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase($value): ?string
     {
         // Serialized type is string
         // The passed value should be an array,

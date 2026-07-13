@@ -55,7 +55,7 @@ final class OrmPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function forInsert(CompilableClause $clause)
+    public function forInsert(CompilableClause $clause): CompilableClause
     {
         if ($this->repository->isReadOnly()) {
             throw new LogicException('Repository "'.$this->metadata->entityName.'" is read only. Cannot execute write query');
@@ -69,7 +69,7 @@ final class OrmPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function forUpdate(CompilableClause $clause)
+    public function forUpdate(CompilableClause $clause): CompilableClause
     {
         if ($this->repository->isReadOnly()) {
             throw new LogicException('Repository "'.$this->metadata->entityName.'" is read only. Cannot execute write query');
@@ -85,7 +85,7 @@ final class OrmPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function forDelete(CompilableClause $clause)
+    public function forDelete(CompilableClause $clause): CompilableClause
     {
         if ($this->repository->isReadOnly()) {
             throw new LogicException('Repository "'.$this->metadata->entityName.'" is read only. Cannot execute write query');
@@ -101,7 +101,7 @@ final class OrmPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function forSelect(CompilableClause $clause)
+    public function forSelect(CompilableClause $clause): CompilableClause
     {
         $this->type = 'select';
 
@@ -156,7 +156,7 @@ final class OrmPreprocessor implements PreprocessorInterface
      *
      * @return string
      */
-    protected function fieldForWriteQuery($attribute, &$type = null)
+    protected function fieldForWriteQuery($attribute, &$type = null): string
     {
         // @fixme Throw exception if wants to write on undefined attribute ?
         if (!isset($this->metadata->attributes[$attribute])) {
@@ -274,7 +274,7 @@ final class OrmPreprocessor implements PreprocessorInterface
      *
      * @return mixed
      */
-    protected function tryConvertValue($value, TypeInterface $type)
+    protected function tryConvertValue($value, TypeInterface $type): mixed
     {
         if (
             $value instanceof QueryInterface

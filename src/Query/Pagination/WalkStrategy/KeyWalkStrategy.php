@@ -178,7 +178,7 @@ final class KeyWalkStrategy implements WalkStrategyInterface
      *
      * @see WalkCursor::$cursor
      */
-    private function getLastKeyOfEntities(WalkCursor $cursor)
+    private function getLastKeyOfEntities(WalkCursor $cursor): mixed
     {
         $lastEntity = end($cursor->entities);
 

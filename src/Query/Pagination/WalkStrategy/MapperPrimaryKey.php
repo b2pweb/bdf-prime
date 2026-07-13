@@ -38,7 +38,7 @@ final class MapperPrimaryKey implements KeyInterface
     /**
      * {@inheritdoc}
      */
-    public function get($entity)
+    public function get($entity): mixed
     {
         return $this->mapper->getId($entity);
     }

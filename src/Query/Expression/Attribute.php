@@ -36,7 +36,7 @@ final class Attribute implements ExpressionInterface
      *
      * @param QuoteCompilerInterface $compiler
      */
-    public function build(CompilableClause $query, object $compiler)
+    public function build(CompilableClause $query, object $compiler): string
     {
         return sprintf($this->pattern, $compiler->quoteIdentifier($query, $query->preprocessor()->field($this->attribute)));
     }

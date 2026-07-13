@@ -60,7 +60,7 @@ final class AccessorResolver
      *
      * @return EmbeddedAccessor
      */
-    public function embedded(EmbeddedInfo $embedded)
+    public function embedded(EmbeddedInfo $embedded): EmbeddedAccessor
     {
         return new EmbeddedAccessor(
             $this->code,

@@ -168,6 +168,7 @@ BC Breaks:
     * `Bdf\Prime\Types\TimeType`
     * `Bdf\Prime\Types\TimestampType`
     * `Bdf\Prime\Types\UnitEnumType`
+* Change: `Bdf\Prime\Collection\CollectionFactory` now ensure that registered wrapper implements `Bdf\Prime\Collection\CollectionInterface`.
 
 Removal of deprecated APIs:
 * Remove: `Bdf\Prime\Cache\DoctrineCacheAdapter`. Use `Bdf\Prime\Cache\SimpleCacheAdapter` or `Bdf\Prime\Cache\CachePoolAdapter` instead.

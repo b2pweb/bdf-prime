@@ -88,7 +88,7 @@ final class HydratorRegistry
      *
      * @return HydratorInterface
      */
-    public function get($entityClass)
+    public function get($entityClass): HydratorInterface
     {
         if (isset($this->hydrators[$entityClass])) {
             return $this->hydrators[$entityClass];

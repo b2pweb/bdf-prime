@@ -119,7 +119,7 @@ final class BelongsToMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function setConstraints($constraints)
+    public function setConstraints($constraints): static
     {
         $this->allConstraints = $constraints;
 
@@ -135,7 +135,7 @@ final class BelongsToMany extends Relation
      *
      * @return array
      */
-    protected function extractConstraints($constraints)
+    protected function extractConstraints($constraints): array
     {
         if (!is_array($constraints)) {
             return [$constraints, []];
@@ -380,7 +380,7 @@ final class BelongsToMany extends Relation
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function associate($owner, $entity)
+    public function associate($owner, $entity): object
     {
         $this->attach($owner, $entity);
 
@@ -393,7 +393,7 @@ final class BelongsToMany extends Relation
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function dissociate($owner)
+    public function dissociate($owner): object
     {
         $this->detach($owner, $this->getRelation($owner));
 
@@ -405,7 +405,7 @@ final class BelongsToMany extends Relation
      *
      * @throws PrimeException
      */
-    public function create($owner, array $data = [])
+    public function create($owner, array $data = []): object
     {
         $entity = $this->distant->entity($data);
 

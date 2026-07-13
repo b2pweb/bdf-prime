@@ -33,7 +33,7 @@ final class PrimeCollectionNormalizer extends TraversableNormalizer implements A
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, Type $type, DenormalizationContext $context)
+    public function denormalize($data, Type $type, DenormalizationContext $context): CollectionInterface
     {
         foreach ($data as $key => $value) {
             $data[$key] = $context->root()->denormalize(
