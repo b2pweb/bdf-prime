@@ -36,7 +36,7 @@ class JsonFunction implements ExpressionInterface
      * @param ExpressionInterface|string $document The JSON document to pass to the function. Can be an attribute name, or a SQL expression.
      * @param ExpressionInterface|scalar ...$arguments The arguments to pass to the function. Can be a scalar which will be quoted, or a SQL expression.
      */
-    public function __construct(string $function, $document, ...$arguments)
+    public function __construct(string $function, ExpressionInterface|string $document, mixed ...$arguments)
     {
         $this->function = $function;
         $this->document = $document;

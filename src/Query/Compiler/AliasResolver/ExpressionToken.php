@@ -21,7 +21,7 @@ final class ExpressionToken
      * @param int $type
      * @param string|array $value
      */
-    public function __construct($type, $value)
+    public function __construct(int $type, string|array $value)
     {
         $this->type = $type;
         $this->value = $value;

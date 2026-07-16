@@ -57,7 +57,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
      *
      * @internal Should not be created manually
      */
-    public function __construct(RepositoryInterface $repository, $storage = null)
+    public function __construct(RepositoryInterface $repository, CollectionInterface|array|null $storage = null)
     {
         if (!$storage instanceof CollectionInterface) {
             /** @psalm-suppress InvalidArgument */
@@ -79,7 +79,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
      * @todo Faut-il utiliser loadIfNotLoaded ?
      */
     #[ReadOperation]
-    public function load($relations): static
+    public function load(array|string $relations): static
     {
         foreach (Relation::sanitizeRelations((array)$relations) as $relationName => $meta) {
             $this->repository->relation($relationName)->load(
@@ -192,7 +192,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function saveAll($relations): int
+    public function saveAll(string|array $relations): int
     {
         $relations = Relation::sanitizeRelations((array)$relations);
 
@@ -221,7 +221,7 @@ final class EntityCollection implements IteratorAggregate, CollectionInterface, 
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function deleteAll($relations): int
+    public function deleteAll(string|array $relations): int
     {
         $relations = Relation::sanitizeRelations((array)$relations);
 

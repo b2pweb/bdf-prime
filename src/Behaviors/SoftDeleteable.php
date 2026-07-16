@@ -58,7 +58,7 @@ final class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
      * @param bool|string|array $deleted
      * @param string            $type
      */
-    public function __construct($deleted = true, string $type = TypeInterface::DATETIME)
+    public function __construct(bool|string|array $deleted = true, string $type = TypeInterface::DATETIME)
     {
         $this->type = $type;
         $this->deleted = $this->getFieldInfos($deleted);
@@ -80,7 +80,7 @@ final class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
      *
      * @return array{name: string, alias?: string}
      */
-    private function getFieldInfos($field): array
+    private function getFieldInfos(bool|string|array $field): array
     {
         if ($field === true) {
             return ['name' => 'deletedAt', 'alias' => 'deleted_at'];

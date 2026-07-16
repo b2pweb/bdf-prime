@@ -31,7 +31,7 @@ final class ArrayResultSet extends ArrayIterator implements ResultSetInterface
      * @param int $flags
      * @psalm-this-out ArrayResultSet<array<string, mixed>>
      */
-    public function __construct($array = [], $flags = 0)
+    public function __construct(array $array = [], int $flags = 0)
     {
         /** @psalm-suppress InvalidArgument */
         parent::__construct($array, $flags);

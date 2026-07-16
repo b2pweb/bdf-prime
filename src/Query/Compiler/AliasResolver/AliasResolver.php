@@ -141,7 +141,7 @@ final class AliasResolver
      *
      * @return string The SQL valid expression, {table alias}.{table attribute}
      */
-    public function resolve(string $attribute, &$type = null): string
+    public function resolve(string $attribute, mixed &$type = null): string
     {
         // The root repository is not registered
         if (!$this->rootRepositoryRegistered) {
@@ -180,12 +180,12 @@ final class AliasResolver
      * Used only for select query
      * If the alias is null, the method will create one
      *
-     * @param string|Metadata|RepositoryInterface $repository
+     * @param string|RepositoryInterface $repository
      * @param string|null $alias
      *
      * @return string|null Returns the metadata alias, or null is the first parameter is a DBAL value
      */
-    public function registerMetadata($repository, ?string $alias): ?string
+    public function registerMetadata(string|RepositoryInterface $repository, ?string $alias): ?string
     {
         if (!$repository instanceof RepositoryInterface) {
             $repository = $this->findRepository($repository);
@@ -227,13 +227,13 @@ final class AliasResolver
     /**
      * Find the associated repository
      *
-     * @param mixed $search
+     * @param string $search
      *
      * @return RepositoryInterface|null
      *
      * @todo find repository from table name
      */
-    private function findRepository($search): ?RepositoryInterface
+    private function findRepository(string $search): ?RepositoryInterface
     {
         if ($this->metadata->table === $search) {
             return $this->repository;

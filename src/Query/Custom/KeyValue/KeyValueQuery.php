@@ -16,6 +16,7 @@ use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Bdf\Prime\Query\Extension\CompilableTrait;
 use Bdf\Prime\Query\Extension\LimitableTrait;
 use Bdf\Prime\Query\Extension\PaginableTrait;
@@ -92,7 +93,7 @@ final class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryIn
      *
      * @return $this
      */
-    public function where($field, $value = null): static
+    public function where(string|array $field, mixed $value = null): static
     {
         if (is_array($field)) {
             if (array_keys($field) !== array_keys($this->statements['where'])) {
@@ -219,7 +220,7 @@ final class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryIn
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function execute($columns = null): ResultSetInterface
+    public function execute(string|ExpressionInterface|array|null $columns = null): ResultSetInterface
     {
         $this->setType(self::TYPE_SELECT);
 
@@ -243,7 +244,7 @@ final class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryIn
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function update($values = null): int
+    public function update(?array $values = null): int
     {
         if ($values !== null) {
             $this->values($values);

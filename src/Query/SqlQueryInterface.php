@@ -74,7 +74,7 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      *
      * @see where()
      */
-    public function having($column, $operator = null, $value = null);
+    public function having(string|iterable|callable|ExpressionInterface $column, mixed $operator = null, mixed $value = null);
 
     /**
      * Adds a restriction over the groups of the query, forming a logical
@@ -88,7 +88,7 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
      *
      * @see having()
      */
-    public function orHaving($column, $operator = null, $value = null);
+    public function orHaving(string|iterable|callable|ExpressionInterface $column, mixed $operator = null, mixed $value = null);
 
     /**
      * Add having IS NULL expression
@@ -131,21 +131,21 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
     /**
      * Add having SQL expression
      *
-     * @param string|\Bdf\Prime\Query\QueryInterface|\Bdf\Prime\Query\Expression\ExpressionInterface $raw
+     * @param string|QueryInterface|ExpressionInterface $raw
      * @param string $type
      *
      * @return $this This Query instance.
      */
-    public function havingRaw($raw, string $type = CompositeExpression::TYPE_AND);
+    public function havingRaw(string|QueryInterface|ExpressionInterface $raw, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add OR having SQL expression
      *
-     * @param string|\Bdf\Prime\Query\QueryInterface|\Bdf\Prime\Query\Expression\ExpressionInterface $raw
+     * @param string|QueryInterface|ExpressionInterface $raw
      *
      * @return $this This Query instance.
      */
-    public function orHavingRaw($raw);
+    public function orHavingRaw(string|QueryInterface|ExpressionInterface $raw);
 
     /**
      * Add key word IGNORE on insert
@@ -183,12 +183,12 @@ interface SqlQueryInterface extends QueryInterface, Aggregatable, Limitable, Ord
     /**
      * Quote a value
      *
-     * @param scalar $value
+     * @param scalar|null $value
      *
      * @return string
      * @throws PrimeException
      */
-    public function quote($value): string;
+    public function quote(int|string|float|bool|null $value): string;
 
     /**
      * Quote a identifier

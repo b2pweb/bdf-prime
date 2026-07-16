@@ -75,7 +75,7 @@ final class ServiceLocator
      *
      * @return ConnectionInterface
      */
-    public function connection($name = null): ConnectionInterface
+    public function connection(?string $name = null): ConnectionInterface
     {
         return $this->connectionManager->getConnection($name);
     }
@@ -90,7 +90,7 @@ final class ServiceLocator
      *
      * @return void
      */
-    public function registerRepository($entityClass, RepositoryInterface $repository): void
+    public function registerRepository(string $entityClass, RepositoryInterface $repository): void
     {
         // https://github.com/vimeo/psalm/issues/4460
         /** @psalm-suppress InvalidPropertyAssignmentValue */
@@ -104,7 +104,7 @@ final class ServiceLocator
      *
      * @return void
      */
-    public function unregisterRepository($entityClass): void
+    public function unregisterRepository(string $entityClass): void
     {
         if (isset($this->repositories[$entityClass]) && $this->repositories[$entityClass] instanceof EntityRepository) {
             $this->repositories[$entityClass]->destroy();
@@ -123,7 +123,7 @@ final class ServiceLocator
      *
      * @psalm-ignore-nullable-return
      */
-    public function repository($entityClass): ?RepositoryInterface
+    public function repository(string|object $entityClass): ?RepositoryInterface
     {
         if (is_object($entityClass)) {
             $entityClass = get_class($entityClass);
@@ -159,7 +159,7 @@ final class ServiceLocator
      *
      * @return $this
      */
-    public function setSerializer($serializer): static
+    public function setSerializer(Closure|SerializerInterface $serializer): static
     {
         if ($serializer instanceof Closure) {
             $this->serializerResolver = $serializer;
@@ -203,7 +203,7 @@ final class ServiceLocator
      *
      * @return HydratorInterface
      */
-    public function hydrator($entity): HydratorInterface
+    public function hydrator(string|object $entity): HydratorInterface
     {
         if (is_object($entity)) {
             $entity = get_class($entity);

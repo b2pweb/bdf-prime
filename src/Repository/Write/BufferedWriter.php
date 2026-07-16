@@ -78,7 +78,7 @@ final class BufferedWriter implements BufferedWriterInterface
     /**
      * {@inheritdoc}
      */
-    public function insert($entity, array $options = []): int
+    public function insert(object $entity, array $options = []): int
     {
         $this->insert[] = [$entity, $options];
 
@@ -88,7 +88,7 @@ final class BufferedWriter implements BufferedWriterInterface
     /**
      * {@inheritdoc}
      */
-    public function update($entity, array $options = []): int
+    public function update(object $entity, array $options = []): int
     {
         $this->update[] = [$entity, $options];
 
@@ -98,7 +98,7 @@ final class BufferedWriter implements BufferedWriterInterface
     /**
      * {@inheritdoc}
      */
-    public function delete($entity, array $options = []): int
+    public function delete(object $entity, array $options = []): int
     {
         $this->delete[] = [$entity, $options];
 

@@ -27,7 +27,7 @@ interface SchemaManagerInterface extends DatabaseManagerInterface, TableManagerI
      *
      * @internal Doctrine schema should be used only internally
      */
-    public function schema($tables = []);
+    public function schema(DoctrineTable|array|TableInterface $tables = []);
 
     /**
      * Load the doctrine schema from the connection

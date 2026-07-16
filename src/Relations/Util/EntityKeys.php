@@ -21,7 +21,7 @@ final class EntityKeys
      * @param list<string> $keys The entity keys values. Must be an integer index array, not an associative one
      * @param mixed $entity The attached entity
      */
-    public function __construct(array $keys, $entity = null)
+    public function __construct(array $keys, mixed $entity = null)
     {
         $this->keys = $keys;
         $this->entity = $entity;
@@ -32,7 +32,7 @@ final class EntityKeys
      *
      * @param mixed $entity
      */
-    public function attach($entity): void
+    public function attach(mixed $entity): void
     {
         $this->entity = $entity;
     }

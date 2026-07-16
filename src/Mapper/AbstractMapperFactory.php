@@ -170,7 +170,7 @@ abstract class AbstractMapperFactory implements MapperFactoryInterface
      *
      * @return string
      */
-    private function getCacheKey($mapperClass): string
+    private function getCacheKey(string $mapperClass): string
     {
         return strtr($mapperClass, '\\', '.');
     }

@@ -25,7 +25,7 @@ final class Attribute implements ExpressionInterface
      * @param string $attribute
      * @param string $pattern
      */
-    public function __construct($attribute, $pattern = '%s')
+    public function __construct(string $attribute, string $pattern = '%s')
     {
         $this->attribute = $attribute;
         $this->pattern = $pattern;

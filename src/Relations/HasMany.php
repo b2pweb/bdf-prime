@@ -55,7 +55,7 @@ final class HasMany extends OneOrMany
     /**
      * {@inheritdoc}
      */
-    protected function relationQuery($keys, $constraints): ReadCommandInterface
+    protected function relationQuery(array $keys, iterable|callable $constraints): ReadCommandInterface
     {
         // Constraints can be on relation attributes : builder must be used
         // @todo Handle "bulk select"

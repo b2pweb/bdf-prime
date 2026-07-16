@@ -141,7 +141,7 @@ final class ExpressionCompiler
      *
      * @return ExpressionToken[]
      */
-    public function compile($expression): array
+    public function compile(string $expression): array
     {
         $len = strlen($expression);
         $pos = 0;
@@ -177,7 +177,7 @@ final class ExpressionCompiler
      *
      * @return ExpressionToken
      */
-    protected function compileAlias($expression, &$pos, $len): ExpressionToken
+    protected function compileAlias(string $expression, int &$pos, int $len): ExpressionToken
     {
         if ($pos !== 0) {
             throw new QueryBuildingException('Alias should be the first expression token');
@@ -202,7 +202,7 @@ final class ExpressionCompiler
      *
      * @return ExpressionToken
      */
-    protected function compileAttribute($expression, &$pos, $len): ExpressionToken
+    protected function compileAttribute(string $expression, int &$pos, int $len): ExpressionToken
     {
         $value = substr($expression, $pos + 1);
         $pos = $len;
@@ -224,7 +224,7 @@ final class ExpressionCompiler
      *
      * @return ExpressionToken
      */
-    protected function compileStatic($expression, &$pos, $len): ExpressionToken
+    protected function compileStatic(string $expression, int &$pos, int $len): ExpressionToken
     {
         if ($pos !== 0) {
             throw new QueryBuildingException('Static expression should be the first expression token');
@@ -254,7 +254,7 @@ final class ExpressionCompiler
      *
      * @return ExpressionToken
      */
-    protected function compileDynamic($expression, &$pos, $len): ExpressionToken
+    protected function compileDynamic(string $expression, int &$pos, int $len): ExpressionToken
     {
         if ($expression[$pos] === self::DYN_SEPARATOR) {
             ++$pos;
@@ -292,7 +292,7 @@ final class ExpressionCompiler
      *
      * @return string
      */
-    protected function compileName($expression, &$pos, $len): string
+    protected function compileName(string $expression, int &$pos, int $len): string
     {
         $name = '';
 

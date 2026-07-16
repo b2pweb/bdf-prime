@@ -21,7 +21,7 @@ trait LimitableTrait
      *
      * @see Limitable::limit()
      */
-    public function limit(?int $limit, ?int $offset = null)
+    public function limit(?int $limit, ?int $offset = null): static
     {
         $this->compilerState->invalidate();
 
@@ -39,7 +39,7 @@ trait LimitableTrait
      *
      * @see Limitable::limitPage()
      */
-    public function limitPage(int $page, int $rowCount = 1)
+    public function limitPage(int $page, int $rowCount = 1): static
     {
         $page     = ($page > 0) ? $page : 1;
         $rowCount = ($rowCount > 0) ? $rowCount : 1;
@@ -78,7 +78,7 @@ trait LimitableTrait
      *
      * @see Limitable::offset()
      */
-    public function offset(?int $offset)
+    public function offset(?int $offset): static
     {
         $this->compilerState->invalidate();
 

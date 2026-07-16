@@ -16,7 +16,7 @@ final class SqlDateTimeTzType extends AbstractSqlDateTimeType
      * @param string $name
      * @param string $className
      */
-    public function __construct(PlatformInterface $platform, $name = self::DATETIMETZ, string $className = \DateTime::class)
+    public function __construct(PlatformInterface $platform, string $name = self::DATETIMETZ, string $className = \DateTime::class)
     {
         parent::__construct($platform, $name);
 

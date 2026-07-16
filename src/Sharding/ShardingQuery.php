@@ -5,6 +5,7 @@ namespace Bdf\Prime\Sharding;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Bdf\Prime\Query\Query;
 use Bdf\Prime\Sharding\Extension\ShardPicker;
 
@@ -29,7 +30,7 @@ class ShardingQuery extends Query
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function execute($columns = null): ResultSetInterface
+    public function execute(string|ExpressionInterface|array|null $columns = null): ResultSetInterface
     {
         $lastShard = $this->connection->getCurrentShardId();
 
@@ -84,7 +85,7 @@ class ShardingQuery extends Query
      *
      * @return boolean Returns true if a shard has been selected
      */
-    private function explodeQueryClauses(array $clauses, $distributionKey): bool
+    private function explodeQueryClauses(array $clauses, string $distributionKey): bool
     {
         foreach ($clauses as $clause) {
             if (isset($clause['nested'])) {

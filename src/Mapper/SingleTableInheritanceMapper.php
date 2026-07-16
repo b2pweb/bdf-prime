@@ -128,7 +128,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      * @return Mapper<E>
      * @psalm-suppress InvalidNullableReturnType
      */
-    final public function getMapperByDiscriminatorValue($value): Mapper
+    final public function getMapperByDiscriminatorValue(mixed $value): Mapper
     {
         /** @psalm-suppress NullableReturnStatement */
         return $this->mapperFactory->createMapper(
@@ -166,7 +166,7 @@ abstract class SingleTableInheritanceMapper extends Mapper implements MapperFact
      *
      * @throws \Exception if discriminator value is unknown
      */
-    final public function getDiscriminatorType($discriminatorValue): string
+    final public function getDiscriminatorType(mixed $discriminatorValue): string
     {
         if (empty($this->discriminatorMap[$discriminatorValue])) {
             throw new \Exception('Unknown discriminator type "' . $discriminatorValue . '"');

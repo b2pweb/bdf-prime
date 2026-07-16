@@ -33,7 +33,7 @@ final class UpgraderCommand extends Command
      * @param StructureUpgraderResolverInterface|ServiceLocator $resolver
      * @param MigrationManager|null $migrationManager
      */
-    public function __construct($resolver, ?MigrationManager $migrationManager = null)
+    public function __construct(StructureUpgraderResolverInterface|ServiceLocator $resolver, ?MigrationManager $migrationManager = null)
     {
         if ($resolver instanceof ServiceLocator) {
             $resolver = new RepositoryUpgraderResolver($resolver);

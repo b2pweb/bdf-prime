@@ -14,7 +14,7 @@ final class AutoIncrementGenerator extends AbstractGenerator
     /**
      * {@inheritdoc}
      */
-    protected function doGenerate($property, array &$data, ServiceLocator $serviceLocator): string|int|null
+    protected function doGenerate(string $property, array &$data, ServiceLocator $serviceLocator): string|int|null
     {
         unset($data[$property]);
 

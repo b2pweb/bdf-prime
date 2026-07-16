@@ -29,7 +29,7 @@ class QueryCompatExtension
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function count(QueryInterface $query, $attributes = null): int
+    public function count(QueryInterface $query, ?array $attributes = null): int
     {
         return count($query->all($attributes));
     }

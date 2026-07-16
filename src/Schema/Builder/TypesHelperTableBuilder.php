@@ -80,7 +80,7 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function primary($columns = null, ?string $name = null): static
+    public function primary(string|array|null $columns = null, ?string $name = null): static
     {
         $this->builder->primary($columns, $name);
 
@@ -106,7 +106,7 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function foreignKey($foreignTable, array $localColumnNames, array $foreignColumnNames, array $options = [], ?string $constraintName = null): static
+    public function foreignKey(TableInterface|string $foreignTable, array $localColumnNames, array $foreignColumnNames, array $options = [], ?string $constraintName = null): static
     {
         $this->builder->foreignKey($foreignTable, $localColumnNames, $foreignColumnNames, $options, $constraintName);
 
@@ -116,7 +116,7 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function index($columns, int $type = IndexInterface::TYPE_SIMPLE, $name = null, array $options = []): static
+    public function index(string|array $columns, int $type = IndexInterface::TYPE_SIMPLE, ?string $name = null, array $options = []): static
     {
         $this->builder->index($columns, $type, $name, $options);
 
@@ -226,7 +226,7 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function bigint(string $name, $default = null): static
+    public function bigint(string $name, int|string|null $default = null): static
     {
         $this->addTypeAsString($name, TypeInterface::BIGINT)->setDefault($default);
 
@@ -293,7 +293,7 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
      *
      * @return $this
      */
-    public function unsignedBigint(string $name, $default = null): static
+    public function unsignedBigint(string $name, mixed $default = null): static
     {
         return $this->bigint($name, $default)->unsigned();
     }
@@ -321,7 +321,7 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function decimal(string $name, $default = null): static
+    public function decimal(string $name, int|string|float|null $default = null): static
     {
         $this->addTypeAsString($name, TypeInterface::DECIMAL)->setDefault($default);
 
@@ -356,7 +356,7 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function date(string $name, $default = null): static
+    public function date(string $name, string|\DateTimeInterface|null $default = null): static
     {
         $this->addTypeAsString($name, TypeInterface::DATE)->setDefault($default);
 
@@ -366,7 +366,7 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function dateTime(string $name, $default = null): static
+    public function dateTime(string $name, string|\DateTimeInterface|null $default = null): static
     {
         $this->addTypeAsString($name, TypeInterface::DATETIME)->setDefault($default);
 
@@ -376,7 +376,7 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function dateTimeTz(string $name, $default = null): static
+    public function dateTimeTz(string $name, string|\DateTimeInterface|null $default = null): static
     {
         $this->addTypeAsString($name, TypeInterface::DATETIMETZ)->setDefault($default);
 
@@ -386,7 +386,7 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function time(string $name, $default = null): static
+    public function time(string $name, string|\DateTimeInterface|null $default = null): static
     {
         $this->addTypeAsString($name, TypeInterface::TIME)->setDefault($default);
 
@@ -396,7 +396,7 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function timestamp(string $name, $default = null): static
+    public function timestamp(string $name, string|\DateTimeInterface|null $default = null): static
     {
         $this->addTypeAsString($name, TypeInterface::TIMESTAMP)->setDefault($default);
 
@@ -426,7 +426,7 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function guid(string $name, $default = null): static
+    public function guid(string $name, mixed $default = null): static
     {
         $this->addTypeAsString($name, TypeInterface::GUID)->setDefault($default);
 
@@ -436,7 +436,7 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function json(string $name, $default = null): static
+    public function json(string $name, mixed $default = null): static
     {
         $this->addTypeAsString($name, TypeInterface::JSON)->setDefault($default);
 
@@ -456,7 +456,7 @@ final class TypesHelperTableBuilder implements TableBuilderInterface, TypesHelpe
     /**
      * {@inheritdoc}
      */
-    public function object(string $name, $default = null): static
+    public function object(string $name, mixed $default = null): static
     {
         $this->addTypeAsString($name, TypeInterface::OBJECT)->setDefault($default);
 

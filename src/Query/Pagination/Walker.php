@@ -85,7 +85,7 @@ final class Walker extends PrimeSerializable implements Iterator, PaginatorInter
      * @param int            $maxRows
      * @param int            $page
      */
-    public function __construct(ReadCommandInterface $query, $maxRows = null, $page = null)
+    public function __construct(ReadCommandInterface $query, ?int $maxRows = null, ?int $page = null)
     {
         $this->query = $query;
         $this->page = 0;

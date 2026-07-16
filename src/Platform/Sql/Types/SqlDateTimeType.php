@@ -20,7 +20,7 @@ final class SqlDateTimeType extends AbstractSqlDateTimeType
      */
     public function __construct(
         PlatformInterface $platform,
-        $name = self::DATETIME,
+        string $name = self::DATETIME,
         string $className = \DateTime::class,
         ?\DateTimeZone $timezone = null
     ) {
@@ -34,7 +34,7 @@ final class SqlDateTimeType extends AbstractSqlDateTimeType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = []): ?DateTimeInterface
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?DateTimeInterface
     {
         // Handle non-nillable date time
         if ($value === '0000-00-00 00:00:00') {

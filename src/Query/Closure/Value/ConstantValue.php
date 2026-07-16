@@ -11,15 +11,12 @@ use ReflectionFunction;
  */
 final class ConstantValue implements ComparisonValueInterface
 {
-    /**
-     * @var mixed
-     */
-    private $value;
+    private mixed $value;
 
     /**
      * @param mixed $value The constant value
      */
-    public function __construct($value)
+    public function __construct(mixed $value)
     {
         $this->value = $value;
     }

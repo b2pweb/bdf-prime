@@ -30,7 +30,7 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
      *
      * @param E[]|CollectionInterface<E>|null $items
      */
-    public function __construct($items = [])
+    public function __construct(mixed $items = [])
     {
         $this->items = $this->getArrayFromItems($items);
     }
@@ -104,10 +104,9 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
      *
      * {@inheritdoc}
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($key)
+    public function offsetGet(mixed $offset): mixed
     {
-        return $this->items[$key];
+        return $this->items[$offset];
     }
 
     /**
@@ -123,9 +122,9 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
      *
      * {@inheritdoc}
      */
-    public function offsetExists($key): bool
+    public function offsetExists(mixed $offset): bool
     {
-        return isset($this->items[$key]);
+        return isset($this->items[$offset]);
     }
 
     /**
@@ -143,9 +142,9 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
      *
      * {@inheritdoc}
      */
-    public function offsetUnset($key): void
+    public function offsetUnset(mixed $offset): void
     {
-        $this->remove($key);
+        $this->remove($offset);
     }
 
     /**
@@ -320,7 +319,7 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
      * @param mixed $items
      * @return array
      */
-    protected function getArrayFromItems($items)
+    protected function getArrayFromItems(mixed $items)
     {
         if (is_array($items)) {
             return $items;
@@ -342,7 +341,7 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
      *
      * @return mixed
      */
-    protected function getDataFromItem($item, $key, $default = null)
+    protected function getDataFromItem($item, string $key, mixed $default = null)
     {
         if (is_array($item)) {
             return isset($item[$key]) ? $item[$key] : $default;

@@ -27,7 +27,7 @@ interface Orderable
      *
      * @return $this This Query instance.
      */
-    public function order($sort, ?string $order = null);
+    public function order(string|array|ExpressionInterface $sort, ?string $order = null);
 
     /**
      * Adds an ordering for the query results.
@@ -43,7 +43,7 @@ interface Orderable
      *
      * @return $this This Query instance.
      */
-    public function addOrder($sort, ?string $order = null);
+    public function addOrder(string|array|ExpressionInterface $sort, ?string $order = null);
 
     /**
      * Get orders

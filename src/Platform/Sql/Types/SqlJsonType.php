@@ -35,7 +35,7 @@ final class SqlJsonType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = []): mixed
+    public function fromDatabase(mixed $value, array $fieldOptions = []): mixed
     {
         if ($value === null) {
             return null;
@@ -53,7 +53,7 @@ final class SqlJsonType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value): mixed
+    public function toDatabase(mixed $value): mixed
     {
         if ($value === null) {
             return null;

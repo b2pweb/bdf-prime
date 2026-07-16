@@ -19,7 +19,7 @@ final class TimestampType extends AbstractFacadeType
      * @param string $name
      * @param string $className
      */
-    public function __construct($name = self::TIMESTAMP, string $className = DateTime::class)
+    public function __construct(string $name = self::TIMESTAMP, string $className = DateTime::class)
     {
         parent::__construct($name);
 
@@ -30,7 +30,7 @@ final class TimestampType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value): mixed
+    public function toDatabase(mixed $value): mixed
     {
         if ($value === null) {
             return null;

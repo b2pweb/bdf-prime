@@ -43,7 +43,7 @@ final class HydratorGenerator
      *
      * @throws HydratorGenerationException
      */
-    public function __construct(ServiceLocator $prime, Mapper $mapper, $className)
+    public function __construct(ServiceLocator $prime, Mapper $mapper, string $className)
     {
         $this->prime = $prime;
         $this->mapper = $mapper;
@@ -269,7 +269,7 @@ PHP;
      *
      * @return string
      */
-    protected function generateEmbeddedHydrator($class): string
+    protected function generateEmbeddedHydrator(string $class): string
     {
         if ($class === $this->className) {
             return '$this';
@@ -285,7 +285,7 @@ PHP;
      *
      * @return string
      */
-    protected function normalizeClassName($className): string
+    protected function normalizeClassName(string $className): string
     {
         return '\\' . ltrim($className, '\\');
     }
@@ -754,7 +754,7 @@ PHP
      *
      * @throws HydratorGenerationException
      */
-    protected function generateHydrateOneCaseAttribute($attribute): string
+    protected function generateHydrateOneCaseAttribute(AttributeInfo $attribute): string
     {
         if ($attribute->isEmbedded()) {
             $code = $this->accessors

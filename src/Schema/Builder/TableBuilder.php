@@ -103,7 +103,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function index($columns, int $type = IndexInterface::TYPE_SIMPLE, ?string $name = null, array $options = []): static
+    public function index(string|array $columns, int $type = IndexInterface::TYPE_SIMPLE, ?string $name = null, array $options = []): static
     {
         if (is_string($columns)) {
             $normalizedColumns = [$columns => []];
@@ -135,7 +135,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function primary($columns = null, ?string $name = null): static
+    public function primary(string|array|null $columns = null, ?string $name = null): static
     {
         return $this->index(
             $columns ?: [$this->current],
@@ -169,7 +169,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function foreignKey($foreignTable, array $localColumnNames, array $foreignColumnNames, array $options = [], ?string $constraintName = null): static
+    public function foreignKey(TableInterface|string $foreignTable, array $localColumnNames, array $foreignColumnNames, array $options = [], ?string $constraintName = null): static
     {
         $foreignKey = new ForeignKey(
             $localColumnNames,

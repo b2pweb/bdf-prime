@@ -33,7 +33,7 @@ final class ArrayOfType implements FacadeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = []): ?array
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?array
     {
         if ($value === null) {
             return null;
@@ -45,7 +45,7 @@ final class ArrayOfType implements FacadeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value): mixed
+    public function toDatabase(mixed $value): mixed
     {
         if ($value === null) {
             return null;

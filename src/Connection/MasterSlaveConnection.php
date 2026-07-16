@@ -117,7 +117,7 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
     /**
      * {@inheritdoc}
      */
-    public function executeQuery(string $sql, array $params = [], $types = [], ?QueryCacheProfile $qcp = null): Result
+    public function executeQuery(string $sql, array $params = [], array $types = [], ?QueryCacheProfile $qcp = null): Result
     {
         if ($this->getTransactionNestingLevel() <= 0 && $this->force !== true) {
             return $this->readConnection->executeQuery($sql, $params, $types, $qcp);

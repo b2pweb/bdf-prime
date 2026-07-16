@@ -10,7 +10,7 @@ final class ArrayObjectType extends AbstractSerializeType
     /**
      * {@inheritdoc}
      */
-    public function __construct($type = self::ARRAY_OBJECT)
+    public function __construct(string $type = self::ARRAY_OBJECT)
     {
         parent::__construct($type);
     }
@@ -26,7 +26,7 @@ final class ArrayObjectType extends AbstractSerializeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value): ?string
+    public function toDatabase(mixed $value): ?string
     {
         // Serialized type is string
         // The passed value should be an array,

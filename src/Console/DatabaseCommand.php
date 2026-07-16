@@ -109,7 +109,7 @@ abstract class DatabaseCommand extends Command
      *
      * @return string The db name to interact
      */
-    protected function prepareConnectionConfig(&$parameters): string
+    protected function prepareConnectionConfig(array &$parameters): string
     {
         $user = $this->io->option('user');
 

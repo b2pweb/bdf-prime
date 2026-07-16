@@ -60,7 +60,7 @@ final class Blameable extends Behavior
      * @param bool|string|array $updatedBy
      * @param string            $type
      */
-    public function __construct(callable $userResolver, $createdBy = true, $updatedBy = true, $type = TypeInterface::STRING)
+    public function __construct(callable $userResolver, bool|string|array $createdBy = true, bool|string|array $updatedBy = true, string $type = TypeInterface::STRING)
     {
         $this->userResolver = $userResolver;
         $this->type = $type;
@@ -84,7 +84,7 @@ final class Blameable extends Behavior
      *
      * @return null|array
      */
-    private function getFieldInfos($field, array $default): ?array
+    private function getFieldInfos(bool|string|array $field, array $default): ?array
     {
         if ($field === true) {
             return $default;

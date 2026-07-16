@@ -272,7 +272,7 @@ final class RepositoryUpgrader implements StructureUpgraderInterface
      *
      * @return ConnectionInterface
      */
-    protected function connection($profile = null): ConnectionInterface
+    protected function connection(?string $profile = null): ConnectionInterface
     {
         return $this->service->connection($profile ?: $this->metadata->connection);
     }

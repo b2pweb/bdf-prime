@@ -19,7 +19,7 @@ final class ClassAccessor
      *
      * @var string
      */
-    private $className;
+    private string $className;
 
     /**
      * @var string[]
@@ -31,7 +31,7 @@ final class ClassAccessor
      *
      * @var string
      */
-    private $scope;
+    private string $scope;
 
     private \ReflectionClass $reflection;
 
@@ -45,7 +45,7 @@ final class ClassAccessor
      *
      * @throws ReflectionException
      */
-    public function __construct($className, $scope, array $subClasses = [])
+    public function __construct(string $className, string $scope, array $subClasses = [])
     {
         $this->className = $className;
         $this->scope = $scope;
@@ -74,7 +74,7 @@ final class ClassAccessor
      *
      * @throws HydratorGenerationException When the attribute is not readable
      */
-    public function getter($varName, $attribute): string
+    public function getter(string $varName, string $attribute): string
     {
         if ($this->isPropertyAccessible($attribute, setter: false)) {
             return $varName.'->'.$attribute;
@@ -101,7 +101,7 @@ final class ClassAccessor
      *
      * @throws HydratorGenerationException When the attribute is not accessible
      */
-    public function setter($varName, $attribute, $value, $useSetterInPriority = true): string
+    public function setter(string $varName, string $attribute, string $value, bool $useSetterInPriority = true): string
     {
         if ($useSetterInPriority && method_exists($this->className, 'set'.ucfirst($attribute))) {
             return $varName.'->set'.ucfirst($attribute).'('.$value.')';
@@ -127,7 +127,7 @@ final class ClassAccessor
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    public function isPropertyAccessible($prop, bool $setter = true): bool
+    public function isPropertyAccessible(string $prop, bool $setter = true): bool
     {
         try {
             $propertyReflection = $this->reflection->getProperty($prop);

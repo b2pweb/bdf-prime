@@ -12,8 +12,10 @@ use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Bdf\Prime\Query\Extension\CachableTrait;
 use Bdf\Prime\Query\Extension\ExecutableTrait;
+use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Sharding\Extension\ShardPicker;
 use Bdf\Prime\Sharding\ShardingConnection;
 
@@ -77,7 +79,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
     /**
      * {@inheritdoc}
      */
-    public function project($columns = null): static
+    public function project(string|ExpressionInterface|QueryInterface|array|null $columns = null): static
     {
         $this->statements['columns'] = (array) $columns;
 
@@ -87,7 +89,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
     /**
      * {@inheritdoc}
      */
-    public function select($columns = null): static
+    public function select(string|ExpressionInterface|QueryInterface|array|null $columns = null): static
     {
         return $this->project($columns);
     }
@@ -95,7 +97,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
     /**
      * {@inheritdoc}
      */
-    public function addSelect($columns): static
+    public function addSelect(string|ExpressionInterface|QueryInterface|array|null $columns): static
     {
         $this->statements['columns'] = array_merge($this->statements['columns'], $columns);
 
@@ -115,7 +117,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
     /**
      * {@inheritdoc}
      */
-    public function where($field, $value = null): static
+    public function where(string|array $field, mixed $value = null): static
     {
         if (is_array($field)) {
             $this->statements['where'] = $field + $this->statements['where'];
@@ -223,7 +225,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
      * @todo execute cached with closure
      */
     #[ReadOperation]
-    public function execute($columns = null): ResultSetInterface
+    public function execute(string|ExpressionInterface|array|null $columns = null): ResultSetInterface
     {
         $results = [];
         $limit = $this->statements['limit'];
@@ -252,7 +254,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function update($values = null): int
+    public function update(?array $values = null): int
     {
         $count = 0;
 
@@ -329,7 +331,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
      *
      * @throws ShardingException
      */
-    private function getQueryByShard($shardId): KeyValueQueryInterface
+    private function getQueryByShard(string $shardId): KeyValueQueryInterface
     {
         if (isset($this->queries[$shardId])) {
             $query = $this->queries[$shardId];

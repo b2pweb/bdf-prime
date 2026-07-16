@@ -105,7 +105,7 @@ abstract class AbstractGenerator implements GeneratorInterface
      * @return string|int|null Returns the generated id
      * @throws PrimeException
      */
-    protected function doGenerate($property, array &$data, ServiceLocator $serviceLocator): string|int|null
+    protected function doGenerate(string $property, array &$data, ServiceLocator $serviceLocator): string|int|null
     {
         // to overload
         return null;
@@ -114,7 +114,7 @@ abstract class AbstractGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function postProcess($entity): void
+    public function postProcess(object $entity): void
     {
         if (!$this->hasBeenErased) {
             return;

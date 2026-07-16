@@ -33,7 +33,7 @@ interface WriterInterface
      * @throws PrimeException When insert fail
      */
     #[WriteOperation]
-    public function insert($entity, array $options = []): int;
+    public function insert(object $entity, array $options = []): int;
 
     /**
      * Update an entity to the repository
@@ -56,7 +56,7 @@ interface WriterInterface
      * @throws PrimeException When update fail
      */
     #[WriteOperation]
-    public function update($entity, array $options = []): int;
+    public function update(object $entity, array $options = []): int;
 
     /**
      * Delete an entity from the repository
@@ -72,5 +72,5 @@ interface WriterInterface
      * @throws PrimeException When delete fail
      */
     #[WriteOperation]
-    public function delete($entity, array $options = []): int;
+    public function delete(object $entity, array $options = []): int;
 }

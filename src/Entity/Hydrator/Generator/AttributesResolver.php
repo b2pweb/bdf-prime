@@ -82,7 +82,7 @@ final class AttributesResolver
      *
      * @return AttributeInfo
      */
-    public function attribute($name): AttributeInfo
+    public function attribute(string $name): AttributeInfo
     {
         return $this->attributes[$name];
     }
@@ -102,7 +102,7 @@ final class AttributesResolver
      *
      * @return EmbeddedInfo
      */
-    public function embedded($attribute): EmbeddedInfo
+    public function embedded(string $attribute): EmbeddedInfo
     {
         return $this->embeddeds[$attribute];
     }
@@ -114,7 +114,7 @@ final class AttributesResolver
      *
      * @return EmbeddedInfo
      */
-    public function rootEmbedded($attribute): EmbeddedInfo
+    public function rootEmbedded(string $attribute): EmbeddedInfo
     {
         return $this->rootEmbeddeds[$attribute];
     }
@@ -136,7 +136,7 @@ final class AttributesResolver
      *
      * @return bool
      */
-    public function hasRootEmbedded($attribute): bool
+    public function hasRootEmbedded(string $attribute): bool
     {
         return isset($this->rootEmbeddeds[$attribute]);
     }
@@ -159,7 +159,7 @@ final class AttributesResolver
      *
      * @return bool
      */
-    public function isEntity($class): bool
+    public function isEntity(string $class): bool
     {
         return $this->prime->mappers()->isEntity($class);
     }
@@ -171,7 +171,7 @@ final class AttributesResolver
      *
      * @return bool
      */
-    public function isImportable($class): bool
+    public function isImportable(string $class): bool
     {
         return is_subclass_of($class, ImportableInterface::class);
     }

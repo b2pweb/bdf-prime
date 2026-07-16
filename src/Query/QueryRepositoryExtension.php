@@ -98,7 +98,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      *
      * @return RepositoryInterface|null
      */
-    public function repository(ReadCommandInterface $query, $name = null): ?RepositoryInterface
+    public function repository(ReadCommandInterface $query, ?string $name = null): ?RepositoryInterface
     {
         if ($name === null) {
             return $this->repository;
@@ -125,7 +125,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      * @return E|null The entity or null if not found
      * @throws PrimeException When query fail
      */
-    public function findById(ReadCommandInterface $query, $id)
+    public function findById(ReadCommandInterface $query, mixed $id): ?object
     {
         $pkAttributes = $this->metadata->primary['attributes'];
         $criteria = null;
@@ -194,7 +194,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      * @throws EntityNotFoundException  If entity is not found
      * @throws PrimeException           When query fail
      */
-    public function findByIdOrFail(ReadCommandInterface $query, $id)
+    public function findByIdOrFail(ReadCommandInterface $query, mixed $id): object
     {
         $entity = $this->findById($query, $id);
 
@@ -219,7 +219,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      * @throws EntityNotFoundException  If entity is not found
      * @throws PrimeException           When query fail
      */
-    public function findByIdOrNew(ReadCommandInterface $query, $id)
+    public function findByIdOrNew(ReadCommandInterface $query, mixed $id): object
     {
         $entity = $this->findById($query, $id);
 
@@ -237,7 +237,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      *
      * @return E
      */
-    public function firstOrFail(ReadCommandInterface $query)
+    public function firstOrFail(ReadCommandInterface $query): object
     {
         $entity = $query->first();
 
@@ -256,7 +256,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      *
      * @return E
      */
-    public function firstOrNew(ReadCommandInterface $query, bool $useCriteriaAsDefault = true)
+    public function firstOrNew(ReadCommandInterface $query, bool $useCriteriaAsDefault = true): object
     {
         $entity = $query->first();
 
@@ -318,7 +318,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      *
      * @return ReadCommandInterface<ConnectionInterface, E>
      */
-    public function with(ReadCommandInterface $query, $relations): ReadCommandInterface
+    public function with(ReadCommandInterface $query, string|array $relations): ReadCommandInterface
     {
         $this->withRelations = Relation::sanitizeRelations((array)$relations);
 
@@ -333,7 +333,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      *
      * @return ReadCommandInterface<ConnectionInterface, E>
      */
-    public function without(ReadCommandInterface $query, $relations): ReadCommandInterface
+    public function without(ReadCommandInterface $query, string|array $relations): ReadCommandInterface
     {
         $this->withoutRelations = Relation::sanitizeWithoutRelations((array)$relations);
 
@@ -350,7 +350,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      *
      * @return ReadCommandInterface<ConnectionInterface, E>
      */
-    public function by(ReadCommandInterface $query, $attribute, $combine = false): ReadCommandInterface
+    public function by(ReadCommandInterface $query, string $attribute, bool $combine = false): ReadCommandInterface
     {
         $this->byOptions = [
             'attribute' => $attribute,
@@ -512,7 +512,7 @@ final class QueryRepositoryExtension extends QueryCompatExtension implements Rec
      *
      * @return mixed
      */
-    public function __call($name, $arguments): mixed
+    public function __call(string $name, array $arguments): mixed
     {
         /** @var EntityRepository $this->repository */
         $scopes = $this->repository->scopes();

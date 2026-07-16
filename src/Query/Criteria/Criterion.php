@@ -39,7 +39,7 @@ readonly class Criterion
      * @param string|null $operator
      * @param bool $skipNull
      */
-    public function __construct($field = null, ?string $operator = null, bool $skipNull = true)
+    public function __construct(ExpressionInterface|string|null $field = null, ?string $operator = null, bool $skipNull = true)
     {
         $this->field = $field;
         $this->operator = $operator;
@@ -65,7 +65,7 @@ readonly class Criterion
      * @param mixed $value The property value
      * @return mixed The transformed value that will be used on the query
      */
-    public function value($value)
+    public function value(mixed $value)
     {
         return $value;
     }

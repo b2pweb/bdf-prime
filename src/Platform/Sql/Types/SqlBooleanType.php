@@ -16,7 +16,7 @@ final class SqlBooleanType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function __construct(PlatformInterface $platform, $name = self::BOOLEAN)
+    public function __construct(PlatformInterface $platform, string $name = self::BOOLEAN)
     {
         parent::__construct($platform, $name);
     }
@@ -24,7 +24,7 @@ final class SqlBooleanType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = []): ?bool
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?bool
     {
         return $value === null ? null : $this->platform->grammar()->convertFromBoolean($value);
     }
@@ -32,7 +32,7 @@ final class SqlBooleanType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value): mixed
+    public function toDatabase(mixed $value): mixed
     {
         return $value === null ? null : $this->platform->grammar()->convertBooleans($value);
     }

@@ -363,7 +363,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
      *
      * @template M as array|object
      */
-    public function map($callback)
+    public function map(callable $callback)
     {
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);

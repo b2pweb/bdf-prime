@@ -100,7 +100,7 @@ final class HydratorGenerationCommand extends Command
      *
      * @return void
      */
-    private function configureOutputs($io): void
+    private function configureOutputs(BdfStyle $io): void
     {
         if ($io->option('loader') !== null) {
             $this->loaderFile = $io->option('loader');
@@ -124,7 +124,7 @@ final class HydratorGenerationCommand extends Command
      *
      * @return void
      */
-    private function generateHydrator($io, $className, Mapper $mapper): void
+    private function generateHydrator(BdfStyle $io, string $className, Mapper $mapper): void
     {
         $io->inline("Generate hydrator for {$className} ");
 
@@ -149,7 +149,7 @@ final class HydratorGenerationCommand extends Command
      *
      * @return void
      */
-    private function generateLoader($io): void
+    private function generateLoader(BdfStyle $io): void
     {
         $io->info('Generating loader file...');
 
@@ -221,7 +221,7 @@ JSON
      *
      * @return string
      */
-    private function getHydratorFilename($hydratorClassname): string
+    private function getHydratorFilename(string $hydratorClassname): string
     {
         return $this->outputDir.$hydratorClassname.'.php';
     }
@@ -231,7 +231,7 @@ JSON
      *
      * @return ClassFileLocator|array
      */
-    private function getClassIterator($path): ClassFileLocator|array
+    private function getClassIterator(string $path): ClassFileLocator|array
     {
         if (is_dir($path)) {
             return new ClassFileLocator($path);

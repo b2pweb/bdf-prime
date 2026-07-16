@@ -29,7 +29,7 @@ final class SqlStringType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function __construct(PlatformInterface $platform, $name = self::STRING)
+    public function __construct(PlatformInterface $platform, string $name = self::STRING)
     {
         parent::__construct($platform, $name);
     }
@@ -39,7 +39,7 @@ final class SqlStringType extends AbstractPlatformType
      *
      * @todo can we remove this transformation for string value ?
      */
-    public function toDatabase($value): ?string
+    public function toDatabase(mixed $value): ?string
     {
         return $value === null ? null : (string) $value;
     }
@@ -47,7 +47,7 @@ final class SqlStringType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = []): ?string
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?string
     {
         return $value === null ? null : (string) $value;
     }

@@ -13,12 +13,15 @@ use Doctrine\Inflector\Inflector as InflectorObject;
 use Doctrine\Inflector\InflectorFactory;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Constant;
+use Nette\PhpGenerator\EnumType;
+use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Printer;
 use Nette\PhpGenerator\PromotedParameter;
 use Nette\PhpGenerator\Property;
+use Nette\PhpGenerator\TraitType;
 use Nette\PhpGenerator\TraitUse;
 use Nette\PhpGenerator\Visibility;
 
@@ -886,11 +889,13 @@ final class EntityGenerator
      * @throws \InvalidArgumentException
      *
      * @api
+     *
+     * @param Visibility::Private|Visibility::Protected $visibility
      */
-    public function setFieldVisibility($visibility): void
+    public function setFieldVisibility(Visibility $visibility): void
     {
         if ($visibility !== static::FIELD_VISIBLE_PRIVATE && $visibility !== static::FIELD_VISIBLE_PROTECTED) {
-            throw new \InvalidArgumentException('Invalid provided visibility (only private and protected are allowed): ' . $visibility);
+            throw new \InvalidArgumentException('Invalid provided visibility (only private and protected are allowed): ' . $visibility->value);
         }
 
         $this->fieldVisibility = $visibility;
@@ -1056,12 +1061,15 @@ final class PropertyGenerator
         $this->varTag = $varTag;
     }
 
-    public function setVisibility($visibility): void
+    /**
+     * @param Visibility::Private|Visibility::Protected $visibility
+     */
+    public function setVisibility(Visibility $visibility): void
     {
         $this->visibility = $visibility;
     }
 
-    public function setDefaultValue($value): void
+    public function setDefaultValue(mixed $value): void
     {
         $this->defaultValue = $value;
         $this->hasDefaultValue = true;
@@ -1180,7 +1188,7 @@ final class ConfigurableEntityPrinter extends Printer
         $this->indentation = str_repeat(' ', $generator->getNumSpaces());
     }
 
-    public function printClass($class, ?PhpNamespace $namespace = null): string
+    public function printClass(ClassType|InterfaceType|TraitType|EnumType $class, ?PhpNamespace $namespace = null): string
     {
         $code = parent::printClass($class, $namespace);
 
@@ -1347,7 +1355,7 @@ final class EntityClassGenerator
      *
      * @return void
      */
-    public function addMember($classMember): void
+    public function addMember(Method|Property|Constant|TraitUse $classMember): void
     {
         $this->class->addMember($classMember);
     }

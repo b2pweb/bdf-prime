@@ -45,7 +45,7 @@ final class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function field(string $attribute, &$type = null): string
+    public function field(string $attribute, mixed &$type = null): string
     {
         if ($type === true) {
             $type = null;

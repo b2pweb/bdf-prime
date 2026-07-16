@@ -64,7 +64,7 @@ final class EntityRelation
      * @param E $owner     The relation owner
      * @param RelationInterface<E, R> $relation  The relation
      */
-    public function __construct($owner, RelationInterface $relation)
+    public function __construct(object $owner, RelationInterface $relation)
     {
         $this->owner    = $owner;
         $this->relation = $relation;
@@ -110,7 +110,7 @@ final class EntityRelation
      *
      * @return E Returns the owner entity instance
      */
-    public function associate($entity): object
+    public function associate(object $entity): object
     {
         return $this->relation->associate($this->owner, $entity);
     }
@@ -171,7 +171,7 @@ final class EntityRelation
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function add($related): int
+    public function add(object $related): int
     {
         return $this->relation->add($this->owner, $related);
     }
@@ -186,7 +186,7 @@ final class EntityRelation
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function has($related): bool
+    public function has(mixed $related): bool
     {
         /** @var BelongsToMany $this->relation */
         return $this->relation->has($this->owner, $related);
@@ -202,7 +202,7 @@ final class EntityRelation
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function attach($related): int
+    public function attach(mixed $related): int
     {
         /** @var BelongsToMany<E, R> $this->relation */
         return $this->relation->attach($this->owner, $related);
@@ -216,7 +216,7 @@ final class EntityRelation
      *
      * @return int
      */
-    public function detach($related): int
+    public function detach(mixed $related): int
     {
         /** @var BelongsToMany<E, R> $this->relation */
         return $this->relation->detach($this->owner, $related);
@@ -267,7 +267,7 @@ final class EntityRelation
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function count($criteria = [], $attributes = null): int
+    public function count(iterable|callable $criteria = [], string|array|null $attributes = null): int
     {
         $query = $this->query()->where($criteria);
         assert($query instanceof Aggregatable);
@@ -286,7 +286,7 @@ final class EntityRelation
      * @throws PrimeException When cannot save entity
      */
     #[WriteOperation]
-    public function saveAll($relations = []): int
+    public function saveAll(string|array $relations = []): int
     {
         return $this->relation->saveAll($this->owner, (array)$relations);
     }
@@ -296,15 +296,15 @@ final class EntityRelation
      *
      * Note: This method can only works
      *
-     * @param array $relations sub-relation names to delete
+     * @param array|string $relations sub-relation names to delete
      *
      * @return int Number of deleted entities
      * @throws PrimeException When cannot delete entity
      */
     #[WriteOperation]
-    public function deleteAll($relations = []): int
+    public function deleteAll(string|array $relations = []): int
     {
-        return $this->relation->deleteAll($this->owner, (array)$relations);
+        return $this->relation->deleteAll($this->owner, $relations);
     }
 
     /**

@@ -37,7 +37,7 @@ interface RepositoryInterface
      * @return RepositoryInterface<T>
      * @template T as object
      */
-    public function repository($entity): ?RepositoryInterface;
+    public function repository(string|object $entity): ?RepositoryInterface;
 
     /**
      * Get mapper
@@ -207,7 +207,7 @@ interface RepositoryInterface
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function exists($entity): bool;
+    public function exists(object $entity): bool;
 
     /**
      * Refresh the entity form the repository
@@ -219,7 +219,7 @@ interface RepositoryInterface
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function refresh($entity, array $criteria = []);
+    public function refresh(object $entity, array $criteria = []);
 
     /**
      * Insert or update an entity
@@ -230,7 +230,7 @@ interface RepositoryInterface
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function save($entity): int;
+    public function save(object $entity): int;
 
     /**
      * Insert an entity
@@ -242,7 +242,7 @@ interface RepositoryInterface
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function insert($entity, bool $ignore = false): int;
+    public function insert(object $entity, bool $ignore = false): int;
 
     /**
      * Update an entity
@@ -254,7 +254,7 @@ interface RepositoryInterface
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function update($entity, ?array $attributes = null): int;
+    public function update(object $entity, ?array $attributes = null): int;
 
     /**
      * Remove an entity
@@ -265,7 +265,7 @@ interface RepositoryInterface
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function delete($entity): int;
+    public function delete(object $entity): int;
 
     /**
      * Save entity and its relations
@@ -277,7 +277,7 @@ interface RepositoryInterface
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function saveAll($entity, $relations): int;
+    public function saveAll(object $entity, string|array $relations): int;
 
     /**
      * Delete entity and its relations
@@ -289,7 +289,7 @@ interface RepositoryInterface
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function deleteAll($entity, $relations): int;
+    public function deleteAll(object $entity, string|array $relations): int;
 
     /**
      * Launch transactionnal queries

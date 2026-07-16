@@ -59,7 +59,7 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      *
      * @return $this This Query instance.
      */
-    public function set(string $column, $value, $type = null);
+    public function set(string $column, mixed $value, mixed $type = null);
 
     /**
      * Turns the query being built into an insert query that inserts into
@@ -99,7 +99,7 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      *
      * @return $this
      */
-    public function setValue(string $column, $value, $type = null);
+    public function setValue(string $column, mixed $value, string|TypeInterface|null $type = null);
 
     /**
      * Replace values from mapper table
@@ -118,13 +118,13 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * Get rows collection
      *
      * @param array $criteria
-     * @param string|array $attributes
+     * @param string|array|null $attributes
      *
      * @return R[]|CollectionInterface<R>|PaginatorInterface<R>
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]
-    public function find(array $criteria, $attributes = null);
+    public function find(array $criteria, string|array|null $attributes = null);
 
     /**
      * Get one row by criteria
@@ -136,5 +136,5 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]
-    public function findOne(array $criteria, $attributes = null);
+    public function findOne(array $criteria, string|array|null $attributes = null);
 }

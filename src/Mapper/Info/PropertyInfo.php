@@ -221,7 +221,7 @@ final class PropertyInfo implements InfoInterface
      *
      * @return mixed
      */
-    public function convert($value, bool $toPhp = true, array $fieldOptions = []): mixed
+    public function convert(mixed $value, bool $toPhp = true, array $fieldOptions = []): mixed
     {
         if ($toPhp) {
             return $this->getType()->fromDatabase($value, $fieldOptions);

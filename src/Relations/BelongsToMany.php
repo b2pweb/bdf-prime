@@ -12,9 +12,11 @@ use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryInterface;
+use Closure;
 
 use function array_diff_key;
 use function count;
+use function is_array;
 
 /**
  * BelongsToMany
@@ -68,16 +70,16 @@ final class BelongsToMany extends Relation
     /**
      * The through global constraints
      *
-     * @var array
+     * @var iterable<string, mixed>|Closure
      */
-    private array $throughConstraints = [];
+    private iterable|Closure $throughConstraints = [];
 
     /**
      * Merge of all constraints
      *
-     * @var array
+     * @var iterable<string, mixed>|Closure
      */
-    private array $allConstraints = [];
+    private iterable|Closure $allConstraints = [];
 
     /**
      * {@inheritdoc}
@@ -119,7 +121,7 @@ final class BelongsToMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function setConstraints($constraints): static
+    public function setConstraints(iterable|Closure $constraints): static
     {
         $this->allConstraints = $constraints;
 
@@ -131,11 +133,11 @@ final class BelongsToMany extends Relation
     /**
      * Extract constraints design for through queries
      *
-     * @param array|\Closure $constraints
+     * @param iterable<string, mixed>|Closure $constraints
      *
      * @return array
      */
-    protected function extractConstraints($constraints): array
+    protected function extractConstraints(iterable|Closure $constraints): array
     {
         if (!is_array($constraints)) {
             return [$constraints, []];
@@ -174,7 +176,7 @@ final class BelongsToMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function joinRepositories(EntityJoinable $query, string $alias, $discriminator = null): array
+    public function joinRepositories(EntityJoinable $query, string $alias, string|int|null $discriminator = null): array
     {
         return [
             $this->attributeAim.'Through' => $this->through,
@@ -185,7 +187,7 @@ final class BelongsToMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function link($owner, ?string $queryClass = null): ReadCommandInterface
+    public function link(array|object $owner, ?string $queryClass = null): ReadCommandInterface
     {
         /** @var QueryInterface<\Bdf\Prime\Connection\ConnectionInterface, R>&EntityJoinable $query */
         $query = $this->distant->query($queryClass);
@@ -231,11 +233,11 @@ final class BelongsToMany extends Relation
      * Get a query from through entity repository
      *
      * @param string|array  $key
-     * @param array $constraints
+     * @param iterable<string, mixed>|callable $constraints
      *
      * @return ReadCommandInterface&Deletable
      */
-    protected function throughQuery($key, $constraints = []): ReadCommandInterface
+    protected function throughQuery(string|array $key, iterable|callable $constraints = []): ReadCommandInterface
     {
         if (is_array($key)) {
             if (count($key) !== 1 || $constraints || $this->throughConstraints) {
@@ -267,7 +269,7 @@ final class BelongsToMany extends Relation
     /**
      * Build the query for find related entities
      */
-    protected function relationQuery(array $keys, $constraints): ReadCommandInterface
+    protected function relationQuery(array $keys, iterable|callable $constraints): ReadCommandInterface
     {
         // Constraints can be on relation attributes : builder must be used
         // @todo Handle "bulk select"
@@ -292,23 +294,30 @@ final class BelongsToMany extends Relation
      * Apply the through constraints
      *
      * @param Q $query
-     * @param array $constraints
+     * @param iterable<string, mixed>|callable $constraints
      * @param string|null $context
      *
      * @return Q
      *
      * @template Q as ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, object>&\Bdf\Prime\Query\Contract\Whereable
      */
-    protected function applyThroughConstraints(ReadCommandInterface $query, $constraints = [], ?string $context = null): ReadCommandInterface
+    protected function applyThroughConstraints(ReadCommandInterface $query, iterable|callable $constraints = [], ?string $context = null): ReadCommandInterface
     {
-        return $query->where($this->applyContext($context, $constraints + $this->throughConstraints));
+        if (is_array($constraints) && is_array($this->throughConstraints)) {
+            return $query->where($this->applyContext($context, $constraints + $this->throughConstraints));
+        } else {
+            return $query
+                ->where($this->applyContext($context, $this->throughConstraints))
+                ->where($this->applyContext($context, $constraints))
+            ;
+        }
     }
 
     /**
      * {@inheritdoc}
      */
     #[ReadOperation]
-    protected function relations($keys, $with, $constraints, $without): array
+    protected function relations(array $keys, array $with, iterable|callable $constraints, array $without): array
     {
         list($constraints, $throughConstraints) = $this->extractConstraints($constraints);
 
@@ -346,7 +355,7 @@ final class BelongsToMany extends Relation
     /**
      * {@inheritdoc}
      */
-    protected function match($collection, $relations): void
+    protected function match(array $collection, array $relations): void
     {
         foreach ($relations['throughEntities'] as $key => $throughDistants) {
             $entities = [];
@@ -380,7 +389,7 @@ final class BelongsToMany extends Relation
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function associate($owner, $entity): object
+    public function associate(object $owner, mixed $entity): object
     {
         $this->attach($owner, $entity);
 
@@ -393,7 +402,7 @@ final class BelongsToMany extends Relation
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function dissociate($owner): object
+    public function dissociate(object $owner): object
     {
         $this->detach($owner, $this->getRelation($owner));
 
@@ -405,7 +414,7 @@ final class BelongsToMany extends Relation
      *
      * @throws PrimeException
      */
-    public function create($owner, array $data = []): object
+    public function create(object $owner, array $data = []): object
     {
         $entity = $this->distant->entity($data);
 
@@ -420,7 +429,7 @@ final class BelongsToMany extends Relation
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function add($owner, $related): int
+    public function add(object $owner, mixed $related): int
     {
         return $this->attach($owner, $related);
     }
@@ -429,7 +438,7 @@ final class BelongsToMany extends Relation
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function saveAll($owner, array $relations = []): int
+    public function saveAll(object $owner, array $relations = []): int
     {
         //Detach all relations
         if ($this->saveStrategy === self::SAVE_STRATEGY_REPLACE) {
@@ -444,7 +453,7 @@ final class BelongsToMany extends Relation
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function deleteAll($owner, array $relations = []): int
+    public function deleteAll(object $owner, array $relations = []): int
     {
         return $this->detach($owner, $this->getRelation($owner));
     }
@@ -459,7 +468,7 @@ final class BelongsToMany extends Relation
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function has($owner, $entity): bool
+    public function has(object $owner, mixed $entity): bool
     {
         $data = [$this->throughLocal => $this->getLocalKeyValue($owner)];
 
@@ -482,7 +491,7 @@ final class BelongsToMany extends Relation
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function attach($owner, $entities): int
+    public function attach(object $owner, mixed $entities): int
     {
         if (empty($entities)) {
             return 0;
@@ -522,7 +531,7 @@ final class BelongsToMany extends Relation
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function detach($owner, $entities): int
+    public function detach(object $owner, mixed $entities): int
     {
         if (empty($entities)) {
             return 0;

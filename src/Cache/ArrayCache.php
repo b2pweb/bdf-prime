@@ -24,7 +24,7 @@ final class ArrayCache implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function set(CacheKey $key, $data): void
+    public function set(CacheKey $key, mixed $data): void
     {
         $this->data[$key->namespace()][$key->key()] = $data;
     }

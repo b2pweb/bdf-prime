@@ -63,7 +63,7 @@ final class Timestampable extends Behavior implements ClockAwareInterface
      * @param bool|string|array $updatedAt
      * @param string            $type
      */
-    public function __construct($createdAt = true, $updatedAt = true, string $type = TypeInterface::DATETIME)
+    public function __construct(bool|string|array $createdAt = true, bool|string|array $updatedAt = true, string $type = TypeInterface::DATETIME)
     {
         $this->clock = NativeClock::instance();
         $this->type = $type;
@@ -95,7 +95,7 @@ final class Timestampable extends Behavior implements ClockAwareInterface
      *
      * @return null|array{name: string, alias?: string}
      */
-    private function getFieldInfos($field, array $default): ?array
+    private function getFieldInfos(bool|string|array $field, array $default): ?array
     {
         if ($field === true) {
             return $default;

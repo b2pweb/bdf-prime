@@ -21,7 +21,7 @@ final class CodeGenerator
      *
      * @return string
      */
-    public function namespace($namespace): string
+    public function namespace(string $namespace): string
     {
         if (empty($namespace)) {
             return '';
@@ -38,7 +38,7 @@ final class CodeGenerator
      *
      * @return string
      */
-    public function properties(array $names, $visibility = 'private'): string
+    public function properties(array $names, string $visibility = 'private'): string
     {
         $out = '';
 
@@ -56,7 +56,7 @@ final class CodeGenerator
      *
      * @return string
      */
-    public function simpleConstructor($properties): string
+    public function simpleConstructor(array $properties): string
     {
         $parameters = implode(', ', array_map(function ($p) {
             return '$'.$p;
@@ -88,7 +88,7 @@ CTR;
      *
      * @return string
      */
-    public function indent($code, $tabs): string
+    public function indent(string $code, int $tabs): string
     {
         $spaces = str_repeat($this->tab, $tabs);
 
@@ -125,7 +125,7 @@ CTR;
      *
      * @return string
      */
-    public function switchIntanceOf($varName, array $cases): string
+    public function switchIntanceOf(string $varName, array $cases): string
     {
         $out = [];
 
@@ -149,7 +149,7 @@ PHP;
      *
      * @return string
      */
-    public function switch($varName, array $cases, $default = null): string
+    public function switch(string $varName, array $cases, ?string $default = null): string
     {
         $code = 'switch ('.$varName.') {'.$this->eol;
 
@@ -192,7 +192,7 @@ PHP;
      *
      * @return string
      */
-    public function className($name): string
+    public function className(string $name): string
     {
         return '\\'.ltrim($name, '\\');
     }
@@ -206,7 +206,7 @@ PHP;
      *
      * @see var_export()
      */
-    public function export($value): string
+    public function export(mixed $value): string
     {
         if ($value === null) {
             return 'null';
@@ -228,7 +228,7 @@ PHP;
      *
      * @return string
      */
-    public function generate($template, array $placeholders): string
+    public function generate(string $template, array $placeholders): string
     {
         /** @var string $file */
         $file = file_get_contents($template);

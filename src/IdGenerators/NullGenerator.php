@@ -24,7 +24,7 @@ final class NullGenerator extends AbstractGenerator
     /**
      * {@inheritdoc}
      */
-    public function postProcess($entity): void
+    public function postProcess(object $entity): void
     {
         //do nothing
     }

@@ -55,7 +55,7 @@ final class DefaultQueryFactory implements QueryFactoryInterface
      *
      * @return void
      */
-    public function register(string $query, $compiler): void
+    public function register(string $query, string|object $compiler): void
     {
         $this->compilers[$query] = $compiler;
     }

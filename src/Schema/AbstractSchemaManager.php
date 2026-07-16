@@ -121,7 +121,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function add($structure): static
+    public function add(object $structure): static
     {
         if ($this->has($structure->name())) {
             $current = $this->load($structure->name());
@@ -230,7 +230,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function pushRollback($queries): static
+    public function pushRollback(mixed $queries): static
     {
         if (!$this->generateRollback) {
             return $this;

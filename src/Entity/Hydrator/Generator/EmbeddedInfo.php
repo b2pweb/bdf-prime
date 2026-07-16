@@ -19,7 +19,7 @@ final class EmbeddedInfo
      * @param array $metadata
      * @param AttributesResolver $resolver
      */
-    public function __construct($path, array $metadata, AttributesResolver $resolver)
+    public function __construct(string $path, array $metadata, AttributesResolver $resolver)
     {
         $this->path = $path;
         $this->metadata = $metadata;
@@ -126,7 +126,7 @@ final class EmbeddedInfo
      *
      * @return mixed
      */
-    public function hint($className = null): mixed
+    public function hint(?string $className = null): mixed
     {
         if ($this->isPolymorph()) {
             return $this->metadata['hints'][$className];

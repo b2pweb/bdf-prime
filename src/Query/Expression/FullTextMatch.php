@@ -21,17 +21,17 @@ use function sprintf;
 final class FullTextMatch implements ExpressionInterface
 {
     private string $search;
-    private mixed $value;
+    private string $value;
     private bool $booleanMode;
 
     /**
      * Constructor
      *
      * @param string  $search
-     * @param array   $value
+     * @param string $value
      * @param boolean $booleanMode
      */
-    public function __construct($search, $value, $booleanMode = false)
+    public function __construct(string $search, string $value, bool $booleanMode = false)
     {
         $this->search = $search;
         $this->value = $value;

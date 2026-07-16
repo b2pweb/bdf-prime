@@ -57,7 +57,7 @@ readonly class LikeCriterion extends Criterion
      * @param string|null $end
      * @param bool $skipNull
      */
-    public function __construct($field = null, bool $startsWith = false, bool $endsWith = false, bool $contains = false, bool $escape = true, ?string $start = null, ?string $end = null, bool $skipNull = true)
+    public function __construct(string|ExpressionInterface|null $field = null, bool $startsWith = false, bool $endsWith = false, bool $contains = false, bool $escape = true, ?string $start = null, ?string $end = null, bool $skipNull = true)
     {
         parent::__construct($field, null, $skipNull);
 
@@ -74,7 +74,7 @@ readonly class LikeCriterion extends Criterion
      *
      * @psalm-suppress ImpureMethodCall
      */
-    public function value($value): Like
+    public function value(mixed $value): Like
     {
         $value = new Like(parent::value($value));
 

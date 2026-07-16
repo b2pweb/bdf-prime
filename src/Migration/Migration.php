@@ -202,7 +202,7 @@ class Migration implements MigrationInterface
      * @return Result
      * @throws PrimeException
      */
-    public function query($sql, array $params = [], $connectionName = null): Result
+    public function query(string $sql, array $params = [], ?string $connectionName = null): Result
     {
         return $this->connection($connectionName)->executeQuery($sql, $params);
     }
@@ -212,12 +212,12 @@ class Migration implements MigrationInterface
      *
      * @param string $sql
      * @param array  $params
-     * @param string $connectionName
+     * @param string|null $connectionName
      *
      * @return int
      * @throws PrimeException
      */
-    public function update($sql, array $params = [], $connectionName = null): int
+    public function update(string $sql, array $params = [], ?string $connectionName = null): int
     {
         $conn = $this->connection($connectionName);
 
@@ -252,12 +252,12 @@ class Migration implements MigrationInterface
     /**
      * Get schema manager instance
      *
-     * @param string $connectionName
+     * @param string|null $connectionName
      *
      * @return SchemaManager
      * @throws PrimeException
      */
-    public function schema($connectionName = null): SchemaManager
+    public function schema(?string $connectionName = null): SchemaManager
     {
         return new SchemaManager($this->connection($connectionName));
     }
@@ -269,7 +269,7 @@ class Migration implements MigrationInterface
      *
      * @return ConnectionInterface&\Doctrine\DBAL\Connection
      */
-    public function connection($connectionName = null): ConnectionInterface
+    public function connection(?string $connectionName = null): ConnectionInterface
     {
         /** @var ConnectionInterface&\Doctrine\DBAL\Connection */
         return $this->prime()->connection($connectionName);
@@ -284,7 +284,7 @@ class Migration implements MigrationInterface
      *
      * @template E as object
      */
-    public function repository($entity): RepositoryInterface
+    public function repository(string|object $entity): RepositoryInterface
     {
         return $this->prime()->repository($entity);
     }

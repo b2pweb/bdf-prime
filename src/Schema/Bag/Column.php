@@ -46,7 +46,7 @@ final class Column implements ColumnInterface
      * @param int|null $scale
      * @param array<string, mixed> $options
      */
-    public function __construct(string $name, PlatformTypeInterface $type, $defaultValue = null, ?int $length = null, bool $autoIncrement = false, bool $unsigned = false, bool $fixed = false, bool $nillable = false, ?string $comment = null, ?int $precision = 10, ?int $scale = 0, array $options = [])
+    public function __construct(string $name, PlatformTypeInterface $type, mixed $defaultValue = null, ?int $length = null, bool $autoIncrement = false, bool $unsigned = false, bool $fixed = false, bool $nillable = false, ?string $comment = null, ?int $precision = 10, ?int $scale = 0, array $options = [])
     {
         $this->name = $name;
         $this->type = $type;

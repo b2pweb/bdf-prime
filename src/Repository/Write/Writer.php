@@ -58,7 +58,7 @@ final class Writer implements WriterInterface
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function insert($entity, array $options = []): int
+    public function insert(object $entity, array $options = []): int
     {
         /** @var EntityRepository<E> $repository */
         $repository = $this->repository;
@@ -89,7 +89,7 @@ final class Writer implements WriterInterface
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function update($entity, array $options = []): int
+    public function update(object $entity, array $options = []): int
     {
         if ($this->repository->isReadOnly()) {
             throw new LogicException('Repository "'.$this->repository->entityName().'" is read only. Cannot execute write query');
@@ -126,7 +126,7 @@ final class Writer implements WriterInterface
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function delete($entity, array $options = []): int
+    public function delete(object $entity, array $options = []): int
     {
         if ($this->repository->isReadOnly()) {
             throw new LogicException('Repository "'.$this->repository->entityName().'" is read only. Cannot execute write query');

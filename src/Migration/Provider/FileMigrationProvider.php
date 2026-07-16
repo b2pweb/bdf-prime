@@ -174,7 +174,7 @@ final class FileMigrationProvider implements MigrationProviderInterface
      *
      * @return void
      */
-    private function assertUnique($version, $className): void
+    private function assertUnique(string $version, string $className): void
     {
         // Check if version already exists
         if (isset($this->migrations[$version])) {
@@ -210,7 +210,7 @@ final class FileMigrationProvider implements MigrationProviderInterface
      *
      * @throws InvalidArgumentException
      */
-    private function parseFilename($filename): array
+    private function parseFilename(string $filename): array
     {
         if (!preg_match('/^([0-9]+)_(.+)\.php/', basename($filename), $matches)) {
             throw new InvalidArgumentException(sprintf('The file "%s" does not have a valid migration filename', $filename));
@@ -230,7 +230,7 @@ final class FileMigrationProvider implements MigrationProviderInterface
      *
      * @return string  The file name
      */
-    private function createFilename($version, $className): string
+    private function createFilename(string $version, string $className): string
     {
         return $this->path . DIRECTORY_SEPARATOR . $version . '_' . $className . '.php';
     }
@@ -242,7 +242,7 @@ final class FileMigrationProvider implements MigrationProviderInterface
      *
      * @return string
      */
-    private function normalizeName($name): string
+    private function normalizeName(string $name): string
     {
         $name = str_replace(['_', '.'], ' ', $name);
         $name = ucwords($name);

@@ -27,9 +27,9 @@ final class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function start($start = '%'): self
+    public function start(string $start = '%'): self
     {
-        $this->start = (string) $start;
+        $this->start = $start;
 
         return $this;
     }
@@ -41,9 +41,9 @@ final class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function end($end = '%'): self
+    public function end(string $end = '%'): self
     {
-        $this->end = (string) $end;
+        $this->end = $end;
 
         return $this;
     }
@@ -55,7 +55,7 @@ final class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function enclose($char = '%'): self
+    public function enclose(string $char = '%'): self
     {
         $this->start = $char;
         $this->end   = $char;
@@ -70,9 +70,9 @@ final class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function escape($escape = true): self
+    public function escape(bool $escape = true): self
     {
-        $this->escape = (bool) $escape;
+        $this->escape = $escape;
 
         return $this;
     }
@@ -147,7 +147,7 @@ final class Like extends AbstractExpressionTransformer
      *
      * @return string
      */
-    public function generate($value): string
+    public function generate(string $value): string
     {
         if ($this->escape) {
             $value = addcslashes($value, '%_');

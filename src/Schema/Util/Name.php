@@ -36,7 +36,7 @@ final class Name
      *
      * @return string
      */
-    public static function serialized(string $prefix, $data, int $length = self::DEFAULT_LENGTH): string
+    public static function serialized(string $prefix, mixed $data, int $length = self::DEFAULT_LENGTH): string
     {
         return substr(strtoupper($prefix.'_'.md5(serialize($data))), 0, $length);
     }

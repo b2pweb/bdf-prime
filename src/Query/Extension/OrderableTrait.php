@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query\Extension;
 
 use Bdf\Prime\Query\Contract\Orderable;
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 
 /**
  * Trait for @see Orderable
@@ -18,29 +19,11 @@ trait OrderableTrait
      *
      * @see Orderable::order()
      */
-    public function order($sort, ?string $order = null)
+    public function order(string|array|ExpressionInterface $sort, ?string $order = null): static
     {
-        $this->compilerState->invalidate('orders');
-
         $this->statements['orders'] = [];
 
-        if (!is_array($sort)) {
-            $sort = [$sort => $order];
-        }
-
-        foreach ($sort as $column => $order) {
-            if (is_int($column)) {
-                $column = $order;
-                $order = Orderable::ORDER_ASC;
-            }
-
-            $this->statements['orders'][] = [
-                'sort'  => $column,
-                'order' => !$order ? Orderable::ORDER_ASC : $order,
-            ];
-        }
-
-        return $this;
+        return $this->addOrder($sort, $order);
     }
 
     /**
@@ -48,12 +31,17 @@ trait OrderableTrait
      *
      * @see Orderable::addOrder()
      */
-    public function addOrder($sort, ?string $order = null)
+    public function addOrder(string|array|ExpressionInterface $sort, ?string $order = null): static
     {
         $this->compilerState->invalidate('orders');
 
         if (!is_array($sort)) {
-            $sort = [$sort => $order];
+            $this->statements['orders'][] = [
+                'sort'  => $sort,
+                'order' => !$order ? Orderable::ORDER_ASC : $order,
+            ];
+
+            return $this;
         }
 
         foreach ($sort as $column => $order) {

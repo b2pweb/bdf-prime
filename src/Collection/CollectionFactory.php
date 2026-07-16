@@ -58,7 +58,7 @@ final class CollectionFactory
      *
      * @return void
      */
-    public function registerWrapperAlias(string $wrapperAlias, $wrapperClass, ?callable $factory = null): void
+    public function registerWrapperAlias(string $wrapperAlias, string|callable $wrapperClass, ?callable $factory = null): void
     {
         $this->aliases[$wrapperAlias] = $wrapperClass;
 
@@ -78,7 +78,7 @@ final class CollectionFactory
      *
      * @template T
      */
-    public function wrap(array $data, $wrapper = 'array'): CollectionInterface
+    public function wrap(array $data, string|callable $wrapper = 'array'): CollectionInterface
     {
         if (is_string($wrapper) && isset($this->aliases[$wrapper])) {
             $wrapper = $this->aliases[$wrapper];

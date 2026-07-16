@@ -10,7 +10,7 @@ final class BooleanType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function __construct($type = self::BOOLEAN)
+    public function __construct(string $type = self::BOOLEAN)
     {
         parent::__construct($type);
     }
@@ -20,7 +20,7 @@ final class BooleanType extends AbstractFacadeType
      *
      * @todo Tester value is string ?
      */
-    public function toDatabase($value): ?string
+    public function toDatabase(mixed $value): ?string
     {
         if ($value === null) {
             return null;
@@ -32,7 +32,7 @@ final class BooleanType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = []): ?bool
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?bool
     {
         if ($value === null) {
             return null;

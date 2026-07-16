@@ -31,5 +31,5 @@ interface QuoteCompilerInterface
      * @return string
      * @throws PrimeException
      */
-    public function quote($value): string;
+    public function quote(mixed $value): string;
 }

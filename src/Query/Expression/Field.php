@@ -25,7 +25,7 @@ final class Field implements ExpressionInterface
      * @param string $search
      * @param array  $values
      */
-    public function __construct($search, array $values)
+    public function __construct(string $search, array $values)
     {
         $this->search = $search;
         $this->values = $values;

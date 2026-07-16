@@ -124,7 +124,7 @@ final class NamedIndex implements IndexInterface
      * @return bool
      * @psalm-assert-if-true non-empty-string $name
      */
-    protected function isValidName($name): bool
+    protected function isValidName(?string $name): bool
     {
         if (empty($name)) {
             return false;

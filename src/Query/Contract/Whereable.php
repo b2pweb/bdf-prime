@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query\Contract;
 
 use Bdf\Prime\Query\Expression\ExpressionInterface;
+use Bdf\Prime\Query\QueryInterface;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 /**
@@ -35,7 +36,7 @@ interface Whereable
      *
      * @return $this This Query instance.
      */
-    public function where($column, $operator = null, $value = null);
+    public function where(string|iterable|callable|ExpressionInterface $column, mixed $operator = null, mixed $value = null);
 
     /**
      * Add or replace single where criterion
@@ -60,7 +61,7 @@ interface Whereable
      *
      * @return $this This Query instance.
      */
-    public function whereReplace(string $column, $operator = null, $value = null);
+    public function whereReplace(string $column, mixed $operator = null, mixed $value = null);
 
     /**
      * Adds one or more restrictions to the query results, forming a logical
@@ -82,7 +83,7 @@ interface Whereable
      *
      * @see where()
      */
-    public function orWhere($column, $operator = null, $value = null);
+    public function orWhere(string|iterable|callable|ExpressionInterface $column, mixed $operator = null, mixed $value = null);
 
     /**
      * Add where IS NULL expression
@@ -125,21 +126,21 @@ interface Whereable
     /**
      * Add where SQL expression
      *
-     * @param string|\Bdf\Prime\Query\QueryInterface|\Bdf\Prime\Query\Expression\ExpressionInterface $raw
+     * @param string|QueryInterface|ExpressionInterface $raw
      * @param string $type
      *
      * @return $this This Query instance.
      */
-    public function whereRaw($raw, string $type = CompositeExpression::TYPE_AND);
+    public function whereRaw(string|QueryInterface|ExpressionInterface $raw, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add OR where SQL expression
      *
-     * @param string|\Bdf\Prime\Query\QueryInterface|\Bdf\Prime\Query\Expression\ExpressionInterface $raw
+     * @param string|QueryInterface|ExpressionInterface $raw
      *
      * @return $this This Query instance.
      */
-    public function orWhereRaw($raw);
+    public function orWhereRaw(string|QueryInterface|ExpressionInterface $raw);
 
     /**
      * Add where nested

@@ -393,7 +393,7 @@ final class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function option(string $name, $value): self
+    public function option(string $name, mixed $value): self
     {
         $this->relations[$this->current][$name] = $value;
 
@@ -481,7 +481,7 @@ final class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function constraints($constraints): self
+    public function constraints(array|\Closure $constraints): self
     {
         $this->relations[$this->current]['constraints'] = $constraints;
 
@@ -545,7 +545,7 @@ final class RelationBuilder implements ArrayAccess, IteratorAggregate
      * @see \Bdf\Prime\Collection\CollectionInterface
      * @see \Bdf\Prime\Query\Query::wrapAs()
      */
-    public function wrapAs($wrapper): self
+    public function wrapAs(string|callable $wrapper): self
     {
         $this->relations[$this->current]['wrapper'] = $wrapper;
 
@@ -567,7 +567,7 @@ final class RelationBuilder implements ArrayAccess, IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->relations[$offset]);
     }
@@ -575,16 +575,15 @@ final class RelationBuilder implements ArrayAccess, IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($key)
+    public function offsetGet(mixed $offset): array
     {
-        return $this->relations[$key];
+        return $this->relations[$offset];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($key, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         // not allowed
     }
@@ -592,7 +591,7 @@ final class RelationBuilder implements ArrayAccess, IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
         // not allowed
     }

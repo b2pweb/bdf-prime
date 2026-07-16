@@ -51,7 +51,7 @@ final class HydratorRegistry
      *
      * @return void
      */
-    public function add($entityClass, HydratorInterface $hydrator): void
+    public function add(string $entityClass, HydratorInterface $hydrator): void
     {
         $this->hydrators[$entityClass] = $hydrator;
     }
@@ -76,7 +76,7 @@ final class HydratorRegistry
      *
      * @return void
      */
-    public function factory($entityClass, $factory): void
+    public function factory(string $entityClass, callable $factory): void
     {
         $this->factories[$entityClass] = $factory;
     }
@@ -88,7 +88,7 @@ final class HydratorRegistry
      *
      * @return HydratorInterface
      */
-    public function get($entityClass): HydratorInterface
+    public function get(string $entityClass): HydratorInterface
     {
         if (isset($this->hydrators[$entityClass])) {
             return $this->hydrators[$entityClass];

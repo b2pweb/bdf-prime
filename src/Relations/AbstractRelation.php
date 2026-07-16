@@ -14,8 +14,10 @@ use Bdf\Prime\Relations\Info\LocalHashTableRelationInfo;
 use Bdf\Prime\Relations\Info\NullRelationInfo;
 use Bdf\Prime\Relations\Info\RelationInfoInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
+use Closure;
 
-use function assert;
+use function is_array;
+use function is_iterable;
 use function is_object;
 
 /**
@@ -57,9 +59,9 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * Global constraints for this relation
      *
-     * @var array
+     * @var iterable<string,mixed>|Closure
      */
-    protected array $constraints = [];
+    protected iterable|Closure $constraints = [];
 
     /**
      * Is the relation not embedded in entity
@@ -85,7 +87,7 @@ abstract class AbstractRelation implements RelationInterface
      * @param RepositoryInterface<L> $local
      * @param RepositoryInterface<R>|null $distant
      */
-    public function __construct($attributeAim, RepositoryInterface $local, ?RepositoryInterface $distant = null)
+    public function __construct(string $attributeAim, RepositoryInterface $local, ?RepositoryInterface $distant = null)
     {
         $this->attributeAim = $attributeAim;
         $this->local = $local;
@@ -200,7 +202,7 @@ abstract class AbstractRelation implements RelationInterface
      *
      * @return $this
      */
-    public function setWrapper($wrapper)
+    public function setWrapper(string|callable $wrapper)
     {
         $this->wrapper = $wrapper;
 
@@ -214,11 +216,11 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * Set the global constraints for this relation
      *
-     * @param array|\Closure $constraints
+     * @param iterable<string,mixed>|Closure $constraints
      *
      * @return $this
      */
-    public function setConstraints($constraints)
+    public function setConstraints(iterable|Closure $constraints)
     {
         $this->constraints = $constraints;
 
@@ -228,9 +230,9 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * Get the global constraints of this relation
      *
-     * @return array|\Closure
+     * @return iterable<string,mixed>|Closure
      */
-    public function getConstraints()
+    public function getConstraints(): iterable|Closure
     {
         return $this->constraints;
     }
@@ -238,7 +240,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function isLoaded($entity): bool
+    public function isLoaded(object $entity): bool
     {
         return $this->relationInfo->isLoaded($entity);
     }
@@ -250,16 +252,16 @@ abstract class AbstractRelation implements RelationInterface
      * Use prefix on keys if set
      *
      * @param Q $query
-     * @param mixed $constraints
-     * @param string $context         The context is the prefix used by the query to refer to the related repository
+     * @param iterable<string,mixed>|callable $constraints
+     * @param string|null $context The context is the prefix used by the query to refer to the related repository
      *
      * @return Q
      *
      * @template Q as \Bdf\Prime\Query\Contract\Whereable&ReadCommandInterface
      */
-    protected function applyConstraints(ReadCommandInterface $query, $constraints = [], $context = null): ReadCommandInterface
+    protected function applyConstraints(ReadCommandInterface $query, iterable|callable $constraints = [], ?string $context = null): ReadCommandInterface
     {
-        if (is_array($constraints)) {
+        if (is_array($constraints) && is_array($this->constraints)) {
             $query->where($this->applyContext($context, $constraints + $this->constraints));
         } else {
             $query->where($this->applyContext($context, $this->constraints));
@@ -275,39 +277,39 @@ abstract class AbstractRelation implements RelationInterface
      * @todo algo également présent dans EntityRepository::constraints()
      *
      * @param string|null $context
-     * @param mixed|array<string,mixed> $constraints
+     * @param iterable<string,mixed>|callable $constraints
      *
-     * @return mixed
+     * @return iterable<string,mixed>|callable
      */
-    protected function applyContext(?string $context, $constraints)
+    protected function applyContext(?string $context, iterable|callable $constraints)
     {
-        if ($context && is_array($constraints)) {
-            $context .= '.';
+        if (!$context || !is_iterable($constraints)) {
+            return $constraints;
+        }
 
-            /** @var string $key */
-            foreach ($constraints as $key => $value) {
-                // Skip commands
-                if ($key[0] !== ':') {
-                    $constraints[$context.$key] = $value;
-                }
+        $withContext = [];
+        $context .= '.';
 
-                unset($constraints[$key]);
+        foreach ($constraints as $key => $value) {
+            // Skip commands
+            if ($key[0] !== ':') {
+                $withContext[$context.$key] = $value;
             }
         }
 
-        return $constraints;
+        return $withContext;
     }
 
     /**
      * Get a query builder from distant entities
      *
-     * @param string|array $value
-     * @param mixed        $constraints
+     * @param mixed $value
+     * @param iterable<string,mixed>|callable $constraints
      * @param class-string|null $queryClass
      *
      * @return ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>&Deletable
      */
-    protected function query($value, $constraints = [], ?string $queryClass = null): ReadCommandInterface
+    protected function query(mixed $value, iterable|callable $constraints = [], ?string $queryClass = null): ReadCommandInterface
     {
         $query = $this->distant->query($queryClass);
 
@@ -328,7 +330,7 @@ abstract class AbstractRelation implements RelationInterface
      *
      * @template Q as \Bdf\Prime\Query\Contract\Whereable&ReadCommandInterface<\Bdf\Prime\Connection\ConnectionInterface, R>
      */
-    abstract protected function applyWhereKeys(ReadCommandInterface $query, $value): ReadCommandInterface;
+    abstract protected function applyWhereKeys(ReadCommandInterface $query, mixed $value): ReadCommandInterface;
 
     //
     //---------- util methods to set and get/set relation, foreign and primary key
@@ -340,7 +342,7 @@ abstract class AbstractRelation implements RelationInterface
      * @param L $entity The relation owner
      * @param R|R[]|null $relation The entity to set to the owner. Can be an array of entities
      */
-    protected function setRelation($entity, $relation): void
+    protected function setRelation(object $entity, array|object|null $relation): void
     {
         if ($this->isDetached) {
             return;
@@ -366,7 +368,7 @@ abstract class AbstractRelation implements RelationInterface
      *
      * @return R|R[]|null The relation object. Can be an array on many relation
      */
-    protected function getRelation($entity)
+    protected function getRelation(object $entity): object|array|null
     {
         if ($this->isDetached) {
             return null;
@@ -395,7 +397,7 @@ abstract class AbstractRelation implements RelationInterface
      *
      * @return string  The alias of the local table
      */
-    protected function getLocalAlias(ReadCommandInterface $query)
+    protected function getLocalAlias(ReadCommandInterface $query): string
     {
         // @todo works ?
         /** @psalm-suppress UndefinedInterfaceMethod */
@@ -413,7 +415,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
+    public function load(EntityIndexerInterface $collection, array $with = [], iterable|callable $constraints = [], array $without = []): void
     {
         throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }
@@ -430,7 +432,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function associate($owner, $entity)
+    public function associate(object $owner, object $entity): object
     {
         throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }
@@ -438,7 +440,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function dissociate($owner)
+    public function dissociate(object $owner): object
     {
         throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }
@@ -446,7 +448,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function create($owner, array $data = [])
+    public function create(object $owner, array $data = []): object
     {
         throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }
@@ -454,7 +456,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function add($owner, $related): int
+    public function add(object $owner, object $related): int
     {
         throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }
@@ -462,7 +464,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function saveAll($owner, array $relations = []): int
+    public function saveAll(object $owner, array $relations = []): int
     {
         throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }
@@ -470,7 +472,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function deleteAll($owner, array $relations = []): int
+    public function deleteAll(object $owner, array $relations = []): int
     {
         throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }
@@ -478,7 +480,7 @@ abstract class AbstractRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function loadIfNotLoaded(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
+    public function loadIfNotLoaded(EntityIndexerInterface $collection, array $with = [], iterable|callable $constraints = [], array $without = []): void
     {
         if ($collection->empty()) {
             return;

@@ -18,7 +18,7 @@ abstract class AbstractExpressionTransformer implements ExpressionTransformerInt
      *
      * @param mixed $value Value to transform
      */
-    public function __construct($value)
+    public function __construct(mixed $value)
     {
         $this->value = $value;
     }

@@ -24,7 +24,7 @@ final class UnitEnumType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = []): ?UnitEnum
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?UnitEnum
     {
         if ($value === null) {
             return null;
@@ -44,7 +44,7 @@ final class UnitEnumType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value): mixed
+    public function toDatabase(mixed $value): mixed
     {
         if (!$value instanceof UnitEnum) {
             return $value;

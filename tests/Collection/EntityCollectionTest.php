@@ -545,7 +545,7 @@ class EntityCollectionTest extends TestCase
         $retVal = match ($method) {
             'all', 'keys', 'toArray' => ['rtrn'],
             'has', 'isEmpty', 'contains' => true,
-            default => new stdClass(),
+            default => $this->createMock(CollectionInterface::class),
         };
         $storage = $this->createMock(CollectionInterface::class);
         $storage->expects($this->once())

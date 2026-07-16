@@ -175,7 +175,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      *
      * @return $this
      */
-    public function pickShard($distributionValue = null): self
+    public function pickShard(mixed $distributionValue = null): self
     {
         $this->useShard(
             $distributionValue !== null
@@ -230,7 +230,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      *
      * @throws ShardingException   If the shard id is not known
      */
-    public function getShardConnection($shardId = null)
+    public function getShardConnection(?string $shardId = null)
     {
         if ($shardId === null) {
             return $this->connections;
@@ -300,7 +300,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function executeQuery(string $sql, array $params = [], $types = [], ?QueryCacheProfile $qcp = null): Result
+    public function executeQuery(string $sql, array $params = [], array $types = [], ?QueryCacheProfile $qcp = null): Result
     {
         if ($this->isUsingShard()) {
             return $this->getSelectedShard()->executeQuery($sql, $params, $types, $qcp);
@@ -319,7 +319,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function executeStatement($sql, array $params = [], array $types = []): int
+    public function executeStatement(string $sql, array $params = [], array $types = []): int
     {
         $result = 0;
 
@@ -363,7 +363,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function createSavepoint($savepoint): void
+    public function createSavepoint(string $savepoint): void
     {
         foreach ($this->getSelectedShards() as $shard) {
             $shard->createSavepoint($savepoint);
@@ -373,7 +373,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function releaseSavepoint($savepoint): void
+    public function releaseSavepoint(string $savepoint): void
     {
         foreach ($this->getSelectedShards() as $shard) {
             $shard->releaseSavepoint($savepoint);
@@ -383,7 +383,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function rollbackSavepoint($savepoint): void
+    public function rollbackSavepoint(string $savepoint): void
     {
         foreach ($this->getSelectedShards() as $shard) {
             $shard->rollbackSavepoint($savepoint);
@@ -393,7 +393,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function lastInsertId($name = null): string|int
+    public function lastInsertId(): string|int
     {
         if ($this->isUsingShard()) {
             return $this->getSelectedShard()->lastInsertId();

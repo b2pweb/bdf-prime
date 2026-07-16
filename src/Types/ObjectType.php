@@ -10,7 +10,7 @@ final class ObjectType extends AbstractSerializeType
     /**
      * {@inheritdoc}
      */
-    public function __construct($type = self::OBJECT)
+    public function __construct(string $type = self::OBJECT)
     {
         parent::__construct($type);
     }
@@ -26,7 +26,7 @@ final class ObjectType extends AbstractSerializeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value): ?string
+    public function toDatabase(mixed $value): ?string
     {
         if (!is_object($value)) {
             return $value;

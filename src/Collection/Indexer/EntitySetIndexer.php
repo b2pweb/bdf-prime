@@ -50,7 +50,7 @@ final class EntitySetIndexer implements EntityIndexerInterface
      *
      * @return void
      */
-    public function push($entity): void
+    public function push(object $entity): void
     {
         $hash = spl_object_hash($entity);
 

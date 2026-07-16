@@ -51,7 +51,7 @@ final class CompilerState
      *
      * @return void
      */
-    public function invalidate($parts = []): void
+    public function invalidate(string|array $parts = []): void
     {
         if ($this->compiling) {
             return;
@@ -87,7 +87,7 @@ final class CompilerState
      *
      * @return void
      */
-    public function bind($value): void
+    public function bind(mixed $value): void
     {
         $this->bindings[$this->currentPart][] = $value;
     }

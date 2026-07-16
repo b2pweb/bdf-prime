@@ -155,7 +155,7 @@ final class RepositoryQueryFactory
      * @throws PrimeException When query fail
      */
     #[ReadOperation]
-    public function findById($id): ?object
+    public function findById(mixed $id): ?object
     {
         // Create a new query if cache is disabled
         if (!$this->supportsKeyValue) {
@@ -204,7 +204,7 @@ final class RepositoryQueryFactory
      *
      * @return KeyValueQueryInterface<ConnectionInterface, E>|null The query, or null if not supported
      */
-    public function keyValue($attribute = null, $value = null): ?KeyValueQueryInterface
+    public function keyValue(string|array|null $attribute = null, mixed $value = null): ?KeyValueQueryInterface
     {
         if (!$this->supportsKeyValue) {
             return null;
@@ -241,7 +241,7 @@ final class RepositoryQueryFactory
      * @throws PrimeException When query fail
      */
     #[ReadOperation]
-    public function countKeyValue($attribute = null, $value = null): int
+    public function countKeyValue(string|array|null $attribute = null, mixed $value = null): int
     {
         if (!$this->supportsKeyValue) {
             $query = $this->builder();
@@ -309,11 +309,11 @@ final class RepositoryQueryFactory
      * Delegates call to corresponding query
      *
      * @param string $name
-     * @param string $arguments
+     * @param list<mixed> $arguments
      *
      * @return mixed
      */
-    public function __call($name, $arguments): mixed
+    public function __call(string $name, array $arguments): mixed
     {
         if (isset($this->queries[$name])) {
             return $this->queries[$name]($this->repository, ...$arguments);

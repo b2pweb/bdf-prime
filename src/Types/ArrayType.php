@@ -20,7 +20,7 @@ final class ArrayType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function __construct($type = self::TARRAY)
+    public function __construct(string $type = self::TARRAY)
     {
         parent::__construct($type);
     }
@@ -28,7 +28,7 @@ final class ArrayType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = []): array
+    public function fromDatabase(mixed $value, array $fieldOptions = []): array
     {
         if ($value === '' || $value === null) {
             return [];
@@ -49,7 +49,7 @@ final class ArrayType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value): ?string
+    public function toDatabase(mixed $value): ?string
     {
         if ($value === null) {
             return null;

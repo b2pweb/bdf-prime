@@ -35,7 +35,7 @@ final class JsonContainsPath extends AbstractPlatformSpecificExpression
      * @param ExpressionInterface|string $target The JSON document or array to search in. Can be an attribute name, or a SQL expression. The value should not be unquoted.
      * @param string $path The path to search in the JSON document. Must start with "$"
      */
-    public function __construct($target, string $path)
+    public function __construct(ExpressionInterface|string $target, string $path)
     {
         $this->target = $target;
         $this->path = $path;

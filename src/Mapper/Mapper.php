@@ -377,12 +377,8 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @param string|GeneratorInterface $generator
      */
-    final public function setGenerator($generator): void
+    final public function setGenerator(string|GeneratorInterface $generator): void
     {
-        if (!is_string($generator) && !$generator instanceof GeneratorInterface) {
-            throw new LogicException('Trying to set an invalid generator in "' . get_class($this) . '"');
-        }
-
         if ($this->clock && $generator instanceof ClockAwareInterface) {
             $generator->setClock($this->clock);
         }
@@ -488,7 +484,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @return void
      */
-    final public function setId($entity, $value): void
+    final public function setId(object $entity, mixed $value): void
     {
         $this->hydrateOne($entity, $this->metadata->primary['attributes'][0], $value);
     }
@@ -501,7 +497,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @return mixed
      */
-    final public function getId($entity): mixed
+    final public function getId(object $entity): mixed
     {
         return $this->extractOne($entity, $this->metadata->primary['attributes'][0]);
     }
@@ -514,7 +510,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @return mixed
      */
-    final public function extractOne($entity, string $attribute): mixed
+    final public function extractOne(object $entity, string $attribute): mixed
     {
         return $this->hydrator->extractOne($entity, $attribute);
     }
@@ -528,7 +524,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @return void
      */
-    final public function hydrateOne($entity, string $attribute, $value): void
+    final public function hydrateOne(object $entity, string $attribute, mixed $value): void
     {
         $this->hydrator->hydrateOne($entity, $attribute, $value);
     }
@@ -540,7 +536,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @return array
      */
-    final public function primaryCriteria($entity): array
+    final public function primaryCriteria(object $entity): array
     {
         return $this->hydrator->flatExtract($entity, array_flip($this->metadata->primary['attributes']));
     }
@@ -587,7 +583,7 @@ abstract class Mapper implements ClockAwareInterface
      *
      * @return array
      */
-    final public function prepareToRepository($entity, ?array $attributes = null): array
+    final public function prepareToRepository(object $entity, ?array $attributes = null): array
     {
         return $this->hydrator->flatExtract($entity, $attributes);
     }
@@ -1035,9 +1031,6 @@ abstract class Mapper implements ClockAwareInterface
      * Get all relations
      *
      * @return array<string, RelationDefinition>
-     * @final
-     *
-     * @todo should be final
      */
     final public function relations(): array
     {

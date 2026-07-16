@@ -18,7 +18,7 @@ abstract class AbstractFacadeType implements FacadeTypeInterface
      *
      * @param string $type
      */
-    public function __construct($type)
+    public function __construct(string $type)
     {
         $this->type = $type;
     }

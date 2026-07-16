@@ -16,7 +16,7 @@ final class SqlDecimalType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function __construct(PlatformInterface $platform, $name = self::DECIMAL)
+    public function __construct(PlatformInterface $platform, string $name = self::DECIMAL)
     {
         parent::__construct($platform, $name);
     }

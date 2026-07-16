@@ -26,7 +26,7 @@ final class SqlIntegerType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function __construct(PlatformInterface $platform, $name = self::INTEGER)
+    public function __construct(PlatformInterface $platform, string $name = self::INTEGER)
     {
         parent::__construct($platform, $name);
     }
@@ -34,7 +34,7 @@ final class SqlIntegerType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = []): ?int
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?int
     {
         return $value === null ? null : (int) $value;
     }

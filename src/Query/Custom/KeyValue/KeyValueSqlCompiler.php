@@ -77,9 +77,9 @@ final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompile
     /**
      * {@inheritdoc}
      */
-    public function quote($value): string
+    public function quote(mixed $value): string
     {
-        return $this->connection->quote($value);
+        return $this->connection->quote((string) $value);
     }
 
     /**
@@ -185,7 +185,7 @@ final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompile
      * @return string
      * @throws PrimeException
      */
-    private function compileAggregate(CompilableClause $query, $function, $column): string
+    private function compileAggregate(CompilableClause $query, string $function, string $column): string
     {
         if ($column !== '*') {
             $column = $query->preprocessor()->field($column);
@@ -216,7 +216,7 @@ final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompile
      * @return string
      * @throws PrimeException
      */
-    private function compileExpressionColumn(CompilableClause $query, $column, $alias = null): string
+    private function compileExpressionColumn(CompilableClause $query, mixed $column, ?string $alias = null): string
     {
         if ($column instanceof ExpressionInterface) {
             return $alias !== null
@@ -313,7 +313,7 @@ final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompile
      *
      * @return Statement
      */
-    private function prepare(CompilableClause $query, $sql): Statement
+    private function prepare(CompilableClause $query, string $sql): Statement
     {
         $query->state()->compiledParts['sql'] = $sql;
 

@@ -869,12 +869,12 @@ class FakeNullableStringType extends AbstractPlatformType
         return PhpTypeInterface::STRING;
     }
 
-    public function toDatabase($value)
+    public function toDatabase($value): mixed
     {
         return (string) $value;
     }
 
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase($value, array $fieldOptions = []): mixed
     {
         $value = (string) $value;
 

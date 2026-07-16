@@ -16,7 +16,7 @@ final class SqlGuidType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function __construct(PlatformInterface $platform, $name = self::GUID)
+    public function __construct(PlatformInterface $platform, string $name = self::GUID)
     {
         parent::__construct($platform, $name);
     }

@@ -225,7 +225,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * {@inheritdoc}
      */
-    public function setExtension($extension): void
+    public function setExtension(?object $extension): void
     {
         $this->extension = $extension;
     }
@@ -239,7 +239,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
      *
      * @return mixed
      */
-    public function __call($name, $arguments): mixed
+    public function __call(string $name, array $arguments): mixed
     {
         return $this->extension->$name($this, ...$arguments);
     }

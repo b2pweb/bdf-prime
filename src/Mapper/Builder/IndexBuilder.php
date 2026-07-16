@@ -37,7 +37,7 @@ final class IndexBuilder
      *
      * @return $this
      */
-    public function add($name = null): static
+    public function add(?string $name = null): static
     {
         if ($name === null) {
             $name = $this->index++;
@@ -77,7 +77,7 @@ final class IndexBuilder
      *
      * @return $this
      */
-    public function on($field, array $options = []): static
+    public function on(string|array $field, array $options = []): static
     {
         if (is_string($field)) {
             $this->indexes[$this->current]['fields'][$field] = $options;
@@ -109,7 +109,7 @@ final class IndexBuilder
      *
      * @return $this
      */
-    public function flag($name): static
+    public function flag(string $name): static
     {
         $this->indexes[$this->current][$name] = true;
 
@@ -128,7 +128,7 @@ final class IndexBuilder
      *
      * @return $this
      */
-    public function option($name, $value): static
+    public function option(string $name, mixed $value): static
     {
         $this->indexes[$this->current][$name] = $value;
 

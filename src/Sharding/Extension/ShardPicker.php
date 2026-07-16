@@ -24,7 +24,7 @@ trait ShardPicker
      *
      * @return $this
      */
-    public function pickShard($distributionValue): static
+    public function pickShard(mixed $distributionValue): static
     {
         $this->shardId = $this->connection->getShardChoser()
             ->pick($distributionValue, $this->connection);

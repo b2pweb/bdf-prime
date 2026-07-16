@@ -76,7 +76,7 @@ final class ConnectionRegistry implements ConnectionRegistryInterface
      *
      * @return void
      */
-    public function declareConnection(string $connectionName, $parameters): void
+    public function declareConnection(string $connectionName, string|array $parameters): void
     {
         $this->parametersMap[$connectionName] = $parameters;
     }

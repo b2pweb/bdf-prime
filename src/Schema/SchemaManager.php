@@ -85,7 +85,7 @@ final class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function schema($tables = []): DoctrineSchema
+    public function schema(DoctrineTable|array|TableInterface $tables = []): DoctrineSchema
     {
         if (!is_array($tables)) {
             $tables = [$tables];
@@ -245,7 +245,7 @@ final class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function diff($new, $old): mixed
+    public function diff(object $new, object $old): mixed
     {
         /** @psalm-suppress InternalMethod */
         $comparator = new Comparator(
@@ -282,7 +282,7 @@ final class SchemaManager extends AbstractSchemaManager
     /**
      * {@inheritdoc}
      */
-    public function push($queries): static
+    public function push(mixed $queries): static
     {
         if ($queries instanceof DoctrineSchemaDiff) {
             $queries = $this->platform->grammar()->getAlterSchemaSQL($queries);

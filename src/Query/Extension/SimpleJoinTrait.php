@@ -6,6 +6,7 @@ use Bdf\Prime\Query\Clause;
 use Bdf\Prime\Query\Compiler\CompilerState;
 use Bdf\Prime\Query\Contract\Joinable;
 use Bdf\Prime\Query\JoinClause;
+use Bdf\Prime\Query\QueryInterface;
 
 /**
  * Trait for join() method
@@ -21,8 +22,9 @@ trait SimpleJoinTrait
      * {@inheritdoc}
      *
      * @see Joinable::join()
+     * @return $this
      */
-    public function join($table, $key, ?string $operator = null, $foreign = null, string $type = Joinable::INNER_JOIN)
+    public function join(string|QueryInterface|array $table, string|callable $key, ?string $operator = null, mixed $foreign = null, string $type = Joinable::INNER_JOIN): static
     {
         $this->compilerState->invalidate('joins');
 
@@ -55,7 +57,7 @@ trait SimpleJoinTrait
      *
      * @see Joinable::leftJoin()
      */
-    public function leftJoin($table, $key, ?string $operator = null, $foreign = null)
+    public function leftJoin(string|QueryInterface|array $table, string|callable $key, ?string $operator = null, mixed $foreign = null): static
     {
         return $this->join($table, $key, $operator, $foreign, Joinable::LEFT_JOIN);
     }
@@ -65,7 +67,7 @@ trait SimpleJoinTrait
      *
      * @see Joinable::rightJoin()
      */
-    public function rightJoin($table, $key, ?string $operator = null, $foreign = null)
+    public function rightJoin(string|QueryInterface|array $table, string|callable $key, ?string $operator = null, mixed $foreign = null): static
     {
         return $this->join($table, $key, $operator, $foreign, Joinable::RIGHT_JOIN);
     }
@@ -75,5 +77,5 @@ trait SimpleJoinTrait
      *
      * @see Clause::addStatement()
      */
-    abstract public function addStatement(string $name, $values): void;
+    abstract public function addStatement(string $name, mixed $values): void;
 }

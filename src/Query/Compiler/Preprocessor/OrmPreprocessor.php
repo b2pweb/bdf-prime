@@ -139,7 +139,7 @@ final class OrmPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function field(string $attribute, &$type = null): string
+    public function field(string $attribute, mixed &$type = null): string
     {
         if ($this->type === 'select' && $this->aliasResolver !== null) {
             return $this->aliasResolver->resolve($attribute, $type);
@@ -156,7 +156,7 @@ final class OrmPreprocessor implements PreprocessorInterface
      *
      * @return string
      */
-    protected function fieldForWriteQuery($attribute, &$type = null): string
+    protected function fieldForWriteQuery(string $attribute, mixed &$type = null): string
     {
         // @fixme Throw exception if wants to write on undefined attribute ?
         if (!isset($this->metadata->attributes[$attribute])) {
@@ -274,7 +274,7 @@ final class OrmPreprocessor implements PreprocessorInterface
      *
      * @return mixed
      */
-    protected function tryConvertValue($value, TypeInterface $type): mixed
+    protected function tryConvertValue(mixed $value, TypeInterface $type): mixed
     {
         if (
             $value instanceof QueryInterface

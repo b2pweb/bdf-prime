@@ -39,7 +39,7 @@ final class Versionable extends Behavior
      * @param string $versionClass
      * @param bool   $allowDeletion
      */
-    public function __construct($versionClass, $allowDeletion = false)
+    public function __construct(string $versionClass, bool $allowDeletion = false)
     {
         $this->versionClass = $versionClass;
         $this->allowDeletion = $allowDeletion;
@@ -163,7 +163,7 @@ final class Versionable extends Behavior
      *
      * @return void
      */
-    protected function incrementVersion($entity, RepositoryInterface $repository): void
+    protected function incrementVersion(object $entity, RepositoryInterface $repository): void
     {
         $mapper = $repository->mapper();
 
@@ -182,7 +182,7 @@ final class Versionable extends Behavior
      *
      * @return void
      */
-    protected function insertVersion($entity, RepositoryInterface $repository): void
+    protected function insertVersion(object $entity, RepositoryInterface $repository): void
     {
         $repository->repository($this->versionClass)->insert($entity);
     }

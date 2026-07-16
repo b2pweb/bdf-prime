@@ -23,7 +23,7 @@ final class Check implements CheckInterface
      * @param mixed $expression
      * @param string|null $name
      */
-    public function __construct($expression, ?string $name = null)
+    public function __construct(mixed $expression, ?string $name = null)
     {
         $this->expression = $expression;
         $this->name       = $name;

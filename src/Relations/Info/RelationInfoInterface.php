@@ -13,17 +13,17 @@ interface RelationInfoInterface
      * @param E $entity
      * @return bool
      */
-    public function isLoaded($entity): bool;
+    public function isLoaded(object $entity): bool;
 
     /**
      * @param E $entity
      * @return void
      */
-    public function clear($entity): void;
+    public function clear(object $entity): void;
 
     /**
      * @param E $entity
      * @return void
      */
-    public function markAsLoaded($entity): void;
+    public function markAsLoaded(object $entity): void;
 }

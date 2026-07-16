@@ -39,7 +39,7 @@ trait DateTimeHelper
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = []): ?DateTimeInterface
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?DateTimeInterface
     {
         if ($value === null) {
             return null;
@@ -67,7 +67,7 @@ trait DateTimeHelper
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value): mixed
+    public function toDatabase(mixed $value): mixed
     {
         if ($value === null) {
             return null;

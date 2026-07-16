@@ -39,7 +39,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
     /**
      * {@inheritdoc}
      */
-    public function quote($value): string
+    public function quote(mixed $value): string
     {
         return $this->connection->quote((string) $this->autoConvertValue($value));
     }
@@ -397,7 +397,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      * @return string
      * @throws PrimeException
      */
-    protected function compileAggregate(CompilableClause $query, $function, $column, $distinct): string
+    protected function compileAggregate(CompilableClause $query, string $function, string $column, ?bool $distinct): string
     {
         if ($column !== '*') {
             $column = $query->preprocessor()->field($column);
@@ -438,7 +438,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      * @return string
      * @throws PrimeException
      */
-    protected function compileExpressionColumn(CompilableClause $query, $column, $alias = null): string
+    protected function compileExpressionColumn(CompilableClause $query, mixed $column, ?string $alias = null): string
     {
         if ($column instanceof QueryInterface) {
             return $this->compileSubQuery($query, $column, $alias);
@@ -683,7 +683,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      * @throws UnexpectedValueException
      * @throws PrimeException
      */
-    protected function compileExpression(CompilableClause $query, $column, string $operator, $value, bool $converted): string
+    protected function compileExpression(CompilableClause $query, string|ExpressionInterface $column, string $operator, mixed $value, bool $converted): string
     {
         if ($value instanceof ExpressionTransformerInterface) {
             if ($column instanceof ExpressionInterface) {
@@ -822,7 +822,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      *
      * @return string
      */
-    protected function compileLeftExpression(CompilableClause $query, $expression): string
+    protected function compileLeftExpression(CompilableClause $query, string|ExpressionInterface $expression): string
     {
         if (is_string($expression)) {
             return $this->quoteIdentifier($query, $expression);
@@ -841,7 +841,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      * @return string
      * @throws PrimeException
      */
-    protected function compileExpressionValue(CompilableClause $query, $value, bool $converted): string
+    protected function compileExpressionValue(CompilableClause $query, mixed $value, bool $converted): string
     {
         if ($value instanceof QueryInterface) {
             return $this->compileSubQuery($query, $value);
@@ -864,7 +864,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      * @return string
      * @throws PrimeException
      */
-    protected function compileTypedValue(CompilableClause $query, $value, ?TypeInterface $type): string
+    protected function compileTypedValue(CompilableClause $query, mixed $value, ?TypeInterface $type): string
     {
         if ($value instanceof QueryInterface) {
             return $this->compileSubQuery($query, $value);
@@ -886,7 +886,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      * @return string
      * @throws PrimeException
      */
-    protected function compileRawValue(CompilableClause $query, $value): string
+    protected function compileRawValue(CompilableClause $query, mixed $value): string
     {
         if ($value instanceof QueryInterface) {
             return $this->compileSubQuery($query, $value);
@@ -909,7 +909,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      * @return string  The sub query sql
      * @throws PrimeException
      */
-    protected function compileSubQuery(CompilableClause $clause, QueryInterface $query, $alias = null): string
+    protected function compileSubQuery(CompilableClause $clause, QueryInterface $query, ?string $alias = null): string
     {
         //TODO les alias peuvent etre les memes. Ne gene pas MySQL, voir à regénérer ceux de la subquery
         $sql = '('.$this->compileSelect($query).')';
@@ -927,7 +927,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      * Compile IN or NOT IN expression
      *
      * @param SqlQueryInterface&CompilableClause $query
-     * @param array|QueryInterface|ExpressionInterface  $values
+     * @param array|QueryInterface|ExpressionInterface|scalar $values
      * @param string|ExpressionInterface $column
      * @param string $operator
      * @param boolean $converted
@@ -935,7 +935,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      * @return string
      * @throws PrimeException
      */
-    protected function compileInExpression(CompilableClause $query, $values, $column, string $operator = 'IN', bool $converted = false): string
+    protected function compileInExpression(CompilableClause $query, mixed $values, string|ExpressionInterface $column, string $operator = 'IN', bool $converted = false): string
     {
         if (is_array($values)) {
             $hasNullValue = null;
@@ -990,7 +990,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      * @return string
      * @throws PrimeException
      */
-    public function compileIntoExpression(CompilableClause $query, array $values, $column, $operator, bool $converted, string $separator = CompositeExpression::TYPE_OR): string
+    public function compileIntoExpression(CompilableClause $query, array $values, string|ExpressionInterface $column, string $operator, bool $converted, string $separator = CompositeExpression::TYPE_OR): string
     {
         $into = [];
 
@@ -1115,7 +1115,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      * @return string
      * @throws PrimeException
      */
-    protected function bindTyped(CompilableClause $query, $value, ?TypeInterface $type): string
+    protected function bindTyped(CompilableClause $query, mixed $value, ?TypeInterface $type): string
     {
         return $this->bindRaw($query, $this->platform()->types()->toDatabase($value, $type));
     }
@@ -1134,7 +1134,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      *
      * @return string
      */
-    protected function bindRaw(CompilableClause $query, $value): string
+    protected function bindRaw(CompilableClause $query, mixed $value): string
     {
         $query->state()->bind($value);
 
@@ -1156,7 +1156,7 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
      *
      * @return array
      */
-    protected function mergeBindings($bindings): array
+    protected function mergeBindings(array $bindings): array
     {
         $mergedBindings = [];
 

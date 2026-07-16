@@ -149,7 +149,7 @@ class TestPack
      *
      * @return self
      */
-    public function declareEntity($entityClasses)
+    public function declareEntity(string|array $entityClasses)
     {
         if (!is_array($entityClasses)) {
             $entityClasses = [$entityClasses];
@@ -287,7 +287,7 @@ class TestPack
      *
      * @return object|null
      */
-    public function get($name): ?object
+    public function get(string $name): ?object
     {
         if (isset($this->entities[$name])) {
             return $this->entities[$name];
@@ -303,7 +303,7 @@ class TestPack
      *
      * @return void
      */
-    public function pushEntity($entity): void
+    public function pushEntity(object $entity): void
     {
         /** @var EntityRepository $repository */
         $repository = Prime::repository($entity);
@@ -326,7 +326,7 @@ class TestPack
      *
      * @return void
      */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         /** @var EntityRepository $repository */
         $repository = Prime::repository($entity);

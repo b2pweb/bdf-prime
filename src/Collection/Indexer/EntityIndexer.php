@@ -39,7 +39,7 @@ final class EntityIndexer implements EntityIndexerInterface
      * @param Mapper<E> $mapper The entity mapper. Used for extract attribute value
      * @param list<string> $indexes List of initial indexes keys to use. Entities will be indexed with theses keys when pushed
      */
-    public function __construct(Mapper $mapper, $indexes = [])
+    public function __construct(Mapper $mapper, array $indexes = [])
     {
         $this->mapper = $mapper;
         $this->indexed = array_fill_keys($indexes, []);
@@ -53,7 +53,7 @@ final class EntityIndexer implements EntityIndexerInterface
      *
      * @return void
      */
-    public function push($entity): void
+    public function push(object $entity): void
     {
         $this->entities[] = $entity;
 

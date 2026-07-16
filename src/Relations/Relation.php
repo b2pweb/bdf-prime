@@ -125,7 +125,7 @@ abstract class Relation extends AbstractRelation
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
+    public function load(EntityIndexerInterface $collection, array $with = [], iterable|callable $constraints = [], array $without = []): void
     {
         if ($collection->empty()) {
             return;
@@ -150,14 +150,14 @@ abstract class Relation extends AbstractRelation
      *
      * @param array $keys List of local keys values (i.e. foreign key on the owner table) to load
      * @param array $with
-     * @param array $constraints
+     * @param iterable<string,mixed>|callable $constraints
      * @param array $without
      *
      * @return array Entities, indexed by the local key value (i.e. foreign key on the owner table). The value may be an array of entities if the relation is a collection, or a single entity if the relation is a single entity
      * @throws PrimeException
      */
     #[ReadOperation]
-    abstract protected function relations($keys, $with, $constraints, $without): array;
+    abstract protected function relations(array $keys, array $with, iterable|callable $constraints, array $without): array;
 
     /**
      * Set the relation in a collection of entities
@@ -165,7 +165,7 @@ abstract class Relation extends AbstractRelation
      * @param L[][] $collection
      * @param array $relations
      */
-    abstract protected function match($collection, $relations): void;
+    abstract protected function match(array $collection, array $relations): void;
 
     /**
      * Get defined relation

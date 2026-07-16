@@ -53,7 +53,7 @@ interface ClauseInterface
      *
      * @return void
      */
-    public function addStatement(string $name, $values): void;
+    public function addStatement(string $name, mixed $values): void;
 
     /**
      * Add a criteria part: WHERE HAVING ON
@@ -90,7 +90,7 @@ interface ClauseInterface
      *
      * @return $this
      */
-    public function buildClause(string $statement, $expression, $operator = null, $value = null, string $type = CompositeExpression::TYPE_AND);
+    public function buildClause(string $statement, string|iterable|ExpressionInterface $expression, mixed $operator = null, mixed $value = null, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Replace a clause value
@@ -113,7 +113,7 @@ interface ClauseInterface
      *
      * @return $this
      */
-    public function replaceClause(string $statement, string $expression, $operator = null, $value = null);
+    public function replaceClause(string $statement, string $expression, mixed $operator = null, mixed $value = null);
 
     /**
      * Add a raw expression in statement
@@ -128,7 +128,7 @@ interface ClauseInterface
      *
      * @return $this
      */
-    public function buildRaw(string $statement, $expression, string $type = CompositeExpression::TYPE_AND);
+    public function buildRaw(string $statement, string|QueryInterface|ExpressionInterface $expression, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * Add nested statement
@@ -158,5 +158,5 @@ interface ClauseInterface
      *
      * @return $this This Query instance.
      */
-    public function addCommand(string $command, $value);
+    public function addCommand(string $command, mixed $value);
 }

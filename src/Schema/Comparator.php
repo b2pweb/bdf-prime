@@ -28,9 +28,9 @@ final class Comparator extends BaseComparator
      *
      * @return void
      */
-    public function setListDropColumn($flag): void
+    public function setListDropColumn(bool $flag): void
     {
-        $this->listDropColumn = (bool)$flag;
+        $this->listDropColumn = $flag;
     }
 
     /**

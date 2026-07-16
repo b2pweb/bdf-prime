@@ -5,6 +5,8 @@ namespace Bdf\Prime\Query\Extension;
 use Bdf\Prime\Query\Clause;
 use Bdf\Prime\Query\Compiler\CompilerState;
 use Bdf\Prime\Query\Contract\Whereable;
+use Bdf\Prime\Query\Expression\ExpressionInterface;
+use Bdf\Prime\Query\QueryInterface;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 /**
@@ -23,7 +25,7 @@ trait SimpleWhereTrait
      * @see Whereable::where()
      * @return $this
      */
-    public function where($column, $operator = null, $value = null)
+    public function where(string|iterable|callable|ExpressionInterface $column, mixed $operator = null, mixed $value = null): static
     {
         if (!is_string($column) && is_callable($column)) {
             $this->nested($column, $operator ?: CompositeExpression::TYPE_AND);
@@ -41,7 +43,7 @@ trait SimpleWhereTrait
      *
      * @see Whereable::whereReplace()
      */
-    public function whereReplace(string $column, $operator = null, $value = null)
+    public function whereReplace(string $column, mixed $operator = null, mixed $value = null): static
     {
         $this->compilerState->invalidate('where');
         $this->replaceClause('where', $column, $operator, $value);
@@ -53,7 +55,7 @@ trait SimpleWhereTrait
      *
      * @see Whereable::orWhere()
      */
-    public function orWhere($column, $operator = null, $value = null)
+    public function orWhere(string|iterable|callable|ExpressionInterface $column, mixed $operator = null, mixed $value = null): static
     {
         if (!is_string($column) && is_callable($column)) {
             $this->nested($column, $operator ?: CompositeExpression::TYPE_OR);
@@ -71,7 +73,7 @@ trait SimpleWhereTrait
      *
      * @see Whereable::whereNull()
      */
-    public function whereNull($column, string $type = CompositeExpression::TYPE_AND)
+    public function whereNull(string|ExpressionInterface $column, string $type = CompositeExpression::TYPE_AND): static
     {
         $this->compilerState->invalidate('where');
 
@@ -83,7 +85,7 @@ trait SimpleWhereTrait
      *
      * @see Whereable::whereNotNull()
      */
-    public function whereNotNull($column, string $type = CompositeExpression::TYPE_AND)
+    public function whereNotNull(string|ExpressionInterface $column, string $type = CompositeExpression::TYPE_AND): static
     {
         $this->compilerState->invalidate('where');
 
@@ -95,7 +97,7 @@ trait SimpleWhereTrait
      *
      * @see Whereable::orWhereNull()
      */
-    public function orWhereNull($column)
+    public function orWhereNull(string|ExpressionInterface $column): static
     {
         return $this->whereNull($column, CompositeExpression::TYPE_OR);
     }
@@ -105,7 +107,7 @@ trait SimpleWhereTrait
      *
      * @see Whereable::orWhereNotNull()
      */
-    public function orWhereNotNull($column)
+    public function orWhereNotNull(string|ExpressionInterface $column): static
     {
         return $this->whereNotNull($column, CompositeExpression::TYPE_OR);
     }
@@ -115,7 +117,7 @@ trait SimpleWhereTrait
      *
      * @see Whereable::whereRaw()
      */
-    public function whereRaw($raw, string $type = CompositeExpression::TYPE_AND)
+    public function whereRaw(string|QueryInterface|ExpressionInterface $raw, string $type = CompositeExpression::TYPE_AND): static
     {
         $this->compilerState->invalidate('where');
 
@@ -127,7 +129,7 @@ trait SimpleWhereTrait
      *
      * @see Whereable::orWhereRaw()
      */
-    public function orWhereRaw($raw)
+    public function orWhereRaw(string|QueryInterface|ExpressionInterface $raw): static
     {
         return $this->whereRaw($raw, CompositeExpression::TYPE_OR);
     }
@@ -137,7 +139,7 @@ trait SimpleWhereTrait
      *
      * @see Whereable::nested()
      */
-    public function nested(callable $callback, string $type = CompositeExpression::TYPE_AND)
+    public function nested(callable $callback, string $type = CompositeExpression::TYPE_AND): static
     {
         $this->compilerState->invalidate('where');
 
@@ -149,14 +151,14 @@ trait SimpleWhereTrait
      *
      * @see Clause::buildClause()
      */
-    abstract public function buildClause(string $statement, $expression, $operator = null, $value = null, string $type = CompositeExpression::TYPE_AND);
+    abstract public function buildClause(string $statement, string|iterable|ExpressionInterface $expression, mixed $operator = null, mixed $value = null, string $type = CompositeExpression::TYPE_AND);
 
     /**
      * {@inheritdoc}
      *
      * @see Clause::replaceClause()
      */
-    abstract public function replaceClause(string $statement, string $expression, $operator = null, $value = null);
+    abstract public function replaceClause(string $statement, string $expression, mixed $operator = null, mixed $value = null);
 
     /**
      * {@inheritdoc}
@@ -170,5 +172,5 @@ trait SimpleWhereTrait
      *
      * @see Clause::buildRaw()
      */
-    abstract public function buildRaw(string $statement, $expression, string $type = CompositeExpression::TYPE_AND);
+    abstract public function buildRaw(string $statement, string|QueryInterface|ExpressionInterface $expression, string $type = CompositeExpression::TYPE_AND);
 }

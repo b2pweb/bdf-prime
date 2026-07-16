@@ -94,7 +94,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function setDefault($value): static
+    public function setDefault(mixed $value): static
     {
         $this->defaultValue = $value;
 
@@ -135,7 +135,7 @@ final class ColumnBuilder implements ColumnBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function unique($index = true): static
+    public function unique(bool|string $index = true): static
     {
         if (is_string($index)) {
             $this->indexes[$index] = IndexInterface::TYPE_UNIQUE;

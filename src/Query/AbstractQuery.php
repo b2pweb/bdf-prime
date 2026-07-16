@@ -31,7 +31,7 @@ abstract class AbstractQuery extends AbstractReadCommand implements QueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function set(string $column, $value, $type = null): static
+    public function set(string $column, mixed $value, mixed $type = null): static
     {
         return $this->setValue($column, $value, $type);
     }
@@ -39,7 +39,7 @@ abstract class AbstractQuery extends AbstractReadCommand implements QueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function setValue(string $column, $value, $type = null): static
+    public function setValue(string $column, mixed $value, mixed $type = null): static
     {
         $this->statements['values']['data'][$column] = $value;
         $this->statements['values']['types'][$column] = $type;
@@ -51,7 +51,7 @@ abstract class AbstractQuery extends AbstractReadCommand implements QueryInterfa
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function find(array $criteria, $attributes = null): array|PaginatorInterface|CollectionInterface
+    public function find(array $criteria, string|array|null $attributes = null): array|PaginatorInterface|CollectionInterface
     {
         if ($attributes !== null) {
             $this->select($attributes);
@@ -75,7 +75,7 @@ abstract class AbstractQuery extends AbstractReadCommand implements QueryInterfa
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function findOne(array $criteria, $attributes = null): array|object|null
+    public function findOne(array $criteria, string|array|null $attributes = null): array|object|null
     {
         return $this->where($criteria)->first($attributes);
     }

@@ -84,7 +84,7 @@ final class BulkInsertSqlCompiler extends AbstractCompiler implements QuoteCompi
     /**
      * {@inheritdoc}
      */
-    public function quote($value): string
+    public function quote(mixed $value): string
     {
         return $this->connection->quote($value);
     }

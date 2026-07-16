@@ -43,12 +43,8 @@ final class JsonContains extends AbstractPlatformSpecificExpression
      * @param ExpressionInterface|string $target The JSON document or array to search in. Can be an attribute name, or a SQL expression. The value should not be unquoted.
      * @param scalar $candidate The value to search for. This value will be escaped.
      */
-    public function __construct($target, $candidate)
+    public function __construct(ExpressionInterface|string $target, string|int|float|bool $candidate)
     {
-        if (!is_scalar($candidate)) {
-            throw new InvalidArgumentException('The candidate value must be a scalar ' . get_debug_type($candidate) . ' given');
-        }
-
         $this->target = $target;
         $this->candidate = $candidate;
     }
@@ -100,7 +96,7 @@ final class JsonContains extends AbstractPlatformSpecificExpression
      *
      * @return string
      */
-    private static function getSqliteExpression(QuoteCompilerInterface $compiler, string $target, $candidate): string
+    private static function getSqliteExpression(QuoteCompilerInterface $compiler, string $target, string|int|float|bool $candidate): string
     {
         $candidate = is_string($candidate) ? $compiler->quote($candidate) : $candidate;
 
@@ -114,7 +110,7 @@ final class JsonContains extends AbstractPlatformSpecificExpression
      *
      * @return string
      */
-    private static function getDefaultExpression(QuoteCompilerInterface $compiler, string $target, $candidate): string
+    private static function getDefaultExpression(QuoteCompilerInterface $compiler, string $target, string|int|float|bool $candidate): string
     {
         $candidate = $compiler->quote(json_encode($candidate));
 

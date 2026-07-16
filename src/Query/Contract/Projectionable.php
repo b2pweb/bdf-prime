@@ -2,6 +2,9 @@
 
 namespace Bdf\Prime\Query\Contract;
 
+use Bdf\Prime\Query\Expression\ExpressionInterface;
+use Bdf\Prime\Query\QueryInterface;
+
 /**
  * Query which can restrict the returning data (or columns) by performing a projection
  *
@@ -19,7 +22,7 @@ interface Projectionable
      *
      * @see Projectionable::select()
      */
-    public function project($columns = null);
+    public function project(string|ExpressionInterface|QueryInterface|array|null $columns = null);
 
     /**
      * Specifies an item that is to be returned in the query result.
@@ -53,7 +56,7 @@ interface Projectionable
      *
      * @return $this This Query instance.
      */
-    public function select($columns = null);
+    public function select(string|ExpressionInterface|QueryInterface|array|null $columns = null);
 
     /**
      * Adds an item that is to be returned in the query result.
@@ -74,5 +77,5 @@ interface Projectionable
      * @return $this This Query instance.
      * @see Projectionable::select() for exemples
      */
-    public function addSelect($columns);
+    public function addSelect(string|ExpressionInterface|QueryInterface|array|null $columns);
 }

@@ -41,7 +41,7 @@ final class ComposableGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function postProcess($entity): void
+    public function postProcess(object $entity): void
     {
         foreach ($this->generators as $generator) {
             $generator->postProcess($entity);

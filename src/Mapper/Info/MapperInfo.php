@@ -237,7 +237,7 @@ final class MapperInfo
      * @param \ArrayAccess|array $relations
      * @return ObjectPropertyInfo|null
      */
-    private function buildObjectProperty(string $property, $relations): ?ObjectPropertyInfo
+    private function buildObjectProperty(string $property, \ArrayAccess|array $relations): ?ObjectPropertyInfo
     {
         if (!isset($this->metadata->embeddeds[$property])) {
             return null;
@@ -287,7 +287,7 @@ final class MapperInfo
      *
      * @return null|InfoInterface
      */
-    public function property($name): ?InfoInterface
+    public function property(string $name): ?InfoInterface
     {
         return $this->properties[$name]
             ?? $this->objects[$name]

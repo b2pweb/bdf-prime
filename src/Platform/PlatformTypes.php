@@ -112,7 +112,7 @@ final class PlatformTypes extends TypesRegistry implements PlatformTypesInterfac
      *
      * @todo revoir la gestion. Doit on appeler une methode TypeInterface::support()
      */
-    public function resolve($value): ?TypeInterface
+    public function resolve(mixed $value): ?TypeInterface
     {
         $type = gettype($value);
 
@@ -140,7 +140,7 @@ final class PlatformTypes extends TypesRegistry implements PlatformTypesInterfac
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value, $type = null): mixed
+    public function toDatabase(mixed $value, string|TypeInterface|null $type = null): mixed
     {
         //ORM optimisation: type is most of the type provides
         if ($type instanceof TypeInterface) {
@@ -151,17 +151,13 @@ final class PlatformTypes extends TypesRegistry implements PlatformTypesInterfac
             return $this->resolve($value)->toDatabase($value);
         }
 
-        if (is_string($type)) {
-            return $this->get($type)->toDatabase($value);
-        }
-
-        throw new TypeException(gettype($value), 'Cannot convert to database the value : ' . print_r($value, true).PHP_EOL.'You should set a valid type as second parameter');
+        return $this->get($type)->toDatabase($value);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, $type = null, array $fieldOptions = []): mixed
+    public function fromDatabase(mixed $value, string|TypeInterface|null $type = null, array $fieldOptions = []): mixed
     {
         //ORM optimisation: type is most of the type provides
         if ($type instanceof TypeInterface) {
@@ -188,7 +184,7 @@ final class PlatformTypes extends TypesRegistry implements PlatformTypesInterfac
      *
      * @return PlatformTypeInterface
      */
-    protected function instantiate($class, $name): PlatformTypeInterface
+    protected function instantiate(string $class, string $name): PlatformTypeInterface
     {
         return new $class($this->platform, $name);
     }

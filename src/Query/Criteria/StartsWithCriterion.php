@@ -16,7 +16,7 @@ readonly class StartsWithCriterion extends LikeCriterion
      * @param bool $escape
      * @param bool $skipNull
      */
-    public function __construct($field = null, bool $escape = true, bool $skipNull = true)
+    public function __construct(string|ExpressionInterface|null $field = null, bool $escape = true, bool $skipNull = true)
     {
         parent::__construct($field, true, false, false, $escape, null, null, $skipNull);
     }

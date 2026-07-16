@@ -5,6 +5,7 @@ v3.0.0
 * Change: Minimum version of doctrine/dbal is now 4.0
 * Add: `Bdf\Prime\Connection\Middleware\DebugStack\DebugStackMiddleware` in replacement of doctrine's `DebugStack` for query logging and debugging
 * Change: `Bdf\Prime\Prime::configure()` now can take the `middlewares` option to defined middlewares on all connections.
+* Change: Most methods are now typed
 
 BC Breaks:
 * Remove: `Bdf\Prime\Visitor` package, with mapper and graphviz visitors without replacements
@@ -169,6 +170,7 @@ BC Breaks:
     * `Bdf\Prime\Types\TimestampType`
     * `Bdf\Prime\Types\UnitEnumType`
 * Change: `Bdf\Prime\Collection\CollectionFactory` now ensure that registered wrapper implements `Bdf\Prime\Collection\CollectionInterface`.
+* Change: Add types on methods and interfaces. Implementations must be updated to match the new signatures.
 
 Removal of deprecated APIs:
 * Remove: `Bdf\Prime\Cache\DoctrineCacheAdapter`. Use `Bdf\Prime\Cache\SimpleCacheAdapter` or `Bdf\Prime\Cache\CachePoolAdapter` instead.

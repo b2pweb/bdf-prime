@@ -16,7 +16,7 @@ final class SqlFloatType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function __construct(PlatformInterface $platform, $name = self::FLOAT)
+    public function __construct(PlatformInterface $platform, string $name = self::FLOAT)
     {
         parent::__construct($platform, $name);
     }
@@ -24,7 +24,7 @@ final class SqlFloatType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = []): ?float
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?float
     {
         return $value === null ? null : (float) $value;
     }

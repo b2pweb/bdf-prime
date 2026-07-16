@@ -12,7 +12,7 @@ final class SqlTimeType extends AbstractSqlDateTimeType
     /**
      * {@inheritdoc}
      */
-    public function __construct(PlatformInterface $platform, $name = self::TIME, string $className = \DateTime::class, ?\DateTimeZone $timezone = null)
+    public function __construct(PlatformInterface $platform, string $name = self::TIME, string $className = \DateTime::class, ?\DateTimeZone $timezone = null)
     {
         parent::__construct($platform, $name);
 
