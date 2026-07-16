@@ -155,4 +155,16 @@ class RelationTest extends TestCase
 
         $this->assertEquals($expected, $relation->getConstraints());
     }
+
+    /**
+     *
+     */
+    public function test_set_get_constraints_closure()
+    {
+        $expected = function ($query) { $query->where('filter', true); };
+        $relation = $this->getMockForAbstractClass('Bdf\Prime\Relations\Relation', [], '', false);
+        $relation->setConstraints($expected);
+
+        $this->assertSame($expected, $relation->getConstraints());
+    }
 }

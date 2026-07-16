@@ -166,6 +166,58 @@ class HasManyTest extends TestCase
         $this->assertEquals([$this->getTestPack()->get('document-admin')], $customer->documents, 'documents on customer');
         $this->assertTrue($customer->relation('documents')->isLoaded());
     }
+
+    /**
+     *
+     */
+    public function test_load_collection_with_closure_constraints()
+    {
+        $customer = Prime::repository('Bdf\Prime\Customer')
+            ->with(['documents' => function ($query) { $query->where('id', 1); }])
+            ->findById('123');
+
+        $this->assertEquals([$this->getTestPack()->get('document-admin')], $customer->documents, 'documents on customer');
+        $this->assertTrue($customer->relation('documents')->isLoaded());
+    }
+
+    /**
+     *
+     */
+    public function test_load_single_entity_with_closure_constraints()
+    {
+        $customer = $this->getTestPack()->get('customer');
+
+        Prime::repository('Bdf\Prime\Customer')->relation('documents')
+            ->load(new SingleEntityIndexer(Customer::mapper(), $customer), [], function ($query) {
+                $query->where('uploaderType', 'admin');
+            });
+
+        $this->assertEquals([$this->getTestPack()->get('document-admin')], $customer->documents, 'documents on customer');
+        $this->assertTrue($customer->relation('documents')->isLoaded());
+    }
+
+    /**
+     *
+     */
+    public function test_link_with_relation_declared_with_closure_constraints()
+    {
+        $this->pack()->nonPersist([
+            $systemDoc = new Document([
+                'id'             => '3',
+                'customerId'     => '123',
+                'uploaderType'   => 'system',
+                'uploaderId'     => '1',
+            ]),
+        ]);
+
+        $customer = $this->getTestPack()->get('customer');
+
+        $documents = Prime::repository('Bdf\Prime\Customer')->relation('documents-system-closure')
+            ->link($customer)
+            ->all();
+
+        $this->assertEquals([$systemDoc], $documents);
+    }
     
     /**
      *
@@ -288,6 +340,24 @@ class HasManyTest extends TestCase
             'id' => 42,
             'customerId' => $customer->id,
             'uploaderType' => 'system',
+        ]), $doc);
+    }
+
+    /**
+     * Closure constraints cannot be used to fill the created entity values,
+     * unlike key-value constraints
+     */
+    public function test_create_with_closure_constraints_should_not_fill_entity()
+    {
+        $customer = $this->getTestPack()->get('customer');
+
+        $doc = $customer
+            ->relation('documents-system-closure')
+            ->create(['id' => 42]);
+
+        $this->assertEquals(new Document([
+            'id' => 42,
+            'customerId' => $customer->id,
         ]), $doc);
     }
 
