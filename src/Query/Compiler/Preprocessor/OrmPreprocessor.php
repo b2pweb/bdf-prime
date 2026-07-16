@@ -123,11 +123,16 @@ final class OrmPreprocessor implements PreprocessorInterface
             }
 
             foreach ($compilerQuery->statements['tables'] as &$table) {
-                $table['alias'] = $this->aliasResolver->registerMetadata($table['table'], $table['alias']);
+                // table can be the table name or a query instance
+                if (is_string($table['table'])) {
+                    $table['alias'] = $this->aliasResolver->registerMetadata($table['table'], $table['alias']);
+                }
             }
 
             foreach ($compilerQuery->statements['joins'] as &$join) {
-                $join['alias'] = $this->aliasResolver->registerMetadata($join['table'], $join['alias']);
+                if (is_string($join['table'])) {
+                    $join['alias'] = $this->aliasResolver->registerMetadata($join['table'], $join['alias']);
+                }
             }
 
             return $compilerQuery;

@@ -361,7 +361,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function min(?string $column = null): int|string|float
+    public function min(?string $column = null): int|string|float|null
     {
         return $this->aggregate(__FUNCTION__, $column);
     }
@@ -370,7 +370,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function max(?string $column = null): int|string|float
+    public function max(?string $column = null): int|string|float|null
     {
         return $this->aggregate(__FUNCTION__, $column);
     }

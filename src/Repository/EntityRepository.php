@@ -1005,13 +1005,13 @@ class EntityRepository implements RepositoryInterface, RepositoryEventsSubscribe
 
     /**
      * @param array $criteria
-     * @param array $attributes
+     * @param array|string|null $attributes
      *
      * @return E|null
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function findOne(array $criteria, ?array $attributes = null): ?object
+    public function findOne(array $criteria, string|array|null $attributes = null): ?object
     {
         return $this->builder()->findOne($criteria, $attributes);
     }

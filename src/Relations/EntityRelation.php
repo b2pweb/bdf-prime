@@ -304,7 +304,7 @@ final class EntityRelation
     #[WriteOperation]
     public function deleteAll(string|array $relations = []): int
     {
-        return $this->relation->deleteAll($this->owner, $relations);
+        return $this->relation->deleteAll($this->owner, (array) $relations);
     }
 
     /**

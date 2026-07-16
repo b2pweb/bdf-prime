@@ -129,7 +129,7 @@ final class Like extends AbstractExpressionTransformer
             return array_map($this->generate(...), $this->value);
         }
 
-        return $this->generate($this->value);
+        return $this->generate((string) $this->value);
     }
 
     /**

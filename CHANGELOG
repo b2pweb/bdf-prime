@@ -6,6 +6,7 @@ v3.0.0
 * Add: `Bdf\Prime\Connection\Middleware\DebugStack\DebugStackMiddleware` in replacement of doctrine's `DebugStack` for query logging and debugging
 * Change: `Bdf\Prime\Prime::configure()` now can take the `middlewares` option to defined middlewares on all connections.
 * Change: Most methods are now typed
+* Fix: ArrayType now handle empty value correctly. The value '0' is now parsed as ['0'] instead of empty array.
 
 BC Breaks:
 * Remove: `Bdf\Prime\Visitor` package, with mapper and graphviz visitors without replacements

@@ -57,6 +57,12 @@ trait DateTimeHelper
         /** @psalm-suppress UndefinedMethod */
         $date = $className::createFromFormat($format, $value, $timezone);
 
+        // Invalid format, fail-safe return
+        // @fixme flag to thow an error instead ?
+        if ($date === false) {
+            return null;
+        }
+
         if ($timezone && $date) {
             $date = $date->setTimezone($timezone);
         }

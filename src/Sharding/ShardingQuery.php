@@ -158,7 +158,7 @@ class ShardingQuery extends Query
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function min(?string $column = null): int|float|string
+    public function min(?string $column = null): int|float|string|null
     {
         return min($this->aggregate(__FUNCTION__, $column));
     }
@@ -167,7 +167,7 @@ class ShardingQuery extends Query
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function max(?string $column = null): int|float|string
+    public function max(?string $column = null): int|float|string|null
     {
         return max($this->aggregate(__FUNCTION__, $column));
     }

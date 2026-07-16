@@ -35,7 +35,7 @@ final class CompilerState
      *
      * @var mixed
      */
-    public mixed $compiled;
+    public mixed $compiled = null;
 
     /**
      * Does the query is compiling ?

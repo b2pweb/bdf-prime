@@ -63,12 +63,10 @@ use function sprintf;
 abstract class Mapper implements ClockAwareInterface
 {
     /**
-     * Enable/Disable query result cache on repository
-     * If null global cache will be set.
-     * Set it to false to deactivate cache on this repository
+     * Set it to null to deactivate cache on this repository
      * Set the cache instance in configure method
      *
-     * @var false|CacheInterface
+     * @var CacheInterface|null
      */
     protected ?CacheInterface $resultCache;
 
@@ -621,7 +619,7 @@ abstract class Mapper implements ClockAwareInterface
     {
         $className = $this->repositoryClass;
 
-        return new $className($this, $this->serviceLocator, $this->resultCache === false ? null : $this->resultCache);
+        return new $className($this, $this->serviceLocator, $this->resultCache);
     }
 
     /**

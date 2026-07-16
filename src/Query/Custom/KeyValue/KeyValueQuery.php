@@ -151,7 +151,7 @@ final class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryIn
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function min(?string $column = null): float|int|string
+    public function min(?string $column = null): float|int|string|null
     {
         return $this->aggregate(__FUNCTION__, $column);
     }
@@ -160,7 +160,7 @@ final class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryIn
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function max(?string $column = null): float|int|string
+    public function max(?string $column = null): float|int|string|null
     {
         return $this->aggregate(__FUNCTION__, $column);
     }

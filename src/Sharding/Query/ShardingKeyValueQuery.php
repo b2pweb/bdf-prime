@@ -179,7 +179,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function min(?string $column = null): float|int|string
+    public function min(?string $column = null): float|int|string|null
     {
         return min($this->aggregate(__FUNCTION__, $column));
     }
@@ -188,7 +188,7 @@ final class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValu
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function max(?string $column = null): float|int|string
+    public function max(?string $column = null): float|int|string|null
     {
         return max($this->aggregate(__FUNCTION__, $column));
     }

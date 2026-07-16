@@ -130,7 +130,7 @@ interface QueryInterface extends ReadCommandInterface, Whereable, Projectionable
      * Get one row by criteria
      *
      * @param array $criteria
-     * @param string|array $attributes
+     * @param string|array|null $attributes
      *
      * @return R|null
      * @throws PrimeException When execute fail
