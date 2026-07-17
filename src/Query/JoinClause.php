@@ -24,13 +24,13 @@ final class JoinClause extends Clause
      *
      * on `contacts`.`user_id` = `users`.`id`  and `contacts`.`info_id` = `info`.`id`
      *
-     * @param  \Closure|string  $key
-     * @param  string|null      $operator
-     * @param  string|ExpressionInterface|null $foreign
+     * @param \Closure|string $key
+     * @param mixed $operator The comparison operator, or the value if $foreign is not provided
+     * @param string|ExpressionInterface|null $foreign The comparison value
      *
      * @return $this
      */
-    public function on(\Closure|string $key, ?string $operator = null, mixed $foreign = null): self
+    public function on(\Closure|string $key, mixed $operator = null, mixed $foreign = null): self
     {
         if ($key instanceof \Closure) {
             $this->nested($key, $operator ?: CompositeExpression::TYPE_AND);
@@ -44,13 +44,13 @@ final class JoinClause extends Clause
     /**
      * Add an "or on" clause to the join.
      *
-     * @param  \Closure|string  $key
-     * @param  string|null      $operator
-     * @param  string|ExpressionInterface|null $foreign
+     * @param \Closure|string $key
+     * @param mixed $operator The comparison operator, or the value if $foreign is not provided
+     * @param string|ExpressionInterface|null $foreign The comparison value
      *
      * @return $this
      */
-    public function orOn(\Closure|string $key, ?string $operator = null, mixed $foreign = null): self
+    public function orOn(\Closure|string $key, mixed $operator = null, mixed $foreign = null): self
     {
         if ($key instanceof \Closure) {
             $this->nested($key, $operator ?: CompositeExpression::TYPE_OR);
@@ -114,12 +114,12 @@ final class JoinClause extends Clause
     /**
      * Add on SQL expression
      *
-     * @param string $raw
+     * @param string|QueryInterface|ExpressionInterface $raw
      * @param string $type
      *
      * @return $this This Query instance.
      */
-    public function onRaw(string $raw, string $type = CompositeExpression::TYPE_AND): self
+    public function onRaw(string|QueryInterface|ExpressionInterface $raw, string $type = CompositeExpression::TYPE_AND): self
     {
         return $this->buildRaw('on', $raw, $type);
     }
@@ -127,11 +127,11 @@ final class JoinClause extends Clause
     /**
      * Add OR on SQL expression
      *
-     * @param string $raw
+     * @param string|QueryInterface|ExpressionInterface $raw
      *
      * @return $this This Query instance.
      */
-    public function orOnRaw(string $raw): self
+    public function orOnRaw(string|QueryInterface|ExpressionInterface $raw): self
     {
         return $this->onRaw($raw, CompositeExpression::TYPE_OR);
     }
