@@ -11,10 +11,7 @@ use Bdf\Prime\Query\Contract\Orderable;
 use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Query\ReadCommandInterface;
-use Countable;
 use IteratorAggregate;
-
-use function method_exists;
 
 /**
  * Abstract paginator
@@ -39,9 +36,9 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
     /**
      * Current query
      *
-     * @var ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable
+     * @var ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable
      */
-    protected ReadCommandInterface&Limitable&Orderable $query;
+    protected ReadCommandInterface&Limitable&Orderable&Paginable $query;
 
     /**
      * Current collection
@@ -78,9 +75,9 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
     /**
      * Get the query
      *
-     * @return ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable
+     * @return ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable
      */
-    final public function query(): ReadCommandInterface&Limitable&Orderable
+    final public function query(): ReadCommandInterface&Limitable&Orderable&Paginable
     {
         return $this->query;
     }
@@ -92,7 +89,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
      */
     protected function loadCollection(): void
     {
-        /** @var ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable $query */
+        /** @var ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable $query */
         $query = $this->query;
 
         if ($this->maxRows > -1) {
@@ -173,20 +170,8 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
             $this->size = $currentSize;
         } elseif ($currentSize + $this->query->getOffset() < $this->query->getLimit()) {
             $this->size = $currentSize + $this->query->getOffset();
-        } elseif ($this->query instanceof Paginable) {
-            $this->size = $this->query->paginationCount();
-        } elseif (method_exists($this->query, 'count')) {
-            // Emulate pagination count by removing limits before count
-            $limit = $this->query->getLimit();
-            $offset = $this->query->getOffset();
-
-            $this->query->limit(null, null);
-
-            $this->size = $this->query->count();
-
-            $this->query->limit($limit, $offset);
         } else {
-            $this->size = $currentSize;
+            $this->size = $this->query->paginationCount();
         }
     }
 
