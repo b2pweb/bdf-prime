@@ -23,7 +23,7 @@ use LogicException;
  *
  * @extends AbstractRelation<L, object>
  */
-final class ByInheritance extends AbstractRelation
+class ByInheritance extends AbstractRelation
 {
     /** @use Polymorph<L> */
     use Polymorph;

@@ -44,7 +44,7 @@ use function is_array;
  *
  * @property EntityRepository<R> $distant
  */
-final class BelongsToMany extends Relation
+class BelongsToMany extends Relation
 {
     /**
      * Through repository

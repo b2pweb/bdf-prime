@@ -13,7 +13,7 @@ use Bdf\Prime\Query\ReadCommandInterface;
  *
  * @extends OneOrMany<L, R>
  */
-final class HasMany extends OneOrMany
+class HasMany extends OneOrMany
 {
     /**
      * {@inheritdoc}
