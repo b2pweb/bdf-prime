@@ -12,38 +12,34 @@ use Bdf\Prime\Query\Expression\ExpressionInterface;
  * @psalm-immutable
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Criterion
+readonly class Criterion
 {
-    /**
-     * The field name of the filter
-     * An expression can be used instead of a simple field name
-     * If null, will use the property name instead
-     *
-     * @var string|ExpressionInterface|null
-     */
-    /*readonly string|ExpressionInterface|null*/ public $field = null;
+    public function __construct(
+        /**
+         * The field name of the filter
+         * An expression can be used instead of a simple field name
+         * If null, will use the property name instead
+         *
+         * @var string|ExpressionInterface|null
+         */
+        public string|ExpressionInterface|null $field = null,
 
-    /**
-     * Define the operator to use for the filter
-     * If null, the default operator will be used (usually '=')
-     */
-    /*readonly*/ public ?string $operator = null;
+        /**
+         * Define the operator to use for the filter
+         * If null, the default operator will be used (usually '=')
+         */
+        public ?string $operator = null,
 
-    /**
-     * Does the filter should be ignored if the value is null?
-     */
-    /*readonly*/ public bool $skipNull = true;
+        /**
+         * Does the filter should be ignored if the value is null?
+         */
+        public bool $skipNull = true,
 
-    /**
-     * @param ExpressionInterface|string|null $field
-     * @param string|null $operator
-     * @param bool $skipNull
-     */
-    public function __construct($field = null, ?string $operator = null, bool $skipNull = true)
-    {
-        $this->field = $field;
-        $this->operator = $operator;
-        $this->skipNull = $skipNull;
+        /**
+         * Does the filter should be ignored if the value is empty (i.e. null, empty string or empty array)?
+         */
+        public bool $skipEmpty = false,
+    ) {
     }
 
     /**
@@ -68,5 +64,20 @@ class Criterion
     public function value($value)
     {
         return $value;
+    }
+
+    /**
+     * Does the current criterion should be skipped for the current value?
+     *
+     * @param mixed $value Value to check
+     * @return bool True if the criterion should be skipped
+     */
+    public function shouldSkipValue(mixed $value): bool
+    {
+        if ($this->skipNull && $value === null) {
+            return true;
+        }
+
+        return $this->skipEmpty && ($value === null || $value === '' || $value === []);
     }
 }

@@ -5,12 +5,14 @@ namespace Php81\Query\Criteria;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Query\Query;
 use DateTime;
+use Php81\Query\Criteria\Fixtures\EmptyCriteria;
 use Php81\Query\Criteria\Fixtures\NestedCriteria;
 use Php81\Query\Criteria\Fixtures\NullableCriteria;
 use Php81\Query\Criteria\Fixtures\SimpleCriteria;
 use Php81\Query\Criteria\Fixtures\SimpleOrCriteria;
 use Php81\Query\Criteria\Fixtures\WithLeftExpressionCriteria;
 use Php81\Query\Criteria\Fixtures\WithLikeCriteria;
+use Php81\Query\Criteria\Fixtures\WithLikeCriteriaArray;
 use PHPUnit\Framework\TestCase;
 
 class CustomCriteriaFunctionalTest extends TestCase
@@ -51,6 +53,17 @@ class CustomCriteriaFunctionalTest extends TestCase
         $this->assertSame(['foo%', '%@bar.com'], $query->getBindings());
     }
 
+    public function test_like_criteria_array()
+    {
+        $query = $this->query()->where(new WithLikeCriteriaArray('foo', ['bar.com', 'baz.fr']));
+        $this->assertSame('SELECT * FROM test WHERE name LIKE ? AND (email LIKE ? OR email LIKE ?)', $query->toSql());
+        $this->assertSame(['foo%', '%@bar.com', '%@baz.fr'], $query->getBindings());
+
+        $query = $this->query()->where(new WithLikeCriteriaArray('foo', []));
+        $this->assertSame('SELECT * FROM test WHERE name LIKE ?', $query->toSql());
+        $this->assertSame(['foo%'], $query->getBindings());
+    }
+
     public function test_nullable()
     {
         $criteria = new NullableCriteria();
@@ -69,6 +82,45 @@ class CustomCriteriaFunctionalTest extends TestCase
         $query = $this->query()->where($criteria);
         $this->assertSame('SELECT * FROM test WHERE foo = ? AND bar = ?', $query->toSql());
         $this->assertSame(['foo', 'bar'], $query->getBindings());
+    }
+
+    public function test_skipEmpty()
+    {
+        $criteria = new EmptyCriteria();
+
+        $query = $this->query()->where($criteria);
+        $this->assertSame('SELECT * FROM test WHERE bar IS NULL', $query->toSql());
+        $this->assertSame([], $query->getBindings());
+
+        $criteria->foo = '';
+        $criteria->bar = '';
+        $query = $this->query()->where($criteria);
+        $this->assertSame('SELECT * FROM test WHERE bar = ?', $query->toSql());
+        $this->assertSame([''], $query->getBindings());
+
+        $criteria->foo = [];
+        $criteria->bar = '';
+        $query = $this->query()->where($criteria);
+        $this->assertSame('SELECT * FROM test WHERE bar = ?', $query->toSql());
+        $this->assertSame([''], $query->getBindings());
+
+        $criteria->foo = 'foo';
+        $criteria->bar = null;
+        $query = $this->query()->where($criteria);
+        $this->assertSame('SELECT * FROM test WHERE foo = ? AND bar IS NULL', $query->toSql());
+        $this->assertSame(['foo'], $query->getBindings());
+
+        $criteria->foo = 'foo';
+        $criteria->bar = 'bar';
+        $query = $this->query()->where($criteria);
+        $this->assertSame('SELECT * FROM test WHERE foo = ? AND bar = ?', $query->toSql());
+        $this->assertSame(['foo', 'bar'], $query->getBindings());
+
+        $criteria->foo = ['foo', 'oof'];
+        $criteria->bar = 'bar';
+        $query = $this->query()->where($criteria);
+        $this->assertSame('SELECT * FROM test WHERE foo IN (?,?) AND bar = ?', $query->toSql());
+        $this->assertSame(['foo', 'oof', 'bar'], $query->getBindings());
     }
 
     public function test_left_expression()

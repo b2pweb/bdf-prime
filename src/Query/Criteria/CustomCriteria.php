@@ -80,7 +80,7 @@ abstract class CustomCriteria implements CriteriaInterface
         foreach ($this->criterionByProperty() as $property => $criterion) {
             $value = $this->$property ?? null;
 
-            if ($value === null && $criterion->skipNull) {
+            if ($criterion->shouldSkipValue($value)) {
                 continue;
             }
 
