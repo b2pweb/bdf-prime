@@ -3,11 +3,12 @@
 namespace Bdf\Prime\Platform\Sql\Types;
 
 use Bdf\Prime\Platform\PlatformInterface;
+use DateTimeInterface;
 
 /**
  * Accept a datetime type
  */
-class SqlDateTimeType extends AbstractSqlDateTimeType
+final class SqlDateTimeType extends AbstractSqlDateTimeType
 {
     /**
      * SqlDateTimeType constructor.
@@ -19,7 +20,7 @@ class SqlDateTimeType extends AbstractSqlDateTimeType
      */
     public function __construct(
         PlatformInterface $platform,
-        $name = self::DATETIME,
+        string $name = self::DATETIME,
         string $className = \DateTime::class,
         ?\DateTimeZone $timezone = null
     ) {
@@ -33,7 +34,7 @@ class SqlDateTimeType extends AbstractSqlDateTimeType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?DateTimeInterface
     {
         // Handle non-nillable date time
         if ($value === '0000-00-00 00:00:00') {

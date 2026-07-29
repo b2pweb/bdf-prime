@@ -69,7 +69,7 @@ abstract class AbstractCompiler implements CompilerInterface
      * @return mixed
      * @throws PrimeException
      */
-    protected function autoConvertValue($value)
+    protected function autoConvertValue(mixed $value)
     {
         if ($value === null) {
             return null;
@@ -88,7 +88,7 @@ abstract class AbstractCompiler implements CompilerInterface
      *
      * @see AbstractCompiler::autoConvertValue()
      */
-    protected function autoConvertValues($values)
+    protected function autoConvertValues(mixed $values)
     {
         if (!is_array($values)) {
             return $this->autoConvertValue($values);

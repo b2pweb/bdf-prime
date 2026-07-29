@@ -16,6 +16,7 @@ use Bdf\Prime\Query\Contract\Paginable;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Bdf\Prime\Query\Extension\CompilableTrait;
 use Bdf\Prime\Query\Extension\LimitableTrait;
 use Bdf\Prime\Query\Extension\PaginableTrait;
@@ -41,7 +42,7 @@ use Bdf\Prime\Query\Extension\ProjectionableTrait;
  * @implements Paginable<R>
  * @extends AbstractReadCommand<C, R>
  */
-class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterface, Compilable, Paginable, Limitable
+final class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterface, Compilable, Paginable, Limitable
 {
     use CompilableTrait;
     use LimitableTrait;
@@ -77,7 +78,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
-    public function from(string $from, ?string $alias = null)
+    public function from(string $from, ?string $alias = null): static
     {
         if ($this->statements['table'] !== $from) {
             $this->compilerState->invalidate('columns');
@@ -89,8 +90,10 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
 
     /**
      * {@inheritdoc}
+     *
+     * @return $this
      */
-    public function where($field, $value = null)
+    public function where(string|array $field, mixed $value = null): static
     {
         if (is_array($field)) {
             if (array_keys($field) !== array_keys($this->statements['where'])) {
@@ -112,7 +115,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
-    public function values(array $values = [], array $types = [])
+    public function values(array $values = [], array $types = []): static
     {
         if (array_keys($values) !== array_keys($this->statements['values']) || $types !== $this->statements['values']['types']) {
             $this->compilerState->invalidate('values');
@@ -148,7 +151,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function min(?string $column = null)
+    public function min(?string $column = null): float|int|string|null
     {
         return $this->aggregate(__FUNCTION__, $column);
     }
@@ -157,7 +160,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function max(?string $column = null)
+    public function max(?string $column = null): float|int|string|null
     {
         return $this->aggregate(__FUNCTION__, $column);
     }
@@ -175,7 +178,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function aggregate(string $function, ?string $column = null)
+    public function aggregate(string $function, ?string $column = null): mixed
     {
         $statements = $this->statements;
 
@@ -217,7 +220,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function execute($columns = null): ResultSetInterface
+    public function execute(string|ExpressionInterface|array|null $columns = null): ResultSetInterface
     {
         $this->setType(self::TYPE_SELECT);
 
@@ -241,7 +244,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function update($values = null): int
+    public function update(?array $values = null): int
     {
         if ($values !== null) {
             $this->values($values);
@@ -253,7 +256,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
     /**
      * {@inheritdoc}
      */
-    public function limit(?int $limit, ?int $offset = null)
+    public function limit(?int $limit, ?int $offset = null): static
     {
         if ($this->statements['limit'] === $limit && $this->statements['offset'] === $offset) {
             return $this;
@@ -284,7 +287,7 @@ class KeyValueQuery extends AbstractReadCommand implements KeyValueQueryInterfac
      * @return string|false
      * @throws PrimeException
      */
-    public function toSql()
+    public function toSql(): string|false
     {
         $this->compile();
 

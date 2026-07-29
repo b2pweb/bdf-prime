@@ -11,6 +11,7 @@ use Bdf\Prime\Repository\Event\BeforeUpdate;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
+use DateTimeInterface;
 use Psr\Clock\ClockInterface;
 
 use function is_string;
@@ -62,7 +63,7 @@ final class Timestampable extends Behavior implements ClockAwareInterface
      * @param bool|string|array $updatedAt
      * @param string            $type
      */
-    public function __construct($createdAt = true, $updatedAt = true, string $type = TypeInterface::DATETIME)
+    public function __construct(bool|string|array $createdAt = true, bool|string|array $updatedAt = true, string $type = TypeInterface::DATETIME)
     {
         $this->clock = NativeClock::instance();
         $this->type = $type;
@@ -94,7 +95,7 @@ final class Timestampable extends Behavior implements ClockAwareInterface
      *
      * @return null|array{name: string, alias?: string}
      */
-    private function getFieldInfos($field, array $default): ?array
+    private function getFieldInfos(bool|string|array $field, array $default): ?array
     {
         if ($field === true) {
             return $default;
@@ -177,9 +178,9 @@ final class Timestampable extends Behavior implements ClockAwareInterface
      * @param string $name
      * @param RepositoryInterface<E> $repository
      *
-     * @return int|\DateTimeInterface
+     * @return int|DateTimeInterface
      */
-    private function createDate(string $name, RepositoryInterface $repository)
+    private function createDate(string $name, RepositoryInterface $repository): int|DateTimeInterface
     {
         $date = $this->clock->now();
 
@@ -198,11 +199,11 @@ final class Timestampable extends Behavior implements ClockAwareInterface
     public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
     {
         if ($this->createdAt !== null) {
-            $notifier->inserting([$this, 'beforeInsert']);
+            $notifier->inserting($this->beforeInsert(...));
         }
 
         if ($this->updatedAt !== null) {
-            $notifier->updating([$this, 'beforeUpdate']);
+            $notifier->updating($this->beforeUpdate(...));
         }
     }
 }

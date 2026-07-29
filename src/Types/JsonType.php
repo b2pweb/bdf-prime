@@ -5,12 +5,12 @@ namespace Bdf\Prime\Types;
 /**
  * JSON object type
  */
-class JsonType extends AbstractJsonType
+final class JsonType extends AbstractJsonType
 {
     /**
      * {@inheritdoc}
      */
-    public function __construct($type = self::JSON)
+    public function __construct(string $type = self::JSON)
     {
         parent::__construct($type);
 

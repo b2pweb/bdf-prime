@@ -14,7 +14,7 @@ trait ShardPicker
     /**
      * @var null|string
      */
-    private $shardId;
+    private ?string $shardId = null;
 
     /**
      * Pick up a shard manually from the distribution value
@@ -24,7 +24,7 @@ trait ShardPicker
      *
      * @return $this
      */
-    public function pickShard($distributionValue)
+    public function pickShard(mixed $distributionValue): static
     {
         $this->shardId = $this->connection->getShardChoser()
             ->pick($distributionValue, $this->connection);
@@ -40,7 +40,7 @@ trait ShardPicker
      *
      * @return $this
      */
-    public function useShard(?string $shardId)
+    public function useShard(?string $shardId): static
     {
         $this->shardId = $shardId;
 

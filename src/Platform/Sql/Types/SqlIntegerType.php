@@ -11,12 +11,12 @@ use Doctrine\DBAL\Types\Types;
 /**
  * Basic integer type for database
  */
-class SqlIntegerType extends AbstractPlatformType
+final class SqlIntegerType extends AbstractPlatformType
 {
     /**
      * @var string[]
      */
-    private static $doctrineTypeMap = [
+    private static array $doctrineTypeMap = [
         self::INTEGER  => Types::INTEGER,
         self::SMALLINT => Types::SMALLINT,
         self::TINYINT  => Types::SMALLINT,
@@ -26,7 +26,7 @@ class SqlIntegerType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function __construct(PlatformInterface $platform, $name = self::INTEGER)
+    public function __construct(PlatformInterface $platform, string $name = self::INTEGER)
     {
         parent::__construct($platform, $name);
     }
@@ -34,7 +34,7 @@ class SqlIntegerType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?int
     {
         return $value === null ? null : (int) $value;
     }
@@ -42,7 +42,7 @@ class SqlIntegerType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function declaration(ColumnInterface $column)
+    public function declaration(ColumnInterface $column): string
     {
         return self::$doctrineTypeMap[$this->name] ?? Types::INTEGER;
     }
@@ -52,7 +52,7 @@ class SqlIntegerType extends AbstractPlatformType
      *
      * @return string[]
      */
-    public static function typeNames()
+    public static function typeNames(): array
     {
         return array_keys(self::$doctrineTypeMap);
     }

@@ -17,5 +17,5 @@ interface ShardChoserInterface
      *
      * @return string  Returns the shard id to use
      */
-    public function pick($distributionValue, ShardingConnection $connection): string;
+    public function pick(mixed $distributionValue, ShardingConnection $connection): string;
 }

@@ -48,7 +48,7 @@ class MorphTo extends BelongsTo
     /**
      * {@inheritdoc}
      */
-    public function joinRepositories(EntityJoinable $query, string $alias, $discriminator = null): array
+    public function joinRepositories(EntityJoinable $query, string $alias, string|int|null $discriminator = null): array
     {
         if ($discriminator === null) {
             throw new LogicException('Joins are not supported on polymorph without discriminator');
@@ -73,7 +73,7 @@ class MorphTo extends BelongsTo
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
+    public function load(EntityIndexerInterface $collection, array $with = [], iterable|callable $constraints = [], array $without = []): void
     {
         if ($collection->empty()) {
             return;
@@ -104,7 +104,7 @@ class MorphTo extends BelongsTo
      *
      * @fixme Do not works with EntityCollection
      */
-    public function link($owner, ?string $queryClass = null): ReadCommandInterface
+    public function link(array|object $owner, ?string $queryClass = null): ReadCommandInterface
     {
         if (!is_object($owner)) {
             throw new InvalidArgumentException('MorphTo relation do not supports querying on collection');
@@ -122,7 +122,7 @@ class MorphTo extends BelongsTo
     /**
      * {@inheritdoc}
      */
-    public function associate($owner, $entity)
+    public function associate(object $owner, object $entity): object
     {
         $this->loadDistantFromType($this->discriminator(get_class($entity)));
 
@@ -133,7 +133,7 @@ class MorphTo extends BelongsTo
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function saveAll($owner, array $relations = []): int
+    public function saveAll(object $owner, array $relations = []): int
     {
         $relations = $this->rearrangeWith($relations);
         $this->loadDistantFrom($owner);
@@ -150,7 +150,7 @@ class MorphTo extends BelongsTo
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function deleteAll($owner, array $relations = []): int
+    public function deleteAll(object $owner, array $relations = []): int
     {
         $relations = $this->rearrangeWith($relations);
         $this->loadDistantFrom($owner);
@@ -171,7 +171,7 @@ class MorphTo extends BelongsTo
      *
      * @return void
      */
-    protected function loadDistantFromType($type): void
+    protected function loadDistantFromType(mixed $type): void
     {
         $this->discriminatorValue = $type;
 
@@ -186,7 +186,7 @@ class MorphTo extends BelongsTo
      *
      * @return void
      */
-    protected function loadDistantFrom($entity): void
+    protected function loadDistantFrom(object $entity): void
     {
         /** @psalm-suppress InvalidArgument */
         $this->updateDiscriminatorValue($entity);
@@ -217,7 +217,7 @@ class MorphTo extends BelongsTo
     /**
      * {@inheritdoc}
      */
-    protected function relationQuery($keys, $constraints): ReadCommandInterface
+    protected function relationQuery(array $keys, iterable|callable $constraints): ReadCommandInterface
     {
         return $this->query($keys, $constraints)->by($this->distantKey);
     }

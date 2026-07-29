@@ -39,7 +39,7 @@ trait RepositoryAssertion
      *
      * @throws \Exception
      */
-    public function assertSameEntities($expectedEntities, $actualEntities, $message = '')
+    public function assertSameEntities(array $expectedEntities, array $actualEntities, string $message = '')
     {
         $this->assertEquals(
             count($expectedEntities),
@@ -62,7 +62,7 @@ trait RepositoryAssertion
      *
      * @throws \Exception
      */
-    public function assertSameEntity($expected, $entity, $message = '')
+    public function assertSameEntity(object $expected, object $entity, string $message = '')
     {
         $this->assertEntity($expected, $entity, 0, $message);
     }
@@ -77,7 +77,7 @@ trait RepositoryAssertion
      *
      * @throws \Exception
     */
-    public function assertEntities($expectedEntities, $actualEntities, $dateTimeDelta = 5, $message = '')
+    public function assertEntities(array $expectedEntities, array $actualEntities, int $dateTimeDelta = 5, string $message = '')
     {
         $this->assertEquals(
             count($expectedEntities),
@@ -102,7 +102,7 @@ trait RepositoryAssertion
      *
      * @throws \Exception
      */
-    public function assertEntity($expected, $entity, $dateTimeDelta = 5, $message = '')
+    public function assertEntity(object $expected, object $entity, int $dateTimeDelta = 5, string $message = '')
     {
         $this->compareEntity(get_class($expected), $expected, $entity, $dateTimeDelta, $message);
     }
@@ -112,14 +112,14 @@ trait RepositoryAssertion
      * The map can also contain constraints
      *
      * @param string        $expectedClass
-     * @param array         $expected
+     * @param object|array  $expected
      * @param object|object[] $entities
      * @param int           $dateTimeDelta
      * @param string        $message
      *
      * @throws \Exception
      */
-    public function assertEntityValues($expectedClass, $expected, $entities, $dateTimeDelta = 5, $message = '')
+    public function assertEntityValues(string $expectedClass, array $expected, $entities, int $dateTimeDelta = 5, string $message = '')
     {
         if (!is_array($entities)) {
             $this->compareEntity($expectedClass, $expected, $entities, $dateTimeDelta, $message);
@@ -149,7 +149,7 @@ trait RepositoryAssertion
      *
      * @throws \Exception
      */
-    private function compareEntity($expectedClass, $expected, $entity, $dateTimeDelta = 0, $message = '')
+    private function compareEntity(string $expectedClass, object|array $expected, object $entity, int $dateTimeDelta = 0, string $message = '')
     {
         if ($message == '') {
             $message = $expectedClass;

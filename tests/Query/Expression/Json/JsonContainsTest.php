@@ -53,12 +53,4 @@ class JsonContainsTest extends TestCase
         $this->assertSame("123 IN (SELECT atom FROM json_each(foo))", (new JsonContains('foo', 123))->build($query, $query->compiler()));
         $this->assertSame("123 IN (SELECT atom FROM json_each(foo->'$.bar'))", (new JsonContains(Json::attr('foo')->bar->unquote(false), 123))->build($query, $query->compiler()));
     }
-
-    public function test_not_scalar_value()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The candidate value must be a scalar array given');
-
-        new JsonContains('foo', []);
-    }
 }

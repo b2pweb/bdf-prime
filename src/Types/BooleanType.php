@@ -5,12 +5,12 @@ namespace Bdf\Prime\Types;
 /**
  * Facade boolean type for database
  */
-class BooleanType extends AbstractFacadeType
+final class BooleanType extends AbstractFacadeType
 {
     /**
      * {@inheritdoc}
      */
-    public function __construct($type = self::BOOLEAN)
+    public function __construct(string $type = self::BOOLEAN)
     {
         parent::__construct($type);
     }
@@ -20,7 +20,7 @@ class BooleanType extends AbstractFacadeType
      *
      * @todo Tester value is string ?
      */
-    public function toDatabase($value)
+    public function toDatabase(mixed $value): ?string
     {
         if ($value === null) {
             return null;
@@ -32,7 +32,7 @@ class BooleanType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?bool
     {
         if ($value === null) {
             return null;
@@ -48,7 +48,7 @@ class BooleanType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    protected function defaultType()
+    protected function defaultType(): string
     {
         return self::STRING;
     }

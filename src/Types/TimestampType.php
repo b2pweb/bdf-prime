@@ -9,7 +9,7 @@ use DateTimeInterface;
 /**
  * Type that maps a SQL TIMESTAMP to a PHP DateTime Object
  */
-class TimestampType extends AbstractFacadeType
+final class TimestampType extends AbstractFacadeType
 {
     use DateTimeHelper;
 
@@ -19,7 +19,7 @@ class TimestampType extends AbstractFacadeType
      * @param string $name
      * @param string $className
      */
-    public function __construct($name = self::TIMESTAMP, string $className = DateTime::class)
+    public function __construct(string $name = self::TIMESTAMP, string $className = DateTime::class)
     {
         parent::__construct($name);
 
@@ -30,7 +30,7 @@ class TimestampType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase(mixed $value): mixed
     {
         if ($value === null) {
             return null;
@@ -47,7 +47,7 @@ class TimestampType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    protected function defaultType()
+    protected function defaultType(): string
     {
         return self::INTEGER;
     }

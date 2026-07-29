@@ -16,21 +16,17 @@ trait Polymorph
      *
      * @var array
      */
-    protected $map = [];
+    protected array $map = [];
 
     /**
      * The discriminator property name for polymorphic relation
-     *
-     * @var string
      */
-    protected $discriminator;
+    protected ?string $discriminator = null;
 
     /**
      * The discriminator value for polymorphic relation
-     *
-     * @var int|string|null
      */
-    protected $discriminatorValue;
+    protected int|string|null $discriminatorValue = null;
 
     /**
      * Set the polymorphic map
@@ -39,7 +35,7 @@ trait Polymorph
      *
      * @return $this
      */
-    public function setMap(array $map)
+    public function setMap(array $map): static
     {
         $this->map = $map;
 
@@ -55,7 +51,7 @@ trait Polymorph
      *
      * @throws InvalidArgumentException If the value has no map
      */
-    public function map($value)
+    public function map(string|int|null $value)
     {
         // empty string are considered as null due to the implicit cast of null key in array
         // do not use empty() to allow 0 as discriminator value
@@ -77,7 +73,7 @@ trait Polymorph
      *
      * @return $this
      */
-    public function setDiscriminator($discriminator)
+    public function setDiscriminator(string $discriminator): static
     {
         $this->discriminator = $discriminator;
 
@@ -91,7 +87,7 @@ trait Polymorph
      *
      * @return $this
      */
-    public function setDiscriminatorValue($value)
+    public function setDiscriminatorValue(string|int|null $value): static
     {
         $this->discriminatorValue = $value;
 
@@ -102,8 +98,9 @@ trait Polymorph
      * Is the relation polymorphic
      *
      * @return bool
+     * @psalm-assert-if-true !null $this->discriminator
      */
-    public function isPolymorphic()
+    public function isPolymorphic(): bool
     {
         return $this->discriminator !== null;
     }
@@ -117,7 +114,7 @@ trait Polymorph
      *
      * @throws InvalidArgumentException   If the class name has no discriminator
      */
-    public function discriminator($className)
+    public function discriminator(string $className): string|int
     {
         foreach ($this->map as $type => &$value) {
             $this->resolveEntity($value);
@@ -137,7 +134,7 @@ trait Polymorph
      *
      * @return array{entity:class-string,distantKey:string,constraints?:mixed}
      */
-    protected function resolveEntity(&$value): array
+    protected function resolveEntity(mixed &$value): array
     {
         if (is_string($value)) {
             list($entity, $distantKey) = Relation::parseEntity($value);
@@ -214,7 +211,7 @@ trait Polymorph
      *
      * @return void
      */
-    protected function updateDiscriminatorValue($entity): void
+    protected function updateDiscriminatorValue(object $entity): void
     {
         /** @psalm-suppress InvalidArgument */
         $this->discriminatorValue = $this->local->mapper()->extractOne($entity, $this->discriminator);

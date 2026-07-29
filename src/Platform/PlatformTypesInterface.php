@@ -41,7 +41,7 @@ interface PlatformTypesInterface extends TypesRegistryInterface
      *
      * @return TypeInterface|null The type, or null to let connection decide
      */
-    public function resolve($value): ?TypeInterface;
+    public function resolve(mixed $value): ?TypeInterface;
 
     /**
      * Convert a PHP value to database value
@@ -53,7 +53,7 @@ interface PlatformTypesInterface extends TypesRegistryInterface
      *
      * @see PlatformTypesInterface::fromDatabase()
      */
-    public function toDatabase($value, $type = null);
+    public function toDatabase(mixed $value, string|TypeInterface|null $type = null);
 
     /**
      * Convert a database value to PHP value
@@ -66,5 +66,5 @@ interface PlatformTypesInterface extends TypesRegistryInterface
      *
      * @see PlatformTypesInterface::toDatabase()
      */
-    public function fromDatabase($value, $type = null, array $fieldOptions = []);
+    public function fromDatabase(mixed $value, string|TypeInterface|null $type = null, array $fieldOptions = []);
 }

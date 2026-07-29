@@ -30,7 +30,7 @@ final class DoctrineResultSet implements ResultSetInterface
     /**
      * @var T|false|null
      */
-    private $current;
+    private mixed $current = null;
 
     /**
      * @var DoctrineFetchStrategyInterface<T>

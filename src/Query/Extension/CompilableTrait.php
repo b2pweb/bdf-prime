@@ -23,12 +23,12 @@ trait CompilableTrait
     /**
      * @var Compilable::TYPE_*
      */
-    protected $type = Compilable::TYPE_SELECT;
+    protected string $type = Compilable::TYPE_SELECT;
 
     /**
      * {@inheritdoc}
      */
-    public function compile(bool $forceRecompile = false)
+    public function compile(bool $forceRecompile = false): mixed
     {
         if ($forceRecompile) {
             $this->compilerState->invalidate('prepared');
@@ -85,7 +85,7 @@ trait CompilableTrait
      * @throws PrimeException When the compilation fail
      * @throws \LogicException If type is not supported by the query or the compiler
      */
-    protected function doCompilation(string $type, object $compiler)
+    protected function doCompilation(string $type, object $compiler): mixed
     {
         switch (true) {
             case $type === Compilable::TYPE_SELECT && $compiler instanceof SelectCompilerInterface:

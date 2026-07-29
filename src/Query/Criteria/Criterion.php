@@ -12,7 +12,7 @@ use Bdf\Prime\Query\Expression\ExpressionInterface;
  * @psalm-immutable
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class Criterion
+readonly class Criterion
 {
     /**
      * The field name of the filter
@@ -21,25 +21,25 @@ class Criterion
      *
      * @var string|ExpressionInterface|null
      */
-    /*readonly string|ExpressionInterface|null*/ public $field = null;
+    public string|ExpressionInterface|null $field;
 
     /**
      * Define the operator to use for the filter
      * If null, the default operator will be used (usually '=')
      */
-    /*readonly*/ public ?string $operator = null;
+    public ?string $operator;
 
     /**
      * Does the filter should be ignored if the value is null?
      */
-    /*readonly*/ public bool $skipNull = true;
+    public bool $skipNull;
 
     /**
      * @param ExpressionInterface|string|null $field
      * @param string|null $operator
      * @param bool $skipNull
      */
-    public function __construct($field = null, ?string $operator = null, bool $skipNull = true)
+    public function __construct(ExpressionInterface|string|null $field = null, ?string $operator = null, bool $skipNull = true)
     {
         $this->field = $field;
         $this->operator = $operator;
@@ -65,7 +65,7 @@ class Criterion
      * @param mixed $value The property value
      * @return mixed The transformed value that will be used on the query
      */
-    public function value($value)
+    public function value(mixed $value)
     {
         return $value;
     }

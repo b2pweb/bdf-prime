@@ -5,22 +5,14 @@ namespace Bdf\Prime\Relations\Util;
 /**
  * Wrap entity keys for handle composite keys
  */
-class EntityKeys
+final class EntityKeys
 {
     /**
      * @var list<string>
      */
-    private $keys = [];
-
-    /**
-     * @var mixed
-     */
-    private $entity;
-
-    /**
-     * @var int|null
-     */
-    private $hash = null;
+    private array $keys = [];
+    private mixed $entity;
+    private ?int $hash = null;
 
 
     /**
@@ -29,7 +21,7 @@ class EntityKeys
      * @param list<string> $keys The entity keys values. Must be an integer index array, not an associative one
      * @param mixed $entity The attached entity
      */
-    public function __construct(array $keys, $entity = null)
+    public function __construct(array $keys, mixed $entity = null)
     {
         $this->keys = $keys;
         $this->entity = $entity;
@@ -40,7 +32,7 @@ class EntityKeys
      *
      * @param mixed $entity
      */
-    public function attach($entity): void
+    public function attach(mixed $entity): void
     {
         $this->entity = $entity;
     }
@@ -50,7 +42,7 @@ class EntityKeys
      *
      * @return mixed
      */
-    public function get()
+    public function get(): mixed
     {
         return $this->entity;
     }

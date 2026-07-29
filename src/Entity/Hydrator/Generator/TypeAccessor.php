@@ -5,22 +5,15 @@ namespace Bdf\Prime\Entity\Hydrator\Generator;
 /**
  * Generates accessors to the type registry
  */
-class TypeAccessor
+final class TypeAccessor
 {
-    /**
-     * @var CodeGenerator
-     */
-    private $code;
-
-    /**
-     * @var string
-     */
-    private $registryVariableName;
+    private CodeGenerator $code;
+    private string $registryVariableName;
 
     /**
      * @var string[]
      */
-    private $declaredTypes = [];
+    private array $declaredTypes = [];
 
     /**
      * TypeAccessor constructor.
@@ -91,7 +84,7 @@ class TypeAccessor
      *
      * @return string
      */
-    private function getValidVariableName(string $typeName)
+    private function getValidVariableName(string $typeName): string
     {
         return str_replace([' ', '\\', '-', '.', ':', '/', '[', ']'], '', $typeName);
     }

@@ -1320,7 +1320,10 @@ class TestInaccessiblePropertyEntityMapper extends Mapper
      */
     public function schema(): array
     {
-        return [];
+        return [
+            'connection' => 'test',
+            'table' => 'test',
+        ];
     }
 
     /**
@@ -1343,7 +1346,10 @@ class TestPropertyNotFoundEntityMapper extends Mapper
      */
     public function schema(): array
     {
-        return [];
+        return [
+            'connection' => 'test',
+            'table' => 'test',
+        ];
     }
 
     /**
@@ -1378,7 +1384,10 @@ class ComplexConstructorEntityMapper extends Mapper
      */
     public function schema(): array
     {
-        return [];
+        return [
+            'connection' => 'test',
+            'table' => 'test',
+        ];
     }
 
     /**
@@ -1405,7 +1414,10 @@ class ArrayOfEntityMapper extends Mapper
      */
     public function schema(): array
     {
-        return [];
+        return [
+            'connection' => 'test',
+            'table' => 'test',
+        ];
     }
 
     /**

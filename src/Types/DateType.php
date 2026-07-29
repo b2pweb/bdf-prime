@@ -5,7 +5,7 @@ namespace Bdf\Prime\Types;
 /**
  * Accept a date type (Y-m-d)
  */
-class DateType extends AbstractDateTimeType
+final class DateType extends AbstractDateTimeType
 {
     /**
      * DateType constructor.
@@ -14,7 +14,7 @@ class DateType extends AbstractDateTimeType
      * @param string $className
      * @param \DateTimeZone|null $timezone
      */
-    public function __construct($name = self::DATE, string $className = \DateTime::class, ?\DateTimeZone $timezone = null)
+    public function __construct(string $name = self::DATE, string $className = \DateTime::class, ?\DateTimeZone $timezone = null)
     {
         parent::__construct($name);
 

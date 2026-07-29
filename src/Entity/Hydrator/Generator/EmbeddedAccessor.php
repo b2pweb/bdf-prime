@@ -7,27 +7,16 @@ use Bdf\Prime\Entity\Hydrator\Exception\HydratorGenerationException;
 /**
  * Accessor for embedded entity
  */
-class EmbeddedAccessor
+final class EmbeddedAccessor
 {
-    /**
-     * @var CodeGenerator
-     */
-    private $code;
-
-    /**
-     * @var EmbeddedInfo
-     */
-    private $embedded;
+    private CodeGenerator $code;
+    private EmbeddedInfo $embedded;
 
     /**
      * @var ClassAccessor[]
      */
-    private $accessors;
-
-    /**
-     * @var EmbeddedAccessor|ClassAccessor
-     */
-    private $parentAccessor;
+    private array $accessors;
+    private EmbeddedAccessor|ClassAccessor $parentAccessor;
 
 
     /**
@@ -38,7 +27,7 @@ class EmbeddedAccessor
      * @param ClassAccessor[] $accessors
      * @param EmbeddedAccessor|ClassAccessor $parentAccessor
      */
-    public function __construct(CodeGenerator $code, EmbeddedInfo $embedded, array $accessors, $parentAccessor)
+    public function __construct(CodeGenerator $code, EmbeddedInfo $embedded, array $accessors, EmbeddedAccessor|ClassAccessor $parentAccessor)
     {
         $this->code = $code;
         $this->embedded  = $embedded;
@@ -59,7 +48,7 @@ class EmbeddedAccessor
      *
      * @throws HydratorGenerationException
      */
-    public function getEmbedded($target, $instantiate = true, $rawDataVarName = null)
+    public function getEmbedded(string $target, bool $instantiate = true, ?string $rawDataVarName = null): string
     {
         return <<<PHP
 { //START accessor for {$this->embedded->path()}
@@ -81,7 +70,7 @@ PHP;
      *
      * @throws HydratorGenerationException When the attribute is not readable
      */
-    public function getter($varName, $attribute)
+    public function getter(string $varName, string $attribute): string
     {
         if (count($this->accessors) === 1) {
             $getter = $this->accessors[0]->getter($varName, $attribute);
@@ -117,7 +106,7 @@ PHP;
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    public function setter($varName, $attribute, $value, $useSetterInPriority = true)
+    public function setter(string $varName, string $attribute, string $value, bool $useSetterInPriority = true): string
     {
         if (count($this->accessors) === 1) {
             $setter = $this->accessors[0]->setter($varName, $attribute, $value, $useSetterInPriority);
@@ -152,7 +141,7 @@ PHP;
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    public function fullSetter($attribute, $value, $tmpVarName = '$__owner', $rawDataVarName = null)
+    public function fullSetter(string $attribute, string $value, string $tmpVarName = '$__owner', ?string $rawDataVarName = null): string
     {
         return $this->code->lines([
             $this->getEmbedded($tmpVarName, true, $rawDataVarName),
@@ -164,14 +153,14 @@ PHP;
      * @param string $parent
      * @param string $target
      * @param bool $instantiate
-     * @param string $rawDataVarName
-     * @param bool $nillable
+     * @param string|null $rawDataVarName
+     * @param bool|null $nillable
      *
      * @return string
      *
      * @throws HydratorGenerationException
      */
-    private function recursiveGetEmbedded($parent, $target, $instantiate = true, $rawDataVarName = null, &$nillable = false)
+    private function recursiveGetEmbedded(string $parent, string $target, bool $instantiate = true, ?string $rawDataVarName = null, ?bool &$nillable = false): string
     {
         $accessor = '';
         $lastVar = $parent;
@@ -212,7 +201,7 @@ PHP;
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    private function getOrInstantiate($parent, $target, $instantiate, $rawDataVarName)
+    private function getOrInstantiate(string $parent, string $target, bool $instantiate, ?string $rawDataVarName): string
     {
         $accessorsSwitch = [];
 
@@ -276,7 +265,7 @@ PHP;
      *
      * @return ClassAccessor[]
      */
-    private function ownerAccessors()
+    private function ownerAccessors(): array
     {
         if ($this->parentAccessor instanceof EmbeddedAccessor) {
             return $this->parentAccessor->accessors;
@@ -290,7 +279,7 @@ PHP;
      *
      * @return bool
      */
-    private function nillable()
+    private function nillable(): bool
     {
         if ($this->embedded->isPolymorph()) {
             return true;

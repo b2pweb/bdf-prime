@@ -15,12 +15,12 @@ final class SingleEntityIndexer implements EntityIndexerInterface
     /**
      * @var Mapper<E>
      */
-    private $mapper;
+    private Mapper $mapper;
 
     /**
      * @var E
      */
-    private $entity;
+    private object $entity;
 
 
     /**
@@ -29,7 +29,7 @@ final class SingleEntityIndexer implements EntityIndexerInterface
      * @param Mapper<E> $mapper
      * @param E $entity
      */
-    public function __construct(Mapper $mapper, $entity)
+    public function __construct(Mapper $mapper, object $entity)
     {
         $this->mapper = $mapper;
         $this->entity = $entity;

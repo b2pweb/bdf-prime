@@ -24,32 +24,29 @@ class TestPack
      *
      * @var static|null
      */
-    protected static $pack;
+    private static ?self $pack = null;
 
     /**
      * Test data by group
      *
      * @var array{persistent:object[], non-persistent: object[]}
      */
-    protected $testPacks = [
+    private array $testPacks = [
         'persistent'        => [],  // Entités créées non modifiables
         'non-persistent'    => []   // Entités créées et détruites aprés un test
     ];
 
-    /**
-     * @var bool
-     */
-    private $initialized = false;
+    private bool $initialized = false;
 
     /**
      * @var class-string[]
      */
-    private $entityClasses = [];
+    private array $entityClasses = [];
 
     /**
      * @var array<string, object>
      */
-    private $entities = [];
+    private array $entities = [];
 
 
     /**
@@ -71,7 +68,7 @@ class TestPack
      *
      * @return bool Return true if testPack is initialized
      */
-    public function isInitialized()
+    public function isInitialized(): bool
     {
         return $this->initialized;
     }
@@ -152,7 +149,7 @@ class TestPack
      *
      * @return self
      */
-    public function declareEntity($entityClasses)
+    public function declareEntity(string|array $entityClasses)
     {
         if (!is_array($entityClasses)) {
             $entityClasses = [$entityClasses];
@@ -290,7 +287,7 @@ class TestPack
      *
      * @return object|null
      */
-    public function get($name)
+    public function get(string $name): ?object
     {
         if (isset($this->entities[$name])) {
             return $this->entities[$name];
@@ -306,7 +303,7 @@ class TestPack
      *
      * @return void
      */
-    public function pushEntity($entity): void
+    public function pushEntity(object $entity): void
     {
         /** @var EntityRepository $repository */
         $repository = Prime::repository($entity);
@@ -329,7 +326,7 @@ class TestPack
      *
      * @return void
      */
-    public function deleteEntity($entity): void
+    public function deleteEntity(object $entity): void
     {
         /** @var EntityRepository $repository */
         $repository = Prime::repository($entity);
@@ -382,7 +379,7 @@ class TestPack
      *
      * @return SimpleConnection[]
      */
-    private function getActiveConnections()
+    private function getActiveConnections(): array
     {
         /** @var SimpleConnection[] */
         return Prime::service()->connections()->connections();

@@ -12,6 +12,7 @@ use Bdf\Prime\Repository\Event\BeforeDelete;
 use Bdf\Prime\Repository\RepositoryEventsSubscriberInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Types\TypeInterface;
+use DateTimeInterface;
 use Psr\Clock\ClockInterface;
 
 use function is_string;
@@ -26,7 +27,7 @@ use function is_string;
  * @template E as object
  * @implements BehaviorInterface<E>
  */
-class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
+final class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
 {
     /**
      * The deleted at info.
@@ -35,7 +36,7 @@ class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
      * @var array{name: string, alias?: string}
      * @private
      */
-    protected array $deleted;
+    private array $deleted;
 
     /**
      * The property type
@@ -43,7 +44,7 @@ class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
      * @var string
      * @private
      */
-    protected string $type;
+    private string $type;
 
     private ClockInterface $clock;
 
@@ -57,7 +58,7 @@ class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
      * @param bool|string|array $deleted
      * @param string            $type
      */
-    public function __construct($deleted = true, string $type = TypeInterface::DATETIME)
+    public function __construct(bool|string|array $deleted = true, string $type = TypeInterface::DATETIME)
     {
         $this->type = $type;
         $this->deleted = $this->getFieldInfos($deleted);
@@ -79,7 +80,7 @@ class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
      *
      * @return array{name: string, alias?: string}
      */
-    private function getFieldInfos($field): array
+    private function getFieldInfos(bool|string|array $field): array
     {
         if ($field === true) {
             return ['name' => 'deletedAt', 'alias' => 'deleted_at'];
@@ -146,9 +147,9 @@ class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
      * @param string $name
      * @param RepositoryInterface<E> $repository
      *
-     * @return \DateTimeInterface|int
+     * @return DateTimeInterface|int
      */
-    private function createDate(string $name, RepositoryInterface $repository)
+    private function createDate(string $name, RepositoryInterface $repository): DateTimeInterface|int
     {
         $date = $this->clock->now();
 
@@ -167,7 +168,7 @@ class SoftDeleteable implements BehaviorInterface, ClockAwareInterface
      */
     public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
     {
-        $notifier->deleting([$this, 'beforeDelete']);
+        $notifier->deleting($this->beforeDelete(...));
     }
 
     /**

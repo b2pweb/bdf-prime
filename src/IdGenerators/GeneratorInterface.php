@@ -45,5 +45,5 @@ interface GeneratorInterface
      *
      * @throws PrimeException
      */
-    public function postProcess($entity): void;
+    public function postProcess(object $entity): void;
 }

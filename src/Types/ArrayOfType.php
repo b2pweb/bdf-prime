@@ -8,22 +8,13 @@ use Bdf\Prime\Platform\PlatformTypeInterface;
 /**
  * Typed array database type
  */
-class ArrayOfType implements FacadeTypeInterface
+final class ArrayOfType implements FacadeTypeInterface
 {
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
-    /**
-     * @var TypeInterface
-     */
-    private $baseArray;
+    private TypeInterface $baseArray;
 
-    /**
-     * @var TypeInterface
-     */
-    private $innerType;
+    private TypeInterface $innerType;
 
 
     /**
@@ -42,7 +33,7 @@ class ArrayOfType implements FacadeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?array
     {
         if ($value === null) {
             return null;
@@ -54,7 +45,7 @@ class ArrayOfType implements FacadeTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase(mixed $value): mixed
     {
         if ($value === null) {
             return null;

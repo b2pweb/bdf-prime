@@ -7,42 +7,42 @@ namespace Bdf\Prime\Query\Compiler;
  *
  * @internal
  */
-class CompilerState
+final class CompilerState
 {
     /**
      * The bind parameters
      *
      * @var array
      */
-    public $bindings = [];
+    public array $bindings = [];
 
     /**
      * The current part in processing for bindings
      *
      * @var string|int
      */
-    public $currentPart;
+    public string|int $currentPart;
 
     /**
      * The compiled sql parts
      *
      * @var array
      */
-    public $compiledParts = [];
+    public array $compiledParts = [];
 
     /**
      * The compiled query
      *
      * @var mixed
      */
-    public $compiled;
+    public mixed $compiled = null;
 
     /**
      * Does the query is compiling ?
      *
      * @var bool
      */
-    public $compiling = false;
+    public bool $compiling = false;
 
     /**
      * Invalidate compiled parts
@@ -51,7 +51,7 @@ class CompilerState
      *
      * @return void
      */
-    public function invalidate($parts = []): void
+    public function invalidate(string|array $parts = []): void
     {
         if ($this->compiling) {
             return;
@@ -87,7 +87,7 @@ class CompilerState
      *
      * @return void
      */
-    public function bind($value): void
+    public function bind(mixed $value): void
     {
         $this->bindings[$this->currentPart][] = $value;
     }
@@ -99,8 +99,8 @@ class CompilerState
      */
     public function __destruct()
     {
-        $this->bindings = null;
-        $this->compiledParts = null;
+        unset($this->bindings);
+        unset($this->compiledParts);
         $this->compiled = null;
     }
 }

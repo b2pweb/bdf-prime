@@ -9,14 +9,12 @@ use Bdf\Prime\Sharding\ShardingConnection;
 /**
  * ShardingConnection
  */
-class ShardingConnectionFactory implements ConnectionFactoryInterface
+final class ShardingConnectionFactory implements ConnectionFactoryInterface
 {
     /**
      * The delegated loader
-     *
-     * @var ConnectionFactoryInterface
      */
-    private $connectionFactory;
+    private ConnectionFactoryInterface $connectionFactory;
 
     /**
      * Set default configuration

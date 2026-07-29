@@ -19,22 +19,13 @@ use Doctrine\DBAL\Exception\TableNotFoundException;
  *
  * @todo gestion du renommage de champs dans le cas où d'autres attributs ont été changés
  */
-class RepositoryUpgrader implements StructureUpgraderInterface
+final class RepositoryUpgrader implements StructureUpgraderInterface
 {
-    /**
-     * @var ServiceLocator
-     */
-    protected $service;
+    private ServiceLocator $service;
 
-    /**
-     * @var Metadata
-     */
-    protected $metadata;
+    private Metadata $metadata;
 
-    /**
-     * @var SchemaManagerInterface
-     */
-    protected $schema;
+    private ?SchemaManagerInterface $schema;
 
 
     /**
@@ -246,7 +237,7 @@ class RepositoryUpgrader implements StructureUpgraderInterface
      * @return SchemaManagerInterface
      * @throws PrimeException
      */
-    protected function schema()
+    protected function schema(): SchemaManagerInterface
     {
         if ($this->schema !== null) {
             return $this->schema;
@@ -261,7 +252,7 @@ class RepositoryUpgrader implements StructureUpgraderInterface
      * @return SchemaManagerInterface|null
      * @throws PrimeException
      */
-    protected function schemaSequence()
+    protected function schemaSequence(): ?SchemaManagerInterface
     {
         if (!$this->metadata->isSequencePrimaryKey()) {
             return null;
@@ -281,7 +272,7 @@ class RepositoryUpgrader implements StructureUpgraderInterface
      *
      * @return ConnectionInterface
      */
-    protected function connection($profile = null)
+    protected function connection(?string $profile = null): ConnectionInterface
     {
         return $this->service->connection($profile ?: $this->metadata->connection);
     }

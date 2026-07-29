@@ -23,49 +23,41 @@ use Bdf\Prime\Sharding\ShardingConnection;
  *
  * @implements InsertQueryInterface<ShardingConnection>
  */
-class ShardingInsertQuery extends CompilableClause implements InsertQueryInterface, Cachable
+final class ShardingInsertQuery extends CompilableClause implements InsertQueryInterface, Cachable
 {
     use CachableTrait;
     use ShardPicker;
 
     /**
      * The DBAL Connection.
-     *
-     * @var ShardingConnection
      */
-    private $connection;
+    private ShardingConnection $connection;
 
-    /**
-     * @var string
-     */
-    private $table;
+    private ?string $table = null;
 
     /**
      * @var string[]
      */
-    private $columns = [];
+    private array $columns = [];
 
     /**
      * @var InsertQueryInterface::MODE_*
      */
-    private $mode = self::MODE_INSERT;
+    private string $mode = self::MODE_INSERT;
 
-    /**
-     * @var array
-     */
-    private $values = [];
+    private array $values = [];
 
     /**
      * Queries indexed by shard id
      *
      * @var BulkInsertQuery[]
      */
-    private $queries = [];
+    private array $queries = [];
 
     /**
      * @var BulkInsertQuery|null
      */
-    private $currentQuery;
+    private ?BulkInsertQuery $currentQuery = null;
 
 
     /**
@@ -92,14 +84,6 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function setCompiler(CompilerInterface $compiler)
-    {
-        throw new BadMethodCallException('Cannot directly compile a sharding query');
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function connection(): ConnectionInterface
     {
         return $this->connection;
@@ -108,7 +92,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function on(ConnectionInterface $connection)
+    public function on(ConnectionInterface $connection): static
     {
         $this->connection = $connection;
         $this->queries = [];
@@ -120,7 +104,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function from(string $from, ?string $alias = null)
+    public function from(string $from, ?string $alias = null): static
     {
         return $this->into($from);
     }
@@ -128,7 +112,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function bulk(bool $flag = true)
+    public function bulk(bool $flag = true): static
     {
         throw new BadMethodCallException('Bulk insert is not (yet ?) supported by sharding connection');
     }
@@ -136,7 +120,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function into(string $table)
+    public function into(string $table): static
     {
         $this->table = $table;
 
@@ -150,7 +134,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function columns(array $columns)
+    public function columns(array $columns): static
     {
         $this->columns = $columns;
 
@@ -164,7 +148,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function values(array $data, bool $replace = false)
+    public function values(array $data, bool $replace = false): static
     {
         $this->values = $data;
         $this->currentQuery = null;
@@ -177,7 +161,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function mode(string $mode)
+    public function mode(string $mode): static
     {
         $this->mode = $mode;
 
@@ -191,7 +175,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function ignore(bool $flag = true)
+    public function ignore(bool $flag = true): static
     {
         return $this->mode($flag ? self::MODE_IGNORE : self::MODE_INSERT);
     }
@@ -199,7 +183,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
     /**
      * {@inheritdoc}
      */
-    public function replace(bool $flag = true)
+    public function replace(bool $flag = true): static
     {
         return $this->mode($flag ? self::MODE_REPLACE : self::MODE_INSERT);
     }
@@ -210,7 +194,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
      * @return ResultSetInterface<array<string, mixed>>
      */
     #[WriteOperation]
-    public function execute($columns = null): ResultSetInterface
+    public function execute(mixed $columns = null): ResultSetInterface
     {
         $result = $this->currentQuery()->execute($columns);
 
@@ -226,7 +210,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
      *
      * @return BulkInsertQuery
      */
-    private function currentQuery()
+    private function currentQuery(): BulkInsertQuery
     {
         if ($this->currentQuery !== null) {
             return $this->currentQuery;
@@ -256,7 +240,7 @@ class ShardingInsertQuery extends CompilableClause implements InsertQueryInterfa
      *
      * @return string
      */
-    private function getShardId()
+    private function getShardId(): string
     {
         if ($this->shardId !== null) {
             return $this->shardId;

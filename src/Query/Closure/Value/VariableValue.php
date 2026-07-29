@@ -22,7 +22,7 @@ final class VariableValue implements ComparisonValueInterface
     /**
      * {@inheritdoc}
      */
-    public function get(ReflectionFunction $reflection)
+    public function get(ReflectionFunction $reflection): mixed
     {
         if ($this->variable === 'this') {
             return $reflection->getClosureThis();

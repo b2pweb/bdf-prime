@@ -250,6 +250,34 @@ class BelongsToManyTest extends TestCase
     /**
      *
      */
+    public function test_load_with_closure_constraints()
+    {
+        $customer = Prime::repository('Bdf\Prime\Customer')
+            ->with(['packs' => function ($query) { $query->where('label', ':like', '%classic'); }])
+            ->findById('123');
+
+        $this->assertEquals([$this->getTestPack()->get('pack-classic')], $customer->packs);
+        $this->assertTrue($this->relation->isLoaded($customer));
+    }
+
+    /**
+     *
+     */
+    public function test_load_single_entity_with_global_closure_constraints()
+    {
+        $customer = $this->getTestPack()->get('customer');
+
+        $this->relation->setConstraints(function ($query) { $query->where('label', 'Pack classic'); });
+
+        $this->relation->load(new SingleEntityIndexer(Customer::mapper(), $customer));
+
+        $this->assertEquals([$this->getTestPack()->get('pack-classic')], $customer->packs);
+        $this->assertTrue($this->relation->isLoaded($customer));
+    }
+
+    /**
+     *
+     */
     public function test_dynamic_join()
     {
         $customers = Prime::repository('Bdf\Prime\Customer')

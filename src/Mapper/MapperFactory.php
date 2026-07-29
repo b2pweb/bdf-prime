@@ -16,10 +16,8 @@ use function str_replace;
 /**
  * Default mapper factory
  * The mapper class will be resolved by the mapper name resolver, and instantiated by calling the constructor
- *
- * Will be marked as final in 3.0
  */
-/*final*/ class MapperFactory extends AbstractMapperFactory
+final class MapperFactory extends AbstractMapperFactory
 {
     /**
      * {@inheritdoc}

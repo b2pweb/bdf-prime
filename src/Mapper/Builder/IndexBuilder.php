@@ -12,28 +12,22 @@ namespace Bdf\Prime\Mapper\Builder;
  * ;
  * </code>
  */
-class IndexBuilder
+final class IndexBuilder
 {
     /**
      * Store formatted indexes
-     *
-     * @var array
      */
-    private $indexes = [];
+    private array $indexes = [];
 
     /**
      * The current index name or offset
-     *
-     * @var string|integer
      */
-    private $current;
+    private string|int $current;
 
     /**
      * Last index offset for auto-generated names
-     *
-     * @var int
      */
-    private $index = 0;
+    private int $index = 0;
 
 
     /**
@@ -43,7 +37,7 @@ class IndexBuilder
      *
      * @return $this
      */
-    public function add($name = null)
+    public function add(?string $name = null): static
     {
         if ($name === null) {
             $name = $this->index++;
@@ -83,7 +77,7 @@ class IndexBuilder
      *
      * @return $this
      */
-    public function on($field, array $options = [])
+    public function on(string|array $field, array $options = []): static
     {
         if (is_string($field)) {
             $this->indexes[$this->current]['fields'][$field] = $options;
@@ -115,7 +109,7 @@ class IndexBuilder
      *
      * @return $this
      */
-    public function flag($name)
+    public function flag(string $name): static
     {
         $this->indexes[$this->current][$name] = true;
 
@@ -134,7 +128,7 @@ class IndexBuilder
      *
      * @return $this
      */
-    public function option($name, $value)
+    public function option(string $name, mixed $value): static
     {
         $this->indexes[$this->current][$name] = $value;
 
@@ -146,7 +140,7 @@ class IndexBuilder
      *
      * @return $this
      */
-    public function unique()
+    public function unique(): static
     {
         return $this->flag('unique');
     }
@@ -156,7 +150,7 @@ class IndexBuilder
      *
      * @return array
      */
-    public function build()
+    public function build(): array
     {
         return $this->indexes;
     }

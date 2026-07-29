@@ -11,15 +11,13 @@ trait JsonHelper
 {
     /**
      * Transform data to array
-     *
-     * @var boolean
      */
-    protected $toArray;
+    protected bool $toArray = false;
 
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase(mixed $value): ?string
     {
         if ($value === null) {
             return null;
@@ -31,7 +29,7 @@ trait JsonHelper
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase(mixed $value, array $fieldOptions = []): mixed
     {
         if ($value === null) {
             return null;

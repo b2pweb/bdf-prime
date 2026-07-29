@@ -14,17 +14,10 @@ use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
  *
  * @implements ExpressionInterface<CompilableClause&\Bdf\Prime\Query\Contract\Compilable, QuoteCompilerInterface>
  */
-class Attribute implements ExpressionInterface
+final class Attribute implements ExpressionInterface
 {
-    /**
-     * @var string
-     */
-    protected $attribute;
-
-    /**
-     * @var string
-     */
-    protected $pattern;
+    private string $attribute;
+    private string $pattern;
 
     /**
      * Set attribute as value
@@ -32,7 +25,7 @@ class Attribute implements ExpressionInterface
      * @param string $attribute
      * @param string $pattern
      */
-    public function __construct($attribute, $pattern = '%s')
+    public function __construct(string $attribute, string $pattern = '%s')
     {
         $this->attribute = $attribute;
         $this->pattern = $pattern;
@@ -43,7 +36,7 @@ class Attribute implements ExpressionInterface
      *
      * @param QuoteCompilerInterface $compiler
      */
-    public function build(CompilableClause $query, object $compiler)
+    public function build(CompilableClause $query, object $compiler): string
     {
         return sprintf($this->pattern, $compiler->quoteIdentifier($query, $query->preprocessor()->field($this->attribute)));
     }

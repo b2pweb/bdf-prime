@@ -48,13 +48,13 @@ class CollectionFactoryTest extends TestCase
     {
         $factory = CollectionFactory::forDbal();
 
-        $factory->registerWrapperAlias('object', \ArrayObject::class);
+        $factory->registerWrapperAlias('object', CustomWrapper::class);
 
         $collection = $factory->wrap([
             ['id' => 1]
         ], 'object');
 
-        $this->assertInstanceOf(\ArrayObject::class, $collection);
+        $this->assertInstanceOf(CustomWrapper::class, $collection);
         $this->assertEquals(1, $collection[0]['id']);
     }
 
@@ -65,12 +65,12 @@ class CollectionFactoryTest extends TestCase
     {
         $factory = CollectionFactory::forDbal();
 
-        $factory->registerWrapperAlias('my_custom_collection_with_factory', \ArrayObject::class, function () {
-            return new \ArrayObject(['hello', 'world']);
+        $factory->registerWrapperAlias('my_custom_collection_with_factory', CustomWrapper::class, function () {
+            return new CustomWrapper(['hello', 'world']);
         });
 
-        $this->assertEquals(new \ArrayObject(['hello', 'world']), $factory->wrap([['id' => 1]], 'my_custom_collection_with_factory'));
-        $this->assertEquals(new \ArrayObject(['hello', 'world']), $factory->wrap([['id' => 1]], \ArrayObject::class));
+        $this->assertEquals(new CustomWrapper(['hello', 'world']), $factory->wrap([['id' => 1]], 'my_custom_collection_with_factory'));
+        $this->assertEquals(new CustomWrapper(['hello', 'world']), $factory->wrap([['id' => 1]], CustomWrapper::class));
     }
 
     /**
@@ -86,11 +86,11 @@ class CollectionFactoryTest extends TestCase
         $collection = $factory->wrap([['id' => 1]], function ($data) use(&$isCalled, &$argument) {
             $isCalled = true;
             $argument = $data;
-            return new \ArrayObject($data);
+            return new CustomWrapper($data);
         });
 
         $this->assertTrue($isCalled);
-        $this->assertInstanceOf(\ArrayObject::class, $collection);
+        $this->assertInstanceOf(CustomWrapper::class, $collection);
         $this->assertEquals(1, $collection[0]['id']);
     }
 
@@ -125,11 +125,11 @@ class CollectionFactoryTest extends TestCase
     {
         $factory = CollectionFactory::forDbal();
 
-        $factory->registerWrapperAlias('my_wrapper_with_factory', \ArrayObject::class, function ($data) {
-            return new \ArrayObject(['hello' => 'world']);
+        $factory->registerWrapperAlias('my_wrapper_with_factory', CustomWrapper::class, function ($data) {
+            return new CustomWrapper(['hello' => 'world']);
         });
 
-        $this->assertEquals(\ArrayObject::class, $factory->wrapperClass('my_wrapper_with_factory'));
+        $this->assertEquals(CustomWrapper::class, $factory->wrapperClass('my_wrapper_with_factory'));
     }
 
     /**
@@ -142,3 +142,5 @@ class CollectionFactoryTest extends TestCase
         $this->assertEquals(ArrayCollection::class, $factory->wrapperClass(ArrayCollection::class));
     }
 }
+
+class CustomWrapper extends ArrayCollection {}

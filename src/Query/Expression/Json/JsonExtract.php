@@ -60,7 +60,7 @@ final class JsonExtract extends AbstractPlatformSpecificExpression
         return sprintf(
             $this->unquote ? '%s->>%s' : '%s->%s',
             $field,
-            (string) $compiler->quote($this->path)
+            $compiler->quote($this->path)
         );
     }
 
@@ -78,7 +78,7 @@ final class JsonExtract extends AbstractPlatformSpecificExpression
         return sprintf(
             self::getExpression($this->unquote),
             $field,
-            (string) $compiler->quote($this->path)
+            $compiler->quote($this->path)
         );
     }
 

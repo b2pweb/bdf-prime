@@ -119,9 +119,9 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     /**
      * {@inheritdoc}
      */
-    public function quote($value): string
+    public function quote(int|string|float|bool|null $value): string
     {
-        return $this->connection->quote($value);
+        return $this->connection->quote((string) $value);
     }
 
     /**
@@ -175,7 +175,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     /**
      * {@inheritdoc}
      */
-    public function ignore(bool $flag = true)
+    public function ignore(bool $flag = true): static
     {
         $this->statements['ignore'] = $flag;
 
@@ -229,7 +229,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
      *
      * @return $this
      */
-    public function values($data = [], array $types = [])
+    public function values(QueryInterface|array $data = [], array $types = []): static
     {
         $this->statements['values'] = [
             'data' => $data,
@@ -265,7 +265,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function execute($columns = null): ResultSetInterface
+    public function execute(string|ExpressionInterface|array|null $columns = null): ResultSetInterface
     {
         if (!empty($columns)) {
             $this->select($columns);
@@ -361,7 +361,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function min(?string $column = null)
+    public function min(?string $column = null): int|string|float|null
     {
         return $this->aggregate(__FUNCTION__, $column);
     }
@@ -370,7 +370,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function max(?string $column = null)
+    public function max(?string $column = null): int|string|float|null
     {
         return $this->aggregate(__FUNCTION__, $column);
     }
@@ -406,8 +406,10 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
 
     /**
      * {@inheritdoc}
+     *
+     * @return $this
      */
-    public function distinct(bool $flag = true)
+    public function distinct(bool $flag = true): static
     {
         $this->compilerState->invalidate('columns');
 
@@ -421,7 +423,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
      *
      * @param string|Query $from The table name, or the embedded query
      */
-    public function from($from, ?string $alias = null)
+    public function from(string|Query $from, ?string $alias = null): static
     {
         $this->compilerState->invalidate('from');
 
@@ -460,7 +462,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
      *
      * @return $this
      */
-    public function fromAlias(string $alias, ?string $table = null)
+    public function fromAlias(string $alias, ?string $table = null): static
     {
         $this->compilerState->invalidate('from');
 
@@ -477,7 +479,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     /**
      * {@inheritdoc}
      */
-    public function group(string ...$columns)
+    public function group(string ...$columns): static
     {
         $this->compilerState->invalidate('groups');
 
@@ -491,7 +493,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
      *
      * @no-named-arguments
      */
-    public function addGroup(string ...$columns)
+    public function addGroup(string ...$columns): static
     {
         $this->compilerState->invalidate('groups');
 
@@ -503,7 +505,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     /**
      * {@inheritdoc}
      */
-    public function having($column, $operator = null, $value = null)
+    public function having(string|iterable|callable|ExpressionInterface $column, mixed $operator = null, mixed $value = null): static
     {
         $this->compilerState->invalidate('having');
 
@@ -513,7 +515,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     /**
      * {@inheritdoc}
      */
-    public function orHaving($column, $operator = null, $value = null)
+    public function orHaving(string|iterable|callable|ExpressionInterface $column, mixed $operator = null, mixed $value = null): static
     {
         $this->compilerState->invalidate('having');
 
@@ -523,7 +525,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     /**
      * {@inheritdoc}
      */
-    public function havingNull(string|ExpressionInterface $column, string $type = CompositeExpression::TYPE_AND)
+    public function havingNull(string|ExpressionInterface $column, string $type = CompositeExpression::TYPE_AND): static
     {
         $this->compilerState->invalidate('having');
 
@@ -533,7 +535,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     /**
      * {@inheritdoc}
      */
-    public function havingNotNull(string|ExpressionInterface $column, string $type = CompositeExpression::TYPE_AND)
+    public function havingNotNull(string|ExpressionInterface $column, string $type = CompositeExpression::TYPE_AND): static
     {
         $this->compilerState->invalidate('having');
 
@@ -543,7 +545,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     /**
      * {@inheritdoc}
      */
-    public function orHavingNull(string|ExpressionInterface $column)
+    public function orHavingNull(string|ExpressionInterface $column): static
     {
         return $this->havingNull($column, CompositeExpression::TYPE_OR);
     }
@@ -551,7 +553,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     /**
      * {@inheritdoc}
      */
-    public function orHavingNotNull(string|ExpressionInterface $column)
+    public function orHavingNotNull(string|ExpressionInterface $column): static
     {
         return $this->havingNotNull($column, CompositeExpression::TYPE_OR);
     }
@@ -559,7 +561,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     /**
      * {@inheritdoc}
      */
-    public function havingRaw($raw, string $type = CompositeExpression::TYPE_AND)
+    public function havingRaw(string|QueryInterface|ExpressionInterface $raw, string $type = CompositeExpression::TYPE_AND): static
     {
         $this->compilerState->invalidate('having');
 
@@ -569,7 +571,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     /**
      * {@inheritdoc}
      */
-    public function orHavingRaw($raw)
+    public function orHavingRaw(string|QueryInterface|ExpressionInterface $raw): static
     {
         return $this->havingRaw($raw, CompositeExpression::TYPE_OR);
     }
@@ -577,7 +579,7 @@ class Query extends AbstractQuery implements SqlQueryInterface, Paginable, Strin
     /**
      * {@inheritdoc}
      */
-    public function addCommand(string $command, $value)
+    public function addCommand(string $command, mixed $value)
     {
         switch ($command) {
             case ':limit':

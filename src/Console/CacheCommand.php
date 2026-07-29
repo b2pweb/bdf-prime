@@ -15,14 +15,11 @@ use Symfony\Component\Console\Output\OutputInterface;
  * permet de manipuler le cache de result query et de metadata
  */
 #[AsCommand('prime:cache', 'Manage all prime caches')]
-class CacheCommand extends Command
+final class CacheCommand extends Command
 {
-    protected static $defaultName = 'prime:cache';
+    private static $defaultName = 'prime:cache';
 
-    /**
-     * @var ServiceLocator
-     */
-    private $locator;
+    private ServiceLocator $locator;
 
     /**
      * CacheCommand constructor.

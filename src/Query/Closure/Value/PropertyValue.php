@@ -25,7 +25,7 @@ final class PropertyValue implements ComparisonValueInterface
     /**
      * {@inheritdoc}
      */
-    public function get(ReflectionFunction $reflection)
+    public function get(ReflectionFunction $reflection): mixed
     {
         return $this->value->get($reflection)->{$this->property};
     }

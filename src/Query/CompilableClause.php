@@ -10,22 +10,10 @@ use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
  */
 class CompilableClause extends Clause implements CompilableClauseInterface
 {
-    /**
-     * @var PreprocessorInterface
-     */
-    private $preprocessor;
-
-    /**
-     * @var bool
-     */
-    private $quoteIdentifier = false;
-
+    private PreprocessorInterface $preprocessor;
+    private bool $quoteIdentifier = false;
     private bool $allowUnknownAttributes = false;
-
-    /**
-     * @var CompilerState
-     */
-    protected $compilerState;
+    protected CompilerState $compilerState;
 
 
     /**

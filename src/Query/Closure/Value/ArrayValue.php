@@ -8,7 +8,7 @@ use ReflectionFunction;
 /**
  * Handle array expression value
  */
-class ArrayValue implements ComparisonValueInterface
+final class ArrayValue implements ComparisonValueInterface
 {
     /**
      * @var array<array-key, ComparisonValueInterface>
@@ -23,7 +23,7 @@ class ArrayValue implements ComparisonValueInterface
     /**
      * {@inheritdoc}
      */
-    public function get(ReflectionFunction $reflection)
+    public function get(ReflectionFunction $reflection): mixed
     {
         $values = [];
 

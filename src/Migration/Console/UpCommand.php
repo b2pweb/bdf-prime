@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class UpCommand
  */
 #[AsCommand('prime:migration:up', 'Run a specific migration')]
-class UpCommand extends AbstractCommand
+final class UpCommand extends AbstractCommand
 {
     protected static $defaultName = 'prime:migration:up';
 

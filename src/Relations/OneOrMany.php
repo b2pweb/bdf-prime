@@ -45,7 +45,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
-    protected function applyConstraints(ReadCommandInterface $query, $constraints = [], $context = null): ReadCommandInterface
+    protected function applyConstraints(ReadCommandInterface $query, iterable|callable $constraints = [], ?string $context = null): ReadCommandInterface
     {
         parent::applyConstraints($query, $constraints, $context);
 
@@ -74,7 +74,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function joinRepositories(EntityJoinable $query, string $alias, $discriminator = null): array
+    public function joinRepositories(EntityJoinable $query, string $alias, string|int|null $discriminator = null): array
     {
         return [
             $alias => $this->relationRepository()
@@ -85,7 +85,7 @@ abstract class OneOrMany extends Relation
      * {@inheritdoc}
      */
     #[ReadOperation]
-    protected function relations($keys, $with, $constraints, $without): array
+    protected function relations(array $keys, array $with, iterable|callable $constraints, array $without): array
     {
         /** @var R[] */
         return $this->relationQuery($keys, $constraints)
@@ -97,7 +97,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
-    protected function match($collection, $relations): void
+    protected function match(array $collection, array $relations): void
     {
         foreach ($relations as $key => $distant) {
             foreach ($collection[$key] as $local) {
@@ -109,7 +109,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function link($owner, ?string $queryClass = null): ReadCommandInterface
+    public function link(array|object $owner, ?string $queryClass = null): ReadCommandInterface
     {
         return $this->query($this->getLocalKeyValue($owner), [], $queryClass);
     }
@@ -117,7 +117,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function associate($owner, $entity)
+    public function associate(object $owner, object $entity): object
     {
         if (!$this->isForeignKeyBarrier($owner)) {
             throw new InvalidArgumentException('The local entity is not the foreign key barrier.');
@@ -136,7 +136,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function dissociate($owner)
+    public function dissociate(object $owner): object
     {
         if (!$this->isForeignKeyBarrier($owner)) {
             throw new InvalidArgumentException('The local entity is not the foreign key barrier.');
@@ -156,7 +156,7 @@ abstract class OneOrMany extends Relation
     /**
      * {@inheritdoc}
      */
-    public function create($owner, array $data = [])
+    public function create(object $owner, array $data = []): object
     {
         if ($this->isForeignKeyBarrier($owner)) {
             throw new InvalidArgumentException('The local entity is not the primary key barrier.');
@@ -173,7 +173,7 @@ abstract class OneOrMany extends Relation
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function add($owner, $related): int
+    public function add(object $owner, object $related): int
     {
         if ($this->isForeignKeyBarrier($owner)) {
             throw new InvalidArgumentException('The local entity is not the primary key barrier.');
@@ -188,7 +188,7 @@ abstract class OneOrMany extends Relation
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function saveAll($owner, array $relations = []): int
+    public function saveAll(object $owner, array $relations = []): int
     {
         $entities = $this->getRelation($owner);
 
@@ -222,7 +222,7 @@ abstract class OneOrMany extends Relation
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function deleteAll($owner, array $relations = []): int
+    public function deleteAll(object $owner, array $relations = []): int
     {
         $entities = $this->getRelation($owner);
 
@@ -254,25 +254,25 @@ abstract class OneOrMany extends Relation
      * Get the query used to load relations
      *
      * @param array $keys The owner keys
-     * @param array $constraints Constraints to apply on the query
+     * @param iterable<string,mixed>|callable $constraints Constraints to apply on the query
      *
      * @return ReadCommandInterface
      */
-    abstract protected function relationQuery($keys, $constraints): ReadCommandInterface;
+    abstract protected function relationQuery(array $keys, iterable|callable $constraints): ReadCommandInterface;
 
     /**
      * Check if the entity is the foreign key barrier
      *
-     * @param string|object $entity
+     * @param class-string|object $entity
      *
      * @return bool
      */
-    private function isForeignKeyBarrier($entity): bool
+    private function isForeignKeyBarrier(string|object $entity): bool
     {
-        list($repository) = $this->getForeignInfos();
+        [$repository] = $this->getForeignInfos();
 
         if (!is_string($entity)) {
-            $entity = get_class($entity);
+            $entity = $entity::class;
         }
 
         return $repository->entityClass() === $entity;
@@ -284,7 +284,7 @@ abstract class OneOrMany extends Relation
      * @param object $entity
      * @param mixed  $id
      */
-    private function setForeignKeyValue($entity, $id): void
+    private function setForeignKeyValue(object $entity, mixed $id): void
     {
         /**
          * @var RepositoryInterface $repository
@@ -309,11 +309,11 @@ abstract class OneOrMany extends Relation
      *
      * @return void
      */
-    private function fillDistantEntityConstraints(object $entity, $id): void
+    private function fillDistantEntityConstraints(object $entity, mixed $id): void
     {
         $this->setForeignKeyValue($entity, $id);
 
-        if (!$this->constraints || !$this->distant) {
+        if (!$this->constraints || !$this->distant || !is_array($this->constraints)) {
             return;
         }
 

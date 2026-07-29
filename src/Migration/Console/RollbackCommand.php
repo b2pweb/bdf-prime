@@ -14,7 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class RollbackCommand
  */
 #[AsCommand('prime:migration:rollback', 'Rollback last, or to a specific migration')]
-class RollbackCommand extends AbstractCommand
+final class RollbackCommand extends AbstractCommand
 {
     protected static $defaultName = 'prime:migration:rollback';
 

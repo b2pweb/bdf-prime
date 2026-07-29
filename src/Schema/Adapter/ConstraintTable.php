@@ -12,15 +12,9 @@ use Bdf\Prime\Schema\TableInterface;
  */
 final class ConstraintTable implements TableInterface
 {
-    /**
-     * @var TableInterface
-     */
-    private $table;
+    private TableInterface $table;
 
-    /**
-     * @var ConstraintSetInterface
-     */
-    private $constraints;
+    private ConstraintSetInterface $constraints;
 
 
     /**
@@ -86,7 +80,7 @@ final class ConstraintTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function option(string $name)
+    public function option(string $name): mixed
     {
         return $this->table->option($name);
     }

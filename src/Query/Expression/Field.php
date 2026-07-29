@@ -14,17 +14,10 @@ use Bdf\Prime\Query\Compiler\QuoteCompilerInterface;
  *
  * @implements ExpressionInterface<CompilableClause&\Bdf\Prime\Query\Contract\Compilable, QuoteCompilerInterface>
  */
-class Field implements ExpressionInterface
+final class Field implements ExpressionInterface
 {
-    /**
-     * @var string
-     */
-    protected $search;
-
-    /**
-     * @var array
-     */
-    protected $values;
+    private string $search;
+    private array $values;
 
     /**
      * Constructor
@@ -32,7 +25,7 @@ class Field implements ExpressionInterface
      * @param string $search
      * @param array  $values
      */
-    public function __construct($search, array $values)
+    public function __construct(string $search, array $values)
     {
         $this->search = $search;
         $this->values = $values;
@@ -45,7 +38,7 @@ class Field implements ExpressionInterface
      *
      * @todo gestion de la platform
      */
-    public function build(CompilableClause $query, object $compiler)
+    public function build(CompilableClause $query, object $compiler): string
     {
         // @todo only mysql ?
         return 'FIELD('.$compiler->quoteIdentifier($query, $query->preprocessor()->field($this->search)).','.implode(',', $this->values).')';

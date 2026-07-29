@@ -12,40 +12,40 @@ use Bdf\Prime\Query\Expression\Like;
  * @psalm-immutable
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class LikeCriterion extends Criterion
+readonly class LikeCriterion extends Criterion
 {
     /**
      * If true, the LIKE expression will match for the start of the value (prefix)
      * Will generate a LIKE 'value%'
      */
-    /*readonly*/ private bool $startsWith;
+    private bool $startsWith;
 
     /**
      * If true, the LIKE expression will match for the end of the value (suffix)
      * Will generate a LIKE '%value'
      */
-    /*readonly*/ private bool $endsWith;
+    private bool $endsWith;
 
     /**
      * If true, the LIKE expression will match any string that contains the value
      * Will generate a LIKE '%value%'
      */
-    /*readonly*/ private bool $contains;
+    private bool $contains;
 
     /**
      * Whether the value should be escaped, so the input value will not be interpreted as a wildcard
      */
-    /*readonly*/ private bool $escape;
+    private bool $escape;
 
     /**
      * Define custom prefix for the LIKE expression
      */
-    /*readonly*/ private ?string $start;
+    private ?string $start;
 
     /**
      * Define custom suffix for the LIKE expression
      */
-    /*readonly*/ private ?string $end;
+    private ?string $end;
 
     /**
      * @param string|ExpressionInterface|null $field
@@ -57,7 +57,7 @@ class LikeCriterion extends Criterion
      * @param string|null $end
      * @param bool $skipNull
      */
-    public function __construct($field = null, bool $startsWith = false, bool $endsWith = false, bool $contains = false, bool $escape = true, ?string $start = null, ?string $end = null, bool $skipNull = true)
+    public function __construct(string|ExpressionInterface|null $field = null, bool $startsWith = false, bool $endsWith = false, bool $contains = false, bool $escape = true, ?string $start = null, ?string $end = null, bool $skipNull = true)
     {
         parent::__construct($field, null, $skipNull);
 
@@ -74,7 +74,7 @@ class LikeCriterion extends Criterion
      *
      * @psalm-suppress ImpureMethodCall
      */
-    public function value($value): Like
+    public function value(mixed $value): Like
     {
         $value = new Like(parent::value($value));
 

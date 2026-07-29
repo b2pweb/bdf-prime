@@ -2,9 +2,9 @@
 
 namespace Bdf\Prime\Connection;
 
-use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Configuration;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
 use Doctrine\DBAL\Result;
 use LogicException;
@@ -30,17 +30,13 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
      * The connection specifically for read operations
      *
      * This connection is used only for the method SimpleConnection#executeQuery
-     *
-     * @var SimpleConnection
      */
-    private $readConnection;
+    private ConnectionInterface&Connection $readConnection;
 
     /**
      * Force the read on master
-     *
-     * @var boolean
      */
-    private $force = false;
+    private bool $force = false;
 
     /**
      * Initializes a new instance of the Connection class.
@@ -121,7 +117,7 @@ class MasterSlaveConnection extends SimpleConnection implements SubConnectionMan
     /**
      * {@inheritdoc}
      */
-    public function executeQuery(string $sql, array $params = [], $types = [], ?QueryCacheProfile $qcp = null): Result
+    public function executeQuery(string $sql, array $params = [], array $types = [], ?QueryCacheProfile $qcp = null): Result
     {
         if ($this->getTransactionNestingLevel() <= 0 && $this->force !== true) {
             return $this->readConnection->executeQuery($sql, $params, $types, $qcp);

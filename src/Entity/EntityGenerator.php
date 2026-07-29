@@ -13,12 +13,15 @@ use Doctrine\Inflector\Inflector as InflectorObject;
 use Doctrine\Inflector\InflectorFactory;
 use Nette\PhpGenerator\ClassType;
 use Nette\PhpGenerator\Constant;
+use Nette\PhpGenerator\EnumType;
+use Nette\PhpGenerator\InterfaceType;
 use Nette\PhpGenerator\Method;
 use Nette\PhpGenerator\PhpFile;
 use Nette\PhpGenerator\PhpNamespace;
 use Nette\PhpGenerator\Printer;
 use Nette\PhpGenerator\PromotedParameter;
 use Nette\PhpGenerator\Property;
+use Nette\PhpGenerator\TraitType;
 use Nette\PhpGenerator\TraitUse;
 use Nette\PhpGenerator\Visibility;
 
@@ -37,7 +40,7 @@ use function class_exists;
  *     $generator->setUpdateEntityIfExists(true);
  *     $generator->generate($mapper, '/path/to/generate/entities');
  */
-class EntityGenerator
+final class EntityGenerator
 {
     // @todo should not be there : should be on PhpTypeInterface
     /**
@@ -192,7 +195,7 @@ class EntityGenerator
      *
      * @api
      */
-    public function generate(Mapper $mapper, ?string $file = null)
+    public function generate(Mapper $mapper, ?string $file = null): string|false
     {
         $this->isNew = !$file || !file_exists($file) || $this->regenerateEntityIfExists;
 
@@ -886,11 +889,13 @@ class EntityGenerator
      * @throws \InvalidArgumentException
      *
      * @api
+     *
+     * @param Visibility::Private|Visibility::Protected $visibility
      */
-    public function setFieldVisibility($visibility): void
+    public function setFieldVisibility(Visibility $visibility): void
     {
         if ($visibility !== static::FIELD_VISIBLE_PRIVATE && $visibility !== static::FIELD_VISIBLE_PROTECTED) {
-            throw new \InvalidArgumentException('Invalid provided visibility (only private and protected are allowed): ' . $visibility);
+            throw new \InvalidArgumentException('Invalid provided visibility (only private and protected are allowed): ' . $visibility->value);
         }
 
         $this->fieldVisibility = $visibility;
@@ -898,8 +903,10 @@ class EntityGenerator
 
     /**
      * Get the field visibility
+     *
+     * @return self::FIELD_*
      */
-    public function getFieldVisibility()
+    public function getFieldVisibility(): Visibility
     {
         return $this->fieldVisibility;
     }
@@ -967,7 +974,7 @@ class EntityGenerator
      *
      * @api
      */
-    public function useGetShortcutMethod(bool $flag = true)
+    public function useGetShortcutMethod(bool $flag = true): void
     {
         $this->useGetShortcutMethod = $flag;
     }
@@ -1020,7 +1027,7 @@ class EntityGenerator
 /**
  * @internal
  */
-class PropertyGenerator
+final class PropertyGenerator
 {
     private string $name;
     private ?string $typeHint = null;
@@ -1054,12 +1061,15 @@ class PropertyGenerator
         $this->varTag = $varTag;
     }
 
-    public function setVisibility($visibility): void
+    /**
+     * @param Visibility::Private|Visibility::Protected $visibility
+     */
+    public function setVisibility(Visibility $visibility): void
     {
         $this->visibility = $visibility;
     }
 
-    public function setDefaultValue($value): void
+    public function setDefaultValue(mixed $value): void
     {
         $this->defaultValue = $value;
         $this->hasDefaultValue = true;
@@ -1167,7 +1177,7 @@ class PropertyGenerator
 /**
  * @internal
  */
-class ConfigurableEntityPrinter extends Printer
+final class ConfigurableEntityPrinter extends Printer
 {
     public function __construct(EntityGenerator $generator)
     {
@@ -1178,7 +1188,7 @@ class ConfigurableEntityPrinter extends Printer
         $this->indentation = str_repeat(' ', $generator->getNumSpaces());
     }
 
-    public function printClass($class, ?PhpNamespace $namespace = null): string
+    public function printClass(ClassType|InterfaceType|TraitType|EnumType $class, ?PhpNamespace $namespace = null): string
     {
         $code = parent::printClass($class, $namespace);
 
@@ -1190,7 +1200,7 @@ class ConfigurableEntityPrinter extends Printer
 /**
  * @internal
  */
-class EntityClassGenerator
+final class EntityClassGenerator
 {
     private ClassType $class;
     private PhpNamespace $namespace;
@@ -1345,7 +1355,7 @@ class EntityClassGenerator
      *
      * @return void
      */
-    public function addMember($classMember): void
+    public function addMember(Method|Property|Constant|TraitUse $classMember): void
     {
         $this->class->addMember($classMember);
     }

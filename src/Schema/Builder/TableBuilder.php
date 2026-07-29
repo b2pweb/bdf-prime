@@ -26,36 +26,26 @@ use Bdf\Prime\Schema\TableInterface;
  */
 final class TableBuilder implements TableBuilderInterface
 {
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
-    /**
-     * @var array
-     */
-    private $options = [];
+    private array $options = [];
 
-    /**
-     * @var array
-     */
-    private $indexes = [];
+    private array $indexes = [];
 
     /**
      * @var ColumnBuilderInterface[]
      */
-    private $columns = [];
+    private array $columns = [];
 
     /**
      * @var ForeignKeyInterface[]
      */
-    private $foreignKeys = [];
+    private array $foreignKeys = [];
 
     /**
-     * @var string
      * @internal
      */
-    private $current;
+    private ?string $current = null;
 
 
     /**
@@ -71,7 +61,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function name(string $name)
+    public function name(string $name): static
     {
         $this->name = $name;
 
@@ -81,7 +71,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function options(array $options)
+    public function options(array $options): static
     {
         $this->options = $options;
 
@@ -91,7 +81,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function indexes(array $indexes)
+    public function indexes(array $indexes): static
     {
         foreach ($indexes as $key => $value) {
             if (!is_array($value)) {
@@ -113,7 +103,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function index($columns, int $type = IndexInterface::TYPE_SIMPLE, ?string $name = null, array $options = [])
+    public function index(string|array $columns, int $type = IndexInterface::TYPE_SIMPLE, ?string $name = null, array $options = []): static
     {
         if (is_string($columns)) {
             $normalizedColumns = [$columns => []];
@@ -145,7 +135,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function primary($columns = null, ?string $name = null)
+    public function primary(string|array|null $columns = null, ?string $name = null): static
     {
         return $this->index(
             $columns ?: [$this->current],
@@ -157,7 +147,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function add(string $column, PlatformTypeInterface $type, array $options = [])
+    public function add(string $column, PlatformTypeInterface $type, array $options = []): ColumnBuilderInterface
     {
         $this->current = $column;
 
@@ -167,7 +157,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function column(?string $name = null)
+    public function column(?string $name = null): ColumnBuilderInterface
     {
         if ($name === null) {
             $name = $this->current;
@@ -179,7 +169,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * {@inheritdoc}
      */
-    public function foreignKey($foreignTable, array $localColumnNames, array $foreignColumnNames, array $options = [], ?string $constraintName = null)
+    public function foreignKey(TableInterface|string $foreignTable, array $localColumnNames, array $foreignColumnNames, array $options = [], ?string $constraintName = null): static
     {
         $foreignKey = new ForeignKey(
             $localColumnNames,
@@ -213,7 +203,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * @return ColumnInterface[]
      */
-    protected function buildColumns()
+    protected function buildColumns(): array
     {
         $columns = [];
 
@@ -229,7 +219,7 @@ final class TableBuilder implements TableBuilderInterface
     /**
      * @return IndexSetInterface
      */
-    protected function buildIndexes()
+    protected function buildIndexes(): IndexSetInterface
     {
         $indexes = [];
 

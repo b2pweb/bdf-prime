@@ -38,43 +38,36 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
      *
      * @var ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable
      */
-    protected $query;
+    protected ReadCommandInterface&Limitable&Orderable&Paginable $query;
 
     /**
      * Current collection
      *
      * @var R[]|CollectionInterface<R>
      */
-    protected $collection = [];
+    protected array|CollectionInterface $collection = [];
 
     /**
      * Total size of the collection
-     *
-     * @var int
      */
-    protected $size;
+    protected ?int $size = null;
 
     /**
      * Current page
-     *
-     * @var int
      */
-    protected $page;
+    protected ?int $page = null;
 
     /**
      * Number of entities loaded in the collection
-     *
-     * @var int
      */
-    protected $maxRows;
+    protected ?int $maxRows = null;
 
 
     /**
      * {@inheritdoc}
      *
-     * @final
      */
-    public function collection()
+    final public function collection(): array|CollectionInterface
     {
         return $this->collection;
     }
@@ -83,9 +76,8 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
      * Get the query
      *
      * @return ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable
-     * @final
      */
-    public function query()
+    final public function query(): ReadCommandInterface&Limitable&Orderable&Paginable
     {
         return $this->query;
     }
@@ -97,12 +89,14 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
      */
     protected function loadCollection(): void
     {
-        /** @var ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable $this->query */
+        /** @var ReadCommandInterface<ConnectionInterface, R>&Limitable&Orderable&Paginable $query */
+        $query = $this->query;
+
         if ($this->maxRows > -1) {
-            $this->query->limitPage($this->page, $this->maxRows);
+            $query->limitPage($this->page, $this->maxRows);
         }
 
-        $this->collection = $this->query->all();
+        $this->collection = $query->all();
     }
 
     /**
@@ -165,6 +159,8 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
 
     /**
      * Find size of the collection
+     *
+     * @psalm-assert !null $this->size
      */
     protected function buildSize(): void
     {
@@ -270,8 +266,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
     /**
      * {@inheritdoc}
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($key)
+    public function offsetGet($key): mixed
     {
         return $this->collection[$key];
     }
@@ -368,7 +363,7 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
      *
      * @template M as array|object
      */
-    public function map($callback)
+    public function map(callable $callback)
     {
         if (!($this->collection instanceof CollectionInterface)) {
             throw new \LogicException('Collection is not an instance of CollectionInterface. Could not call method ' . __METHOD__);

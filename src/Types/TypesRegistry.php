@@ -35,7 +35,7 @@ class TypesRegistry implements TypesRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function register($type, ?string $alias = null)
+    public function register(string|TypeInterface $type, ?string $alias = null)
     {
         if ($alias === null) {
             $alias = $type instanceof TypeInterface ? $type->name() : $type;
@@ -99,7 +99,7 @@ class TypesRegistry implements TypesRegistryInterface
      *
      * @return TypeInterface
      */
-    protected function instantiate($class, $name)
+    protected function instantiate(string $class, string $name): TypeInterface
     {
         return new $class($name);
     }

@@ -36,7 +36,7 @@ use IteratorAggregate;
  * @implements ArrayAccess<string, RelationDefinition>
  * @implements IteratorAggregate<string, RelationDefinition>
  */
-class RelationBuilder implements ArrayAccess, IteratorAggregate
+final class RelationBuilder implements ArrayAccess, IteratorAggregate
 {
     public const MODE_EAGER = "EAGER";
     public const MODE_LAZY = "LAZY";
@@ -46,7 +46,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @var array<string, RelationDefinition>
      */
-    protected array $relations = [];
+    private array $relations = [];
 
     /**
      * The name of the current relation
@@ -393,7 +393,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function option(string $name, $value): self
+    public function option(string $name, mixed $value): self
     {
         $this->relations[$this->current][$name] = $value;
 
@@ -481,7 +481,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      *
      * @return $this
      */
-    public function constraints($constraints): self
+    public function constraints(array|\Closure $constraints): self
     {
         $this->relations[$this->current]['constraints'] = $constraints;
 
@@ -545,7 +545,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
      * @see \Bdf\Prime\Collection\CollectionInterface
      * @see \Bdf\Prime\Query\Query::wrapAs()
      */
-    public function wrapAs($wrapper): self
+    public function wrapAs(string|callable $wrapper): self
     {
         $this->relations[$this->current]['wrapper'] = $wrapper;
 
@@ -567,7 +567,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->relations[$offset]);
     }
@@ -575,16 +575,15 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($key)
+    public function offsetGet(mixed $offset): array
     {
-        return $this->relations[$key];
+        return $this->relations[$offset];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($key, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         // not allowed
     }
@@ -592,7 +591,7 @@ class RelationBuilder implements ArrayAccess, IteratorAggregate
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
         // not allowed
     }

@@ -9,7 +9,7 @@ use function constant;
 use function defined;
 use function is_subclass_of;
 
-class UnitEnumType extends AbstractFacadeType
+final class UnitEnumType extends AbstractFacadeType
 {
     public const UNIT_ENUM = 'unit_enum';
 
@@ -24,7 +24,7 @@ class UnitEnumType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?UnitEnum
     {
         if ($value === null) {
             return null;
@@ -44,7 +44,7 @@ class UnitEnumType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase(mixed $value): mixed
     {
         if (!$value instanceof UnitEnum) {
             return $value;

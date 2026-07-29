@@ -15,7 +15,7 @@ final class MapperPrimaryKey implements KeyInterface
     /**
      * @var Mapper<E>
      */
-    private $mapper;
+    private Mapper $mapper;
 
     /**
      * EntityPrimaryKey constructor.
@@ -38,7 +38,7 @@ final class MapperPrimaryKey implements KeyInterface
     /**
      * {@inheritdoc}
      */
-    public function get($entity)
+    public function get(object $entity): mixed
     {
         return $this->mapper->getId($entity);
     }

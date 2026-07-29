@@ -22,24 +22,17 @@ use TypeError;
  * @template E as object
  * @implements MapperHydratorInterface<E>
  */
-class MapperHydrator implements MapperHydratorInterface
+final class MapperHydrator implements MapperHydratorInterface
 {
-    /**
-     * @var InstantiatorInterface
-     */
-    protected $instantiator;
-
-    /**
-     * @var Metadata
-     */
-    protected $metadata;
+    private InstantiatorInterface $instantiator;
+    private Metadata $metadata;
 
     /**
      * Property accessors, indexed by attribute name
      *
      * @var ReflectionProperty[][]
      */
-    private $reflectionProperties = [];
+    private array $reflectionProperties = [];
 
     /**
      * {@inheritdoc}
@@ -151,7 +144,7 @@ class MapperHydrator implements MapperHydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function extractOne($object, string $attribute)
+    public function extractOne($object, string $attribute): mixed
     {
         if (!isset($this->metadata->attributes[$attribute])) {
             if (!isset($this->metadata->embeddeds[$attribute])) {
@@ -202,7 +195,7 @@ class MapperHydrator implements MapperHydratorInterface
      *
      * @return object|null The object, or null if cannot be instantiated (polymorph)
      */
-    protected function getOwnerObject($entity, array $metadata)
+    protected function getOwnerObject(object $entity, array $metadata): ?object
     {
         if (!isset($metadata['embedded'])) {
             return $entity;
@@ -252,7 +245,7 @@ class MapperHydrator implements MapperHydratorInterface
      * @throws ReflectionException When property do not exist on the object
      * @throws UninitializedPropertyException When the property is not initialized
      */
-    protected function readFromAttribute($entity, array $metadata)
+    protected function readFromAttribute(object $entity, array $metadata): mixed
     {
         $attribute = $metadata['attribute'];
         $class = get_class($entity);
@@ -285,7 +278,7 @@ class MapperHydrator implements MapperHydratorInterface
      * @throws ReflectionException When property do not exist on the object
      * @throws UninitializedPropertyException When the property is not initialized
      */
-    protected function readFromEmbedded($entity, array $metadata)
+    protected function readFromEmbedded(object $entity, array $metadata): mixed
     {
         $attribute = $metadata['path'];
         $class = get_class($entity);
@@ -314,7 +307,7 @@ class MapperHydrator implements MapperHydratorInterface
      *
      * @return void
      */
-    protected function writeToAttribute($entity, array $metadata, $value, bool $skipInvalid)
+    protected function writeToAttribute(object $entity, array $metadata, mixed $value, bool $skipInvalid): void
     {
         $attribute = $metadata['attribute'];
         $class = get_class($entity);
@@ -347,7 +340,7 @@ class MapperHydrator implements MapperHydratorInterface
      *
      * @return void
      */
-    protected function writeToEmbedded($entity, array $metadata, $value, bool $skipInvalid)
+    protected function writeToEmbedded(object $entity, array $metadata, mixed $value, bool $skipInvalid): void
     {
         $attribute = $metadata['path'];
         $class = get_class($entity);
@@ -385,7 +378,7 @@ class MapperHydrator implements MapperHydratorInterface
      * @throws ReflectionException
      * @throws UninitializedPropertyException
      */
-    private function readFromProperty(string $class, string $property, string $attribute, $entity)
+    private function readFromProperty(string $class, string $property, string $attribute, object $entity): mixed
     {
         if ($class === stdClass::class) {
             return $entity->$property ?? null;
@@ -408,7 +401,7 @@ class MapperHydrator implements MapperHydratorInterface
      *
      * @return bool
      */
-    private function shouldSkipValue(ReflectionProperty $property, $value): bool
+    private function shouldSkipValue(ReflectionProperty $property, mixed $value): bool
     {
         if ($value !== null) {
             return false;
@@ -428,7 +421,7 @@ class MapperHydrator implements MapperHydratorInterface
      *
      * @return void
      */
-    private function writeToReflection(ReflectionProperty $reflectionProperty, $entity, $value, bool $skipInvalid, array $metadata): void
+    private function writeToReflection(ReflectionProperty $reflectionProperty, object $entity, mixed $value, bool $skipInvalid, array $metadata): void
     {
         if (!$skipInvalid || !$this->shouldSkipValue($reflectionProperty, $value)) {
             try {

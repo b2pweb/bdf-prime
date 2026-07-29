@@ -36,10 +36,10 @@ final class FunctionCallParser
         $this->valueParser = $valueParser;
 
         $this->functions = [
-            'str_contains' => [$this, 'parseStrContains'],
-            'str_starts_with' => [$this, 'parseStartsWith'],
-            'str_ends_with' => [$this, 'parseEndsWith'],
-            'in_array' => [$this, 'parseInArray'],
+            'str_contains' => $this->parseStrContains(...),
+            'str_starts_with' => $this->parseStartsWith(...),
+            'str_ends_with' => $this->parseEndsWith(...),
+            'in_array' => $this->parseInArray(...),
         ];
     }
 

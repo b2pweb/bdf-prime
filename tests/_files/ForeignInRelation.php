@@ -59,7 +59,7 @@ class ForeignInRelation extends AbstractRelation implements CustomRelationInterf
     /**
      * {@inheritdoc}
      */
-    public function joinRepositories(EntityJoinable $query, string $alias, $discriminator = null): array
+    public function joinRepositories(EntityJoinable $query, string $alias, string|int|null $discriminator = null): array
     {
         return [
             $alias => $this->relationRepository()
@@ -69,7 +69,7 @@ class ForeignInRelation extends AbstractRelation implements CustomRelationInterf
     /**
      * {@inheritdoc}
      */
-    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
+    public function load(EntityIndexerInterface $collection, array $with = [], iterable|callable $constraints = [], array $without = []): void
     {
         $entities = $this
             ->query($this->getLocalKeyValue($collection->all()), $constraints)
@@ -100,7 +100,7 @@ class ForeignInRelation extends AbstractRelation implements CustomRelationInterf
     protected function getLocalKeyValue($entity)
     {
         if (is_array($entity)) {
-            return array_map([$this, 'getLocalKeyValue'], $entity);
+            return array_map($this->getLocalKeyValue(...), $entity);
         }
 
         $keys = [];

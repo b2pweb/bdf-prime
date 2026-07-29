@@ -88,18 +88,19 @@ interface RelationInterface
      * $relation->load($users, ['packs.pack', 'parent']); // Load customer, customer packs, packs and parent customer
      * $relation->load($users, [], ['name :not' => 'John']); // Load only customers which as not the name 'John'
      * $relation->load($users, [], [], ['packs']); // Do not load packs (if marked as eager)
+     * $relation->load($users, [], function ($query) { $query->where('name', '!=', 'John'); }); // Add a constraint, using a closure
      * </code>
      *
      * @param EntityIndexerInterface<L> $collection Relation owners entities
      * @param string[] $with The distant relations to load. The array is in form : [ 'subrelation', 'other.subsubrelation', ... ]
-     * @param mixed $constraints The distant constraints. Should be a criteria array, using relation attributes
+     * @param iterable<string,mixed>|callable $constraints The distant constraints. Should be a criteria array or closure, using relation attributes
      * @param string[] $without The distant relations to unload (in case of eager load). Format is same as $with, expects that only leaf relation are unloaded
      *
      * @return void
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void;
+    public function load(EntityIndexerInterface $collection, array $with = [], iterable|callable $constraints = [], array $without = []): void;
 
     /**
      * Manually load relation entities by their foreign keys
@@ -135,7 +136,7 @@ interface RelationInterface
      *
      * @param EntityIndexerInterface<L> $collection Relation owners entities
      * @param string[] $with The distant relations to load. The array is in form : [ 'subrelation', 'other.subsubrelation', ... ]
-     * @param mixed $constraints The distant constraints. Should be a criteria array, using relation attributes
+     * @param iterable<string, mixed>|callable $constraints The distant constraints. Should be a criteria array, using relation attributes
      * @param string[] $without The distant relations to unload (in case of eager load). Format is same as $with, expects that only leaf relation are unloaded
      *
      * @return void
@@ -144,7 +145,7 @@ interface RelationInterface
      * @see RelationInterface::load() The base loading method
      */
     #[ReadOperation]
-    public function loadIfNotLoaded(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void;
+    public function loadIfNotLoaded(EntityIndexerInterface $collection, array $with = [], iterable|callable $constraints = [], array $without = []): void;
 
     /**
      * Get the distant query linked to the entity
@@ -162,7 +163,7 @@ interface RelationInterface
      *
      * @template Q as ReadCommandInterface
      */
-    public function link($owner, ?string $queryClass = null): ReadCommandInterface;
+    public function link(array|object $owner, ?string $queryClass = null): ReadCommandInterface;
 
     /**
      * Add join expression on query builder
@@ -184,7 +185,7 @@ interface RelationInterface
      *
      * @return array<string, RepositoryInterface> Repositories, indexed by alias
      */
-    public function joinRepositories(EntityJoinable $query, string $alias, $discriminator = null): array;
+    public function joinRepositories(EntityJoinable $query, string $alias, string|int|null $discriminator = null): array;
 
     /**
      * Associate an entity to the owner entity
@@ -209,7 +210,7 @@ interface RelationInterface
      *
      * @throws \InvalidArgumentException If the owner is not a foreign key barrier
      */
-    public function associate($owner, $entity);
+    public function associate(object $owner, object $entity): object;
 
     /**
      * Remove the relation from owner entity
@@ -226,7 +227,7 @@ interface RelationInterface
      *
      * @throws \InvalidArgumentException If the owner is not a foreign key barrier
      */
-    public function dissociate($owner);
+    public function dissociate(object $owner): object;
 
     /**
      * Add a relation entity on the given entity owner
@@ -249,7 +250,7 @@ interface RelationInterface
      * @throws PrimeException When cannot save entity
      */
     #[WriteOperation]
-    public function add($owner, $related): int;
+    public function add(object $owner, object $related): int;
 
     /**
      * Create the relation entity and set its foreign key value
@@ -271,7 +272,7 @@ interface RelationInterface
      *
      * @throws \InvalidArgumentException If the owner is the foreign key barrier
      */
-    public function create($owner, array $data = []);
+    public function create(object $owner, array $data = []): object;
 
     /**
      * Save the relation from an entity
@@ -285,7 +286,7 @@ interface RelationInterface
      * @throws PrimeException When cannot save entity
      */
     #[WriteOperation]
-    public function saveAll($owner, array $relations = []): int;
+    public function saveAll(object $owner, array $relations = []): int;
 
     /**
      * Remove the relation from an entity
@@ -299,7 +300,7 @@ interface RelationInterface
      * @throws PrimeException When cannot delete entity
      */
     #[WriteOperation]
-    public function deleteAll($owner, array $relations = []): int;
+    public function deleteAll(object $owner, array $relations = []): int;
 
     /**
      * Check if the relation is loaded into the given entity
@@ -308,5 +309,5 @@ interface RelationInterface
      *
      * @return boolean
      */
-    public function isLoaded($entity): bool;
+    public function isLoaded(object $entity): bool;
 }

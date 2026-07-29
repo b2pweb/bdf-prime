@@ -24,10 +24,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
  */
 abstract class Aggregate implements ExpressionInterface
 {
-    /**
-     * @var string
-     */
-    private $attribute;
+    private string $attribute;
 
     /**
      * Max constructor.
@@ -44,7 +41,7 @@ abstract class Aggregate implements ExpressionInterface
      *
      * @param CompilerInterface&QuoteCompilerInterface $compiler
      */
-    final public function build(CompilableClause $query, object $compiler)
+    final public function build(CompilableClause $query, object $compiler): string
     {
         $attribute = $this->attribute;
 

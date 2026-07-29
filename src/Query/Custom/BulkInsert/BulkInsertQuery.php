@@ -48,7 +48,7 @@ use Bdf\Prime\Query\Extension\CachableTrait;
  * @template C as \Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection
  * @implements InsertQueryInterface<C>
  */
-class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, InsertQueryInterface
+final class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, InsertQueryInterface
 {
     use CachableTrait;
 
@@ -57,14 +57,14 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
      *
      * @var C
      */
-    protected $connection;
+    private ConnectionInterface $connection;
 
     /**
      * The SQL compiler
      *
      * @var CompilerInterface<BulkInsertQuery>&QuoteCompilerInterface
      */
-    protected $compiler;
+    private CompilerInterface $compiler;
 
 
     /**
@@ -101,7 +101,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
     /**
      * {@inheritdoc}
      */
-    public function on(ConnectionInterface $connection)
+    public function on(ConnectionInterface $connection): static
     {
         $this->connection = $connection;
         $this->compiler = $connection->factory()->compiler(static::class);
@@ -123,7 +123,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
      * @return ResultSetInterface<array<string, mixed>>
      */
     #[WriteOperation]
-    public function execute($columns = null): ResultSetInterface
+    public function execute(mixed $columns = null): ResultSetInterface
     {
         $result = $this->connection->execute($this);
 
@@ -137,7 +137,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
     /**
      * {@inheritdoc}
      */
-    public function into(string $table)
+    public function into(string $table): static
     {
         $this->compilerState->invalidate('table');
         $this->compilerState->invalidate('columns');
@@ -156,7 +156,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
      *
      * @see BulkInsertQuery::into()
      */
-    public function from(string $from, ?string $alias = null)
+    public function from(string $from, ?string $alias = null): static
     {
         return $this->into($from);
     }
@@ -164,7 +164,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
     /**
      * {@inheritdoc}
      */
-    public function columns(array $columns)
+    public function columns(array $columns): static
     {
         $this->compilerState->invalidate('columns');
 
@@ -190,7 +190,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
     /**
      * {@inheritdoc}
      */
-    public function values(array $data, bool $replace = false)
+    public function values(array $data, bool $replace = false): static
     {
         if (empty($this->statements['columns'])) {
             $this->columns(array_keys($data));
@@ -212,7 +212,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
     /**
      * {@inheritdoc}
      */
-    public function mode(string $mode)
+    public function mode(string $mode): static
     {
         if ($mode !== $this->statements['mode']) {
             $this->compilerState->invalidate('mode');
@@ -225,7 +225,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
     /**
      * {@inheritdoc}
      */
-    public function ignore(bool $flag = true)
+    public function ignore(bool $flag = true): static
     {
         return $this->mode($flag ? self::MODE_IGNORE : self::MODE_INSERT);
     }
@@ -233,7 +233,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
     /**
      * {@inheritdoc}
      */
-    public function replace(bool $flag = true)
+    public function replace(bool $flag = true): static
     {
         return $this->mode($flag ? self::MODE_REPLACE : self::MODE_INSERT);
     }
@@ -241,7 +241,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
     /**
      * {@inheritdoc}
      */
-    public function bulk(bool $flag = true)
+    public function bulk(bool $flag = true): static
     {
         $this->compilerState->invalidate();
         $this->statements['bulk'] = $flag;
@@ -252,7 +252,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
     /**
      * {@inheritdoc}
      */
-    public function compile(bool $forceRecompile = false)
+    public function compile(bool $forceRecompile = false): mixed
     {
         if (!$forceRecompile && $this->state()->compiled) {
             return $this->state()->compiled;
@@ -282,7 +282,7 @@ class BulkInsertQuery extends CompilableClause implements Compilable, Cachable, 
      *
      * @return string
      */
-    protected function cacheNamespace()
+    protected function cacheNamespace(): string
     {
         return $this->connection->getName().':'.$this->statements['table'];
     }

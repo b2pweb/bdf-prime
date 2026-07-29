@@ -15,10 +15,9 @@ use stdClass;
 final class ObjectDoctrineFetch implements DoctrineFetchStrategyInterface
 {
     /**
-     * @var ObjectDoctrineFetch
      * @readonly
      */
-    private static $instance;
+    private static ?ObjectDoctrineFetch $instance = null;
 
     /**
      * {@inheritdoc}

@@ -8,12 +8,12 @@ namespace Bdf\Prime\Sharding;
  *
  * @implements ShardChoserInterface<int>
  */
-class ModuloChoser implements ShardChoserInterface
+final class ModuloChoser implements ShardChoserInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function pick($distributionValue, ShardingConnection $connection): string
+    public function pick(mixed $distributionValue, ShardingConnection $connection): string
     {
         $ids = $connection->getShardIds();
 

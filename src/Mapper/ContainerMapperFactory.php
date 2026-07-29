@@ -12,10 +12,8 @@ use Psr\SimpleCache\CacheInterface as Psr16CacheInterface;
 /**
  * Mapper factory using a PSR-11 container to instantiate mappers
  * This factory allows to inject services into mappers
- *
- * Note: This class will extend AbstractMapperFactory in version 3.0
  */
-final class ContainerMapperFactory extends MapperFactory
+final class ContainerMapperFactory extends AbstractMapperFactory
 {
     private ContainerInterface $container;
 

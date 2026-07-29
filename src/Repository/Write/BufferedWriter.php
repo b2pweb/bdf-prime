@@ -35,32 +35,32 @@ use Bdf\Prime\Repository\RepositoryInterface;
  * @template E as object
  * @implements BufferedWriterInterface<E>
  */
-class BufferedWriter implements BufferedWriterInterface
+final class BufferedWriter implements BufferedWriterInterface
 {
     /**
      * @var RepositoryInterface<E>&RepositoryEventsSubscriberInterface
      */
-    private $repository;
+    private RepositoryInterface $repository;
 
     /**
      * @var WriterInterface<E>
      */
-    private $writer;
+    private WriterInterface $writer;
 
     /**
      * @var array<list{E, array}>
      */
-    private $insert = [];
+    private array $insert = [];
 
     /**
      * @var array<list{E, array}>
      */
-    private $update = [];
+    private array $update = [];
 
     /**
      * @var array<list{E, array}>
      */
-    private $delete = [];
+    private array $delete = [];
 
 
     /**
@@ -78,7 +78,7 @@ class BufferedWriter implements BufferedWriterInterface
     /**
      * {@inheritdoc}
      */
-    public function insert($entity, array $options = []): int
+    public function insert(object $entity, array $options = []): int
     {
         $this->insert[] = [$entity, $options];
 
@@ -88,7 +88,7 @@ class BufferedWriter implements BufferedWriterInterface
     /**
      * {@inheritdoc}
      */
-    public function update($entity, array $options = []): int
+    public function update(object $entity, array $options = []): int
     {
         $this->update[] = [$entity, $options];
 
@@ -98,7 +98,7 @@ class BufferedWriter implements BufferedWriterInterface
     /**
      * {@inheritdoc}
      */
-    public function delete($entity, array $options = []): int
+    public function delete(object $entity, array $options = []): int
     {
         $this->delete[] = [$entity, $options];
 
@@ -140,7 +140,7 @@ class BufferedWriter implements BufferedWriterInterface
      * @return int
      * @throws PrimeException
      */
-    private function flushInsert()
+    private function flushInsert(): int
     {
         $count = 0;
 
@@ -155,7 +155,7 @@ class BufferedWriter implements BufferedWriterInterface
      * @return int
      * @throws PrimeException
      */
-    private function flushUpdate()
+    private function flushUpdate(): int
     {
         $count = 0;
 
@@ -170,7 +170,7 @@ class BufferedWriter implements BufferedWriterInterface
      * @return int
      * @throws PrimeException
      */
-    private function flushDelete()
+    private function flushDelete(): int
     {
         /** @var EntityRepository<E> $this->repository */
         if (empty($this->delete)) {

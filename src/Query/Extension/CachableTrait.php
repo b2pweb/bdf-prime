@@ -21,15 +21,8 @@ use Bdf\Util\Arr;
  */
 trait CachableTrait
 {
-    /**
-     * @var null|CacheInterface
-     */
-    protected $cache;
-
-    /**
-     * @var CacheKey
-     */
-    protected $cacheKey = null;
+    protected ?CacheInterface $cache = null;
+    protected ?CacheKey $cacheKey = null;
 
 
     /**
@@ -120,6 +113,7 @@ trait CachableTrait
      * {@inheritdoc}
      *
      * @see Cachable::setCacheNamespace()
+     * @return $this
      */
     public function setCacheNamespace(string $namespace)
     {
@@ -177,7 +171,7 @@ trait CachableTrait
      *
      * @return void
      */
-    protected function clearCacheOnWrite()
+    protected function clearCacheOnWrite(): void
     {
         if ($this->cache) {
             $this->cache->flush($this->cacheKey ? $this->cacheKey->namespace() : $this->cacheNamespace());
@@ -187,8 +181,6 @@ trait CachableTrait
     /**
      * Get the cache key
      * The cache key is generated from the query string
-     *
-     * @return string
      */
     protected function cacheKey(): ?string
     {

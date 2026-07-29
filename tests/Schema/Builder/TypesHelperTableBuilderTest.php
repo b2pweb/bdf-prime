@@ -60,7 +60,7 @@ class TypesHelperTableBuilderTest extends TestCase
         $mock = $this->createMock(TableBuilderInterface::class);
 
         $builder = new TypesHelperTableBuilder($mock, $this->types);
-        $return = $returnThis ? $builder : new stdClass();
+        $return = $returnThis ? $builder : $this->createMock(ColumnBuilderInterface::class);
 
         $mock->expects($this->once())
             ->method($method)

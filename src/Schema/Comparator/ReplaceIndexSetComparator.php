@@ -6,12 +6,9 @@ namespace Bdf\Prime\Schema\Comparator;
  * Comparator for index set, which transform changed() to added() and remove() (do a replace of the index)
  * The changed() will always returns an empty array
  */
-class ReplaceIndexSetComparator implements IndexSetComparatorInterface
+final class ReplaceIndexSetComparator implements IndexSetComparatorInterface
 {
-    /**
-     * @var IndexSetComparatorInterface
-     */
-    private $comparator;
+    private IndexSetComparatorInterface $comparator;
 
 
     /**

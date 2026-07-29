@@ -8,6 +8,7 @@ use Bdf\Prime\Entity\Extensions\ArrayInjector;
 use Bdf\Prime\Entity\ImportableInterface;
 use Bdf\Prime\Entity\InitializableInterface;
 use Bdf\Prime\Entity\Model;
+use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\ServiceLocator;
 use Bdf\Util\Console\BdfStyle;
 use Bdf\Util\File\ClassFileLocator;
@@ -29,14 +30,11 @@ use Symfony\Component\Filesystem\Filesystem;
  * @psalm-suppress InvalidCast
  */
 #[AsCommand('prime:entity', 'Generate entity class by mapper')]
-class EntityCommand extends Command
+final class EntityCommand extends Command
 {
     protected static $defaultName = 'prime:entity';
 
-    /**
-     * @var ServiceLocator
-     */
-    private $locator;
+    private ServiceLocator $locator;
 
     /**
      * EntityCommand constructor.
@@ -110,7 +108,7 @@ EOF
      *
      * @return ClassFileLocator|array
      */
-    protected function getClassIterator($path)
+    protected function getClassIterator(string $path): ClassFileLocator|array
     {
         if (is_dir($path)) {
             return new ClassFileLocator($path);
@@ -125,12 +123,12 @@ EOF
     /**
      * @param BdfStyle $io
      * @param EntityGenerator $generator
-     * @param \Bdf\Prime\Mapper\Mapper $mapper
+     * @param Mapper $mapper
      * @param PhpClassFile $classInfo
      *
      * @return void
      */
-    protected function runUserActions($io, $generator, $mapper, $classInfo)
+    protected function runUserActions(BdfStyle $io, EntityGenerator $generator, Mapper $mapper, PhpClassFile $classInfo): void
     {
         //TODO AAAAAAAAAAAAAAAAAAAAH !!!!!!!
         $fileName  = str_replace('Mapper', '', $classInfo->getRealPath());
@@ -154,10 +152,7 @@ EOF
         }
 
         $generator->useTypedProperties();
-
-        if (PHP_MAJOR_VERSION >= 8) {
-            $generator->useConstructorPropertyPromotion();
-        }
+        $generator->useConstructorPropertyPromotion();
 
         $choices = [
             '0'     => 'Skip',

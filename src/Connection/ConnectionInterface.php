@@ -61,7 +61,7 @@ interface ConnectionInterface
      *
      * @throws PrimeException When cannot convert value
      */
-    public function fromDatabase($value, $type, array $fieldOptions = []);
+    public function fromDatabase(mixed $value, string|TypeInterface $type, array $fieldOptions = []);
 
     /**
      * Transform PHP value to database value
@@ -73,7 +73,7 @@ interface ConnectionInterface
      *
      * @throws PrimeException When cannot convert value
      */
-    public function toDatabase($value, $type = null);
+    public function toDatabase(mixed $value, string|TypeInterface|null $type = null);
 
     /**
      * Get a query builder
@@ -111,7 +111,7 @@ interface ConnectionInterface
      *
      * @return ReadCommandInterface
      */
-    public function from($table, ?string $alias = null): ReadCommandInterface;
+    public function from(string|QueryInterface $table, ?string $alias = null): ReadCommandInterface;
 
     /**
      * Executes a raw select query and returns array of object
@@ -122,7 +122,7 @@ interface ConnectionInterface
      * @return ResultSetInterface<\stdClass> The database result, in object form
      * @throws PrimeException When select fail
      */
-    public function select($query, array $bindings = []): ResultSetInterface;
+    public function select(mixed $query, array $bindings = []): ResultSetInterface;
 
     /**
      * Execute the query and get the result.

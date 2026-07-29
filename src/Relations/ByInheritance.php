@@ -66,7 +66,7 @@ class ByInheritance extends AbstractRelation
      * {@inheritdoc}
      */
     #[ReadOperation]
-    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
+    public function load(EntityIndexerInterface $collection, array $with = [], iterable|callable $constraints = [], array $without = []): void
     {
         if ($collection->empty()) {
             return;
@@ -91,7 +91,7 @@ class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
-    public function link($owner, ?string $queryClass = null): ReadCommandInterface
+    public function link(array|object $owner, ?string $queryClass = null): ReadCommandInterface
     {
         $this->updateDiscriminatorValue($owner);
 
@@ -122,7 +122,7 @@ class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
-    public function joinRepositories(EntityJoinable $query, string $alias, $discriminator = null): array
+    public function joinRepositories(EntityJoinable $query, string $alias, string|int|null $discriminator = null): array
     {
         $this->discriminatorValue = $discriminator;
 
@@ -134,7 +134,7 @@ class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
-    public function associate($owner, $entity)
+    public function associate(object $owner, object $entity): object
     {
         $this->updateDiscriminatorValue($owner);
 
@@ -144,7 +144,7 @@ class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
-    public function dissociate($owner)
+    public function dissociate(object $owner): object
     {
         $this->updateDiscriminatorValue($owner);
 
@@ -154,7 +154,7 @@ class ByInheritance extends AbstractRelation
     /**
      * {@inheritdoc}
      */
-    public function create($owner, array $data = [])
+    public function create(object $owner, array $data = []): object
     {
         $this->updateDiscriminatorValue($owner);
 
@@ -165,7 +165,7 @@ class ByInheritance extends AbstractRelation
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function add($owner, $related): int
+    public function add(object $owner, object $related): int
     {
         $this->updateDiscriminatorValue($owner);
 
@@ -176,7 +176,7 @@ class ByInheritance extends AbstractRelation
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function saveAll($owner, array $relations = []): int
+    public function saveAll(object $owner, array $relations = []): int
     {
         $relations = $this->rearrangeWith($relations);
         $this->updateDiscriminatorValue($owner);
@@ -188,7 +188,7 @@ class ByInheritance extends AbstractRelation
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function deleteAll($owner, array $relations = []): int
+    public function deleteAll(object $owner, array $relations = []): int
     {
         $relations = $this->rearrangeWith($relations);
         $this->updateDiscriminatorValue($owner);
@@ -215,31 +215,9 @@ class ByInheritance extends AbstractRelation
     }
 
     /**
-     * Unused method by inheritance
-     *
-     * {@inheritdoc}
-     *
-     * @return void
-     */
-    protected function relations($keys, $with, $constraints, $without): void
-    {
-    }
-
-    /**
-     * Unused method by inheritance
-     *
-     * {@inheritdoc}
-     *
-     * @return void
-     */
-    protected function match($collection, $relations): void
-    {
-    }
-
-    /**
      * {@inheritdoc}
      */
-    protected function applyWhereKeys(ReadCommandInterface $query, $value): ReadCommandInterface
+    protected function applyWhereKeys(ReadCommandInterface $query, mixed $value): ReadCommandInterface
     {
         return $query;
     }

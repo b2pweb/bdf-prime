@@ -4,6 +4,8 @@ namespace Bdf\Prime\Query\Extension;
 
 use Bdf\Prime\Query\Compiler\CompilerState;
 use Bdf\Prime\Query\Contract\Projectionable;
+use Bdf\Prime\Query\Expression\ExpressionInterface;
+use Bdf\Prime\Query\QueryInterface;
 
 /**
  * Trait for @see Projectionable
@@ -18,7 +20,7 @@ trait ProjectionableTrait
     /**
      * @see Projectionable::project()
      */
-    public function project($columns = null)
+    public function project(string|ExpressionInterface|QueryInterface|array|null $columns = null): static
     {
         return $this->select($columns);
     }
@@ -26,7 +28,7 @@ trait ProjectionableTrait
     /**
      * @see Projectionable::select()
      */
-    public function select($columns = null)
+    public function select(string|ExpressionInterface|QueryInterface|array|null $columns = null): static
     {
         $this->statements['columns'] = [];
 
@@ -36,7 +38,7 @@ trait ProjectionableTrait
     /**
      * @see Projectionable::addSelect()
      */
-    public function addSelect($columns)
+    public function addSelect(string|ExpressionInterface|QueryInterface|array|null $columns): static
     {
         $this->compilerState->invalidate('columns');
 

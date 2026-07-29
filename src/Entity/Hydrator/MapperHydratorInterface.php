@@ -111,5 +111,5 @@ interface MapperHydratorInterface
      *
      * @see MapperHydratorInterface::extractOne() For perform the reverse operation
      */
-    public function hydrateOne($object, string $attribute, $value): void;
+    public function hydrateOne($object, string $attribute, mixed $value): void;
 }

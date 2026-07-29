@@ -10,7 +10,7 @@ abstract class AbstractSerializeType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase(mixed $value): ?string
     {
         if ($value === null) {
             return null;
@@ -22,7 +22,7 @@ abstract class AbstractSerializeType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase(mixed $value, array $fieldOptions = []): mixed
     {
         if ($value === null) {
             return null;
@@ -34,7 +34,7 @@ abstract class AbstractSerializeType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    protected function defaultType()
+    protected function defaultType(): string
     {
         return self::TEXT;
     }

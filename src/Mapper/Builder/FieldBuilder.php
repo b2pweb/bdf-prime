@@ -55,14 +55,12 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @var array<string, FieldDefinition>
      */
-    protected $fields = [];
+    protected array $fields = [];
 
     /**
      * The name of the current field
-     *
-     * @var string
      */
-    protected $current;
+    protected string $current;
 
 
     /**
@@ -102,7 +100,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @return $this
      */
-    public function primary($type = Metadata::PK_AUTO)
+    public function primary(string|bool $type = Metadata::PK_AUTO)
     {
         $this->fields[$this->current]['primary'] = $type;
 
@@ -138,7 +136,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function bigint(string $name, $default = null)
+    public function bigint(string $name, string|int|null $default = null)
     {
         return $this->add($name, TypeInterface::BIGINT, $default);
     }
@@ -180,7 +178,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function decimal(string $name, $default = null)
+    public function decimal(string $name, int|string|float|null $default = null)
     {
         return $this->add($name, TypeInterface::DECIMAL, $default);
     }
@@ -196,7 +194,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function date(string $name, $default = null)
+    public function date(string $name, string|\DateTimeInterface|null $default = null)
     {
         return $this->add($name, TypeInterface::DATE, $default);
     }
@@ -204,7 +202,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function dateTime(string $name, $default = null)
+    public function dateTime(string $name, string|\DateTimeInterface|null $default = null)
     {
         return $this->add($name, TypeInterface::DATETIME, $default);
     }
@@ -212,7 +210,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function dateTimeTz(string $name, $default = null)
+    public function dateTimeTz(string $name, string|\DateTimeInterface|null $default = null)
     {
         return $this->add($name, TypeInterface::DATETIMETZ, $default);
     }
@@ -220,7 +218,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function time(string $name, $default = null)
+    public function time(string $name, string|\DateTimeInterface|null $default = null)
     {
         return $this->add($name, TypeInterface::TIME, $default);
     }
@@ -228,7 +226,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function timestamp(string $name, $default = null)
+    public function timestamp(string $name, string|\DateTimeInterface|null $default = null)
     {
         return $this->add($name, TypeInterface::TIMESTAMP, $default);
     }
@@ -252,7 +250,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function guid(string $name, $default = null)
+    public function guid(string $name, mixed $default = null)
     {
         return $this->add($name, TypeInterface::GUID, $default);
     }
@@ -260,7 +258,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function json(string $name, $default = null)
+    public function json(string $name, mixed $default = null)
     {
         return $this->add($name, TypeInterface::JSON, $default);
     }
@@ -276,7 +274,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function object(string $name, $default = null)
+    public function object(string $name, mixed $default = null)
     {
         return $this->add($name, TypeInterface::OBJECT, $default);
     }
@@ -401,7 +399,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @return $this             This builder instance
      */
-    public function add(string $name, string $type = TypeInterface::STRING, $default = null)
+    public function add(string $name, string $type = TypeInterface::STRING, mixed $default = null)
     {
         $this->current = $name;
 
@@ -527,7 +525,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @return $this             This builder instance
      */
-    public function setDefault($value)
+    public function setDefault(mixed $value)
     {
         $this->fields[$this->current]['default'] = $value;
 
@@ -585,7 +583,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @return $this             This builder instance
      */
-    public function unique($index = true)
+    public function unique(bool|string $index = true)
     {
         $this->fields[$this->current]['unique'] = $index;
 
@@ -686,7 +684,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @return $this             This builder instance
      */
-    public function phpOptions(string $key, $value)
+    public function phpOptions(string $key, mixed $value)
     {
         $this->fields[$this->current]['phpOptions'][$key] = $value;
 
@@ -721,7 +719,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @see \Doctrine\DBAL\Schema\Table for the detail
      */
-    public function schemaOption(string $key, $value)
+    public function schemaOption(string $key, mixed $value)
     {
         $this->fields[$this->current]['customSchemaOptions'][$key] = $value;
 
@@ -751,7 +749,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
      *
      * @return $this              This builder instance
      */
-    public function definition($definition)
+    public function definition(string $definition)
     {
         $this->fields[$this->current]['columnDefinition'] = $definition;
 
@@ -826,7 +824,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         return isset($this->fields[$offset]);
     }
@@ -834,16 +832,15 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    #[\ReturnTypeWillChange]
-    public function offsetGet($key)
+    public function offsetGet(mixed $offset): array
     {
-        return $this->fields[$key];
+        return $this->fields[$offset];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($key, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         // not allowed
     }
@@ -851,7 +848,7 @@ class FieldBuilder implements IteratorAggregate, ArrayAccess, TypesHelperInterfa
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
         // not allowed
     }

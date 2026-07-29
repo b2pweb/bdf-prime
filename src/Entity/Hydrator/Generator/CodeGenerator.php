@@ -7,22 +7,11 @@ namespace Bdf\Prime\Entity\Hydrator\Generator;
  *
  * @todo Handle use and simplify FQN
  */
-class CodeGenerator
+final class CodeGenerator
 {
-    /**
-     * @var string
-     */
-    private $eol = "\n";
-
-    /**
-     * @var string
-     */
-    private $tab = '    ';
-
-    /**
-     * @var int
-     */
-    private $tmpVarCount = 0;
+    private string $eol = "\n";
+    private string $tab = '    ';
+    private int $tmpVarCount = 0;
 
 
     /**
@@ -32,7 +21,7 @@ class CodeGenerator
      *
      * @return string
      */
-    public function namespace($namespace)
+    public function namespace(string $namespace): string
     {
         if (empty($namespace)) {
             return '';
@@ -49,7 +38,7 @@ class CodeGenerator
      *
      * @return string
      */
-    public function properties(array $names, $visibility = 'private')
+    public function properties(array $names, string $visibility = 'private'): string
     {
         $out = '';
 
@@ -67,7 +56,7 @@ class CodeGenerator
      *
      * @return string
      */
-    public function simpleConstructor($properties)
+    public function simpleConstructor(array $properties): string
     {
         $parameters = implode(', ', array_map(function ($p) {
             return '$'.$p;
@@ -99,7 +88,7 @@ CTR;
      *
      * @return string
      */
-    public function indent($code, $tabs)
+    public function indent(string $code, int $tabs): string
     {
         $spaces = str_repeat($this->tab, $tabs);
 
@@ -111,7 +100,7 @@ CTR;
      *
      * @return string
      */
-    public function eol()
+    public function eol(): string
     {
         return $this->eol;
     }
@@ -123,7 +112,7 @@ CTR;
      *
      * @return string
      */
-    public function lines(array $lines)
+    public function lines(array $lines): string
     {
         return implode($this->eol, $lines);
     }
@@ -136,7 +125,7 @@ CTR;
      *
      * @return string
      */
-    public function switchIntanceOf($varName, array $cases)
+    public function switchIntanceOf(string $varName, array $cases): string
     {
         $out = [];
 
@@ -160,7 +149,7 @@ PHP;
      *
      * @return string
      */
-    public function switch($varName, array $cases, $default = null)
+    public function switch(string $varName, array $cases, ?string $default = null): string
     {
         $code = 'switch ('.$varName.') {'.$this->eol;
 
@@ -191,7 +180,7 @@ PHP;
      *
      * @return string
      */
-    public function tmpVar()
+    public function tmpVar(): string
     {
         return '$__tmp_'.$this->tmpVarCount++;
     }
@@ -203,7 +192,7 @@ PHP;
      *
      * @return string
      */
-    public function className($name)
+    public function className(string $name): string
     {
         return '\\'.ltrim($name, '\\');
     }
@@ -217,7 +206,7 @@ PHP;
      *
      * @see var_export()
      */
-    public function export($value)
+    public function export(mixed $value): string
     {
         if ($value === null) {
             return 'null';
@@ -225,7 +214,7 @@ PHP;
 
         // Indexed array
         if (is_array($value) && array_values($value) === $value) {
-            return '['.implode(', ', array_map([$this, 'export'], $value)).']';
+            return '['.implode(', ', array_map($this->export(...), $value)).']';
         }
 
         return var_export($value, true);
@@ -239,7 +228,7 @@ PHP;
      *
      * @return string
      */
-    public function generate($template, array $placeholders)
+    public function generate(string $template, array $placeholders): string
     {
         /** @var string $file */
         $file = file_get_contents($template);

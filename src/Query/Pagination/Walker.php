@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Query\Pagination;
 
 use BadMethodCallException;
+use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\PrimeSerializable;
@@ -31,7 +32,7 @@ use LogicException;
  * @implements PaginatorInterface<R>
  * @implements Iterator<array-key, R>
  */
-class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
+final class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
 {
     public const DEFAULT_PAGE  = 1;
     public const DEFAULT_LIMIT = 150;
@@ -41,14 +42,14 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
      *
      * @var int
      */
-    protected $startPage;
+    private $startPage;
 
     /**
      * The current offset
      *
      * @var int|null
      */
-    protected $offset;
+    private $offset;
 
     /**
      * @var R[]
@@ -56,29 +57,26 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     private $collection = [];
 
     /**
-     * @var WalkStrategyInterface<R>
+     * @var WalkStrategyInterface<R>|null
      */
-    private $strategy;
+    private ?WalkStrategyInterface $strategy = null;
 
     /**
-     * @var WalkCursor<R>
+     * @var WalkCursor<R>|null
      */
-    private $cursor;
+    private ?WalkCursor $cursor = null;
 
     /**
      * @var ReadCommandInterface<ConnectionInterface, R>
      */
-    private $query;
+    private ReadCommandInterface $query;
+
+    private int $page;
 
     /**
      * @var int
      */
-    private $page;
-
-    /**
-     * @var int
-     */
-    private $maxRows;
+    private int $maxRows;
 
     /**
      * Create a query walker
@@ -87,7 +85,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
      * @param int            $maxRows
      * @param int            $page
      */
-    public function __construct(ReadCommandInterface $query, $maxRows = null, $page = null)
+    public function __construct(ReadCommandInterface $query, ?int $maxRows = null, ?int $page = null)
     {
         $this->query = $query;
         $this->page = 0;
@@ -161,7 +159,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function collection()
+    public function collection(): array|CollectionInterface
     {
         return $this->collection;
     }
@@ -169,7 +167,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function size()
+    public function size(): int
     {
         if (!$this->query instanceof Paginable) {
             throw new BadMethodCallException(__METHOD__.' should be called with a Paginable query');
@@ -225,7 +223,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function page()
+    public function page(): int
     {
         return $this->page;
     }
@@ -233,7 +231,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function pageMaxRows()
+    public function pageMaxRows(): int
     {
         return $this->maxRows;
     }
@@ -262,8 +260,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
      *
      * @return R
      */
-    #[\ReturnTypeWillChange]
-    public function current()
+    public function current(): mixed
     {
         return current($this->collection);
     }
@@ -273,8 +270,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
      *
      * {@inheritdoc}
      */
-    #[\ReturnTypeWillChange]
-    public function key()
+    public function key(): int|string|null
     {
         if ($this->offset !== null) {
             /** @var array<int, mixed> $this->collection */
@@ -338,7 +334,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function pushAll(array $items)
+    public function pushAll(array $items): static
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }
@@ -346,7 +342,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function push($item)
+    public function push($item): static
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }
@@ -354,7 +350,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function put($key, $item)
+    public function put($key, $item): static
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }
@@ -362,7 +358,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function all()
+    public function all(): array
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }
@@ -378,7 +374,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function has($key)
+    public function has($key): bool
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }
@@ -386,7 +382,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function remove($key)
+    public function remove($key): static
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }
@@ -394,7 +390,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function clear()
+    public function clear(): static
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }
@@ -402,7 +398,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function keys()
+    public function keys(): array
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }
@@ -410,7 +406,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function isEmpty()
+    public function isEmpty(): bool
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }
@@ -418,7 +414,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function map($callback)
+    public function map($callback): self
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }
@@ -426,7 +422,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function filter($callback = null)
+    public function filter($callback = null): static
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }
@@ -434,7 +430,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function groupBy($groupBy, $mode = self::GROUPBY)
+    public function groupBy($groupBy, $mode = self::GROUPBY): self
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }
@@ -442,7 +438,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function contains($element)
+    public function contains($element): bool
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }
@@ -458,7 +454,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function merge($items)
+    public function merge($items): self
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }
@@ -466,7 +462,7 @@ class Walker extends PrimeSerializable implements Iterator, PaginatorInterface
     /**
      * {@inheritdoc}
      */
-    public function sort(?callable $callback = null)
+    public function sort(?callable $callback = null): self
     {
         throw new BadMethodCallException('Collection methods are not supported by the Walker');
     }

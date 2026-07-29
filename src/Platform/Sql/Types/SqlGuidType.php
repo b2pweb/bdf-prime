@@ -11,12 +11,12 @@ use Doctrine\DBAL\Types\Types;
 /**
  * Represents a GUID/UUID datatype in the database.
  */
-class SqlGuidType extends AbstractPlatformType
+final class SqlGuidType extends AbstractPlatformType
 {
     /**
      * {@inheritdoc}
      */
-    public function __construct(PlatformInterface $platform, $name = self::GUID)
+    public function __construct(PlatformInterface $platform, string $name = self::GUID)
     {
         parent::__construct($platform, $name);
     }
@@ -24,7 +24,7 @@ class SqlGuidType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function declaration(ColumnInterface $column)
+    public function declaration(ColumnInterface $column): mixed
     {
         return Types::GUID;
     }

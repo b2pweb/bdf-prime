@@ -20,15 +20,9 @@ use function array_map;
  */
 final class DoctrineTable implements TableInterface
 {
-    /**
-     * @var Table
-     */
-    private $table;
+    private Table $table;
 
-    /**
-     * @var TypesRegistryInterface
-     */
-    private $types;
+    private TypesRegistryInterface $types;
 
 
     /**
@@ -142,7 +136,7 @@ final class DoctrineTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function option(string $name)
+    public function option(string $name): mixed
     {
         return $this->table->getOption($name);
     }

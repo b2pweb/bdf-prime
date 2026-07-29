@@ -13,22 +13,11 @@ use Bdf\Prime\Types\ArrayType;
  * $query->where('name', (new Like('John'))->startsWith()); // name LIKE 'John%'
  * </code>
  */
-class Like extends AbstractExpressionTransformer
+final class Like extends AbstractExpressionTransformer
 {
-    /**
-     * @var string
-     */
-    protected $start = '';
-
-    /**
-     * @var string
-     */
-    protected $end = '';
-
-    /**
-     * @var bool
-     */
-    protected $escape = false;
+    private string $start = '';
+    private string $end = '';
+    private bool $escape = false;
 
 
     /**
@@ -38,9 +27,9 @@ class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function start($start = '%')
+    public function start(string $start = '%'): self
     {
-        $this->start = (string) $start;
+        $this->start = $start;
 
         return $this;
     }
@@ -52,9 +41,9 @@ class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function end($end = '%')
+    public function end(string $end = '%'): self
     {
-        $this->end = (string) $end;
+        $this->end = $end;
 
         return $this;
     }
@@ -66,7 +55,7 @@ class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function enclose($char = '%')
+    public function enclose(string $char = '%'): self
     {
         $this->start = $char;
         $this->end   = $char;
@@ -81,9 +70,9 @@ class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function escape($escape = true)
+    public function escape(bool $escape = true): self
     {
-        $this->escape = (bool) $escape;
+        $this->escape = $escape;
 
         return $this;
     }
@@ -93,7 +82,7 @@ class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function contains()
+    public function contains(): self
     {
         return $this->enclose('%');
     }
@@ -103,7 +92,7 @@ class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function startsWith()
+    public function startsWith(): self
     {
         return $this->end('%');
     }
@@ -113,7 +102,7 @@ class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function endsWith()
+    public function endsWith(): self
     {
         return $this->start('%');
     }
@@ -123,7 +112,7 @@ class Like extends AbstractExpressionTransformer
      *
      * @return $this
      */
-    public function searchableArray()
+    public function searchableArray(): self
     {
         $this->start = '%,';
         $this->end   = ',%';
@@ -134,13 +123,13 @@ class Like extends AbstractExpressionTransformer
     /**
      * {@inheritdoc}
      */
-    public function getValue()
+    public function getValue(): string|array
     {
         if (is_array($this->value)) {
-            return array_map([$this, 'generate'], $this->value);
+            return array_map($this->generate(...), $this->value);
         }
 
-        return $this->generate($this->value);
+        return $this->generate((string) $this->value);
     }
 
     /**
@@ -158,7 +147,7 @@ class Like extends AbstractExpressionTransformer
      *
      * @return string
      */
-    public function generate($value)
+    public function generate(string $value): string
     {
         if ($this->escape) {
             $value = addcslashes($value, '%_');

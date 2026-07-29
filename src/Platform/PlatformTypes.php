@@ -15,7 +15,7 @@ use UnitEnum;
 /**
  * Manage types of platform
  */
-class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
+final class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
 {
     /**
      * Map of interface to prime type
@@ -24,7 +24,7 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
      *
      * @internal resolve use this for its optimisation
      */
-    private $interfaceTypes = [
+    private array $interfaceTypes = [
         \DateTimeInterface::class => TypeInterface::DATETIME,
         BackedEnum::class => BackedEnumType::STRING_ENUM,
         UnitEnum::class => UnitEnumType::UNIT_ENUM,
@@ -37,21 +37,14 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
      *
      * @internal resolve use this for its optimisation
      */
-    private $classTypes = [
+    private array $classTypes = [
         \DateTime::class          => TypeInterface::DATETIME,
         \DateTimeImmutable::class => TypeInterface::DATETIME,
         \stdClass::class          => TypeInterface::OBJECT,
     ];
 
-    /**
-     * @var PlatformInterface
-     */
-    private $platform;
-
-    /**
-     * @var TypesRegistryInterface
-     */
-    private $commons;
+    private PlatformInterface $platform;
+    private TypesRegistryInterface $commons;
 
 
     /**
@@ -119,7 +112,7 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
      *
      * @todo revoir la gestion. Doit on appeler une methode TypeInterface::support()
      */
-    public function resolve($value): ?TypeInterface
+    public function resolve(mixed $value): ?TypeInterface
     {
         $type = gettype($value);
 
@@ -147,7 +140,7 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value, $type = null)
+    public function toDatabase(mixed $value, string|TypeInterface|null $type = null): mixed
     {
         //ORM optimisation: type is most of the type provides
         if ($type instanceof TypeInterface) {
@@ -158,17 +151,13 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
             return $this->resolve($value)->toDatabase($value);
         }
 
-        if (is_string($type)) {
-            return $this->get($type)->toDatabase($value);
-        }
-
-        throw new TypeException(gettype($value), 'Cannot convert to database the value : ' . print_r($value, true).PHP_EOL.'You should set a valid type as second parameter');
+        return $this->get($type)->toDatabase($value);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, $type = null, array $fieldOptions = [])
+    public function fromDatabase(mixed $value, string|TypeInterface|null $type = null, array $fieldOptions = []): mixed
     {
         //ORM optimisation: type is most of the type provides
         if ($type instanceof TypeInterface) {
@@ -195,7 +184,7 @@ class PlatformTypes extends TypesRegistry implements PlatformTypesInterface
      *
      * @return PlatformTypeInterface
      */
-    protected function instantiate($class, $name)
+    protected function instantiate(string $class, string $name): PlatformTypeInterface
     {
         return new $class($this->platform, $name);
     }

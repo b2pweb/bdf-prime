@@ -51,7 +51,7 @@ interface TypesHelperInterface
      *
      * @return $this             This builder instance
      */
-    public function bigint(string $name, $default = null);
+    public function bigint(string $name, string|int|null $default = null);
 
     /**
      * Add a smallint (2 bytes) field
@@ -102,7 +102,7 @@ interface TypesHelperInterface
      *
      * @return $this             This builder instance
      */
-    public function decimal(string $name, $default = null);
+    public function decimal(string $name, int|string|float|null $default = null);
 
     /**
      * Add a boolean field
@@ -122,7 +122,7 @@ interface TypesHelperInterface
      *
      * @return $this             This builder instance
      */
-    public function date(string $name, $default = null);
+    public function date(string $name, string|\DateTimeInterface|null $default = null);
 
     /**
      * Add a datetime field
@@ -132,7 +132,7 @@ interface TypesHelperInterface
      *
      * @return $this             This builder instance
      */
-    public function dateTime(string $name, $default = null);
+    public function dateTime(string $name, string|\DateTimeInterface|null $default = null);
 
     /**
      * Add a datetimeTz field
@@ -142,7 +142,7 @@ interface TypesHelperInterface
      *
      * @return $this             This builder instance
      */
-    public function dateTimeTz(string $name, $default = null);
+    public function dateTimeTz(string $name, string|\DateTimeInterface|null $default = null);
 
     /**
      * Add a time field
@@ -152,7 +152,7 @@ interface TypesHelperInterface
      *
      * @return $this             This builder instance
      */
-    public function time(string $name, $default = null);
+    public function time(string $name, string|\DateTimeInterface|null $default = null);
 
     /**
      * Add a timestamp field
@@ -162,7 +162,7 @@ interface TypesHelperInterface
      *
      * @return $this             This builder instance
      */
-    public function timestamp(string $name, $default = null);
+    public function timestamp(string $name, string|\DateTimeInterface|null $default = null);
 
     /**
      * Add a binary field
@@ -192,7 +192,7 @@ interface TypesHelperInterface
      *
      * @return $this             This builder instance
      */
-    public function guid(string $name, $default = null);
+    public function guid(string $name, mixed $default = null);
 
     /**
      * Add a json array field
@@ -202,7 +202,7 @@ interface TypesHelperInterface
      *
      * @return $this             This builder instance
      */
-    public function json(string $name, $default = null);
+    public function json(string $name, mixed $default = null);
 
     /**
      * Add a simple array field
@@ -222,7 +222,7 @@ interface TypesHelperInterface
      *
      * @return $this             This builder instance
      */
-    public function object(string $name, $default = null);
+    public function object(string $name, mixed $default = null);
 
     /**
      * Add a associative array

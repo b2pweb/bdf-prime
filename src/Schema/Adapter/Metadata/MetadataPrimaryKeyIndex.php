@@ -12,10 +12,7 @@ use Bdf\Prime\Schema\Adapter\NamedIndex;
  */
 final class MetadataPrimaryKeyIndex extends AbstractIndex
 {
-    /**
-     * @var array
-     */
-    private $metadata;
+    private array $metadata;
 
 
     /**

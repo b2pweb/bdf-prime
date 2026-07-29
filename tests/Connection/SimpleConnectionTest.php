@@ -7,6 +7,7 @@ use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Connection\Result\UpdateResultSet;
 use Bdf\Prime\Entity\Model;
 use Bdf\Prime\Exception\QueryExecutionException;
+use Bdf\Prime\Platform\AbstractPlatformType;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Platform\Sql\Types\SqlBooleanType;
 use Bdf\Prime\Platform\Sql\Types\SqlIntegerType;
@@ -21,7 +22,9 @@ use Bdf\Prime\Query\Custom\BulkInsert\BulkInsertQuery;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueSqlCompiler;
 use Bdf\Prime\Query\Query;
+use Bdf\Prime\Schema\ColumnInterface;
 use Bdf\Prime\TestEntity;
+use Bdf\Prime\Types\PhpTypeInterface;
 use Bdf\Prime\Types\TypeInterface;
 use Exception;
 use PHPUnit\Framework\TestCase;
@@ -854,16 +857,26 @@ class SimpleConnectionTest extends TestCase
     }
 }
 
-class FakeNullableStringType extends SqlStringType
+class FakeNullableStringType extends AbstractPlatformType
 {
-    public function toDatabase($value)
+    public function declaration(ColumnInterface $column)
     {
-        return (string) parent::toDatabase($value);
+        return self::STRING;
     }
 
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function phpType(): string
     {
-        $value = parent::fromDatabase($value, $fieldOptions);
+        return PhpTypeInterface::STRING;
+    }
+
+    public function toDatabase($value): mixed
+    {
+        return (string) $value;
+    }
+
+    public function fromDatabase($value, array $fieldOptions = []): mixed
+    {
+        $value = (string) $value;
 
         return $value === '' ? null : $value;
     }

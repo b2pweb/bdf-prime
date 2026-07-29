@@ -201,36 +201,6 @@ class MapperTest extends TestCase
         ], $mapper->relation(Pack::class));
     }
 
-    public function test_relation_legacy()
-    {
-        $mapper = new LegacyMapper(Prime::service(), TestEntity::class);
-        $mapper->build();
-
-        $this->assertEquals([
-            'type' => 'hasOne',
-            'entity' => TestEmbeddedEntity::class,
-            'localKey' => 'foreign.id',
-            'distantKey' => 'id',
-            'name' => 'foreign',
-        ], $mapper->relation('foreign'));
-
-        $this->assertEquals([
-            'type' => 'hasOne',
-            'entity' => TestEmbeddedEntity::class,
-            'localKey' => 'foreign.id',
-            'distantKey' => 'id',
-            'name' => 'foreign',
-        ], $mapper->relation(TestEmbeddedEntity::class));
-
-        $this->assertEquals([
-            'type' => 'hasOne',
-            'entity' => TestEmbeddedEntity::class,
-            'localKey' => 'foreign.id',
-            'distantKey' => 'id',
-            'name' => 'foreign',
-        ], $mapper->relation(TestEmbeddedEntity::class, 'foreign'));
-    }
-
     public function test_relation_not_found()
     {
         $this->expectException(RelationNotFoundException::class);
@@ -446,8 +416,7 @@ class MapperTest extends TestCase
      */
     public function test_set_generator_need_valid_generator()
     {
-        $this->expectException('LogicException');
-        $this->expectExceptionMessageMatches('/Trying to set an invalid generator/');
+        $this->expectException(\TypeError::class);
 
         $mapper = new TestEntityMapper(Prime::service(), TestEntity::class);
         $mapper->build();
@@ -803,54 +772,6 @@ class MyCustomCriteria extends Criteria
         $this->add('name', 'foo' . $bar);
 
         return $this;
-    }
-}
-
-class LegacyMapper extends Mapper
-{
-    /**
-     * {@inheritdoc}
-     */
-    public function schema(): array
-    {
-        return [
-            'connection' => 'test',
-            'database'   => 'test',
-            'table'      => 'test_',
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function fields(): iterable
-    {
-        return [
-            'id'          => ['type' => 'integer', 'primary' => Metadata::PK_AUTOINCREMENT],
-            'name'        => ['type' => 'string', 'length' => '255'],
-            'dateInsert'  => ['type' => 'datetime', 'alias' => 'date_insert', 'nillable' => true],
-            'foreign'     => [
-                'class'    => TestEmbeddedEntity::class,
-                'embedded' => [
-                    'id'    => ['type' => 'integer', 'alias' => 'foreign_key', 'nillable' => true],
-                ]
-            ],
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function relations(): array
-    {
-        return [
-            'foreign' => [
-                'type'       => 'hasOne',
-                'entity'     => TestEmbeddedEntity::class,
-                'localKey'   => 'foreign.id',
-                'distantKey' => 'id',
-            ]
-        ];
     }
 }
 

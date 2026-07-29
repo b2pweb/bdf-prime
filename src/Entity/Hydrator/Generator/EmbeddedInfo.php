@@ -5,22 +5,11 @@ namespace Bdf\Prime\Entity\Hydrator\Generator;
 /**
  * Information about an embedded object
  */
-class EmbeddedInfo
+final class EmbeddedInfo
 {
-    /**
-     * @var string
-     */
-    private $path;
-
-    /**
-     * @var array
-     */
-    private $metadata;
-
-    /**
-     * @var AttributesResolver
-     */
-    private $resolver;
+    private string $path;
+    private array $metadata;
+    private AttributesResolver $resolver;
 
 
     /**
@@ -30,7 +19,7 @@ class EmbeddedInfo
      * @param array $metadata
      * @param AttributesResolver $resolver
      */
-    public function __construct($path, array $metadata, AttributesResolver $resolver)
+    public function __construct(string $path, array $metadata, AttributesResolver $resolver)
     {
         $this->path = $path;
         $this->metadata = $metadata;
@@ -40,7 +29,7 @@ class EmbeddedInfo
     /**
      * @return string
      */
-    public function path()
+    public function path(): string
     {
         return $this->metadata['path'];
     }
@@ -48,7 +37,7 @@ class EmbeddedInfo
     /**
      * @return array
      */
-    public function paths()
+    public function paths(): array
     {
         return $this->metadata['paths'];
     }
@@ -58,7 +47,7 @@ class EmbeddedInfo
      *
      * @return string
      */
-    public function rootAttribute()
+    public function rootAttribute(): string
     {
         return $this->paths()[0];
     }
@@ -68,7 +57,7 @@ class EmbeddedInfo
      *
      * @return bool
      */
-    public function isRoot()
+    public function isRoot(): bool
     {
         return $this->metadata['parentPath'] === 'root';
     }
@@ -78,7 +67,7 @@ class EmbeddedInfo
      *
      * @return bool
      */
-    public function isEntity()
+    public function isEntity(): bool
     {
         foreach ($this->classes() as $class) {
             if (!$this->resolver->isEntity($class)) {
@@ -94,7 +83,7 @@ class EmbeddedInfo
      *
      * @return bool
      */
-    public function isImportable()
+    public function isImportable(): bool
     {
         foreach ($this->classes() as $class) {
             if (!$this->resolver->isImportable($class)) {
@@ -110,7 +99,7 @@ class EmbeddedInfo
      *
      * @return string[]
      */
-    public function classes()
+    public function classes(): array
     {
         if (!empty($this->metadata['polymorph'])) {
             return $this->metadata['class_map'];
@@ -122,7 +111,7 @@ class EmbeddedInfo
     /**
      * @return string
      */
-    public function class()
+    public function class(): string
     {
         $classes = $this->classes();
 
@@ -137,7 +126,7 @@ class EmbeddedInfo
      *
      * @return mixed
      */
-    public function hint($className = null)
+    public function hint(?string $className = null): mixed
     {
         if ($this->isPolymorph()) {
             return $this->metadata['hints'][$className];
@@ -151,7 +140,7 @@ class EmbeddedInfo
      *
      * @return string
      */
-    public function discriminatorField()
+    public function discriminatorField(): string
     {
         return $this->metadata['discriminator_field'];
     }
@@ -161,7 +150,7 @@ class EmbeddedInfo
      *
      * @return bool
      */
-    public function isPolymorph()
+    public function isPolymorph(): bool
     {
         return !empty($this->metadata['polymorph']);
     }
@@ -169,7 +158,7 @@ class EmbeddedInfo
     /**
      * @return array
      */
-    public function metadata()
+    public function metadata(): array
     {
         return $this->metadata;
     }
@@ -179,7 +168,7 @@ class EmbeddedInfo
      *
      * @return EmbeddedInfo
      */
-    public function parent()
+    public function parent(): self
     {
         return $this->resolver->embedded($this->metadata['parentPath']);
     }
@@ -189,7 +178,7 @@ class EmbeddedInfo
      *
      * @return string
      */
-    public function property()
+    public function property(): string
     {
         if ($this->isRoot()) {
             return $this->path;

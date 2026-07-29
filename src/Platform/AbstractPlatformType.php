@@ -7,15 +7,8 @@ namespace Bdf\Prime\Platform;
  */
 abstract class AbstractPlatformType implements PlatformTypeInterface
 {
-    /**
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * @var PlatformInterface
-     */
-    protected $platform;
+    protected string $name;
+    protected PlatformInterface $platform;
 
 
     /**
@@ -30,7 +23,7 @@ abstract class AbstractPlatformType implements PlatformTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase(mixed $value, array $fieldOptions = []): mixed
     {
         return $value;
     }
@@ -38,7 +31,7 @@ abstract class AbstractPlatformType implements PlatformTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase(mixed $value): mixed
     {
         return $value;
     }
