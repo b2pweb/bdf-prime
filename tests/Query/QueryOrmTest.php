@@ -16,6 +16,7 @@ use Bdf\Prime\Query\Expression\Operator;
 use Bdf\Prime\Query\Expression\Raw;
 use Bdf\Prime\Query\Expression\RawValue;
 use Bdf\Prime\Query\Expression\Value;
+use Bdf\Prime\Record\Field;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Right;
 use Bdf\Prime\TestEntity;
@@ -1378,5 +1379,66 @@ class QueryOrmTest extends TestCase
         };
 
         $this->assertSame('SELECT t0.name, t0.foreign_key FROM test_ t0', $this->query->by('foreign.id')->as($r::class)->toSql());
+    }
+
+    /**
+     * A record field declared with an expression is projected as "alias => expression",
+     * so the attribute is only present as the *value* of the projection, not as a projected column.
+     * It must still be added to the select clause.
+     */
+    public function test_as_with_by_on_expression_field_should_add_attribute_on_projection()
+    {
+        $r = new class('') {
+            public function __construct(
+                #[Field(expression: 'name')]
+                public readonly string $label,
+            ) {}
+        };
+
+        $this->assertSame('SELECT t0.name as label, t0.name FROM test_ t0', $this->query->by('name')->as($r::class)->toSql());
+    }
+
+    public function test_as_then_by_on_expression_field_should_add_attribute_on_projection()
+    {
+        $r = new class('') {
+            public function __construct(
+                #[Field(expression: 'name')]
+                public readonly string $label,
+            ) {}
+        };
+
+        $this->assertSame('SELECT t0.name as label, t0.name FROM test_ t0', $this->query->as($r::class)->by('name')->toSql());
+    }
+
+    public function test_as_with_by_on_expression_field_aliased_with_the_attribute_name_should_not_duplicate_projection()
+    {
+        $r = new class('') {
+            public function __construct(
+                #[Field('name', expression: new Raw('LOWER(name)'))]
+                public readonly string $name,
+            ) {}
+        };
+
+        $this->assertSame('SELECT LOWER(name) as name FROM test_ t0', $this->query->by('name')->as($r::class)->toSql());
+    }
+
+    /**
+     * Both call orders must index the records on the value of the by() attribute,
+     * not collapse them into a single bucket.
+     */
+    public function test_as_and_by_on_expression_field_should_index_on_the_attribute_value()
+    {
+        $this->repository->insert(new TestEntity(['id' => 1, 'name' => 'John']));
+        $this->repository->insert(new TestEntity(['id' => 2, 'name' => 'Mark']));
+
+        $r = new class('') {
+            public function __construct(
+                #[Field(expression: 'name')]
+                public readonly string $label,
+            ) {}
+        };
+
+        $this->assertSame(['John', 'Mark'], array_keys($this->repository->builder()->by('name')->as($r::class)->all()));
+        $this->assertSame(['John', 'Mark'], array_keys($this->repository->builder()->as($r::class)->by('name')->all()));
     }
 }

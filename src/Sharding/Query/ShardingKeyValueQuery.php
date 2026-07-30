@@ -9,15 +9,15 @@ use Bdf\Prime\Exception\ShardingException;
 use Bdf\Prime\Query\AbstractReadCommand;
 use Bdf\Prime\Query\Compiler\Preprocessor\DefaultPreprocessor;
 use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
-use Bdf\Prime\Query\Contract\Projectionable;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\ReadOperation;
 use Bdf\Prime\Query\Contract\WriteOperation;
-use Bdf\Prime\Query\Expression\ExpressionInterface as ColumnType;
 use Bdf\Prime\Query\Extension\CachableTrait;
 use Bdf\Prime\Query\Extension\ExecutableTrait;
 use Bdf\Prime\Sharding\Extension\ShardPicker;
 use Bdf\Prime\Sharding\ShardingConnection;
+
+use function is_array;
 
 /**
  * Handle simple key/value query on sharding connection
@@ -98,7 +98,9 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
             return $this;
         }
 
-        foreach ((array) $columns as $alias => $column) {
+        $columns = is_array($columns) ? $columns : [$columns];
+
+        foreach ($columns as $alias => $column) {
             if (is_int($alias)) {
                 if (!in_array($column, $this->statements['columns'])) {
                     $this->statements['columns'][] = $column;

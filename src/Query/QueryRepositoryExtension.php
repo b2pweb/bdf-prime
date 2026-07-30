@@ -26,13 +26,14 @@ use Bdf\Prime\Repository\RepositoryInterface;
 use Closure;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
+use function array_any;
 use function array_diff;
 use function array_keys;
 use function array_merge;
 use function class_exists;
 use function count;
-use function in_array;
 use function is_array;
+use function is_int;
 use function spl_object_id;
 
 /**
@@ -441,7 +442,11 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
         if ($this->byOptions && $projection) {
             $byAttribute = $this->byOptions['attribute'];
 
-            if (!in_array($byAttribute, $projection)) {
+            // The "by" attribute is not project neither as alias nor simple projection (i.e. int key in prime)
+            if (
+                !isset($projection[$byAttribute])
+                && !array_any(array_keys($projection, $byAttribute, true), static fn ($value) => is_int($value))
+            ) {
                 $projection[] = $byAttribute;
             }
         }

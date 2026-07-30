@@ -2,11 +2,13 @@
 
 namespace Bdf\Prime\Relations;
 
+use Bdf\Prime\Admin;
 use Bdf\Prime\Collection\Indexer\EntityIndexer;
 use Bdf\Prime\Collection\Indexer\SingleEntityIndexer;
 use Bdf\Prime\Commit;
 use Bdf\Prime\Company;
 use Bdf\Prime\Developer;
+use Bdf\Prime\Document;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Customer;
@@ -52,6 +54,26 @@ class HasOneTest extends TestCase
                     'id'      => '123',
                     'address' => '1 rue chez toi',
                     'city'    => 'MAISON',
+                ]),
+
+                // Polymorphic relation (morphOne) : Admin::mainDocument
+                'admin' => new Admin([
+                    'id'    => '10',
+                    'name'  => 'Admin User',
+                    'roles' => [1],
+                ]),
+                'document-admin' => new Document([
+                    'id'           => '10',
+                    'customerId'   => '123',
+                    'uploaderType' => 'admin',
+                    'uploaderId'   => '10',
+                ]),
+                // Uploaded by a user, but sharing the owner key space of the admin relation
+                'document-user' => new Document([
+                    'id'           => '20',
+                    'customerId'   => '123',
+                    'uploaderType' => 'user',
+                    'uploaderId'   => '321',
                 ]),
             ]);
     }
@@ -461,6 +483,35 @@ class HasOneTest extends TestCase
     }
 
     /**
+     * morphOne is a polymorphic HasOne : the KeyValueQuery optimisation used for a single
+     * foreign key must not skip the discriminator constraint.
+     *
+     * @see \Bdf\Prime\Relations\Builder\RelationBuilder::morphOne()
+     */
+    public function test_morph_loadByForeignKeys_should_apply_discriminator_on_single_key()
+    {
+        $relation = Admin::repository()->relation('mainDocument');
+
+        $this->assertEquals([
+            10 => $this->getTestPack()->get('document-admin'),
+        ], $relation->loadByForeignKeys(['10']));
+
+        // The document 20 has been uploaded by a user : it must not be loaded by the admin relation
+        $this->assertSame([], $relation->loadByForeignKeys(['321']));
+    }
+
+    public function test_morph_loadRecordByForeignKeys_should_apply_discriminator_on_single_key()
+    {
+        $relation = Admin::repository()->relation('mainDocument');
+
+        $this->assertEquals([
+            10 => new HasOneDocumentRecord(10, 'admin'),
+        ], $relation->loadRecordByForeignKeys(['10'], HasOneDocumentRecord::class));
+
+        $this->assertSame([], $relation->loadRecordByForeignKeys(['321'], HasOneDocumentRecord::class));
+    }
+
+    /**
      *
      */
     public function test_load_twice_should_not_reload()
@@ -495,5 +546,13 @@ final readonly class HasOneLocationRecord
     public function __construct(
         public int $id,
         public string $city,
+    ) {}
+}
+
+final readonly class HasOneDocumentRecord
+{
+    public function __construct(
+        public int $id,
+        public string $uploaderType,
     ) {}
 }

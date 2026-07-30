@@ -91,7 +91,7 @@ final class Field
         /**
          * A transformer function to apply to the field value.
          *
-         * This transformer will be called with the database value
+         * This transformer will be called with the value parsed by the prime type (if provided)
          * before passing it to the parameter.
          *
          * @var null|callable(mixed):mixed

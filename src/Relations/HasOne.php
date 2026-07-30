@@ -43,7 +43,7 @@ class HasOne extends OneOrMany
     {
         // Constraints can be on relation attributes : builder must be used
         // @todo Handle "bulk select"
-        if (count($keys) !== 1 || $constraints || $this->constraints) {
+        if (count($keys) !== 1 || $constraints || $this->constraints || $this->isPolymorphic()) {
             return $this->query($keys, $constraints)->by($this->distantKey);
         }
 

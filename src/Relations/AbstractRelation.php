@@ -6,7 +6,6 @@ use BadMethodCallException;
 use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Collection\Indexer\EntityIndexerInterface;
 use Bdf\Prime\Collection\Indexer\EntitySetIndexer;
-use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Locatorizable;
 use Bdf\Prime\Query\Contract\Deletable;
 use Bdf\Prime\Query\Contract\ReadOperation;
@@ -16,7 +15,6 @@ use Bdf\Prime\Relations\Info\NullRelationInfo;
 use Bdf\Prime\Relations\Info\RelationInfoInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 
-use function assert;
 use function is_object;
 
 /**

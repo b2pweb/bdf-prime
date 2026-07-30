@@ -288,7 +288,7 @@ class BelongsToMany extends Relation
     /**
      * Build the query for find related entities
      */
-    protected function relationQuery(array $keys, $constraints): ReadCommandInterface
+    protected function relationQuery(array $keys, $constraints, bool $recreate = false): ReadCommandInterface
     {
         // Constraints can be on relation attributes : builder must be used
         // @todo Handle "bulk select"
@@ -296,7 +296,7 @@ class BelongsToMany extends Relation
             return $this->query($keys, $constraints)->by($this->distantKey);
         }
 
-        if ($this->relationQuery) {
+        if (!$recreate && $this->relationQuery) {
             return $this->relationQuery->where($this->distantKey, reset($keys));
         }
 
@@ -306,7 +306,13 @@ class BelongsToMany extends Relation
             return $this->query($keys, $constraints)->by($this->distantKey);
         }
 
-        return $this->relationQuery = $query->by($this->distantKey);
+        $query->by($this->distantKey);
+
+        if (!$recreate) {
+            $this->relationQuery = $query;
+        }
+
+        return $query;
     }
 
     /**
@@ -350,15 +356,13 @@ class BelongsToMany extends Relation
         }
 
         if ($throughDistants !== []) {
-            $relationQuery = $this->relationQuery($throughDistants, $constraints)
+            $relationQuery = $this->relationQuery($throughDistants, $constraints, recreate: $recordClass !== null)
                 ->with($with)
                 ->without($without)
             ;
 
             if ($recordClass !== null) {
-                // The query instance is cached, so clone it to make sure that record class is not registered
-                // to the base relation query
-                $relationQuery = (clone $relationQuery)->as($recordClass);
+                $relationQuery->as($recordClass);
             }
 
             $relations = $relationQuery->all();

@@ -178,6 +178,37 @@ class BelongsToManyTest extends TestCase
     }
 
     /**
+     * With a single distant key the relation query is a KeyValueQuery kept in memory :
+     * loading records must not register the record class nor its projection on the cached query.
+     */
+    public function test_loadRecordByForeignKey_should_not_alter_the_cached_relation_query()
+    {
+        $this->pack()->nonPersist([
+            new Customer([
+                'id'            => '789',
+                'name'          => 'Customer',
+            ]),
+            new CustomerPack([
+                'customerId' => '789',
+                'packId' => 3,
+            ]),
+        ]);
+
+        $relation = Customer::repository()->relation('packs');
+        $expected = ['789' => [$this->getTestPack()->get('pack-empty')]];
+
+        $this->assertEquals($expected, $relation->loadByForeignKeys(['789']));
+
+        $this->assertEquals(
+            ['789' => [new BelongsToManyPackRecord(3, 'Pack empty')]],
+            $relation->loadRecordByForeignKeys(['789'], BelongsToManyPackRecord::class)
+        );
+
+        // The entity query must still return fully hydrated entities
+        $this->assertEquals($expected, $relation->loadByForeignKeys(['789']));
+    }
+
+    /**
      *
      */
     public function test_load_relation()
