@@ -223,7 +223,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
                 $hydrated[] = $recordManager->instantiate($recordClassName, $row, $platform);
             }
 
-            $hydrated = $recordManager->finalize($recordClassName, $hydrated);
+            $hydrated = $recordManager->finalize($recordClassName, $hydrated, $proceed);
         } else {
             $hydrated = $proceed;
         }

@@ -7,6 +7,8 @@ use Bdf\Prime\Record\CastType;
 use Bdf\Prime\Record\Field;
 use PHPUnit\Framework\TestCase;
 
+use function strrev;
+
 class FieldTest extends TestCase
 {
     public function test_cast()
@@ -17,6 +19,8 @@ class FieldTest extends TestCase
         $this->assertSame(null, (new Field(castType: CastType::Integer))->cast(''));
         $this->assertSame(0, (new Field(castType: CastType::Integer, nullable: false))->cast(''));
         $this->assertSame(null, (new Field(castType: CastType::Integer, nullable: true))->cast(''));
+        $this->assertSame('321', (new Field(transformer: strrev(...)))->cast('123'));
+        $this->assertSame(321, (new Field(castType: CastType::Integer, transformer: strrev(...)))->cast('123'));
     }
 
     public function test_empty()

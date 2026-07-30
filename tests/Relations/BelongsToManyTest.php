@@ -136,6 +136,47 @@ class BelongsToManyTest extends TestCase
         ], $loaded);
     }
 
+    public function test_loadRecordByForeignKey()
+    {
+        $this->pack()->nonPersist([
+            new Customer([
+                'id'            => '456',
+                'name'          => 'Customer',
+            ]),
+            new CustomerPack([
+                'customerId' => '456',
+                'packId' => 1,
+            ]),
+            new CustomerPack([
+                'customerId' => '456',
+                'packId' => 4,
+            ]),
+        ]);
+
+        $relation = Customer::repository()->relation('packs');
+        $loaded = $relation->loadRecordByForeignKeys(['123', '456', '404'], BelongsToManyPackRecord::class);
+
+        $this->assertEquals([
+            '123' => [
+                new BelongsToManyPackRecord(1, 'Pack referencement'),
+                new BelongsToManyPackRecord(2, 'Pack classic'),
+            ],
+            '456' => [
+                new BelongsToManyPackRecord(1, 'Pack referencement'),
+                new BelongsToManyPackRecord(4, 'Pack empty2'),
+            ],
+            '404' => [],
+        ], $loaded);
+    }
+
+    public function test_loadRecordByForeignKey_empty()
+    {
+        $relation = Customer::repository()->relation('packs');
+
+        $this->assertSame([], $relation->loadRecordByForeignKeys([], BelongsToManyPackRecord::class));
+        $this->assertSame(['404' => []], $relation->loadRecordByForeignKeys(['404'], BelongsToManyPackRecord::class));
+    }
+
     /**
      *
      */
@@ -697,3 +738,11 @@ class BelongsToManyTest extends TestCase
 }
 
 class MyCustomQuery extends Query {}
+
+final readonly class BelongsToManyPackRecord
+{
+    public function __construct(
+        public int $id,
+        public string $label,
+    ) {}
+}

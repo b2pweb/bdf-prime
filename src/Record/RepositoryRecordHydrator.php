@@ -6,8 +6,10 @@ use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 use InvalidArgumentException;
 use ReflectionClass;
+use ReflectionNamedType;
 
 use function class_exists;
+use function is_a;
 use function is_string;
 use function sprintf;
 
@@ -63,7 +65,7 @@ final class RepositoryRecordHydrator implements RecordHydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function finalize(string $recordClass, array $entities): array
+    public function finalize(string $recordClass, array $entities, array $rows): array
     {
         return $entities;
     }
@@ -109,14 +111,41 @@ final class RepositoryRecordHydrator implements RecordHydratorInterface
         foreach ($constructorParameters as $parameter) {
             foreach ($parameter->getAttributes(LoadRelation::class) as $loadRelationAttr) {
                 $relAttr = $loadRelationAttr->newInstance();
-                $relObj = $this->repository->relation($relAttr->relation);
+                $parameterType = $parameter->getType() instanceof ReflectionNamedType && !$parameter->getType()->isBuiltin() ? $parameter->getType()->getName() : null;
+
+                $relationName = $relAttr->relation ?? $parameterType;
+
+                if ($relationName === null) {
+                    throw new InvalidArgumentException(sprintf('Cannot determine relation name for parameter %s in class %s. Set the relation name on the LoadRelation attribute, or set the relation class on the parameter type.', $parameter->name, $recordClass));
+                }
+
+                $relObj = $this->repository->relation($relationName);
+
+                $readRecord = $relAttr->as;
+
+                if (
+                    $readRecord === null
+                    && $relAttr->transformer === null
+                    && $parameterType !== null
+                    && !is_a($relObj->relationRepository()->entityClass(), $parameterType, true)
+                ) {
+                    $readRecord = $parameterType;
+                }
+
                 $relations[$parameter->name] = new RelationLoader(
-                    relationName: $relAttr->relation,
+                    relationName: $relationName,
                     target: $parameter->name,
                     foreignKeyProperty: $relObj->localKeyProperty(),
                     foreignKeyField: $attributesMetadata[$relObj->localKeyProperty()]['field'],
+                    readRecord: $readRecord,
                 );
-                $fields[$parameter->name] = new Field(name: $parameter->name, projection: $relObj->localKeyProperty());
+                $fields[$parameter->name] = new Field(
+                    name: $parameter->name,
+                    castType: CastType::fromType($parameter->getType()),
+                    nullable: $parameter->allowsNull(),
+                    projection: $relObj->localKeyProperty(),
+                    transformer: $relAttr->transformer,
+                );
                 continue 2;
             }
 

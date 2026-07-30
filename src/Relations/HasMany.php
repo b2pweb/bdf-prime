@@ -5,6 +5,8 @@ namespace Bdf\Prime\Relations;
 use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\ReadCommandInterface;
 
+use function count;
+
 /**
  * HasMany
  *
@@ -57,15 +59,34 @@ class HasMany extends OneOrMany
     /**
      * {@inheritdoc}
      */
-    protected function relationQuery($keys, $constraints): ReadCommandInterface
+    public function loadRecordByForeignKeys(array $keys, string $recordClass): array
     {
-        // Constraints can be on relation attributes : builder must be used
+        $loaded = parent::loadRecordByForeignKeys($keys, $recordClass);
+
+        if (count($keys) === count($loaded)) {
+            return $loaded;
+        }
+
+        // Provide empty array for missing keys
+        foreach ($keys as $key) {
+            $loaded[$key] ??= [];
+        }
+
+        return $loaded;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function relationQuery($keys, $constraints, bool $recreate = false): ReadCommandInterface
+    {
+        // Constraints can be set on relation attributes : builder must be used
         // @todo Handle "bulk select"
-        if (count($keys) !== 1 || $constraints || $this->constraints) {
+        if (count($keys) !== 1 || $constraints || $this->constraints || $this->isPolymorphic()) {
             return $this->query($keys, $constraints)->by($this->distantKey, true);
         }
 
-        if ($this->relationQuery) {
+        if ($this->relationQuery && !$recreate) {
             return $this->relationQuery->where($this->distantKey, $keys[0]);
         }
 
@@ -75,6 +96,12 @@ class HasMany extends OneOrMany
             return $this->query($keys, $constraints)->by($this->distantKey, true);
         }
 
-        return $this->relationQuery = $query->by($this->distantKey, true);
+        $query->by($this->distantKey, true);
+
+        if (!$recreate) {
+            $this->relationQuery = $query;
+        }
+
+        return $query;
     }
 }

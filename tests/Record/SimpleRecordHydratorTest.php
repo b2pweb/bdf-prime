@@ -20,7 +20,7 @@ class SimpleRecordHydratorTest extends TestCase
         $this->assertSame(['id', 'name'], $hydrator->projection(SimpleDbalRecord::class));
         $this->assertSame($rows, $hydrator->prepare(SimpleDbalRecord::class, $rows));
         $this->assertEquals(new SimpleDbalRecord(1, 'John Miller'), $hydrator->instantiate(SimpleDbalRecord::class, $rows[0], $this->createMock(PlatformInterface::class)));
-        $this->assertSame($rows, $hydrator->finalize(SimpleDbalRecord::class, $rows));
+        $this->assertSame($rows, $hydrator->finalize(SimpleDbalRecord::class, $rows, $rows));
     }
 
     public function test_with_name_mapping()
@@ -35,9 +35,8 @@ class SimpleRecordHydratorTest extends TestCase
         $this->assertSame(['id', 'name'], $hydrator->projection(DbalRecordWithNameMapping::class));
         $this->assertSame($rows, $hydrator->prepare(DbalRecordWithNameMapping::class, $rows));
         $this->assertEquals(new DbalRecordWithNameMapping(1, 'John Miller'), $hydrator->instantiate(DbalRecordWithNameMapping::class, $rows[0], $this->createMock(PlatformInterface::class)));
-        $this->assertSame($rows, $hydrator->finalize(DbalRecordWithNameMapping::class, $rows));
+        $this->assertSame($rows, $hydrator->finalize(DbalRecordWithNameMapping::class, $rows, $rows));
     }
-
 }
 
 class SimpleDbalRecord

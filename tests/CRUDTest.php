@@ -3,6 +3,8 @@
 namespace Bdf\Prime;
 
 use Bdf\Prime\Exception\DBALException;
+use Bdf\Prime\Query\Expression\Attribute;
+use Bdf\Prime\Record\Field;
 use Bdf\Prime\Record\LoadRelation;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
@@ -575,6 +577,32 @@ class CRUDTest extends TestCase
         ], $records);
     }
 
+    public function test_record_with_transformer()
+    {
+        $this->pack()->nonPersist([
+            new User([
+                'id' => 12,
+                'name' => 'John',
+                'roles' => ['2'],
+                'customer' => new Customer(['id' => '1']),
+            ]),
+            new User([
+                'id' => 13,
+                'name' => 'Mark',
+                'roles' => ['5'],
+                'customer' => new Customer(['id' => '1']),
+            ]),
+        ]);
+
+        $records = User::repository()->builder()->as(RecordWithTransformer::class)->all();
+
+        $this->assertContainsOnly(RecordWithTransformer::class, $records);
+        $this->assertEquals([
+            new RecordWithTransformer('12', '61409aa1fd47d4a5332de23cbf59a36f'),
+            new RecordWithTransformer('13', 'b82a9a13f4651e9abcbde90cd24ce2cb'),
+        ], $records);
+    }
+
     public function test_record_with_relation()
     {
         $this->pack()->nonPersist([
@@ -627,6 +655,182 @@ class CRUDTest extends TestCase
         ], $records);
     }
 
+    public function test_record_with_relation_record()
+    {
+        $this->pack()->nonPersist([
+            $customer1 = new Customer(['id' => 1, 'name' => 'Customer 1']),
+            $customer2 = new Customer(['id' => 2, 'name' => 'Customer 2']),
+            new User([
+                'id' => 12,
+                'name' => 'John',
+                'roles' => ['2'],
+                'customer' => $customer1,
+            ]),
+            new User([
+                'id' => 13,
+                'name' => 'Mark',
+                'roles' => ['5'],
+                'customer' => $customer2,
+            ]),
+            $doc1 = new Document([
+                'id' => 1,
+                'customerId' => 1,
+                'uploaderType' => 'user',
+                'uploaderId' => 12,
+                'contact' => new Contact([
+                    'name' => 'John',
+                ]),
+            ]),
+            $doc2 = new Document([
+                'id' => 2,
+                'customerId' => 1,
+                'uploaderType' => 'user',
+                'uploaderId' => 12,
+                'contact' => new Contact([
+                    'name' => 'Jean',
+                ]),
+            ]),
+            $doc3 = new Document([
+                'id' => 3,
+                'customerId' => 2,
+                'uploaderType' => 'user',
+                'uploaderId' => 13,
+                'contact' => new Contact([
+                    'name' => 'Michel',
+                ]),
+            ]),
+        ]);
+
+        $records = User::repository()->builder()->as(NameAndCustomerRecord::class)->all();
+
+        $this->assertEquals([
+            new NameAndCustomerRecord('John', new CustomerRecord(1, 'Customer 1', true)),
+            new NameAndCustomerRecord('Mark', new CustomerRecord(2, 'Customer 2', true)),
+        ], $records);
+
+        $records = User::repository()->builder()->as(NameAndDocumentsRecord::class)->all();
+
+        $this->assertEquals([
+            new NameAndDocumentsRecord('John', [new DocumentRecord(1, 'John'), new DocumentRecord(2, 'Jean')]),
+            new NameAndDocumentsRecord('Mark', [new DocumentRecord(3, 'Michel')]),
+        ], $records);
+    }
+
+    public function test_record_with_by()
+    {
+        $this->declareUsersForRecord();
+
+        $records = User::repository()->builder()->by('name')->as(IdNameRecord::class)->all();
+
+        $this->assertEquals([
+            'John' => new IdNameRecord('12', 'John'),
+            'Mark' => new IdNameRecord('13', 'Mark'),
+            'Paul' => new IdNameRecord('14', 'Paul'),
+        ], $records);
+    }
+
+    public function test_record_with_by_combine()
+    {
+        $this->declareUsersForRecord();
+
+        $records = User::repository()->builder()->by('name', true)->as(IdNameRecord::class)->all();
+
+        $this->assertEquals([
+            'John' => [new IdNameRecord('12', 'John')],
+            'Mark' => [new IdNameRecord('13', 'Mark')],
+            'Paul' => [new IdNameRecord('14', 'Paul')],
+        ], $records);
+    }
+
+    public function test_record_with_by_on_attribute_not_declared_on_record()
+    {
+        $this->declareUsersForRecord();
+
+        $query = User::repository()->builder()->by('id')->as(NameOnlyRecord::class);
+
+        $this->assertEquals('SELECT t0.name_, t0.id_ FROM user_ t0', $query->toSql());
+        $this->assertEquals([
+            12 => new NameOnlyRecord('John'),
+            13 => new NameOnlyRecord('Mark'),
+            14 => new NameOnlyRecord('Paul'),
+        ], $query->all());
+    }
+
+    public function test_record_with_by_on_embedded_attribute_not_declared_on_record()
+    {
+        $this->declareUsersForRecord();
+
+        $query = User::repository()->builder()->by('customer.id', true)->as(NameOnlyRecord::class);
+
+        $this->assertEquals('SELECT t0.name_, t0.customer_id FROM user_ t0', $query->toSql());
+        $this->assertEquals([
+            1 => [new NameOnlyRecord('John'), new NameOnlyRecord('Paul')],
+            2 => [new NameOnlyRecord('Mark')],
+        ], $query->all());
+    }
+
+    public function test_record_with_by_on_renamed_property()
+    {
+        $this->declareUsersForRecord();
+
+        $records = User::repository()->builder()->by('name')->as(RecordWithRenamedProperty::class)->all();
+
+        $this->assertEquals([
+            'John' => new RecordWithRenamedProperty('John'),
+            'Mark' => new RecordWithRenamedProperty('Mark'),
+            'Paul' => new RecordWithRenamedProperty('Paul'),
+        ], $records);
+    }
+
+    public function test_record_with_by_and_relation()
+    {
+        $this->declareUsersForRecord();
+
+        $records = User::repository()->builder()->by('id')->as(NameAndCustomerRecord::class)->all();
+
+        $this->assertEquals([
+            12 => new NameAndCustomerRecord('John', new CustomerRecord(1, 'Customer 1', true)),
+            13 => new NameAndCustomerRecord('Mark', new CustomerRecord(2, 'Customer 2', true)),
+            14 => new NameAndCustomerRecord('Paul', new CustomerRecord(1, 'Customer 1', true)),
+        ], $records);
+    }
+
+    public function test_record_with_with_should_raise_error()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('with() method is not available with record. Use #[LoadRelation] attribute instead.');
+
+        $this->declareUsersForRecord();
+
+        User::repository()->builder()->with('customer')->as(IdNameRecord::class)->all();
+    }
+
+    private function declareUsersForRecord(): void
+    {
+        $this->pack()->nonPersist([
+            new Customer(['id' => 1, 'name' => 'Customer 1']),
+            new Customer(['id' => 2, 'name' => 'Customer 2']),
+            new User([
+                'id' => 12,
+                'name' => 'John',
+                'roles' => ['2'],
+                'customer' => new Customer(['id' => '1']),
+            ]),
+            new User([
+                'id' => 13,
+                'name' => 'Mark',
+                'roles' => ['5'],
+                'customer' => new Customer(['id' => '2']),
+            ]),
+            new User([
+                'id' => 14,
+                'name' => 'Paul',
+                'roles' => ['5'],
+                'customer' => new Customer(['id' => '1']),
+            ]),
+        ]);
+    }
+
     public function test_with_custom_storage_type()
     {
         $this->pack()->declareEntity(EntityWithCustomStorageType::class);
@@ -657,13 +861,57 @@ class IdNameRecord
     ) {}
 }
 
+class NameOnlyRecord
+{
+    public function __construct(
+        public readonly string $name,
+    ) {}
+}
+
+class RecordWithRenamedProperty
+{
+    public function __construct(
+        #[Field('name')]
+        public readonly string $label,
+    ) {}
+}
+
+class RecordWithTransformer
+{
+    public function __construct(
+        public readonly string $id,
+        #[Field(transformer: 'md5')]
+        public readonly string $name,
+    ) {}
+}
+
 class NameAndCustomer
 {
     public function __construct(
         public readonly string $name,
 
-        #[LoadRelation(Customer::class)]
+        #[LoadRelation]
         public readonly Customer $customer,
+    ) {}
+}
+
+class NameAndCustomerRecord
+{
+    public function __construct(
+        public readonly string $name,
+
+        #[LoadRelation(Customer::class)]
+        public readonly CustomerRecord $customer,
+    ) {}
+}
+
+final readonly class CustomerRecord
+{
+    public function __construct(
+        public int $id,
+        public string $name,
+        #[Field(expression: new Attribute('parentId', '%s IS NULL'))]
+        public bool $isParent,
     ) {}
 }
 
@@ -674,5 +922,24 @@ class NameAndDocuments
 
         #[LoadRelation(Document::class)]
         public readonly array $documents,
+    ) {}
+}
+
+class NameAndDocumentsRecord
+{
+    public function __construct(
+        public readonly string $name,
+
+        #[LoadRelation(Document::class, as: DocumentRecord::class)]
+        public readonly array $documents,
+    ) {}
+}
+
+final readonly class DocumentRecord
+{
+    public function __construct(
+        public int $id,
+        #[Field('contact.name')]
+        public string $contact,
     ) {}
 }

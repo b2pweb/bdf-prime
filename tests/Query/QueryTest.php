@@ -1629,6 +1629,132 @@ class QueryTest extends TestCase
         );
     }
 
+    public function test_addProjection_without_projection_should_be_ignored()
+    {
+        $this->assertEquals('SELECT * FROM test_', $this->query()->addProjection('name')->toSql());
+        $this->assertEquals('SELECT * FROM test_', $this->query()->select()->addProjection('name')->toSql());
+        $this->assertEquals('SELECT * FROM test_', $this->query()->select('*')->addProjection('name')->toSql());
+        $this->assertEquals('SELECT * FROM test_', $this->query()->select(['*'])->addProjection(['name', 'id'])->toSql());
+    }
+
+    public function test_addProjection_should_return_this()
+    {
+        $query = $this->query();
+
+        $this->assertSame($query, $query->addProjection('name'));
+        $this->assertSame($query, $query->select('id')->addProjection('name'));
+    }
+
+    public function test_addProjection_single_column()
+    {
+        $this->assertEquals(
+            'SELECT id, name FROM test_',
+            $this->query()->select('id')->addProjection('name')->toSql()
+        );
+    }
+
+    public function test_addProjection_multiple_columns()
+    {
+        $this->assertEquals(
+            'SELECT id, name, date_insert FROM test_',
+            $this->query()->select('id')->addProjection(['name', 'date_insert'])->toSql()
+        );
+    }
+
+    public function test_addProjection_with_alias()
+    {
+        $this->assertEquals(
+            'SELECT id, name as myName FROM test_',
+            $this->query()->select('id')->addProjection(['myName' => 'name'])->toSql()
+        );
+    }
+
+    public function test_addProjection_with_expression()
+    {
+        $this->assertEquals(
+            'SELECT id, MAX(id) as maxId FROM test_',
+            $this->query()->select('id')->addProjection(['maxId' => new Raw('MAX(id)')])->toSql()
+        );
+    }
+
+    public function test_addProjection_already_projected_column_should_be_ignored()
+    {
+        $this->assertEquals(
+            'SELECT id, name FROM test_',
+            $this->query()->select(['id', 'name'])->addProjection('name')->toSql()
+        );
+
+        $this->assertEquals(
+            'SELECT id, name FROM test_',
+            $this->query()->select(['id', 'name'])->addProjection(['id', 'name'])->toSql()
+        );
+
+        $this->assertEquals(
+            'SELECT id, name, date_insert FROM test_',
+            $this->query()->select(['id', 'name'])->addProjection(['name', 'date_insert'])->toSql()
+        );
+    }
+
+    public function test_addProjection_already_projected_column_with_same_alias_should_be_ignored()
+    {
+        $this->assertEquals(
+            'SELECT name as myName FROM test_',
+            $this->query()->select(['myName' => 'name'])->addProjection(['myName' => 'name'])->toSql()
+        );
+    }
+
+    public function test_addProjection_already_projected_column_with_other_alias_should_be_added()
+    {
+        $this->assertEquals(
+            'SELECT name, name as myName FROM test_',
+            $this->query()->select('name')->addProjection(['myName' => 'name'])->toSql()
+        );
+
+        $this->assertEquals(
+            'SELECT name as myName, name as otherName FROM test_',
+            $this->query()->select(['myName' => 'name'])->addProjection(['otherName' => 'name'])->toSql()
+        );
+    }
+
+    public function test_addProjection_already_projected_expression_should_be_ignored()
+    {
+        $this->assertEquals(
+            'SELECT id, MAX(id) as maxId FROM test_',
+            $this->query()
+                ->select(['id', 'maxId' => new Raw('MAX(id)')])
+                ->addProjection(['maxId' => new Raw('MAX(id)')])
+                ->toSql()
+        );
+    }
+
+    public function test_addProjection_should_invalidate_compiled_query()
+    {
+        $query = $this->query()->select('id');
+
+        $this->assertEquals('SELECT id FROM test_', $query->toSql());
+        $this->assertEquals('SELECT id, name FROM test_', $query->addProjection('name')->toSql());
+        $this->assertEquals('SELECT id, name FROM test_', $query->addProjection('id')->toSql());
+    }
+
+    public function test_addProjection_then_select_should_reset_projection()
+    {
+        $query = $this->query()->select('id')->addProjection('name');
+
+        $this->assertEquals('SELECT id, name FROM test_', $query->toSql());
+        $this->assertEquals('SELECT date_insert FROM test_', $query->select('date_insert')->toSql());
+    }
+
+    public function test_addProjection_and_execute()
+    {
+        $this->push(['id' => 1, 'name' => 'John']);
+        $this->push(['id' => 2, 'name' => 'Mickey']);
+
+        $this->assertEquals([
+            ['id' => 1, 'name' => 'John'],
+            ['id' => 2, 'name' => 'Mickey'],
+        ], $this->query()->select('id')->addProjection('name')->order('id')->all());
+    }
+
     public function test_whereReplace()
     {
         $query = $this->query()->whereReplace('id', 1);

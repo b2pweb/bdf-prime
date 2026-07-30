@@ -84,6 +84,49 @@ class HasOneTest extends TestCase
         ], $entities);
     }
 
+    public function test_loadRecordByForeignKeys()
+    {
+        $relation = Customer::repository()->relation('location');
+        $records = $relation->loadRecordByForeignKeys(['123', '321'], HasOneLocationRecord::class);
+
+        $this->assertContainsOnly(HasOneLocationRecord::class, $records);
+        $this->assertEquals([
+            '123' => new HasOneLocationRecord(123, 'MAISON'),
+        ], $records);
+    }
+
+    public function test_loadRecordByForeignKeys_empty()
+    {
+        $relation = Customer::repository()->relation('location');
+
+        $this->assertSame([], $relation->loadRecordByForeignKeys([], HasOneLocationRecord::class));
+        $this->assertSame([], $relation->loadRecordByForeignKeys(['404'], HasOneLocationRecord::class));
+    }
+
+    /**
+     * The relation query is cached (i.e. HasOne::$relationQuery), so the record class
+     * must not be kept on the next call, which loads entities
+     */
+    public function test_loadRecordByForeignKeys_should_not_keep_record_class_on_next_load()
+    {
+        $relation = Customer::repository()->relation('location');
+
+        // Use a single key to enable the KeyValueQuery optimisation, which caches the query
+        $this->assertEquals(
+            ['123' => new HasOneLocationRecord(123, 'MAISON')],
+            $relation->loadRecordByForeignKeys(['123'], HasOneLocationRecord::class)
+        );
+
+        $this->assertEquals(
+            ['123' => new Location([
+                'id'      => '123',
+                'address' => '1 rue chez toi',
+                'city'    => 'MAISON',
+            ])],
+            $relation->loadByForeignKeys(['123'])
+        );
+    }
+
     /**
      *
      */
@@ -445,4 +488,12 @@ class HasOneTest extends TestCase
         $customer->reload('location');
         $this->assertNotSame($loadedLocation, $customer->location);
     }
+}
+
+final readonly class HasOneLocationRecord
+{
+    public function __construct(
+        public int $id,
+        public string $city,
+    ) {}
 }

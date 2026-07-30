@@ -131,6 +131,30 @@ class BelongsToTest extends TestCase
         ], $customers);
     }
 
+    public function test_loadRecordByForeignKeys()
+    {
+        $repository = Prime::repository(User::class);
+        $customer = $this->getTestPack()->get('customer');
+        $customer2 = $this->getTestPack()->get('customer2');
+
+        $relation = $repository->relation('customer');
+        $customers = $relation->loadRecordByForeignKeys([$customer->id, $customer2->id, 404], BelongsToCustomerRecord::class);
+
+        $this->assertContainsOnly(BelongsToCustomerRecord::class, $customers);
+        $this->assertEquals([
+            $customer->id => new BelongsToCustomerRecord((int) $customer->id, $customer->name),
+            $customer2->id => new BelongsToCustomerRecord((int) $customer2->id, $customer2->name),
+        ], $customers);
+    }
+
+    public function test_loadRecordByForeignKeys_empty()
+    {
+        $relation = Prime::repository(User::class)->relation('customer');
+
+        $this->assertSame([], $relation->loadRecordByForeignKeys([], BelongsToCustomerRecord::class));
+        $this->assertSame([], $relation->loadRecordByForeignKeys([404, 405], BelongsToCustomerRecord::class));
+    }
+
     /**
      *
      */
@@ -810,4 +834,12 @@ class BelongsToTest extends TestCase
         $this->assertNotSame($loadedAuthor, $commit->author);
         $this->assertEntity($project, $commit->author->project);
     }
+}
+
+final readonly class BelongsToCustomerRecord
+{
+    public function __construct(
+        public int $id,
+        public string $name,
+    ) {}
 }

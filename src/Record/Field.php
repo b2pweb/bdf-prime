@@ -26,6 +26,10 @@ use ReflectionParameter;
  *         // Database field type can be specified to allow parsing the value
  *         #[Field('created_at', type: 'datetime')]
  *         public readonly DateTime $createdAt,
+ *
+ *         // Use a transformer to parse database value
+ *         #[Field(transformer: CustomData::fromString(...))]
+ *         public readonly CustomData $data,
  *     ) {}
  * }
  * ```
@@ -83,6 +87,16 @@ final class Field
          * If this value is a string, it will be used as alias for the projection.
          */
         public readonly string|false|null $projection = null,
+
+        /**
+         * A transformer function to apply to the field value.
+         *
+         * This transformer will be called with the database value
+         * before passing it to the parameter.
+         *
+         * @var null|callable(mixed):mixed
+         */
+        public readonly mixed $transformer = null,
     ) {
     }
 
@@ -94,6 +108,10 @@ final class Field
      */
     public function cast(mixed $value): mixed
     {
+        if ($this->transformer !== null) {
+            $value = ($this->transformer)($value);
+        }
+
         if ($this->castType === null) {
             return $value;
         }
@@ -104,7 +122,7 @@ final class Field
     /**
      * Replace values and return a new instance
      */
-    public function with(?string $name = null, ExpressionInterface|string|null $expression = null, ?string $type = null, ?CastType $castType = null, ?bool $nullable = null, string|false|null $projection = null): self
+    public function with(?string $name = null, ExpressionInterface|string|null $expression = null, ?string $type = null, ?CastType $castType = null, ?bool $nullable = null, string|false|null $projection = null, ?callable $transformer = null): self
     {
         return new self(
             name: $name ?? $this->name,
@@ -113,6 +131,7 @@ final class Field
             castType: $castType ?? $this->castType,
             nullable: $nullable ?? $this->nullable,
             projection: $projection ?? $this->projection,
+            transformer: $transformer ?? $this->transformer,
         );
     }
 

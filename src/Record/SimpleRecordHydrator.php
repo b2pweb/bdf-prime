@@ -47,7 +47,7 @@ final class SimpleRecordHydrator implements RecordHydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function finalize(string $recordClass, array $entities): array
+    public function finalize(string $recordClass, array $entities, array $rows): array
     {
         return $entities;
     }
