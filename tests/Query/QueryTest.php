@@ -17,6 +17,7 @@ use Bdf\Prime\Query\Expression\Like;
 use Bdf\Prime\Query\Expression\Now;
 use Bdf\Prime\Query\Expression\Raw;
 use Bdf\Prime\Query\Factory\QueryFactoryInterface;
+use Bdf\Prime\Record\Embedded;
 use Bdf\Prime\Record\Field;
 use Bdf\Prime\Types\TypeInterface;
 use DateTime;
@@ -2171,6 +2172,58 @@ class QueryTest extends TestCase
         $this->assertNull($records[2]->createdAt);
     }
 
+    /**
+     *
+     */
+    public function test_record_with_embedded_without_prefix()
+    {
+        $this->push([
+            'id' => 1,
+            'name' => 'test-name1',
+            'date_insert' => new \DateTime('2025-01-21 12:00:00'),
+        ]);
+        $this->push([
+            'id' => 2,
+            'name' => 'test-name2',
+        ]);
+
+        $query = $this->query()->as(DbalRecordWithFlatEmbedded::class);
+        $records = $query->all();
+
+        $this->assertSame('SELECT id, name, date_insert FROM test_', $query->toSql());
+        $this->assertContainsOnly(DbalRecordWithFlatEmbedded::class, $records);
+        $this->assertEquals([
+            new DbalRecordWithFlatEmbedded(1, new DbalEmbeddedData('test-name1', new DateTime('2025-01-21 12:00:00'))),
+            new DbalRecordWithFlatEmbedded(2, new DbalEmbeddedData('test-name2', null)),
+        ], $records);
+    }
+
+    /**
+     *
+     */
+    public function test_record_with_embedded_prefix()
+    {
+        $this->push([
+            'id' => 1,
+            'name' => 'test-name1',
+            'date_insert' => new \DateTime('2025-01-21 12:00:00'),
+        ]);
+        $this->push([
+            'id' => 2,
+            'name' => 'test-name2',
+        ]);
+
+        $query = $this->query()->as(DbalRecordWithPrefixedEmbedded::class);
+        $records = $query->all();
+
+        $this->assertSame('SELECT id, date_insert FROM test_', $query->toSql());
+        $this->assertContainsOnly(DbalRecordWithPrefixedEmbedded::class, $records);
+        $this->assertEquals([
+            new DbalRecordWithPrefixedEmbedded(1, new DbalEmbeddedDate(new DateTime('2025-01-21 12:00:00'))),
+            new DbalRecordWithPrefixedEmbedded(2, new DbalEmbeddedDate(null)),
+        ], $records);
+    }
+
     public function test_where_filter_entry()
     {
         $this->push([
@@ -2294,4 +2347,42 @@ class QueryTest extends TestCase
 
         $this->assertSame('SELECT * FROM test_ WHERE id > ? OR name LIKE ?', $query->toSql());
     }
+}
+
+class DbalRecordWithFlatEmbedded
+{
+    public function __construct(
+        public readonly int $id = 0,
+
+        #[Embedded('')]
+        public readonly ?DbalEmbeddedData $data = null,
+    ) {}
+}
+
+class DbalEmbeddedData
+{
+    public function __construct(
+        public readonly ?string $name = null,
+
+        #[Field('date_insert', type: TypeInterface::DATETIME)]
+        public readonly ?DateTime $createdAt = null,
+    ) {}
+}
+
+class DbalRecordWithPrefixedEmbedded
+{
+    public function __construct(
+        public readonly int $id = 0,
+
+        #[Embedded('date_')]
+        public readonly ?DbalEmbeddedDate $date = null,
+    ) {}
+}
+
+class DbalEmbeddedDate
+{
+    public function __construct(
+        #[Field(type: TypeInterface::DATETIME)]
+        public readonly ?DateTime $insert = null,
+    ) {}
 }

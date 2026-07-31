@@ -4,6 +4,7 @@ namespace Bdf\Prime;
 
 use Bdf\Prime\Exception\DBALException;
 use Bdf\Prime\Query\Expression\Attribute;
+use Bdf\Prime\Record\Embedded;
 use Bdf\Prime\Record\Field;
 use Bdf\Prime\Record\LoadRelation;
 use Doctrine\DBAL\Connection;
@@ -716,6 +717,196 @@ class CRUDTest extends TestCase
         ], $records);
     }
 
+    public function test_record_with_sub_record()
+    {
+        $this->pack()->nonPersist([
+            $customer1 = new Customer(['id' => 1, 'name' => 'Customer 1']),
+            $customer2 = new Customer(['id' => 2, 'name' => 'Customer 2']),
+            new User([
+                'id' => 12,
+                'name' => 'John',
+                'roles' => ['2'],
+                'customer' => $customer1,
+            ]),
+            new User([
+                'id' => 13,
+                'name' => 'Mark',
+                'roles' => ['5'],
+                'customer' => $customer2,
+            ]),
+            $doc1 = new Document([
+                'id' => 1,
+                'customerId' => 1,
+                'uploaderType' => 'user',
+                'uploaderId' => 12,
+                'contact' => new Contact([
+                    'name' => 'John',
+                ]),
+            ]),
+            $doc2 = new Document([
+                'id' => 2,
+                'customerId' => 1,
+                'uploaderType' => 'user',
+                'uploaderId' => 12,
+                'contact' => new Contact([
+                    'name' => 'Jean',
+                    'location' => new Location([
+                        'address' => '12 rue de la Paix',
+                        'city' => 'Roubaix',
+                    ])
+                ]),
+            ]),
+            $doc3 = new Document([
+                'id' => 3,
+                'customerId' => 2,
+                'uploaderType' => 'user',
+                'uploaderId' => 13,
+                'contact' => new Contact([
+                    'name' => 'Michel',
+                ]),
+            ]),
+            $doc4 = new Document([
+                'id' => 4,
+                'customerId' => 2,
+                'uploaderType' => 'admin',
+                'uploaderId' => 24,
+            ]),
+        ]);
+
+        $records = Document::repository()->builder()->as(DocumentRecordWithSubRecord::class)->all();
+
+        $this->assertEquals([
+            new DocumentRecordWithSubRecord(1, new UploaderRecord(12, 'user'), new DocumentContactRecord('John', null, null)),
+            new DocumentRecordWithSubRecord(2, new UploaderRecord(12, 'user'), new DocumentContactRecord('Jean', '12 rue de la Paix', 'Roubaix')),
+            new DocumentRecordWithSubRecord(3, new UploaderRecord(13, 'user'), new DocumentContactRecord('Michel', null, null)),
+            new DocumentRecordWithSubRecord(4, new UploaderRecord(24, 'admin'), new DocumentContactRecord(null, null, null)),
+        ], $records);
+    }
+
+    public function test_record_with_nested_sub_record()
+    {
+        $this->declareDocumentsForRecord();
+
+        $records = Document::repository()->builder()->as(DocumentRecordWithNestedSubRecord::class)->all();
+
+        $this->assertEquals([
+            new DocumentRecordWithNestedSubRecord(1, new ContactRecord('John', new LocationRecord(null, null))),
+            new DocumentRecordWithNestedSubRecord(2, new ContactRecord('Jean', new LocationRecord('12 rue de la Paix', 'Roubaix'))),
+            new DocumentRecordWithNestedSubRecord(3, new ContactRecord('Michel', new LocationRecord(null, null))),
+            new DocumentRecordWithNestedSubRecord(4, new ContactRecord(null, new LocationRecord(null, null))),
+        ], $records);
+    }
+
+    public function test_record_with_sub_record_and_filters()
+    {
+        $this->declareDocumentsForRecord();
+
+        $records = Document::repository()->builder()
+            ->where('contact.name', 'Jean')
+            ->as(DocumentRecordWithNestedSubRecord::class)
+            ->all()
+        ;
+
+        $this->assertEquals([
+            new DocumentRecordWithNestedSubRecord(2, new ContactRecord('Jean', new LocationRecord('12 rue de la Paix', 'Roubaix'))),
+        ], $records);
+
+        $records = Document::repository()->builder()
+            ->where('contact.location.city', 'Roubaix')
+            ->as(DocumentRecordWithNestedSubRecord::class)
+            ->all()
+        ;
+
+        $this->assertEquals([
+            new DocumentRecordWithNestedSubRecord(2, new ContactRecord('Jean', new LocationRecord('12 rue de la Paix', 'Roubaix'))),
+        ], $records);
+    }
+
+    public function test_record_with_sub_record_and_relation()
+    {
+        $this->declareDocumentsForRecord();
+
+        $records = Document::repository()->builder()->as(DocumentRecordWithSubRecordAndRelation::class)->all();
+
+        $this->assertEquals([
+            new DocumentRecordWithSubRecordAndRelation(1, new ContactRecord('John', new LocationRecord(null, null)), 'Customer 1'),
+            new DocumentRecordWithSubRecordAndRelation(2, new ContactRecord('Jean', new LocationRecord('12 rue de la Paix', 'Roubaix')), 'Customer 1'),
+            new DocumentRecordWithSubRecordAndRelation(3, new ContactRecord('Michel', new LocationRecord(null, null)), 'Customer 2'),
+            new DocumentRecordWithSubRecordAndRelation(4, new ContactRecord(null, new LocationRecord(null, null)), 'Customer 2'),
+        ], $records);
+    }
+
+    public function test_record_with_sub_record_and_by()
+    {
+        $this->declareDocumentsForRecord();
+
+        $records = Document::repository()->builder()->by('contact.name')->as(DocumentRecordWithNestedSubRecord::class)->all();
+
+        $this->assertEquals([
+            'John' => new DocumentRecordWithNestedSubRecord(1, new ContactRecord('John', new LocationRecord(null, null))),
+            'Jean' => new DocumentRecordWithNestedSubRecord(2, new ContactRecord('Jean', new LocationRecord('12 rue de la Paix', 'Roubaix'))),
+            'Michel' => new DocumentRecordWithNestedSubRecord(3, new ContactRecord('Michel', new LocationRecord(null, null))),
+            '' => new DocumentRecordWithNestedSubRecord(4, new ContactRecord(null, new LocationRecord(null, null))),
+        ], $records);
+    }
+
+    private function declareDocumentsForRecord(): void
+    {
+        $this->pack()->nonPersist([
+            $customer1 = new Customer(['id' => 1, 'name' => 'Customer 1']),
+            $customer2 = new Customer(['id' => 2, 'name' => 'Customer 2']),
+            new User([
+                'id' => 12,
+                'name' => 'John',
+                'roles' => ['2'],
+                'customer' => $customer1,
+            ]),
+            new User([
+                'id' => 13,
+                'name' => 'Mark',
+                'roles' => ['5'],
+                'customer' => $customer2,
+            ]),
+            new Document([
+                'id' => 1,
+                'customerId' => 1,
+                'uploaderType' => 'user',
+                'uploaderId' => 12,
+                'contact' => new Contact([
+                    'name' => 'John',
+                ]),
+            ]),
+            new Document([
+                'id' => 2,
+                'customerId' => 1,
+                'uploaderType' => 'user',
+                'uploaderId' => 12,
+                'contact' => new Contact([
+                    'name' => 'Jean',
+                    'location' => new Location([
+                        'address' => '12 rue de la Paix',
+                        'city' => 'Roubaix',
+                    ])
+                ]),
+            ]),
+            new Document([
+                'id' => 3,
+                'customerId' => 2,
+                'uploaderType' => 'user',
+                'uploaderId' => 13,
+                'contact' => new Contact([
+                    'name' => 'Michel',
+                ]),
+            ]),
+            new Document([
+                'id' => 4,
+                'customerId' => 2,
+                'uploaderType' => 'admin',
+                'uploaderId' => 24,
+            ]),
+        ]);
+    }
+
     public function test_record_with_by()
     {
         $this->declareUsersForRecord();
@@ -941,5 +1132,88 @@ final readonly class DocumentRecord
         public int $id,
         #[Field('contact.name')]
         public string $contact,
+    ) {}
+}
+
+final readonly class DocumentRecordWithSubRecord
+{
+    public function __construct(
+        public int $id,
+
+        #[Embedded('')]
+        public UploaderRecord $uploader,
+
+        #[Embedded]
+        public DocumentContactRecord $contact,
+    ) {}
+}
+
+final readonly class DocumentContactRecord
+{
+    public function __construct(
+        public ?string $name,
+
+        #[Field('location.address')]
+        public ?string $address,
+
+        #[Field('location.city')]
+        public ?string $city,
+    ) {}
+}
+
+final readonly class UploaderRecord
+{
+    public function __construct(
+        #[Field('uploaderId')]
+        public int $id,
+
+        #[Field('uploaderType')]
+        public string $type,
+    ) {}
+}
+
+final readonly class DocumentRecordWithNestedSubRecord
+{
+    public function __construct(
+        public int $id,
+
+        #[Embedded]
+        public ContactRecord $contact,
+    ) {}
+}
+
+final readonly class DocumentRecordWithSubRecordAndRelation
+{
+    public function __construct(
+        public int $id,
+
+        #[Embedded]
+        public ContactRecord $contact,
+
+        #[LoadRelation('customer', transformer: [self::class, 'customerName'])]
+        public string $customerName,
+    ) {}
+
+    public static function customerName(Customer $customer): string
+    {
+        return $customer->name;
+    }
+}
+
+final readonly class ContactRecord
+{
+    public function __construct(
+        public ?string $name,
+
+        #[Embedded]
+        public LocationRecord $location,
+    ) {}
+}
+
+final readonly class LocationRecord
+{
+    public function __construct(
+        public ?string $address,
+        public ?string $city,
     ) {}
 }

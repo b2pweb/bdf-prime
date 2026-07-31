@@ -37,6 +37,28 @@ class SimpleRecordHydratorTest extends TestCase
         $this->assertEquals(new DbalRecordWithNameMapping(1, 'John Miller'), $hydrator->instantiate(DbalRecordWithNameMapping::class, $rows[0], $this->createMock(PlatformInterface::class)));
         $this->assertSame($rows, $hydrator->finalize(DbalRecordWithNameMapping::class, $rows, $rows));
     }
+
+    public function test_with_embedded()
+    {
+        $hydrator = new SimpleRecordHydrator();
+        $rows = [
+            ['id' => 1, 'name' => 'John Miller', 'customer_id' => 1, 'customer_name' => 'John Inc.'],
+            ['id' => 2, 'name' => 'Jane Doe', 'customer_id' => 2, 'customer_name' => 'Doe Ltd.'],
+        ];
+
+        $this->assertSame(['id', 'name', 'customer_id', 'customer_name'], $hydrator->projection(DbalRecordWithEmbedded::class));
+        $this->assertSame($rows, $hydrator->prepare(DbalRecordWithEmbedded::class, $rows));
+        $this->assertEquals(
+            new DbalRecordWithEmbedded(1, 'John Miller', new DbalCustomerRecord(1, 'John Inc.')),
+            $hydrator->instantiate(DbalRecordWithEmbedded::class, $rows[0], $this->createMock(PlatformInterface::class))
+        );
+        $this->assertSame($rows, $hydrator->finalize(DbalRecordWithEmbedded::class, $rows, $rows));
+    }
+
+    public function test_instance_should_be_shared()
+    {
+        $this->assertSame(SimpleRecordHydrator::instance(), SimpleRecordHydrator::instance());
+    }
 }
 
 class SimpleDbalRecord
@@ -54,5 +76,23 @@ class DbalRecordWithNameMapping
         public readonly int $foo,
         #[Field('name')]
         public readonly string $bar,
+    ) {}
+}
+
+class DbalRecordWithEmbedded
+{
+    public function __construct(
+        public readonly int $id,
+        public readonly string $name,
+        #[Embedded]
+        public readonly DbalCustomerRecord $customer,
+    ) {}
+}
+
+class DbalCustomerRecord
+{
+    public function __construct(
+        public readonly int $id,
+        public readonly string $name,
     ) {}
 }

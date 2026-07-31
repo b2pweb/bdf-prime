@@ -3,6 +3,7 @@
 namespace Bdf\Prime\Record;
 
 use Bdf\Prime\Customer;
+use Bdf\Prime\Document;
 use Bdf\Prime\Faction;
 use Bdf\Prime\PrimeTestCase;
 use Bdf\Prime\Test\TestPack;
@@ -297,6 +298,96 @@ class RepositoryRecordHydratorTest extends TestCase
         $this->assertSame($rows, $hydrator->finalize(OrmRecordWithImplicitType::class, $rows, $rows));
     }
 
+    public function test_with_embedded()
+    {
+        $hydrator = new RepositoryRecordHydrator($this->prime()->repository(Document::class));
+        $rows = [
+            ['id_' => 1, 'customer_id' => 1, 'uploader_type' => 'user', 'uploader_id' => 12, 'contact_name' => 'John', 'contact_address' => '12 rue de la Paix', 'contact_city' => 'Roubaix'],
+            ['id_' => 2, 'customer_id' => 1, 'uploader_type' => 'admin', 'uploader_id' => 24, 'contact_name' => null, 'contact_address' => null, 'contact_city' => null],
+        ];
+
+        $this->assertSame(['id', 'contact.name', 'contact.location.address', 'contact.location.city'], $hydrator->projection(OrmRecordWithEmbedded::class));
+        $this->assertSame($rows, $hydrator->prepare(OrmRecordWithEmbedded::class, $rows));
+        $this->assertEquals(
+            new OrmRecordWithEmbedded(1, new OrmContactRecord('John', new OrmLocationRecord('12 rue de la Paix', 'Roubaix'))),
+            $hydrator->instantiate(OrmRecordWithEmbedded::class, $rows[0], $this->prime()->connection('test')->platform())
+        );
+        $this->assertEquals(
+            new OrmRecordWithEmbedded(2, new OrmContactRecord(null, new OrmLocationRecord(null, null))),
+            $hydrator->instantiate(OrmRecordWithEmbedded::class, $rows[1], $this->prime()->connection('test')->platform())
+        );
+        $this->assertSame($rows, $hydrator->finalize(OrmRecordWithEmbedded::class, $rows, $rows));
+    }
+
+    public function test_with_embedded_without_prefix()
+    {
+        $hydrator = new RepositoryRecordHydrator($this->prime()->repository(Document::class));
+        $rows = [
+            ['id_' => 1, 'customer_id' => 1, 'uploader_type' => 'user', 'uploader_id' => 12, 'contact_name' => 'John', 'contact_address' => null, 'contact_city' => null],
+        ];
+
+        $this->assertSame(['id', 'uploaderId', 'uploaderType'], $hydrator->projection(OrmRecordWithFlatEmbedded::class));
+        $this->assertEquals(
+            new OrmRecordWithFlatEmbedded(1, new OrmUploaderRecord(12, 'user')),
+            $hydrator->instantiate(OrmRecordWithFlatEmbedded::class, $rows[0], $this->prime()->connection('test')->platform())
+        );
+    }
+
+    public function test_with_embedded_custom_prefix()
+    {
+        $hydrator = new RepositoryRecordHydrator($this->prime()->repository(Document::class));
+        $rows = [
+            ['id_' => 1, 'customer_id' => 1, 'uploader_type' => 'user', 'uploader_id' => 12, 'contact_name' => 'John', 'contact_address' => '12 rue de la Paix', 'contact_city' => 'Roubaix'],
+        ];
+
+        $this->assertSame(['id', 'contact.location.address', 'contact.location.city'], $hydrator->projection(OrmRecordWithEmbeddedCustomPrefix::class));
+        $this->assertEquals(
+            new OrmRecordWithEmbeddedCustomPrefix(1, new OrmLocationRecord('12 rue de la Paix', 'Roubaix')),
+            $hydrator->instantiate(OrmRecordWithEmbeddedCustomPrefix::class, $rows[0], $this->prime()->connection('test')->platform())
+        );
+    }
+
+    public function test_with_embedded_on_entity_embedded_relation()
+    {
+        $hydrator = new RepositoryRecordHydrator($this->prime()->repository(User::class));
+        $rows = [
+            ['id_' => 1, 'name_' => 'John Miller', 'customer_id' => 1, 'roles_' => ',admin,user,'],
+        ];
+
+        $this->assertSame(['name', 'customer.id'], $hydrator->projection(OrmRecordWithEmbeddedRelationKey::class));
+        $this->assertEquals(
+            new OrmRecordWithEmbeddedRelationKey('John Miller', new OrmCustomerKeyRecord(1)),
+            $hydrator->instantiate(OrmRecordWithEmbeddedRelationKey::class, $rows[0], $this->prime()->connection('test')->platform())
+        );
+    }
+
+    public function test_with_embedded_and_type_resolution()
+    {
+        $hydrator = new RepositoryRecordHydrator($this->prime()->repository(User::class));
+        $rows = [
+            ['id_' => 1, 'name_' => 'John Miller', 'customer_id' => 1, 'roles_' => ',admin,user,'],
+        ];
+
+        $this->assertSame(['id', 'roles'], $hydrator->projection(OrmRecordWithEmbeddedTypedField::class));
+        $this->assertEquals(
+            new OrmRecordWithEmbeddedTypedField(new OrmUserDataRecord(1, ['admin', 'user'])),
+            $hydrator->instantiate(OrmRecordWithEmbeddedTypedField::class, $rows[0], $this->prime()->connection('test')->platform())
+        );
+    }
+
+    public function test_error_embedded_without_type()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The parameter embedded on Bdf\Prime\Record\MissingEmbeddedType must have a type or the #[Embedded] attribute must define a className.');
+
+        $hydrator = new RepositoryRecordHydrator($this->prime()->repository(User::class));
+        $rows = [
+            ['id_' => 1, 'name_' => 'John Miller', 'customer_id' => 1, 'roles_' => ',admin,user,'],
+        ];
+
+        $hydrator->instantiate(MissingEmbeddedType::class, $rows[0], $this->prime()->connection('test')->platform());
+    }
+
     public function test_error_no_constructor()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -455,6 +546,101 @@ class OrmRecordWithImplicitType
     public function __construct(
         public readonly string $name,
         public readonly array $roles,
+    ) {}
+}
+
+class OrmRecordWithEmbedded
+{
+    public function __construct(
+        public readonly int $id,
+        #[Embedded]
+        public readonly OrmContactRecord $contact,
+    ) {}
+}
+
+class OrmContactRecord
+{
+    public function __construct(
+        public readonly ?string $name,
+        #[Embedded]
+        public readonly OrmLocationRecord $location,
+    ) {}
+}
+
+class OrmLocationRecord
+{
+    public function __construct(
+        public readonly ?string $address,
+        public readonly ?string $city,
+    ) {}
+}
+
+class OrmRecordWithFlatEmbedded
+{
+    public function __construct(
+        public readonly int $id,
+        #[Embedded('')]
+        public readonly OrmUploaderRecord $uploader,
+    ) {}
+}
+
+class OrmUploaderRecord
+{
+    public function __construct(
+        #[Field('uploaderId')]
+        public readonly int $id,
+        #[Field('uploaderType')]
+        public readonly string $type,
+    ) {}
+}
+
+class OrmRecordWithEmbeddedCustomPrefix
+{
+    public function __construct(
+        public readonly int $id,
+        #[Embedded('contact.location.')]
+        public readonly OrmLocationRecord $location,
+    ) {}
+}
+
+class OrmRecordWithEmbeddedRelationKey
+{
+    public function __construct(
+        public readonly string $name,
+        #[Embedded]
+        public readonly OrmCustomerKeyRecord $customer,
+    ) {}
+}
+
+class OrmCustomerKeyRecord
+{
+    public function __construct(
+        public readonly int $id,
+    ) {}
+}
+
+class OrmRecordWithEmbeddedTypedField
+{
+    public function __construct(
+        #[Embedded('')]
+        public readonly OrmUserDataRecord $data,
+    ) {}
+}
+
+class OrmUserDataRecord
+{
+    public function __construct(
+        public readonly int $id,
+        public readonly array $roles,
+    ) {}
+}
+
+class MissingEmbeddedType
+{
+    public function __construct(
+        public readonly string $name,
+        #[Embedded]
+        public readonly mixed $embedded,
     ) {}
 }
 

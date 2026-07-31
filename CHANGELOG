@@ -15,6 +15,7 @@ v3.0.0
 * Change: on `Bdf\Prime\Record\LoadRelation`, if `as` and `transformer` are not provided, and the parameter type differs from the relation entity class, the parameter type will be used as read record.
 * Add: `Bdf\Prime\Relations\RelationInterface::loadRecordByForeignKeys()` to load relation entities as records, without owner entity.
 * Fix: `morphMany` relation : the discriminator was not applied when loading a single foreign key, because of the `KeyValueQuery` optimisation.
+* Add: `Bdf\Prime\Record\Embedded` to handle embedded values on records
 
 BC Breaks:
 * Remove: `Bdf\Prime\Visitor` package, with mapper and graphviz visitors without replacements

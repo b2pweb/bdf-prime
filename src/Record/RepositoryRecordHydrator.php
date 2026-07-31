@@ -7,10 +7,10 @@ use Bdf\Prime\Repository\RepositoryInterface;
 use InvalidArgumentException;
 use ReflectionClass;
 use ReflectionNamedType;
+use ReflectionParameter;
 
 use function class_exists;
 use function is_a;
-use function is_string;
 use function sprintf;
 
 /**
@@ -98,77 +98,143 @@ final class RepositoryRecordHydrator implements RecordHydratorInterface
             return $instantiator;
         }
 
-        $constructorParameters = (new ReflectionClass($recordClass))->getConstructor()?->getParameters();
+        $constructorParameters = new ReflectionClass($recordClass)->getConstructor()?->getParameters();
 
         if ($constructorParameters === null) {
             throw new InvalidArgumentException(sprintf('The record class %s must have a constructor', $recordClass));
         }
 
-        $fields = [];
-        $relations = [];
+        $builder = new EntityRecordInstantiatorBuilder($recordClass);
         $attributesMetadata = $this->repository->metadata()->attributes;
 
         foreach ($constructorParameters as $parameter) {
-            foreach ($parameter->getAttributes(LoadRelation::class) as $loadRelationAttr) {
-                $relAttr = $loadRelationAttr->newInstance();
-                $parameterType = $parameter->getType() instanceof ReflectionNamedType && !$parameter->getType()->isBuiltin() ? $parameter->getType()->getName() : null;
-
-                $relationName = $relAttr->relation ?? $parameterType;
-
-                if ($relationName === null) {
-                    throw new InvalidArgumentException(sprintf('Cannot determine relation name for parameter %s in class %s. Set the relation name on the LoadRelation attribute, or set the relation class on the parameter type.', $parameter->name, $recordClass));
-                }
-
-                $relObj = $this->repository->relation($relationName);
-
-                $readRecord = $relAttr->as;
-
-                if (
-                    $readRecord === null
-                    && $relAttr->transformer === null
-                    && $parameterType !== null
-                    && !is_a($relObj->relationRepository()->entityClass(), $parameterType, true)
-                ) {
-                    $readRecord = $parameterType;
-                }
-
-                $relations[$parameter->name] = new RelationLoader(
-                    relationName: $relationName,
-                    target: $parameter->name,
-                    foreignKeyProperty: $relObj->localKeyProperty(),
-                    foreignKeyField: $attributesMetadata[$relObj->localKeyProperty()]['field'],
-                    readRecord: $readRecord,
-                );
-                $fields[$parameter->name] = new Field(
-                    name: $parameter->name,
-                    castType: CastType::fromType($parameter->getType()),
-                    nullable: $parameter->allowsNull(),
-                    projection: $relObj->localKeyProperty(),
-                    transformer: $relAttr->transformer,
-                );
-                continue 2;
+            if ($this->buildRelation($builder, $parameter, $attributesMetadata)) {
+                continue;
             }
 
-            $field = Field::fromReflectionParameter($parameter);
-
-            // resolve the db type from the mapper, if possible
-            if ($field->type === null && ($field->expression === null || is_string($field->expression))) {
-                $field = $field->with(
-                    type: $attributesMetadata[$field->expression ?? $field->name]['type'] ?? null,
-                );
+            if ($this->buildEmbedded($builder, $parameter, $attributesMetadata)) {
+                continue;
             }
 
-            $field = $field->with(
-                name: $attributesMetadata[$field->name]['field'] ?? $field->name,
-                projection: $field->name
-            );
-
-            $fields[$field->name] = $field;
+            $this->buildField($builder, $parameter, $attributesMetadata);
         }
 
-        return $this->cache[$recordClass] = new EntityRecordInstantiator(
-            new RecordInstantiator($recordClass, $fields),
-            $relations
+        return $this->cache[$recordClass] = $builder->build();
+    }
+
+    /**
+     * @param EntityRecordInstantiatorBuilder $builder
+     * @param ReflectionParameter $parameter
+     * @param array $attributesMetadata
+     * @return bool
+     */
+    private function buildRelation(EntityRecordInstantiatorBuilder $builder, ReflectionParameter $parameter, array $attributesMetadata): bool
+    {
+        foreach ($parameter->getAttributes(LoadRelation::class) as $loadRelationAttr) {
+            $relAttr = $loadRelationAttr->newInstance();
+            $parameterType = $parameter->getType() instanceof ReflectionNamedType && !$parameter->getType()->isBuiltin() ? $parameter->getType()->getName() : null;
+
+            $relationName = $relAttr->relation ?? $parameterType;
+
+            if ($relationName === null) {
+                throw new InvalidArgumentException(sprintf('Cannot determine relation name for parameter %s in class %s. Set the relation name on the LoadRelation attribute, or set the relation class on the parameter type.', $parameter->name, $builder->recordClass));
+            }
+
+            $relObj = $this->repository->relation($relationName);
+
+            $readRecord = $relAttr->as;
+
+            if (
+                $readRecord === null
+                && $relAttr->transformer === null
+                && $parameterType !== null
+                && !is_a($relObj->relationRepository()->entityClass(), $parameterType, true)
+            ) {
+                $readRecord = $parameterType;
+            }
+
+            $builder->relation(new RelationLoader(
+                relationName: $relationName,
+                target: $parameter->name,
+                foreignKeyProperty: $relObj->localKeyProperty(),
+                foreignKeyField: $attributesMetadata[$relObj->localKeyProperty()]['field'],
+                readRecord: $readRecord,
+            ));
+            $builder->parameter(new Field(
+                name: $parameter->name,
+                castType: CastType::fromType($parameter->getType()),
+                nullable: $parameter->allowsNull(),
+                projection: $relObj->localKeyProperty(),
+                transformer: $relAttr->transformer,
+            ));
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private function buildEmbedded(EntityRecordInstantiatorBuilder $builder, ReflectionParameter $parameter, array $attributesMetadata): bool
+    {
+        $embedded = Embedded::fromReflectionParameter($parameter, $attributesMetadata);
+
+        if (!$embedded) {
+            return false;
+        }
+
+        $builder->parameter($embedded);
+        return true;
+    }
+
+    private function buildField(EntityRecordInstantiatorBuilder $builder, ReflectionParameter $parameter, array $attributesMetadata): void
+    {
+        $field = Field::fromReflectionParameter($parameter)->withAttributesMetadata($attributesMetadata);
+
+        $builder->parameter($field);
+    }
+}
+
+/**
+ * @internal
+ * @template R as object
+ */
+final class EntityRecordInstantiatorBuilder
+{
+    /**
+     * @var list<RecordParameterInterface>
+     */
+    private array $parameters = [];
+
+    /**
+     * @var array<string, RelationLoader>
+     */
+    private array $relations = [];
+
+    public function __construct(
+        /**
+         * @var class-string<R>
+         */
+        public readonly string $recordClass,
+    ) {}
+
+    public function parameter(RecordParameterInterface $field): void
+    {
+        $this->parameters[] = $field;
+    }
+
+    public function relation(RelationLoader $relation): void
+    {
+        $this->relations[$relation->target] = $relation;
+    }
+
+    /**
+     * @return EntityRecordInstantiator<R>
+     */
+    public function build(): EntityRecordInstantiator
+    {
+        return new EntityRecordInstantiator(
+            new RecordInstantiator($this->recordClass, $this->parameters),
+            $this->relations,
         );
     }
 }
