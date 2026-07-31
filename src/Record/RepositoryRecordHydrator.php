@@ -215,7 +215,8 @@ final class EntityRecordInstantiatorBuilder
          * @var class-string<R>
          */
         public readonly string $recordClass,
-    ) {}
+    ) {
+    }
 
     public function parameter(RecordParameterInterface $field): void
     {
