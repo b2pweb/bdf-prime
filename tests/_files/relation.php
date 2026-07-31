@@ -419,6 +419,9 @@ class AdminMapper extends Mapper
 
         $builder->on('documents')
             ->morphMany(Document::class.'::uploaderId', 'uploaderType=admin');
+
+        $builder->on('mainDocument')
+            ->morphOne(Document::class.'::uploaderId', 'uploaderType=admin');
     }
 }
 

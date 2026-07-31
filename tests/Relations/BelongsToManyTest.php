@@ -136,6 +136,78 @@ class BelongsToManyTest extends TestCase
         ], $loaded);
     }
 
+    public function test_loadRecordByForeignKey()
+    {
+        $this->pack()->nonPersist([
+            new Customer([
+                'id'            => '456',
+                'name'          => 'Customer',
+            ]),
+            new CustomerPack([
+                'customerId' => '456',
+                'packId' => 1,
+            ]),
+            new CustomerPack([
+                'customerId' => '456',
+                'packId' => 4,
+            ]),
+        ]);
+
+        $relation = Customer::repository()->relation('packs');
+        $loaded = $relation->loadRecordByForeignKeys(['123', '456', '404'], BelongsToManyPackRecord::class);
+
+        $this->assertEquals([
+            '123' => [
+                new BelongsToManyPackRecord(1, 'Pack referencement'),
+                new BelongsToManyPackRecord(2, 'Pack classic'),
+            ],
+            '456' => [
+                new BelongsToManyPackRecord(1, 'Pack referencement'),
+                new BelongsToManyPackRecord(4, 'Pack empty2'),
+            ],
+            '404' => [],
+        ], $loaded);
+    }
+
+    public function test_loadRecordByForeignKey_empty()
+    {
+        $relation = Customer::repository()->relation('packs');
+
+        $this->assertSame([], $relation->loadRecordByForeignKeys([], BelongsToManyPackRecord::class));
+        $this->assertSame(['404' => []], $relation->loadRecordByForeignKeys(['404'], BelongsToManyPackRecord::class));
+    }
+
+    /**
+     * With a single distant key the relation query is a KeyValueQuery kept in memory :
+     * loading records must not register the record class nor its projection on the cached query.
+     */
+    public function test_loadRecordByForeignKey_should_not_alter_the_cached_relation_query()
+    {
+        $this->pack()->nonPersist([
+            new Customer([
+                'id'            => '789',
+                'name'          => 'Customer',
+            ]),
+            new CustomerPack([
+                'customerId' => '789',
+                'packId' => 3,
+            ]),
+        ]);
+
+        $relation = Customer::repository()->relation('packs');
+        $expected = ['789' => [$this->getTestPack()->get('pack-empty')]];
+
+        $this->assertEquals($expected, $relation->loadByForeignKeys(['789']));
+
+        $this->assertEquals(
+            ['789' => [new BelongsToManyPackRecord(3, 'Pack empty')]],
+            $relation->loadRecordByForeignKeys(['789'], BelongsToManyPackRecord::class)
+        );
+
+        // The entity query must still return fully hydrated entities
+        $this->assertEquals($expected, $relation->loadByForeignKeys(['789']));
+    }
+
     /**
      *
      */
@@ -697,3 +769,11 @@ class BelongsToManyTest extends TestCase
 }
 
 class MyCustomQuery extends Query {}
+
+final readonly class BelongsToManyPackRecord
+{
+    public function __construct(
+        public int $id,
+        public string $label,
+    ) {}
+}

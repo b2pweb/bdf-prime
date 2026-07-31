@@ -39,15 +39,15 @@ class HasOne extends OneOrMany
     /**
      * {@inheritdoc}
      */
-    protected function relationQuery($keys, $constraints): ReadCommandInterface
+    protected function relationQuery($keys, $constraints, bool $recreate = false): ReadCommandInterface
     {
         // Constraints can be on relation attributes : builder must be used
         // @todo Handle "bulk select"
-        if (count($keys) !== 1 || $constraints || $this->constraints) {
+        if (count($keys) !== 1 || $constraints || $this->constraints || $this->isPolymorphic()) {
             return $this->query($keys, $constraints)->by($this->distantKey);
         }
 
-        if ($this->relationQuery) {
+        if ($this->relationQuery && !$recreate) {
             return $this->relationQuery->where($this->distantKey, $keys[0]);
         }
 
@@ -57,6 +57,12 @@ class HasOne extends OneOrMany
             return $this->query($keys, $constraints)->by($this->distantKey);
         }
 
-        return $this->relationQuery = $query->by($this->distantKey);
+        $query->by($this->distantKey);
+
+        if (!$recreate) {
+            $this->relationQuery = $query;
+        }
+
+        return $query;
     }
 }

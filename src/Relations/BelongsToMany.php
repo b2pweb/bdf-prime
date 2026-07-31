@@ -209,7 +209,21 @@ class BelongsToMany extends Relation
      */
     public function loadByForeignKeys(array $keys): array
     {
-        ['throughEntities' => $throughEntities, 'entities' => $entities] = $this->relations($keys, [], [], []);
+        return $this->internalLoadByForeignKeys($keys, null);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadRecordByForeignKeys(array $keys, string $recordClass): array
+    {
+        return $this->internalLoadByForeignKeys($keys, $recordClass);
+    }
+
+
+    protected function internalLoadByForeignKeys(array $keys, ?string $recordClass): array
+    {
+        ['throughEntities' => $throughEntities, 'entities' => $entities] = $this->relations($keys, [], [], [], $recordClass);
 
         $loaded = [];
 
@@ -274,7 +288,7 @@ class BelongsToMany extends Relation
     /**
      * Build the query for find related entities
      */
-    protected function relationQuery(array $keys, $constraints): ReadCommandInterface
+    protected function relationQuery(array $keys, $constraints, bool $recreate = false): ReadCommandInterface
     {
         // Constraints can be on relation attributes : builder must be used
         // @todo Handle "bulk select"
@@ -282,7 +296,7 @@ class BelongsToMany extends Relation
             return $this->query($keys, $constraints)->by($this->distantKey);
         }
 
-        if ($this->relationQuery) {
+        if (!$recreate && $this->relationQuery) {
             return $this->relationQuery->where($this->distantKey, reset($keys));
         }
 
@@ -292,7 +306,13 @@ class BelongsToMany extends Relation
             return $this->query($keys, $constraints)->by($this->distantKey);
         }
 
-        return $this->relationQuery = $query->by($this->distantKey);
+        $query->by($this->distantKey);
+
+        if (!$recreate) {
+            $this->relationQuery = $query;
+        }
+
+        return $query;
     }
 
     /**
@@ -315,7 +335,7 @@ class BelongsToMany extends Relation
      * {@inheritdoc}
      */
     #[ReadOperation]
-    protected function relations($keys, $with, $constraints, $without): array
+    protected function relations($keys, $with, $constraints, $without, ?string $recordClass = null): array
     {
         list($constraints, $throughConstraints) = $this->extractConstraints($constraints);
 
@@ -336,10 +356,16 @@ class BelongsToMany extends Relation
         }
 
         if ($throughDistants !== []) {
-            $relations = $this->relationQuery($throughDistants, $constraints)
+            $relationQuery = $this->relationQuery($throughDistants, $constraints, recreate: $recordClass !== null)
                 ->with($with)
                 ->without($without)
-                ->all();
+            ;
+
+            if ($recordClass !== null) {
+                $relationQuery->as($recordClass);
+            }
+
+            $relations = $relationQuery->all();
         } else {
             $relations = [];
         }

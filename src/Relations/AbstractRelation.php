@@ -15,7 +15,6 @@ use Bdf\Prime\Relations\Info\NullRelationInfo;
 use Bdf\Prime\Relations\Info\RelationInfoInterface;
 use Bdf\Prime\Repository\RepositoryInterface;
 
-use function assert;
 use function is_object;
 
 /**
@@ -431,6 +430,15 @@ abstract class AbstractRelation implements RelationInterface
      */
     #[ReadOperation]
     public function loadByForeignKeys(array $keys): array
+    {
+        throw new BadMethodCallException('Unsupported operation '.__METHOD__);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    #[ReadOperation]
+    public function loadRecordByForeignKeys(array $keys, string $recordClass): array
     {
         throw new BadMethodCallException('Unsupported operation '.__METHOD__);
     }

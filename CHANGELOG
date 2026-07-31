@@ -5,6 +5,17 @@ v3.0.0
 * Change: Minimum version of doctrine/dbal is now 4.0
 * Add: `Bdf\Prime\Connection\Middleware\DebugStack\DebugStackMiddleware` in replacement of doctrine's `DebugStack` for query logging and debugging
 * Change: `Bdf\Prime\Prime::configure()` now can take the `middlewares` option to defined middlewares on all connections.
+* Change: `Bdf\Prime\Query\QueryRepositoryExtension::by()` now add the requested columns to the select clause if not already present.
+* Add: `Bdf\Prime\Query\Contract\Projectionable::addProjection()` to add columns to the select clause, only if not already present.
+* Change: Records now supports `by()` method on query to index the result by the given column.
+* Add: `Bdf\Prime\Collection\Indexer\RecordIndexer` implementation of `EntityIndexerInterface` for indexing records, using a closure to extract the properties which are not publicly accessible.
+* Add: `transformer` parameter on `Bdf\Prime\Record\Field` and `Bdf\Prime\Record\LoadRelation` to apply a transformation on the value when hydrating the record.
+* Add: `as` parameter on `Bdf\Prime\Record\LoadRelation` to load the relation as a record instead of the entity.
+* Change: `Bdf\Prime\Record\LoadRelation::$relation` is now optional : if not provided, the type of the parameter will be used as relation name.
+* Change: on `Bdf\Prime\Record\LoadRelation`, if `as` and `transformer` are not provided, and the parameter type differs from the relation entity class, the parameter type will be used as read record.
+* Add: `Bdf\Prime\Relations\RelationInterface::loadRecordByForeignKeys()` to load relation entities as records, without owner entity.
+* Fix: `morphMany` relation : the discriminator was not applied when loading a single foreign key, because of the `KeyValueQuery` optimisation.
+* Add: `Bdf\Prime\Record\Embedded` to handle embedded values on records
 
 BC Breaks:
 * Remove: `Bdf\Prime\Visitor` package, with mapper and graphviz visitors without replacements
@@ -26,6 +37,9 @@ BC Breaks:
     * `Bdf\Prime\Platform\PlatformInterface::apply()`
 * Change: use `LockMode` enum instead of int constant on `Bdf\Prime\Query\Contract\Lockable` methods
 * Change: `Bdf\Prime\Connection\ShardingConnection::getDatabase()` now return the database name of the default connection instead of empty string
+* Add: `Bdf\Prime\Query\Contract\Projectionable::addProjection()` method
+* Add: `Bdf\Prime\Relations\RelationInterface::loadRecordByForeignKeys()` method to load records instead of entities
+* Change: `Bdf\Prime\Record\RecordHydratorInterface::finalize()` now takes raw database rows as last parameter
 
 Removal of deprecated APIs:
 * Remove: `Bdf\Prime\Cache\DoctrineCacheAdapter`. Use `Bdf\Prime\Cache\SimpleCacheAdapter` or `Bdf\Prime\Cache\CachePoolAdapter` instead.

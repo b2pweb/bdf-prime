@@ -104,6 +104,15 @@ class MorphToTest extends TestCase
         $relation->loadByForeignKeys(['10', '321']);
     }
 
+    public function test_loadRecordByForeignKeys()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('MorphTo relation do not supports querying by foreign keys');
+
+        $relation = Document::repository()->relation('uploader');
+        $relation->loadRecordByForeignKeys(['10', '321'], MorphToUploaderRecord::class);
+    }
+
     /**
      * 
      */
@@ -681,4 +690,12 @@ class MorphToTest extends TestCase
         // Works because the type is given, so the repository can be resolved
         $fkNull->relation('uploader')->query();
     }
+}
+
+final readonly class MorphToUploaderRecord
+{
+    public function __construct(
+        public int $id,
+        public string $name,
+    ) {}
 }

@@ -3,8 +3,14 @@
 namespace Bdf\Prime\Record;
 
 use Attribute;
+use Bdf\Prime\Platform\PlatformInterface;
+use Bdf\Prime\Platform\PlatformTypesInterface;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
+use Override;
 use ReflectionParameter;
+
+use function assert;
+use function is_string;
 
 /**
  * Define a mapping for a database field to a record constructor parameter
@@ -26,12 +32,16 @@ use ReflectionParameter;
  *         // Database field type can be specified to allow parsing the value
  *         #[Field('created_at', type: 'datetime')]
  *         public readonly DateTime $createdAt,
+ *
+ *         // Use a transformer to parse database value
+ *         #[Field(transformer: CustomData::fromString(...))]
+ *         public readonly CustomData $data,
  *     ) {}
  * }
  * ```
  */
 #[Attribute(Attribute::TARGET_PARAMETER)]
-final class Field
+final class Field implements RecordParameterInterface
 {
     public function __construct(
         /**
@@ -83,6 +93,16 @@ final class Field
          * If this value is a string, it will be used as alias for the projection.
          */
         public readonly string|false|null $projection = null,
+
+        /**
+         * A transformer function to apply to the field value.
+         *
+         * This transformer will be called with the value parsed by the prime type (if provided)
+         * before passing it to the parameter.
+         *
+         * @var null|callable(mixed):mixed
+         */
+        public readonly mixed $transformer = null,
     ) {
     }
 
@@ -94,6 +114,10 @@ final class Field
      */
     public function cast(mixed $value): mixed
     {
+        if ($this->transformer !== null) {
+            $value = ($this->transformer)($value);
+        }
+
         if ($this->castType === null) {
             return $value;
         }
@@ -101,10 +125,39 @@ final class Field
         return $this->castType->cast($value, $this->nullable ?? true);
     }
 
+    #[Override]
+    public function projection(): array
+    {
+        if ($this->projection === false) {
+            return [];
+        }
+
+        $name = $this->projection ?? $this->name;
+        assert($name !== null);
+
+        if ($this->expression) {
+            return [$name => $this->expression];
+        }
+
+        return [$name];
+    }
+
+    #[Override]
+    public function value(PlatformInterface $platform, array $data): mixed
+    {
+        $value = $data[$this->name] ?? null;
+
+        if ($this->type !== null) {
+            $value = $platform->types()->fromDatabase($value, $this->type);
+        }
+
+        return $this->cast($value);
+    }
+
     /**
      * Replace values and return a new instance
      */
-    public function with(?string $name = null, ExpressionInterface|string|null $expression = null, ?string $type = null, ?CastType $castType = null, ?bool $nullable = null, string|false|null $projection = null): self
+    public function with(?string $name = null, ExpressionInterface|string|null $expression = null, ?string $type = null, ?CastType $castType = null, ?bool $nullable = null, string|false|null $projection = null, ?callable $transformer = null): self
     {
         return new self(
             name: $name ?? $this->name,
@@ -113,6 +166,29 @@ final class Field
             castType: $castType ?? $this->castType,
             nullable: $nullable ?? $this->nullable,
             projection: $projection ?? $this->projection,
+            transformer: $transformer ?? $this->transformer,
+        );
+    }
+
+    /**
+     * Resolve database field name and type from the attributes metadata
+     *
+     * @param array $attributesMetadata
+     * @return self
+     */
+    public function withAttributesMetadata(array $attributesMetadata): self
+    {
+        $field = $this;
+
+        if ($field->type === null && ($field->expression === null || is_string($field->expression))) {
+            $field = $field->with(
+                type: $attributesMetadata[$field->expression ?? $field->name]['type'] ?? null,
+            );
+        }
+
+        return $field->with(
+            name: $attributesMetadata[$field->name]['field'] ?? $field->name,
+            projection: $field->projection ?? $field->name,
         );
     }
 

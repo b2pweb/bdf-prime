@@ -16,6 +16,7 @@ use Bdf\Prime\Query\Expression\Operator;
 use Bdf\Prime\Query\Expression\Raw;
 use Bdf\Prime\Query\Expression\RawValue;
 use Bdf\Prime\Query\Expression\Value;
+use Bdf\Prime\Record\Field;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Prime\Right;
 use Bdf\Prime\TestEntity;
@@ -1259,6 +1260,43 @@ class QueryOrmTest extends TestCase
         $this->assertEquals('SELECT t0.* FROM entity_with_constraint t0 WHERE t0.name = ? AND (t0.enabled = ?)', $query->where('name', '')->toSql());
     }
 
+    public function test_addProjection_without_projection_should_be_ignored()
+    {
+        $this->assertSame('SELECT t0.* FROM test_ t0', $this->query->addProjection('name')->toSql());
+    }
+
+    public function test_addProjection_should_resolve_attribute()
+    {
+        $this->assertSame(
+            'SELECT t0.name, t0.foreign_key FROM test_ t0',
+            $this->query->select('name')->addProjection('foreign.id')->toSql()
+        );
+    }
+
+    public function test_addProjection_with_alias()
+    {
+        $this->assertSame(
+            'SELECT t0.name, t0.foreign_key as foreignId FROM test_ t0',
+            $this->query->select('name')->addProjection(['foreignId' => 'foreign.id'])->toSql()
+        );
+    }
+
+    public function test_addProjection_already_projected_attribute_should_be_ignored()
+    {
+        $this->assertSame(
+            'SELECT t0.id, t0.name FROM test_ t0',
+            $this->query->select(['id', 'name'])->addProjection(['name', 'id'])->toSql()
+        );
+    }
+
+    public function test_addProjection_should_invalidate_compiled_query()
+    {
+        $this->query->select('name');
+
+        $this->assertSame('SELECT t0.name FROM test_ t0', $this->query->toSql());
+        $this->assertSame('SELECT t0.name, t0.id FROM test_ t0', $this->query->addProjection('id')->toSql());
+    }
+
     public function test_as_should_define_projection()
     {
         $r = new class('', '') {
@@ -1269,5 +1307,138 @@ class QueryOrmTest extends TestCase
         };
 
         $this->assertSame('SELECT t0.id, t0.name FROM test_ t0', $this->query->as($r::class)->toSql());
+    }
+
+    public function test_by_without_record_should_not_change_projection()
+    {
+        $this->assertSame('SELECT t0.* FROM test_ t0', $this->query->by('id')->toSql());
+    }
+
+    public function test_by_with_select_should_add_column()
+    {
+        $this->assertSame('SELECT t0.name, t0.id FROM test_ t0', $this->query->select('name')->by('id')->toSql());
+    }
+
+    public function test_by_with_select_column_already_present()
+    {
+        $this->assertSame('SELECT t0.id, t0.name FROM test_ t0', $this->query->select(['id', 'name'])->by('id')->toSql());
+    }
+
+    public function test_as_with_by_should_add_missing_attribute_on_projection()
+    {
+        $r = new class('') {
+            public function __construct(
+                public readonly string $name,
+            ) {}
+        };
+
+        $this->assertSame('SELECT t0.name, t0.id FROM test_ t0', $this->query->by('id')->as($r::class)->toSql());
+    }
+
+    public function test_as_then_by_should_add_missing_attribute_on_projection()
+    {
+        $r = new class('') {
+            public function __construct(
+                public readonly string $name,
+            ) {}
+        };
+
+        $this->assertSame('SELECT t0.name, t0.id FROM test_ t0', $this->query->as($r::class)->by('id')->toSql());
+    }
+
+    public function test_as_with_by_should_not_duplicate_projected_attribute()
+    {
+        $r = new class('', '') {
+            public function __construct(
+                public readonly string $id,
+                public readonly string $name,
+            ) {}
+        };
+
+        $this->assertSame('SELECT t0.id, t0.name FROM test_ t0', $this->query->by('name')->as($r::class)->toSql());
+    }
+
+    public function test_as_then_by_should_not_duplicate_projected_attribute()
+    {
+        $r = new class('', '') {
+            public function __construct(
+                public readonly string $id,
+                public readonly string $name,
+            ) {}
+        };
+
+        $this->assertSame('SELECT t0.id, t0.name FROM test_ t0', $this->query->as($r::class)->by('name')->toSql());
+    }
+
+    public function test_as_with_by_on_aliased_attribute_should_add_attribute_on_projection()
+    {
+        $r = new class('') {
+            public function __construct(
+                public readonly string $name,
+            ) {}
+        };
+
+        $this->assertSame('SELECT t0.name, t0.foreign_key FROM test_ t0', $this->query->by('foreign.id')->as($r::class)->toSql());
+    }
+
+    /**
+     * A record field declared with an expression is projected as "alias => expression",
+     * so the attribute is only present as the *value* of the projection, not as a projected column.
+     * It must still be added to the select clause.
+     */
+    public function test_as_with_by_on_expression_field_should_add_attribute_on_projection()
+    {
+        $r = new class('') {
+            public function __construct(
+                #[Field(expression: 'name')]
+                public readonly string $label,
+            ) {}
+        };
+
+        $this->assertSame('SELECT t0.name as label, t0.name FROM test_ t0', $this->query->by('name')->as($r::class)->toSql());
+    }
+
+    public function test_as_then_by_on_expression_field_should_add_attribute_on_projection()
+    {
+        $r = new class('') {
+            public function __construct(
+                #[Field(expression: 'name')]
+                public readonly string $label,
+            ) {}
+        };
+
+        $this->assertSame('SELECT t0.name as label, t0.name FROM test_ t0', $this->query->as($r::class)->by('name')->toSql());
+    }
+
+    public function test_as_with_by_on_expression_field_aliased_with_the_attribute_name_should_not_duplicate_projection()
+    {
+        $r = new class('') {
+            public function __construct(
+                #[Field('name', expression: new Raw('LOWER(name)'))]
+                public readonly string $name,
+            ) {}
+        };
+
+        $this->assertSame('SELECT LOWER(name) as name FROM test_ t0', $this->query->by('name')->as($r::class)->toSql());
+    }
+
+    /**
+     * Both call orders must index the records on the value of the by() attribute,
+     * not collapse them into a single bucket.
+     */
+    public function test_as_and_by_on_expression_field_should_index_on_the_attribute_value()
+    {
+        $this->repository->insert(new TestEntity(['id' => 1, 'name' => 'John']));
+        $this->repository->insert(new TestEntity(['id' => 2, 'name' => 'Mark']));
+
+        $r = new class('') {
+            public function __construct(
+                #[Field(expression: 'name')]
+                public readonly string $label,
+            ) {}
+        };
+
+        $this->assertSame(['John', 'Mark'], array_keys($this->repository->builder()->by('name')->as($r::class)->all()));
+        $this->assertSame(['John', 'Mark'], array_keys($this->repository->builder()->as($r::class)->by('name')->all()));
     }
 }

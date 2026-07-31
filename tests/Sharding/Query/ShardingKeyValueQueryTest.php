@@ -199,6 +199,92 @@ class ShardingKeyValueQueryTest extends TestCase
     /**
      *
      */
+    public function test_addProjection()
+    {
+        $this->connection->insert('test2', ['id' => 1, 'value' => 'John', 'other' => 'b']);
+        $this->connection->insert('test2', ['id' => 2, 'value' => 'Bob', 'other' => 'a']);
+
+        $this->assertEquals([
+            ['id' => 2, 'value' => 'Bob'],
+            ['id' => 1, 'value' => 'John'],
+        ], $this->query()->from('test2')->project('id')->addProjection('value')->all());
+    }
+
+    /**
+     *
+     */
+    public function test_addProjection_multiple_columns()
+    {
+        $this->connection->insert('test2', ['id' => 1, 'value' => 'John', 'other' => 'b']);
+        $this->connection->insert('test2', ['id' => 2, 'value' => 'Bob', 'other' => 'a']);
+
+        $this->assertEquals([
+            ['id' => 2, 'value' => 'Bob', 'other' => 'a'],
+            ['id' => 1, 'value' => 'John', 'other' => 'b'],
+        ], $this->query()->from('test2')->project('id')->addProjection(['value', 'other'])->all());
+    }
+
+    /**
+     *
+     */
+    public function test_addProjection_without_projection_should_be_ignored()
+    {
+        $this->connection->insert('test2', ['id' => 1, 'value' => 'John', 'other' => 'b']);
+        $this->connection->insert('test2', ['id' => 2, 'value' => 'Bob', 'other' => 'a']);
+
+        $this->assertEquals([
+            ['id' => 2, 'value' => 'Bob', 'other' => 'a'],
+            ['id' => 1, 'value' => 'John', 'other' => 'b'],
+        ], $this->query()->from('test2')->addProjection('value')->all());
+    }
+
+    /**
+     *
+     */
+    public function test_addProjection_already_projected_should_be_ignored()
+    {
+        $this->connection->insert('test2', ['id' => 1, 'value' => 'John', 'other' => 'b']);
+        $this->connection->insert('test2', ['id' => 2, 'value' => 'Bob', 'other' => 'a']);
+
+        $query = $this->query()->from('test2')->project(['id', 'value'])->addProjection(['value', 'id', 'other']);
+
+        $this->assertSame(['id', 'value', 'other'], $query->statements['columns']);
+        $this->assertEquals([
+            ['id' => 2, 'value' => 'Bob', 'other' => 'a'],
+            ['id' => 1, 'value' => 'John', 'other' => 'b'],
+        ], $query->all());
+    }
+
+    /**
+     *
+     */
+    public function test_addProjection_with_alias()
+    {
+        $this->connection->insert('test2', ['id' => 1, 'value' => 'John', 'other' => 'b']);
+        $this->connection->insert('test2', ['id' => 2, 'value' => 'Bob', 'other' => 'a']);
+
+        $query = $this->query()->from('test2')->project(['id'])->addProjection(['myValue' => 'value']);
+
+        $this->assertSame(['id', 'myValue' => 'value'], $query->statements['columns']);
+        $this->assertEquals([
+            ['id' => 2, 'myValue' => 'Bob'],
+            ['id' => 1, 'myValue' => 'John'],
+        ], $query->all());
+    }
+
+    /**
+     *
+     */
+    public function test_addProjection_already_projected_alias_should_be_ignored()
+    {
+        $query = $this->query()->from('test2')->project(['myValue' => 'value'])->addProjection(['myValue' => 'other']);
+
+        $this->assertSame(['myValue' => 'value'], $query->statements['columns']);
+    }
+
+    /**
+     *
+     */
     public function test_reuse_filter_on_discriminator()
     {
         $this->connection->insert('test', ['id' => 1, 'name' => 'John']);

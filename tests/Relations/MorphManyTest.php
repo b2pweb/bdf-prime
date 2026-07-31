@@ -96,6 +96,33 @@ class MorphManyTest extends TestCase
         ], $loaded);
     }
 
+    public function test_loadRecordByForeignKeys()
+    {
+        $relation = Admin::repository()->relation('documents');
+        $loaded = $relation->loadRecordByForeignKeys(['10', '404'], MorphManyDocumentRecord::class);
+
+        $this->assertEquals([
+            10 => [
+                new MorphManyDocumentRecord(10, 'admin'),
+            ],
+            404 => [],
+        ], $loaded);
+    }
+
+    public function test_loadRecordByForeignKeys_should_apply_discriminator()
+    {
+        // The user 321 has a document, but it should not be loaded by the admin relation
+        $relation = Admin::repository()->relation('documents');
+
+        $this->assertSame(['321' => []], $relation->loadRecordByForeignKeys(['321'], MorphManyDocumentRecord::class));
+
+        $relation = User::repository()->relation('documents');
+
+        $this->assertEquals([
+            321 => [new MorphManyDocumentRecord(20, 'user')],
+        ], $relation->loadRecordByForeignKeys(['321'], MorphManyDocumentRecord::class));
+    }
+
     /**
      *
      */
@@ -216,4 +243,12 @@ class MorphManyTest extends TestCase
         $user->reload('documents');
         $this->assertNotSame($loadedDocuments, $user->documents);
     }
+}
+
+final readonly class MorphManyDocumentRecord
+{
+    public function __construct(
+        public int $id,
+        public string $uploaderType,
+    ) {}
 }
