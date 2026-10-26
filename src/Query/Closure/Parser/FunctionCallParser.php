@@ -61,7 +61,7 @@ final class FunctionCallParser
         $args = $expr->args;
 
         foreach ($args as $arg) {
-            if ($arg instanceof VariadicPlaceholder || $arg->unpack) {
+            if (!$arg instanceof Arg || $arg->unpack) {
                 throw new RuntimeException('Unsupported unpacking in function call ' . $function . ' in filters.');
             }
         }

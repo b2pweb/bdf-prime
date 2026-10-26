@@ -58,7 +58,7 @@ final class EntityIndexer implements EntityIndexerInterface
         $this->entities[] = $entity;
 
         foreach ($this->indexed as $key => &$indexed) {
-            $indexed[$this->mapper->extractOne($entity, $key)][] = $entity;
+            $indexed[$this->mapper->extractOne($entity, $key) ?? ''][] = $entity;
         }
     }
 
@@ -74,7 +74,7 @@ final class EntityIndexer implements EntityIndexerInterface
         $indexed = [];
 
         foreach ($this->entities as $entity) {
-            $indexed[$this->mapper->extractOne($entity, $key)][] = $entity;
+            $indexed[$this->mapper->extractOne($entity, $key) ?? ''][] = $entity;
         }
 
         return $this->indexed[$key] = $indexed;
