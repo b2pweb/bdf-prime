@@ -384,6 +384,7 @@ class RepositoryQueryFactory
     private function extension()
     {
         if (!$this->extension) {
+            /** @psalm-suppress InvalidArgument */
             $this->extension = new QueryRepositoryExtension(
                 $this->repository,
                 new ClosureCompiler($this->repository, $this->metadataCache)
