@@ -102,6 +102,7 @@ class SchemaManager extends AbstractSchemaManager
         $config = new SchemaConfig();
         $config->setName($this->connection->getDatabase());
 
+        /** @psalm-suppress InternalMethod */
         return new DoctrineSchema($tables, [], $config);
     }
 
@@ -192,6 +193,7 @@ class SchemaManager extends AbstractSchemaManager
         try {
             $manager = $this->getDoctrineManager();
 
+            /** @psalm-suppress InternalMethod */
             return new PrimeTableAdapter(
                 new DoctrineTable(
                     $name,

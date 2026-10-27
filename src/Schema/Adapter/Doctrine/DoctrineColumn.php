@@ -41,6 +41,7 @@ final class DoctrineColumn implements ColumnInterface
      */
     public function name(): string
     {
+        /** @psalm-suppress InternalMethod */
         return $this->column->getObjectName()->toString();
     }
 

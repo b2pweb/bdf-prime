@@ -30,6 +30,7 @@ final readonly class DoctrineIndex implements IndexInterface
      */
     public function name(): string
     {
+        /** @psalm-suppress InternalMethod */
         return $this->index->getObjectName()->toString();
     }
 

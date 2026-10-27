@@ -31,6 +31,7 @@ final readonly class TableTransformer
         $extractor = new FkExtractor();
         $this->table->constraints()->apply($extractor);
 
+        /** @psalm-suppress InternalMethod */
         return new Table(
             $this->table->name(),
             array_map(

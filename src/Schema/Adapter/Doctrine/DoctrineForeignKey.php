@@ -26,6 +26,7 @@ final readonly class DoctrineForeignKey implements ForeignKeyInterface
      */
     public function name(): string
     {
+        /** @psalm-suppress InternalMethod */
         return $this->fk->getObjectName()->toString();
     }
 

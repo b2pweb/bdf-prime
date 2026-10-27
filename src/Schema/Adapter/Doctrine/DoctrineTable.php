@@ -48,6 +48,7 @@ final class DoctrineTable implements TableInterface
      */
     public function name(): string
     {
+        /** @psalm-suppress InternalMethod */
         return $this->table->getObjectName()->toString();
     }
 
