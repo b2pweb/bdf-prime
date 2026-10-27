@@ -235,7 +235,7 @@ class ArrayCollection extends PrimeSerializable implements IteratorAggregate, Co
         }
 
         foreach ($this->items as $key => $item) {
-            $groupKey = $groupBy($item, $key, $results);
+            $groupKey = $groupBy($item, $key, $results) ?? '';
 
             switch ($mode) {
                 case self::GROUPBY:

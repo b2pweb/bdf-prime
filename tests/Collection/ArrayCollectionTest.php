@@ -287,6 +287,23 @@ class ArrayCollectionTest extends TestCase
     }
     
     /**
+     *
+     */
+    public function test_group_by_null_value_should_use_empty_string_key()
+    {
+        $collection = new ArrayCollection([
+            1 => new TestEntity(['id' => 1, 'name' => 'Test1']),
+            2 => new TestEntity(['id' => 2]),
+            3 => new TestEntity(['id' => 3]),
+        ]);
+
+        $this->assertEquals([
+            'Test1' => [new TestEntity(['id' => 1, 'name' => 'Test1'])],
+            '' => [new TestEntity(['id' => 2]), new TestEntity(['id' => 3])],
+        ], $collection->groupBy('name', ArrayCollection::GROUPBY_COMBINE)->all());
+    }
+
+    /**
      * 
      */
     public function test_group_by_with_custom_needs_callable()
