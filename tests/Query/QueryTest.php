@@ -2105,7 +2105,7 @@ class QueryTest extends TestCase
                 return 'OR';
             }
 
-            public function getIterator()
+            public function getIterator(): \Generator
             {
                 yield 'id >' => 1;
                 yield 'name :like' => 'j%';
@@ -2150,7 +2150,7 @@ class QueryTest extends TestCase
                 return 'OR';
             }
 
-            public function getIterator()
+            public function getIterator(): \Generator
             {
                 yield 'id >' => 2;
                 yield 'name :like' => 'j%';

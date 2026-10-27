@@ -36,4 +36,19 @@ class SingleEntityIndexerTest extends TestCase
         $this->assertSame([$entity], $indexer->all());
         $this->assertFalse($indexer->empty());
     }
+
+    /**
+     *
+     */
+    public function test_null_value_should_be_indexed_by_empty_string()
+    {
+        $entity = new TestEntity([
+            'id' => 12,
+        ]);
+
+        $indexer = new SingleEntityIndexer(TestEntity::mapper(), $entity);
+
+        $this->assertSame(['' => [$entity]], $indexer->by('name'));
+        $this->assertSame(['' => $entity], $indexer->byOverride('name'));
+    }
 }

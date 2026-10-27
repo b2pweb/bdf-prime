@@ -240,7 +240,11 @@ abstract class AbstractPaginator extends PrimeSerializable implements PaginatorI
      */
     public function offsetSet($key, $value): void
     {
-        $this->collection[$key] = $value;
+        if ($key === null) {
+            $this->collection[] = $value;
+        } else {
+            $this->collection[$key] = $value;
+        }
     }
 
     /**
