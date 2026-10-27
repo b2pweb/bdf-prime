@@ -416,4 +416,27 @@ class PaginatorTest extends TestCase
 
         $this->assertEquals(2, $paginator->size());
     }
+
+    /**
+     *
+     */
+    public function test_array_access_append_on_array_collection()
+    {
+        $paginator = new class extends AbstractPaginator {
+            public function __construct()
+            {
+            }
+
+            public function getIterator(): \Iterator
+            {
+                return new \ArrayIterator($this->collection);
+            }
+        };
+
+        $paginator[] = 'a';
+        $paginator['k'] = 'b';
+        $paginator[] = 'c';
+
+        $this->assertSame([0 => 'a', 'k' => 'b', 1 => 'c'], $paginator->all());
+    }
 }

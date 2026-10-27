@@ -40,7 +40,7 @@ final class SingleEntityIndexer implements EntityIndexerInterface
      */
     public function by(string $key): array
     {
-        return [$this->mapper->extractOne($this->entity, $key) => [$this->entity]];
+        return [$this->mapper->extractOne($this->entity, $key) ?? '' => [$this->entity]];
     }
 
     /**
@@ -48,7 +48,7 @@ final class SingleEntityIndexer implements EntityIndexerInterface
      */
     public function byOverride(string $key): array
     {
-        return [$this->mapper->extractOne($this->entity, $key) => $this->entity];
+        return [$this->mapper->extractOne($this->entity, $key) ?? '' => $this->entity];
     }
 
     /**
