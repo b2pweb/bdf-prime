@@ -412,12 +412,12 @@ class SqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
         }
 
         switch ($function) {
-            case 'avg'  :      return "AVG($column) AS aggregate";
+            case 'avg':      return "AVG($column) AS aggregate";
             case 'count':      return "COUNT($column) AS aggregate";
-            case 'max'  :      return "MAX($column) AS aggregate";
-            case 'min'  :      return "MIN($column) AS aggregate";
+            case 'max':      return "MAX($column) AS aggregate";
+            case 'min':      return "MIN($column) AS aggregate";
             case 'pagination': return "COUNT($column) AS aggregate";
-            case 'sum'  :      return "SUM($column) AS aggregate";
+            case 'sum':      return "SUM($column) AS aggregate";
 
             default:
                 throw new QueryBuildingException(sprintf('Unknown aggregate expression "%s"', $function));
