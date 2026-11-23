@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php-versions: ['8.4', '8.5']
+        php-versions: ['8.4', '8.5', '8.6']
     name: PHP ${{ matrix.php-versions }}
 
     steps:
@@ -106,6 +106,9 @@ jobs:
 
     - name: Validate composer.json and composer.lock
       run: composer validate --strict
+
+    - name: Set psalm to v6
+      run: composer req --dev --no-install vimeo/psalm:~6.0
 
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress

@@ -4,6 +4,8 @@ namespace Bdf\Prime\Collection\Indexer;
 
 use Bdf\Prime\Mapper\Mapper;
 
+use function spl_object_id;
+
 /**
  * Indexer for entities, but ensure that there is no duplicates
  *
@@ -18,7 +20,7 @@ final class EntitySetIndexer implements EntityIndexerInterface
     private $mapper;
 
     /**
-     * All entities, indexing by there object hash
+     * All entities, indexing by their object id
      *
      * @var E[]
      */
@@ -52,7 +54,7 @@ final class EntitySetIndexer implements EntityIndexerInterface
      */
     public function push($entity): void
     {
-        $hash = spl_object_hash($entity);
+        $hash = spl_object_id($entity);
 
         if (isset($this->entities[$hash])) {
             return;

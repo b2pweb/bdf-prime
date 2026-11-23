@@ -193,12 +193,12 @@ class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInter
         }
 
         switch ($function) {
-            case 'avg'  :      return "AVG($column) AS aggregate";
+            case 'avg':      return "AVG($column) AS aggregate";
             case 'count':      return "COUNT($column) AS aggregate";
-            case 'max'  :      return "MAX($column) AS aggregate";
-            case 'min'  :      return "MIN($column) AS aggregate";
+            case 'max':      return "MAX($column) AS aggregate";
+            case 'min':      return "MIN($column) AS aggregate";
             case 'pagination': return "COUNT($column) AS aggregate";
-            case 'sum'  :      return "SUM($column) AS aggregate";
+            case 'sum':      return "SUM($column) AS aggregate";
 
             default:
                 $method = 'get'.ucfirst($function).'Expression';
