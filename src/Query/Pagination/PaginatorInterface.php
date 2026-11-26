@@ -41,7 +41,7 @@ interface PaginatorInterface extends CollectionInterface
      *
      * @return Orderable::ORDER_*|array<string,Orderable::ORDER_*>|null
      */
-    public function order($attribute = null);
+    public function order(?string $attribute = null);
 
     /**
      * Get query limit

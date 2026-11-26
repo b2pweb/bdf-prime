@@ -28,7 +28,7 @@ final class LikeValue implements ComparisonValueInterface
     /**
      * {@inheritdoc}
      */
-    public function get(ReflectionFunction $reflection)
+    public function get(ReflectionFunction $reflection): mixed
     {
         return $this->prefix . addcslashes($this->value->get($reflection), '%_') . $this->suffix;
     }

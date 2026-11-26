@@ -15,12 +15,9 @@ use Bdf\Serializer\Type\TypeFactory;
 /**
  * Class PrimeCollectionNormalizer
  */
-class PrimeCollectionNormalizer extends TraversableNormalizer implements AutoRegisterInterface
+final class PrimeCollectionNormalizer extends TraversableNormalizer implements AutoRegisterInterface
 {
-    /**
-     * @var ServiceLocator
-     */
-    private $prime;
+    private ServiceLocator $prime;
 
 
     /**
@@ -36,7 +33,7 @@ class PrimeCollectionNormalizer extends TraversableNormalizer implements AutoReg
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, Type $type, DenormalizationContext $context)
+    public function denormalize($data, Type $type, DenormalizationContext $context): CollectionInterface
     {
         foreach ($data as $key => $value) {
             $data[$key] = $context->root()->denormalize(

@@ -16,7 +16,7 @@ final class LocalHashTableRelationInfo implements RelationInfoInterface
      *
      * @var \WeakMap<object, bool>
      */
-    private $loaded;
+    private \WeakMap $loaded;
 
     public function __construct()
     {
@@ -26,7 +26,7 @@ final class LocalHashTableRelationInfo implements RelationInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function isLoaded($entity): bool
+    public function isLoaded(object $entity): bool
     {
         return !empty($this->loaded[$entity]);
     }
@@ -34,7 +34,7 @@ final class LocalHashTableRelationInfo implements RelationInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function clear($entity): void
+    public function clear(object $entity): void
     {
         unset($this->loaded[$entity]);
     }
@@ -42,7 +42,7 @@ final class LocalHashTableRelationInfo implements RelationInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function markAsLoaded($entity): void
+    public function markAsLoaded(object $entity): void
     {
         $this->loaded[$entity] = true;
     }

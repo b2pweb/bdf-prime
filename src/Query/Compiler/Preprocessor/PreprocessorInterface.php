@@ -18,7 +18,7 @@ interface PreprocessorInterface
      *
      * @template Q as CompilableClause
      */
-    public function forInsert(CompilableClause $clause);
+    public function forInsert(CompilableClause $clause): CompilableClause;
 
     /**
      * Prepare update Query
@@ -29,7 +29,7 @@ interface PreprocessorInterface
      *
      * @template Q as CompilableClause
      */
-    public function forUpdate(CompilableClause $clause);
+    public function forUpdate(CompilableClause $clause): CompilableClause;
 
     /**
      * Prepare delete Query
@@ -40,7 +40,7 @@ interface PreprocessorInterface
      *
      * @template Q as CompilableClause
      */
-    public function forDelete(CompilableClause $clause);
+    public function forDelete(CompilableClause $clause): CompilableClause;
 
     /**
      * Prepare select Query
@@ -51,7 +51,7 @@ interface PreprocessorInterface
      *
      * @template Q as CompilableClause
      */
-    public function forSelect(CompilableClause $clause);
+    public function forSelect(CompilableClause $clause): CompilableClause;
 
     /**
      * Get formatted field from attribute alias
@@ -61,7 +61,7 @@ interface PreprocessorInterface
      *
      * @return string
      */
-    public function field(string $attribute, &$type = null): string;
+    public function field(string $attribute, mixed &$type = null): string;
 
     /**
      * Prepare the clause expression array

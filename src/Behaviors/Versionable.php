@@ -19,30 +19,19 @@ use Bdf\Prime\Repository\RepositoryInterface;
  * @template E as object
  * @extends Behavior<E>
  */
-class Versionable extends Behavior
+final class Versionable extends Behavior
 {
     public const COLUMN_NAME = 'version';
 
     /**
      * The version repository className
-     *
-     * @var string
      */
-    protected $versionClass;
+    private string $versionClass;
 
     /**
      * Allow version deletion
-     *
-     * @var boolean
      */
-    protected $allowDeletion;
-
-    /**
-     * Version table name
-     *
-     * @var string
-     */
-    protected $tableName;
+    private bool $allowDeletion;
 
     /**
      * Versionable constructor.
@@ -50,7 +39,7 @@ class Versionable extends Behavior
      * @param string $versionClass
      * @param bool   $allowDeletion
      */
-    public function __construct($versionClass, $allowDeletion = false)
+    public function __construct(string $versionClass, bool $allowDeletion = false)
     {
         $this->versionClass = $versionClass;
         $this->allowDeletion = $allowDeletion;
@@ -155,14 +144,14 @@ class Versionable extends Behavior
      */
     public function subscribe(RepositoryEventsSubscriberInterface $notifier): void
     {
-        $notifier->inserting([$this, 'beforeInsert']);
-        $notifier->inserted([$this, 'afterInsert']);
+        $notifier->inserting($this->beforeInsert(...));
+        $notifier->inserted($this->afterInsert(...));
 
-        $notifier->updating([$this, 'beforeUpdate']);
-        $notifier->updated([$this, 'afterUpdate']);
+        $notifier->updating($this->beforeUpdate(...));
+        $notifier->updated($this->afterUpdate(...));
 
         if ($this->allowDeletion) {
-            $notifier->deleted([$this, 'deleteAllVersions']);
+            $notifier->deleted($this->deleteAllVersions(...));
         }
     }
 
@@ -174,7 +163,7 @@ class Versionable extends Behavior
      *
      * @return void
      */
-    protected function incrementVersion($entity, RepositoryInterface $repository): void
+    protected function incrementVersion(object $entity, RepositoryInterface $repository): void
     {
         $mapper = $repository->mapper();
 
@@ -193,7 +182,7 @@ class Versionable extends Behavior
      *
      * @return void
      */
-    protected function insertVersion($entity, RepositoryInterface $repository): void
+    protected function insertVersion(object $entity, RepositoryInterface $repository): void
     {
         $repository->repository($this->versionClass)->insert($entity);
     }

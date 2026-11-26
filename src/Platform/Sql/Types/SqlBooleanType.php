@@ -11,12 +11,12 @@ use Doctrine\DBAL\Types\Types;
 /**
  * Basic boolean type for database
  */
-class SqlBooleanType extends AbstractPlatformType
+final class SqlBooleanType extends AbstractPlatformType
 {
     /**
      * {@inheritdoc}
      */
-    public function __construct(PlatformInterface $platform, $name = self::BOOLEAN)
+    public function __construct(PlatformInterface $platform, string $name = self::BOOLEAN)
     {
         parent::__construct($platform, $name);
     }
@@ -24,7 +24,7 @@ class SqlBooleanType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?bool
     {
         return $value === null ? null : $this->platform->grammar()->convertFromBoolean($value);
     }
@@ -32,7 +32,7 @@ class SqlBooleanType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase(mixed $value): mixed
     {
         return $value === null ? null : $this->platform->grammar()->convertBooleans($value);
     }
@@ -40,7 +40,7 @@ class SqlBooleanType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function declaration(ColumnInterface $column)
+    public function declaration(ColumnInterface $column): string
     {
         return Types::BOOLEAN;
     }

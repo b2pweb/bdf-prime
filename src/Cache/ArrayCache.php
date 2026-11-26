@@ -5,17 +5,14 @@ namespace Bdf\Prime\Cache;
 /**
  * ArrayCache
  */
-class ArrayCache implements CacheInterface
+final class ArrayCache implements CacheInterface
 {
-    /**
-     * @var array
-     */
-    private $data = [];
+    private array $data = [];
 
     /**
      * {@inheritDoc}
      */
-    public function get(CacheKey $key)
+    public function get(CacheKey $key): mixed
     {
         if (!isset($this->data[$key->namespace()][$key->key()])) {
             return null;
@@ -27,7 +24,7 @@ class ArrayCache implements CacheInterface
     /**
      * {@inheritDoc}
      */
-    public function set(CacheKey $key, $data): void
+    public function set(CacheKey $key, mixed $data): void
     {
         $this->data[$key->namespace()][$key->key()] = $data;
     }

@@ -12,37 +12,31 @@ final class ForeignKey implements ForeignKeyInterface
     /**
      * @var string[]
      */
-    private $fields;
+    private array $fields;
 
-    /**
-     * @var string
-     */
-    private $table;
+    private string $table;
 
     /**
      * @var string[]
      */
-    private $referred;
+    private array $referred;
 
-    /**
-     * @var string|null
-     */
-    private $name;
+    private ?string $name;
 
     /**
      * @var ForeignKeyInterface::MODE_*
      */
-    private $onDelete;
+    private string $onDelete;
 
     /**
      * @var ForeignKeyInterface::MODE_*
      */
-    private $onUpdate;
+    private string $onUpdate;
 
     /**
      * @var ForeignKeyInterface::MATCH_*
      */
-    private $match;
+    private string $match;
 
 
     /**

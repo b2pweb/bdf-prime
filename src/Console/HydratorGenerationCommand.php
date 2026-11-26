@@ -22,24 +22,13 @@ use Symfony\Component\Filesystem\Filesystem;
  * HydratorGenerationCommand
  */
 #[AsCommand('prime:hydrator', 'Generate optimized hydrator classes for entities')]
-class HydratorGenerationCommand extends Command
+final class HydratorGenerationCommand extends Command
 {
     protected static $defaultName = 'prime:hydrator';
 
-    /**
-     * @var ServiceLocator
-     */
-    private $locator;
-
-    /**
-     * @var string
-     */
-    private $outputDir;
-
-    /**
-     * @var string
-     */
-    private $loaderFile;
+    private ServiceLocator $locator;
+    private ?string $outputDir = null;
+    private ?string $loaderFile;
 
     /**
      * HydratorGenerationCommand constructor.
@@ -111,7 +100,7 @@ class HydratorGenerationCommand extends Command
      *
      * @return void
      */
-    private function configureOutputs($io): void
+    private function configureOutputs(BdfStyle $io): void
     {
         if ($io->option('loader') !== null) {
             $this->loaderFile = $io->option('loader');
@@ -135,7 +124,7 @@ class HydratorGenerationCommand extends Command
      *
      * @return void
      */
-    private function generateHydrator($io, $className, Mapper $mapper): void
+    private function generateHydrator(BdfStyle $io, string $className, Mapper $mapper): void
     {
         $io->inline("Generate hydrator for {$className} ");
 
@@ -160,7 +149,7 @@ class HydratorGenerationCommand extends Command
      *
      * @return void
      */
-    private function generateLoader($io): void
+    private function generateLoader(BdfStyle $io): void
     {
         $io->info('Generating loader file...');
 
@@ -232,7 +221,7 @@ JSON
      *
      * @return string
      */
-    private function getHydratorFilename($hydratorClassname)
+    private function getHydratorFilename(string $hydratorClassname): string
     {
         return $this->outputDir.$hydratorClassname.'.php';
     }
@@ -242,7 +231,7 @@ JSON
      *
      * @return ClassFileLocator|array
      */
-    private function getClassIterator($path)
+    private function getClassIterator(string $path): ClassFileLocator|array
     {
         if (is_dir($path)) {
             return new ClassFileLocator($path);

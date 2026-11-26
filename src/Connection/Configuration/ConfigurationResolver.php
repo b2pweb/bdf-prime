@@ -7,17 +7,14 @@ use Bdf\Prime\Configuration;
 /**
  * Allows declaration of configuration custom by connection. Use a default connection if the configuration is not set.
  */
-class ConfigurationResolver implements ConfigurationResolverInterface
+final class ConfigurationResolver implements ConfigurationResolverInterface
 {
     /**
      * @var Configuration[]
      */
-    private $configurations;
+    private array $configurations;
 
-    /**
-     * @var Configuration|null
-     */
-    private $default;
+    private ?Configuration $default = null;
 
     /**
      * ConfigurationResolver constructor.

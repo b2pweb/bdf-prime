@@ -10,10 +10,7 @@ use Bdf\Prime\Platform\PlatformTypeInterface;
  */
 abstract class AbstractFacadeType implements FacadeTypeInterface
 {
-    /**
-     * @var string
-     */
-    protected $type;
+    protected string $type;
 
 
     /**
@@ -21,7 +18,7 @@ abstract class AbstractFacadeType implements FacadeTypeInterface
      *
      * @param string $type
      */
-    public function __construct($type)
+    public function __construct(string $type)
     {
         $this->type = $type;
     }
@@ -41,7 +38,7 @@ abstract class AbstractFacadeType implements FacadeTypeInterface
      *
      * @return string
      */
-    abstract protected function defaultType();
+    abstract protected function defaultType(): string;
 
     /**
      * {@inheritdoc}

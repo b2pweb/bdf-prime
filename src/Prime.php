@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime;
 
+use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Connection\Configuration\ConfigurationResolver;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Connection\ConnectionRegistry;
@@ -40,11 +41,11 @@ class Prime
     /**
      * Configure the locator
      *
-     * @param array|ContainerInterface|ServiceLocator $config
+     * @param array|ContainerInterface|ServiceLocator|null $config
      *
      * @return void
      */
-    public static function configure($config): void
+    public static function configure(array|ContainerInterface|ServiceLocator|null $config): void
     {
         if ($config instanceof ServiceLocator) {
             static::$config = null;
@@ -60,7 +61,7 @@ class Prime
      *
      * @return bool
      */
-    public static function isConfigured()
+    public static function isConfigured(): bool
     {
         return static::$config !== null;
     }
@@ -78,7 +79,7 @@ class Prime
      *
      * @template T as object
      */
-    public static function repository($repository)
+    public static function repository($repository): ?RepositoryInterface
     {
         if ($repository instanceof RepositoryInterface) {
             /** @var RepositoryInterface<T> $repository */
@@ -98,7 +99,7 @@ class Prime
      *
      * @return void
      */
-    public static function create($repositories, $force = false): void
+    public static function create(string|array|RepositoryInterface $repositories, bool $force = false): void
     {
         static::callSchemaResolverMethod('migrate', $repositories, $force);
     }
@@ -113,7 +114,7 @@ class Prime
      *
      * @return void
      */
-    public static function drop($repositories, $force = false): void
+    public static function drop(string|array|RepositoryInterface $repositories, bool $force = false): void
     {
         static::callSchemaResolverMethod('drop', $repositories, $force);
     }
@@ -128,7 +129,7 @@ class Prime
      *
      * @return void
      */
-    public static function truncate($repositories, $force = false): void
+    public static function truncate(string|array|RepositoryInterface $repositories, bool $force = false): void
     {
         static::callSchemaResolverMethod('truncate', $repositories, $force);
     }
@@ -144,7 +145,7 @@ class Prime
      *
      * @return void
      */
-    protected static function callSchemaResolverMethod($method, $repositories, $force): void
+    protected static function callSchemaResolverMethod(string $method, mixed $repositories, bool $force): void
     {
         if (!is_array($repositories)) {
             $repositories = [$repositories];
@@ -183,7 +184,7 @@ class Prime
      *
      * @return void
      */
-    public static function push($repositoryName, $entities = null): void
+    public static function push(mixed $repositoryName, mixed $entities = null): void
     {
         static::callRepositoryMethod('replace', $repositoryName, $entities);
     }
@@ -212,7 +213,7 @@ class Prime
      *
      * @return void
      */
-    public static function save($repositoryName, $entities = null): void
+    public static function save(mixed $repositoryName, mixed $entities = null): void
     {
         static::callRepositoryMethod('save', $repositoryName, $entities);
     }
@@ -240,7 +241,7 @@ class Prime
      *
      * @return void
      */
-    public static function remove($repositoryName, $entities = null): void
+    public static function remove(mixed $repositoryName, mixed $entities = null): void
     {
         static::callRepositoryMethod('delete', $repositoryName, $entities);
     }
@@ -256,7 +257,7 @@ class Prime
      *
      * @return void
      */
-    protected static function callRepositoryMethod($method, $repositoryName, $entities): void
+    protected static function callRepositoryMethod(string $method, mixed $repositoryName, mixed $entities): void
     {
         if (!is_string($repositoryName) && !$repositoryName instanceof RepositoryInterface) {
             $entities = $repositoryName;
@@ -288,7 +289,7 @@ class Prime
      *
      * @throws PrimeException
      */
-    public static function exists($entity, $compare = true)
+    public static function exists(object $entity, bool $compare = true): bool
     {
         $repository = static::repository($entity);
 
@@ -325,7 +326,7 @@ class Prime
      *
      * @template T as object
      */
-    public static function find($repositoryName, $criteria = null)
+    public static function find($repositoryName, $criteria = null): array|CollectionInterface
     {
         /** @psalm-suppress InvalidArgument */
         $repository = static::repository($repositoryName);
@@ -356,7 +357,7 @@ class Prime
      *
      * @template T as object
      */
-    public static function one($repositoryName, $criteria = null)
+    public static function one($repositoryName, $criteria = null): ?object
     {
         /** @psalm-suppress InvalidArgument */
         $repository = static::repository($repositoryName);
@@ -381,7 +382,7 @@ class Prime
      *
      * @template T as object
      */
-    public static function refresh($entity, $additionalCriteria = [])
+    public static function refresh($entity, array $additionalCriteria = []): ?object
     {
         $repository = static::repository($entity);
 
@@ -399,7 +400,7 @@ class Prime
      *
      * @return ConnectionInterface
      */
-    public static function connection($name = null)
+    public static function connection(?string $name = null): ConnectionInterface
     {
         return static::service()->connection($name);
     }
@@ -409,7 +410,7 @@ class Prime
      *
      * @return ServiceLocator
      */
-    public static function service()
+    public static function service(): ServiceLocator
     {
         if (static::$serviceLocator === null) {
             static::initialize();
@@ -423,7 +424,7 @@ class Prime
      *
      * @return void
      */
-    protected static function initialize()
+    protected static function initialize(): void
     {
         if (static::$config instanceof ContainerInterface) {
             static::$serviceLocator = static::$config->get('prime');

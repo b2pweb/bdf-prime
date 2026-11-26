@@ -23,5 +23,5 @@ interface KeyInterface
      *
      * @return mixed The attribute value
      */
-    public function get($entity);
+    public function get(object $entity);
 }

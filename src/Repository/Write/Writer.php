@@ -5,7 +5,6 @@ namespace Bdf\Prime\Repository\Write;
 use Bdf\Prime\Query\Contract\Query\InsertQueryInterface;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\WriteOperation;
-use Bdf\Prime\Query\Custom\KeyValue\KeyValueQuery;
 use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\Event\AfterDelete;
@@ -25,36 +24,22 @@ use LogicException;
  * @template E as object
  * @implements WriterInterface<E>
  */
-class Writer implements WriterInterface
+final class Writer implements WriterInterface
 {
     /**
      * @var RepositoryInterface<E>&RepositoryEventsSubscriberInterface<E>
      */
-    private $repository;
+    private RepositoryInterface $repository;
 
-    /**
-     * @var ServiceLocator
-     */
-    private $serviceLocator;
+    private ServiceLocator $serviceLocator;
 
     //==================
     // Prepared queries
     //==================
 
-    /**
-     * @var InsertQueryInterface
-     */
-    private $insertQuery;
-
-    /**
-     * @var KeyValueQueryInterface|QueryInterface
-     */
-    private $deleteQuery;
-
-    /**
-     * @var KeyValueQuery|QueryInterface
-     */
-    private $updateQuery;
+    private ?InsertQueryInterface $insertQuery = null;
+    private KeyValueQueryInterface|QueryInterface|null $deleteQuery = null;
+    private KeyValueQueryInterface|QueryInterface|null $updateQuery = null;
 
 
     /**
@@ -73,7 +58,7 @@ class Writer implements WriterInterface
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function insert($entity, array $options = []): int
+    public function insert(object $entity, array $options = []): int
     {
         /** @var EntityRepository<E> $repository */
         $repository = $this->repository;
@@ -104,7 +89,7 @@ class Writer implements WriterInterface
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function update($entity, array $options = []): int
+    public function update(object $entity, array $options = []): int
     {
         if ($this->repository->isReadOnly()) {
             throw new LogicException('Repository "'.$this->repository->entityName().'" is read only. Cannot execute write query');
@@ -141,7 +126,7 @@ class Writer implements WriterInterface
      * {@inheritdoc}
      */
     #[WriteOperation]
-    public function delete($entity, array $options = []): int
+    public function delete(object $entity, array $options = []): int
     {
         if ($this->repository->isReadOnly()) {
             throw new LogicException('Repository "'.$this->repository->entityName().'" is read only. Cannot execute write query');
@@ -181,7 +166,7 @@ class Writer implements WriterInterface
      *
      * @return KeyValueQueryInterface|QueryInterface
      */
-    private function deleteQuery()
+    private function deleteQuery(): KeyValueQueryInterface|QueryInterface
     {
         if ($this->deleteQuery) {
             return $this->deleteQuery;
@@ -197,7 +182,7 @@ class Writer implements WriterInterface
      *
      * @return KeyValueQueryInterface|QueryInterface
      */
-    private function updateQuery()
+    private function updateQuery(): KeyValueQueryInterface|QueryInterface
     {
         if ($this->updateQuery) {
             return $this->updateQuery;

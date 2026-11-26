@@ -14,10 +14,9 @@ namespace Bdf\Prime\Connection\Result\FetchStrategy;
 final class ListArrayFetch implements ArrayFetchStrategyInterface
 {
     /**
-     * @var ListArrayFetch
      * @readonly
      */
-    private static $instance;
+    private static ?ListArrayFetch $instance = null;
 
     /**
      * {@inheritdoc}

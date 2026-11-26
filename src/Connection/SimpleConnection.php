@@ -26,7 +26,9 @@ use Bdf\Prime\Query\Custom\KeyValue\KeyValueSqlCompiler;
 use Bdf\Prime\Query\Factory\DefaultQueryFactory;
 use Bdf\Prime\Query\Factory\QueryFactoryInterface;
 use Bdf\Prime\Query\Query;
+use Bdf\Prime\Query\QueryInterface;
 use Bdf\Prime\Schema\SchemaManager;
+use Bdf\Prime\Types\TypeInterface;
 use Closure;
 use Doctrine\DBAL\Cache\QueryCacheProfile;
 use Doctrine\DBAL\Configuration;
@@ -56,24 +58,16 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
      *
      * @var string
      */
-    protected $name;
+    protected string $name;
 
     /**
      * The schema manager.
-     *
-     * @var SchemaManager
      */
-    private $schema;
+    private ?SchemaManager $schema = null;
 
-    /**
-     * @var SqlPlatform
-     */
-    private $platform;
+    private ?SqlPlatform $platform = null;
 
-    /**
-     * @var QueryFactoryInterface
-     */
-    private $factory;
+    private DefaultQueryFactory $factory;
 
     /**
      * List of listeners to call when the connection is closed,
@@ -214,7 +208,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, $type, array $fieldOptions = [])
+    public function fromDatabase(mixed $value, string|TypeInterface $type, array $fieldOptions = []): mixed
     {
         return $this->platform()->types()->fromDatabase($value, $type, $fieldOptions);
     }
@@ -222,7 +216,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value, $type = null)
+    public function toDatabase(mixed $value, string|TypeInterface|null $type = null): mixed
     {
         return $this->platform()->types()->toDatabase($value, $type);
     }
@@ -254,7 +248,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function from($table, ?string $alias = null): Query
+    public function from(string|QueryInterface $table, ?string $alias = null): Query
     {
         return $this->builder()->from($table, $alias);
     }
@@ -286,7 +280,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function select($query, array $bindings = []): ResultSetInterface
+    public function select(mixed $query, array $bindings = []): ResultSetInterface
     {
         return (new DoctrineResultSet($this->executeQuery($query, $bindings)))->asObject();
     }
@@ -294,7 +288,7 @@ class SimpleConnection extends BaseConnection implements ConnectionInterface, Tr
     /**
      * {@inheritdoc}
      */
-    public function executeQuery(string $sql, array $params = [], $types = [], ?QueryCacheProfile $qcp = null): Result
+    public function executeQuery(string $sql, array $params = [], array $types = [], ?QueryCacheProfile $qcp = null): Result
     {
         $types = $types ?: Binder::types($params);
 

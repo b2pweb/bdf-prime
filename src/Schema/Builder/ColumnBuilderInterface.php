@@ -75,7 +75,7 @@ interface ColumnBuilderInterface
      *
      * @return $this             This builder instance
      */
-    public function setDefault($value);
+    public function setDefault(mixed $value);
 
     /**
      * Set the precision and scale of a digit
@@ -112,7 +112,7 @@ interface ColumnBuilderInterface
      *
      * @return $this             This builder instance
      */
-    public function unique($index = true);
+    public function unique(bool|string $index = true);
 
     /**
      * Set fixed flag of current field.

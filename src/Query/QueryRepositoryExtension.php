@@ -33,27 +33,23 @@ use function is_array;
  *
  * @template E as object
  */
-class QueryRepositoryExtension extends QueryCompatExtension implements RecordHydratorInterface
+final class QueryRepositoryExtension extends QueryCompatExtension implements RecordHydratorInterface
 {
     /**
      * @var RepositoryInterface<E>
      */
-    protected $repository;
-
-    /**
-     * @var Metadata
-     */
-    protected $metadata;
+    private RepositoryInterface $repository;
+    private Metadata $metadata;
 
     /**
      * @var Mapper<E>
      */
-    protected $mapper;
+    private Mapper $mapper;
 
     /**
      * @var ClosureCompiler<E>|null
      */
-    protected $closureCompiler;
+    private ?ClosureCompiler $closureCompiler;
 
     /**
      * Array of relations to associate on entities
@@ -62,23 +58,21 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
      *
      * @var array
      */
-    protected $withRelations = [];
+    private array $withRelations = [];
 
     /**
      * Array of relations to discard
      *
      * @var array
      */
-    protected $withoutRelations = [];
+    private array $withoutRelations = [];
 
     /**
      * Collect entities by attribute
-     *
-     * @var array
      */
-    protected $byOptions;
+    private ?array $byOptions = null;
 
-    protected RepositoryRecordHydrator $recordManager;
+    private RepositoryRecordHydrator $recordManager;
 
 
     /**
@@ -104,7 +98,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
      *
      * @return RepositoryInterface|null
      */
-    public function repository(ReadCommandInterface $query, $name = null)
+    public function repository(ReadCommandInterface $query, ?string $name = null): ?RepositoryInterface
     {
         if ($name === null) {
             return $this->repository;
@@ -131,7 +125,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
      * @return E|null The entity or null if not found
      * @throws PrimeException When query fail
      */
-    public function findById(ReadCommandInterface $query, $id)
+    public function findById(ReadCommandInterface $query, mixed $id): ?object
     {
         $pkAttributes = $this->metadata->primary['attributes'];
         $criteria = null;
@@ -200,7 +194,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
      * @throws EntityNotFoundException  If entity is not found
      * @throws PrimeException           When query fail
      */
-    public function findByIdOrFail(ReadCommandInterface $query, $id)
+    public function findByIdOrFail(ReadCommandInterface $query, mixed $id): object
     {
         $entity = $this->findById($query, $id);
 
@@ -225,7 +219,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
      * @throws EntityNotFoundException  If entity is not found
      * @throws PrimeException           When query fail
      */
-    public function findByIdOrNew(ReadCommandInterface $query, $id)
+    public function findByIdOrNew(ReadCommandInterface $query, mixed $id): object
     {
         $entity = $this->findById($query, $id);
 
@@ -243,7 +237,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
      *
      * @return E
      */
-    public function firstOrFail(ReadCommandInterface $query)
+    public function firstOrFail(ReadCommandInterface $query): object
     {
         $entity = $query->first();
 
@@ -262,7 +256,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
      *
      * @return E
      */
-    public function firstOrNew(ReadCommandInterface $query, bool $useCriteriaAsDefault = true)
+    public function firstOrNew(ReadCommandInterface $query, bool $useCriteriaAsDefault = true): object
     {
         $entity = $query->first();
 
@@ -290,7 +284,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
      *
      * @return ReadCommandInterface<ConnectionInterface, E>
      */
-    public function filter(ReadCommandInterface $query, Closure $predicate)
+    public function filter(ReadCommandInterface $query, Closure $predicate): ReadCommandInterface
     {
         if (!$this->closureCompiler) {
             throw new BadMethodCallException('Closure filter is not enabled.');
@@ -324,7 +318,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
      *
      * @return ReadCommandInterface<ConnectionInterface, E>
      */
-    public function with(ReadCommandInterface $query, $relations)
+    public function with(ReadCommandInterface $query, string|array $relations): ReadCommandInterface
     {
         $this->withRelations = Relation::sanitizeRelations((array)$relations);
 
@@ -339,7 +333,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
      *
      * @return ReadCommandInterface<ConnectionInterface, E>
      */
-    public function without(ReadCommandInterface $query, $relations)
+    public function without(ReadCommandInterface $query, string|array $relations): ReadCommandInterface
     {
         $this->withoutRelations = Relation::sanitizeWithoutRelations((array)$relations);
 
@@ -356,7 +350,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
      *
      * @return ReadCommandInterface<ConnectionInterface, E>
      */
-    public function by(ReadCommandInterface $query, $attribute, $combine = false)
+    public function by(ReadCommandInterface $query, string $attribute, bool $combine = false): ReadCommandInterface
     {
         $this->byOptions = [
             'attribute' => $attribute,
@@ -518,7 +512,7 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
      *
      * @return mixed
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, array $arguments): mixed
     {
         /** @var EntityRepository $this->repository */
         $scopes = $this->repository->scopes();

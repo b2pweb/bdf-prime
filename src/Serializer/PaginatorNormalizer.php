@@ -19,12 +19,12 @@ use Bdf\Serializer\Type\Type;
  *
  * @implements NormalizerInterface<PaginatorInterface>
  */
-class PaginatorNormalizer implements NormalizerInterface, AutoRegisterInterface
+final class PaginatorNormalizer implements NormalizerInterface, AutoRegisterInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function normalize($data, NormalizationContext $context)
+    public function normalize($data, NormalizationContext $context): mixed
     {
         /** @var PaginatorInterface $data */
         $class = get_class($data);
@@ -52,7 +52,7 @@ class PaginatorNormalizer implements NormalizerInterface, AutoRegisterInterface
     /**
      * {@inheritdoc}
      */
-    public function denormalize($data, Type $type, DenormalizationContext $context)
+    public function denormalize($data, Type $type, DenormalizationContext $context): never
     {
         throw new UnexpectedValueException('Paginator cannot be denormalized');
     }

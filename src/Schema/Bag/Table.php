@@ -13,30 +13,18 @@ use Bdf\Prime\Schema\TableInterface;
  */
 final class Table implements TableInterface
 {
-    /**
-     * @var string
-     */
-    private $name;
+    private string $name;
 
     /**
      * @var ColumnInterface[]
      */
-    private $columns;
+    private array $columns;
 
-    /**
-     * @var IndexSetInterface
-     */
-    private $indexes;
+    private IndexSetInterface $indexes;
 
-    /**
-     * @var array
-     */
-    private $options;
+    private array $options;
 
-    /**
-     * @var ConstraintSetInterface
-     */
-    private $constraints;
+    private ConstraintSetInterface $constraints;
 
 
     /**
@@ -113,7 +101,7 @@ final class Table implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function option(string $name)
+    public function option(string $name): mixed
     {
         return $this->options[$name];
     }

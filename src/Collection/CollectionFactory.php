@@ -7,14 +7,14 @@ use Bdf\Prime\Repository\RepositoryInterface;
 /**
  * Factory for CollectionInterface
  */
-class CollectionFactory
+final class CollectionFactory
 {
     /**
      * Alias of known collection class
      *
      * @var array<string, class-string<CollectionInterface>|callable(array):CollectionInterface>
      */
-    private $aliases = [
+    private array $aliases = [
         'array' => ArrayCollection::class,
     ];
 
@@ -23,7 +23,7 @@ class CollectionFactory
      *
      * @var array<class-string<CollectionInterface>, callable(array):CollectionInterface>
      */
-    private $factories = [];
+    private array $factories = [];
 
 
     /**
@@ -58,7 +58,7 @@ class CollectionFactory
      *
      * @return void
      */
-    public function registerWrapperAlias(string $wrapperAlias, $wrapperClass, ?callable $factory = null)
+    public function registerWrapperAlias(string $wrapperAlias, string|callable $wrapperClass, ?callable $factory = null): void
     {
         $this->aliases[$wrapperAlias] = $wrapperClass;
 
@@ -78,7 +78,7 @@ class CollectionFactory
      *
      * @template T
      */
-    public function wrap(array $data, $wrapper = 'array')
+    public function wrap(array $data, string|callable $wrapper = 'array'): CollectionInterface
     {
         if (is_string($wrapper) && isset($this->aliases[$wrapper])) {
             $wrapper = $this->aliases[$wrapper];
@@ -125,7 +125,7 @@ class CollectionFactory
     public static function forRepository(RepositoryInterface $repository): self
     {
         $factory = new static();
-        $factory->registerWrapperAlias('collection', EntityCollection::class, [$repository, 'collection']);
+        $factory->registerWrapperAlias('collection', EntityCollection::class, $repository->collection(...));
 
         return $factory;
     }

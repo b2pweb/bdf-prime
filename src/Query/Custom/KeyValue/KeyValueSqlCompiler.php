@@ -20,12 +20,12 @@ use function implode;
  * @extends AbstractCompiler<KeyValueQuery, \Doctrine\DBAL\Connection&\Bdf\Prime\Connection\ConnectionInterface>
  * @implements QuoteCompilerInterface<KeyValueQuery>
  */
-class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
+final class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
 {
     /**
      * {@inheritdoc}
      */
-    protected function doCompileInsert(CompilableClause $query)
+    protected function doCompileInsert(CompilableClause $query): mixed
     {
         throw new \BadMethodCallException('INSERT operation is not supported on key value query');
     }
@@ -33,7 +33,7 @@ class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInter
     /**
      * {@inheritdoc}
      */
-    protected function doCompileUpdate(CompilableClause $query)
+    protected function doCompileUpdate(CompilableClause $query): mixed
     {
         return $this->prepare($query, 'UPDATE '.$this->quoteIdentifier($query, $query->statements['table']).$this->compileValues($query).$this->compileWhere($query));
     }
@@ -41,7 +41,7 @@ class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInter
     /**
      * {@inheritdoc}
      */
-    protected function doCompileDelete(CompilableClause $query)
+    protected function doCompileDelete(CompilableClause $query): mixed
     {
         return $this->prepare($query, 'DELETE FROM '.$this->quoteIdentifier($query, $query->statements['table']).$this->compileWhere($query));
     }
@@ -49,7 +49,7 @@ class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInter
     /**
      * {@inheritdoc}
      */
-    protected function doCompileSelect(CompilableClause $query)
+    protected function doCompileSelect(CompilableClause $query): mixed
     {
         $sql = 'SELECT '.$this->compileProjection($query).' FROM '.$this->quoteIdentifier($query, $query->statements['table']).$this->compileWhere($query).$this->compileLimit($query);
 
@@ -77,9 +77,9 @@ class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInter
     /**
      * {@inheritdoc}
      */
-    public function quote($value)
+    public function quote(mixed $value): string
     {
-        return $this->connection->quote($value);
+        return $this->connection->quote((string) $value);
     }
 
     /**
@@ -115,7 +115,7 @@ class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInter
      * @return string
      * @throws PrimeException
      */
-    private function compileWhere(CompilableClause $query)
+    private function compileWhere(CompilableClause $query): string
     {
         if (isset($query->state()->compiledParts['where'])) {
             return $query->state()->compiledParts['where'];
@@ -156,7 +156,7 @@ class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInter
      * @return string
      * @throws PrimeException
      */
-    private function compileProjection(CompilableClause $query)
+    private function compileProjection(CompilableClause $query): string
     {
         if (!empty($query->statements['aggregate'])) {
             return $this->compileAggregate($query, $query->statements['aggregate'][0], $query->statements['aggregate'][1]);
@@ -185,7 +185,7 @@ class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInter
      * @return string
      * @throws PrimeException
      */
-    private function compileAggregate(CompilableClause $query, $function, $column)
+    private function compileAggregate(CompilableClause $query, string $function, string $column): string
     {
         if ($column !== '*') {
             $column = $query->preprocessor()->field($column);
@@ -216,7 +216,7 @@ class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInter
      * @return string
      * @throws PrimeException
      */
-    private function compileExpressionColumn(CompilableClause $query, $column, $alias = null)
+    private function compileExpressionColumn(CompilableClause $query, mixed $column, ?string $alias = null): string
     {
         if ($column instanceof ExpressionInterface) {
             return $alias !== null
@@ -246,7 +246,7 @@ class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInter
      * @return string
      * @throws PrimeException
      */
-    private function compileLimit(CompilableClause $query)
+    private function compileLimit(CompilableClause $query): string
     {
         if (!isset($query->statements['limit']) && !isset($query->statements['offset'])) {
             return '';
@@ -313,7 +313,7 @@ class KeyValueSqlCompiler extends AbstractCompiler implements QuoteCompilerInter
      *
      * @return Statement
      */
-    private function prepare(CompilableClause $query, $sql)
+    private function prepare(CompilableClause $query, string $sql): Statement
     {
         $query->state()->compiledParts['sql'] = $sql;
 

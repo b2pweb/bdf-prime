@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class DownCommand
  */
 #[AsCommand('prime:migration:down', 'Revert a specific migration')]
-class DownCommand extends AbstractCommand
+final class DownCommand extends AbstractCommand
 {
     protected static $defaultName = 'prime:migration:down';
 

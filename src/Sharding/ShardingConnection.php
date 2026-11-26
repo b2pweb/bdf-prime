@@ -61,28 +61,22 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      *
      * @var SimpleConnection[]
      */
-    private $connections = [];
+    private array $connections = [];
 
     /**
      * The shard choser
-     *
-     * @var ShardChoserInterface
      */
-    private $shardChoser;
+    private ShardChoserInterface $shardChoser;
 
     /**
      * The id of current shard. Null means all shards
-     *
-     * @var string
      */
-    private $currentShardId;
+    private ?string $currentShardId = null;
 
     /**
      * The distribution key
-     *
-     * @var string
      */
-    private $distributionKey;
+    private string $distributionKey;
 
     /**
      * Initializes a new instance of the Connection class.
@@ -139,7 +133,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      *
      * @return array
      */
-    public function getShardIds()
+    public function getShardIds(): array
     {
         return array_keys($this->connections);
     }
@@ -149,7 +143,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      *
      * @return ShardChoserInterface
      */
-    public function getShardChoser()
+    public function getShardChoser(): ShardChoserInterface
     {
         return $this->shardChoser;
     }
@@ -159,7 +153,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      *
      * @return string
      */
-    public function getDistributionKey()
+    public function getDistributionKey(): string
     {
         return $this->distributionKey;
     }
@@ -167,9 +161,9 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * Get the current shard
      *
-     * @return string
+     * @return string|null
      */
-    public function getCurrentShardId()
+    public function getCurrentShardId(): ?string
     {
         return $this->currentShardId;
     }
@@ -181,7 +175,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      *
      * @return $this
      */
-    public function pickShard($distributionValue = null)
+    public function pickShard(mixed $distributionValue = null): self
     {
         $this->useShard(
             $distributionValue !== null
@@ -201,7 +195,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      *
      * @throws ShardingException   If the shard id is not known
      */
-    public function useShard(?string $shardId = null)
+    public function useShard(?string $shardId = null): self
     {
         if ($shardId !== null && !isset($this->connections[$shardId])) {
             throw ShardingException::unknown($shardId);
@@ -217,7 +211,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      *
      * @return boolean
      */
-    public function isUsingShard()
+    public function isUsingShard(): bool
     {
         return $this->currentShardId !== null;
     }
@@ -236,7 +230,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      *
      * @throws ShardingException   If the shard id is not known
      */
-    public function getShardConnection($shardId = null)
+    public function getShardConnection(?string $shardId = null)
     {
         if ($shardId === null) {
             return $this->connections;
@@ -262,7 +256,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      *
      * @return SimpleConnection[]
      */
-    protected function getSelectedShards()
+    protected function getSelectedShards(): array
     {
         if ($this->isUsingShard()) {
             return [$this->connections[$this->currentShardId]];
@@ -276,7 +270,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
      *
      * @return SimpleConnection
      */
-    protected function getSelectedShard()
+    protected function getSelectedShard(): SimpleConnection
     {
         return $this->connections[$this->currentShardId];
     }
@@ -306,7 +300,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function executeQuery(string $sql, array $params = [], $types = [], ?QueryCacheProfile $qcp = null): Result
+    public function executeQuery(string $sql, array $params = [], array $types = [], ?QueryCacheProfile $qcp = null): Result
     {
         if ($this->isUsingShard()) {
             return $this->getSelectedShard()->executeQuery($sql, $params, $types, $qcp);
@@ -325,7 +319,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function executeStatement($sql, array $params = [], array $types = []): int
+    public function executeStatement(string $sql, array $params = [], array $types = []): int
     {
         $result = 0;
 
@@ -369,7 +363,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function createSavepoint($savepoint): void
+    public function createSavepoint(string $savepoint): void
     {
         foreach ($this->getSelectedShards() as $shard) {
             $shard->createSavepoint($savepoint);
@@ -379,7 +373,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function releaseSavepoint($savepoint): void
+    public function releaseSavepoint(string $savepoint): void
     {
         foreach ($this->getSelectedShards() as $shard) {
             $shard->releaseSavepoint($savepoint);
@@ -389,7 +383,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function rollbackSavepoint($savepoint): void
+    public function rollbackSavepoint(string $savepoint): void
     {
         foreach ($this->getSelectedShards() as $shard) {
             $shard->rollbackSavepoint($savepoint);
@@ -399,7 +393,7 @@ class ShardingConnection extends SimpleConnection implements SubConnectionManage
     /**
      * {@inheritdoc}
      */
-    public function lastInsertId($name = null): string|int
+    public function lastInsertId(): string|int
     {
         if ($this->isUsingShard()) {
             return $this->getSelectedShard()->lastInsertId();

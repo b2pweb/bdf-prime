@@ -21,12 +21,12 @@ use function implode;
  * @extends AbstractCompiler<BulkInsertQuery, \Doctrine\DBAL\Connection&\Bdf\Prime\Connection\ConnectionInterface>
  * @implements QuoteCompilerInterface<BulkInsertQuery>
  */
-class BulkInsertSqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
+final class BulkInsertSqlCompiler extends AbstractCompiler implements QuoteCompilerInterface
 {
     /**
      * {@inheritdoc}
      */
-    protected function doCompileInsert(CompilableClause $query)
+    protected function doCompileInsert(CompilableClause $query): mixed
     {
         $sql = $this->compileMode($query).' INTO '.$this->quoteIdentifier($query, $query->statements['table']);
 
@@ -42,7 +42,7 @@ class BulkInsertSqlCompiler extends AbstractCompiler implements QuoteCompilerInt
     /**
      * {@inheritdoc}
      */
-    protected function doCompileUpdate(CompilableClause $query)
+    protected function doCompileUpdate(CompilableClause $query): mixed
     {
         throw new \BadMethodCallException();
     }
@@ -50,7 +50,7 @@ class BulkInsertSqlCompiler extends AbstractCompiler implements QuoteCompilerInt
     /**
      * {@inheritdoc}
      */
-    protected function doCompileDelete(CompilableClause $query)
+    protected function doCompileDelete(CompilableClause $query): mixed
     {
         throw new \BadMethodCallException();
     }
@@ -58,7 +58,7 @@ class BulkInsertSqlCompiler extends AbstractCompiler implements QuoteCompilerInt
     /**
      * {@inheritdoc}
      */
-    protected function doCompileSelect(CompilableClause $query)
+    protected function doCompileSelect(CompilableClause $query): mixed
     {
         throw new \BadMethodCallException();
     }
@@ -84,7 +84,7 @@ class BulkInsertSqlCompiler extends AbstractCompiler implements QuoteCompilerInt
     /**
      * {@inheritdoc}
      */
-    public function quote($value)
+    public function quote(mixed $value): string
     {
         return $this->connection->quote($value);
     }
@@ -124,7 +124,7 @@ class BulkInsertSqlCompiler extends AbstractCompiler implements QuoteCompilerInt
      * @return string
      * @throws PrimeException
      */
-    private function compileMode(CompilableClause $query)
+    private function compileMode(CompilableClause $query): string
     {
         switch ($query->statements['mode']) {
             case BulkInsertQuery::MODE_REPLACE:
@@ -186,7 +186,7 @@ class BulkInsertSqlCompiler extends AbstractCompiler implements QuoteCompilerInt
      *
      * @return string
      */
-    private function compileValues(CompilableClause $query)
+    private function compileValues(CompilableClause $query): string
     {
         if (!$query->statements['bulk']) {
             return 'VALUES '.$query->state()->compiledParts['columns']['values'];

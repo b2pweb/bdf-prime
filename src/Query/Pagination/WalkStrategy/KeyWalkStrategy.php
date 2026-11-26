@@ -30,7 +30,7 @@ final class KeyWalkStrategy implements WalkStrategyInterface
     /**
      * @var KeyInterface<E>
      */
-    private $key;
+    private KeyInterface $key;
 
     /**
      * PrimaryKeyWalkStrategy constructor.
@@ -178,7 +178,7 @@ final class KeyWalkStrategy implements WalkStrategyInterface
      *
      * @see WalkCursor::$cursor
      */
-    private function getLastKeyOfEntities(WalkCursor $cursor)
+    private function getLastKeyOfEntities(WalkCursor $cursor): mixed
     {
         $lastEntity = end($cursor->entities);
 

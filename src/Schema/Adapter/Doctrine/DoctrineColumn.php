@@ -13,15 +13,9 @@ use Doctrine\DBAL\Types\Type;
  */
 final class DoctrineColumn implements ColumnInterface
 {
-    /**
-     * @var Column
-     */
-    private $column;
+    private Column $column;
 
-    /**
-     * @var TypesRegistryInterface
-     */
-    private $types;
+    private TypesRegistryInterface $types;
 
 
     /**
@@ -58,7 +52,7 @@ final class DoctrineColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function defaultValue()
+    public function defaultValue(): mixed
     {
         return $this->column->getDefault();
     }
@@ -138,7 +132,7 @@ final class DoctrineColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function option(string $name)
+    public function option(string $name): mixed
     {
         return $this->column->getPlatformOption($name);
     }

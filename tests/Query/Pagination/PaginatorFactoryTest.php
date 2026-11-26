@@ -2,7 +2,7 @@
 
 namespace Bdf\Prime\Query\Pagination;
 
-use Bdf\Prime\Query\SqlQueryInterface;
+use Bdf\Prime\Query\Query;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,7 +15,8 @@ class PaginatorFactoryTest extends TestCase
      */
     public function test_create_default()
     {
-        $query = $this->createMock(SqlQueryInterface::class);
+        $query = $this->createMock(Query::class);
+        $query->expects($this->once())->method('all')->willReturn([]);
 
         $paginator = PaginatorFactory::instance()->create($query);
 
@@ -28,7 +29,7 @@ class PaginatorFactoryTest extends TestCase
      */
     public function test_create_walker()
     {
-        $query = $this->createMock(SqlQueryInterface::class);
+        $query = $this->createMock(Query::class);
 
         $paginator = PaginatorFactory::instance()->create($query, 'walker');
 
@@ -41,7 +42,7 @@ class PaginatorFactoryTest extends TestCase
      */
     public function test_create_explicit_class_name()
     {
-        $query = $this->createMock(SqlQueryInterface::class);
+        $query = $this->createMock(Query::class);
 
         $paginator = PaginatorFactory::instance()->create($query, EmptyPaginator::class);
 
@@ -62,7 +63,7 @@ class PaginatorFactoryTest extends TestCase
      */
     public function test_addAlias()
     {
-        $query = $this->createMock(SqlQueryInterface::class);
+        $query = $this->createMock(Query::class);
 
         $factory = new PaginatorFactory();
         $factory->addAlias(EmptyPaginator::class, 'alias');
@@ -76,7 +77,7 @@ class PaginatorFactoryTest extends TestCase
      */
     public function test_addFactory()
     {
-        $query = $this->createMock(SqlQueryInterface::class);
+        $query = $this->createMock(Query::class);
 
         $factory = new PaginatorFactory();
         $paginator = new EmptyPaginator();

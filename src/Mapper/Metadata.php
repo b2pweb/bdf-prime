@@ -75,14 +75,14 @@ class Metadata
      *
      * @var class-string
      */
-    public $entityName;
+    public string $entityName;
 
     /**
      * The instantiator hint
      *
      * @var int|null
      */
-    public $instantiatorHint;
+    public ?int $instantiatorHint;
 
     /**
      * The class name to use
@@ -91,7 +91,7 @@ class Metadata
      *
      * @var class-string
      */
-    public $entityClass;
+    public string $entityClass;
 
     /**
      * The property accessor class name to use
@@ -99,32 +99,32 @@ class Metadata
      *
      * @var class-string
      */
-    public $propertyAccessorClass;
+    public string $propertyAccessorClass;
 
     /**
      * @var string
      */
-    public $connection;
+    public string $connection;
 
     /**
      * @var string|null
      */
-    public $database;
+    public ?string $database;
 
     /**
      * @var string
      */
-    public $table;
+    public string $table;
 
     /**
      * @var boolean
      */
-    public $useQuoteIdentifier;
+    public bool $useQuoteIdentifier;
 
     /**
      * @var array<string, string>
      */
-    public $tableOptions = [];
+    public array $tableOptions = [];
 
     /**
      * The indexes
@@ -154,12 +154,12 @@ class Metadata
      *
      * @var IndexMetadata[]
      */
-    public $indexes = [];
+    public array $indexes = [];
 
     /**
      * @var SequenceMetadata
      */
-    public $sequence = [
+    public array $sequence = [
         'connection' => null,
         'table'      => null,
         'column'     => null,
@@ -171,19 +171,19 @@ class Metadata
      *
      * @var array<string, FieldMetadata>
      */
-    public $fields = [];
+    public array $fields = [];
 
     /**
      * List of entity columns, indexed by the entity property name
      *
      * @var array<string, FieldMetadata>
      */
-    public $attributes = [];
+    public array $attributes = [];
 
     /**
      * @var array<string, EmbeddedMetadata>
      */
-    public $embeddeds = [];
+    public array $embeddeds = [];
 
     /**
      * @var array{
@@ -192,7 +192,7 @@ class Metadata
      *     fields: list<string>
      * }
      */
-    public $primary = [
+    public array $primary = [
         'type'          => self::PK_AUTO,
         'attributes'    => [],
         'fields'        => [],
@@ -203,21 +203,21 @@ class Metadata
      *
      * @var array
      */
-    public $constraints = [];
+    public array $constraints = [];
 
     /**
      * Flag indiquant que le meta a déjà été construit
      *
      * @var bool
      */
-    protected $built = false;
+    protected bool $built = false;
 
     /**
      * Relations that must be loaded eagerly
      *
      * @var array
      */
-    public $eagerRelations = [];
+    public array $eagerRelations = [];
 
     /**
      * List of mapper configurators
@@ -313,7 +313,7 @@ class Metadata
      *
      * @return EmbeddedMetadata|null
      */
-    public function embedded($attribute): ?array
+    public function embedded(string $attribute): ?array
     {
         return $this->embeddeds[$attribute] ?? null;
     }
@@ -326,7 +326,7 @@ class Metadata
      *
      * @return array|null
      */
-    public function meta($key, $type = 'attributes')
+    public function meta(string $key, string $type = 'attributes')
     {
         if (isset($this->{$type}[$key])) {
             return $this->{$type}[$key];
@@ -342,7 +342,7 @@ class Metadata
      *
      * @return list<string>|Metadata::PK_*
      */
-    public function primary($type = 'attributes')
+    public function primary(string $type = 'attributes')
     {
         return $this->primary[$type];
     }
@@ -397,7 +397,7 @@ class Metadata
      *
      * @return bool
      */
-    public function isPrimary($key, $type = 'attributes'): bool
+    public function isPrimary(string $key, string $type = 'attributes'): bool
     {
         return in_array($key, $this->primary[$type]);
     }
@@ -467,7 +467,7 @@ class Metadata
      *
      * @return bool
      */
-    public function fieldExists($field): bool
+    public function fieldExists(string $field): bool
     {
         return isset($this->fields[$field]);
     }
@@ -479,7 +479,7 @@ class Metadata
      *
      * @return string
      */
-    public function fieldType($field): string
+    public function fieldType(string $field): string
     {
         return $this->fields[$field]['type'];
     }
@@ -501,7 +501,7 @@ class Metadata
      *
      * @return bool
      */
-    public function attributeExists($attribute): bool
+    public function attributeExists(string $attribute): bool
     {
         return isset($this->attributes[$attribute]);
     }
@@ -513,7 +513,7 @@ class Metadata
      *
      * @return string
      */
-    public function attributeType($attribute): string
+    public function attributeType(string $attribute): string
     {
         return $this->attributes[$attribute]['type'];
     }
@@ -525,7 +525,7 @@ class Metadata
      *
      * @return string
      */
-    public function fieldFrom($attribute): string
+    public function fieldFrom(string $attribute): string
     {
         return $this->attributes[$attribute]['field'];
     }
@@ -537,7 +537,7 @@ class Metadata
      *
      * @return string
      */
-    public function attributeFrom($field): string
+    public function attributeFrom(string $field): string
     {
         return $this->fields[$field]['attribute'];
     }
@@ -574,7 +574,7 @@ class Metadata
      *
      * @return class-string
      */
-    private function getExistingClassName($entityClass): string
+    private function getExistingClassName(string $entityClass): string
     {
         if ($entityClass === stdClass::class || !class_exists($entityClass)) {
             return stdClass::class;
@@ -593,7 +593,7 @@ class Metadata
      *
      * @return null|int
      */
-    private function getInstantiatorHint($className): ?int
+    private function getInstantiatorHint(string $className): ?int
     {
         if ($className === stdClass::class) {
             return InstantiatorInterface::USE_CONSTRUCTOR_HINT;
@@ -645,7 +645,7 @@ class Metadata
      * @param iterable<string, FieldDefinition> $fields
      * @param EmbeddedMetadata|null $embeddedMeta
      */
-    private function buildFields(iterable $fields, $embeddedMeta = null): void
+    private function buildFields(iterable $fields, ?array $embeddedMeta = null): void
     {
         foreach ($fields as $attribute => $meta) {
             if (isset($meta['embedded'])) {
@@ -800,7 +800,7 @@ class Metadata
      *
      * @return EmbeddedMetadata
      */
-    private function buildPolymorph($attribute, array $meta, ?array $embeddedMeta): array
+    private function buildPolymorph(string $attribute, array $meta, ?array $embeddedMeta): array
     {
         if ($embeddedMeta === null) {
             $attributePath = $attribute;
@@ -834,9 +834,9 @@ class Metadata
      * @param string $attribute
      * @param string[] $map
      * @param string $discriminator
-     * @param array  $embeddedMeta
+     * @param array|null $embeddedMeta
      */
-    private function buildMappedEmbedded($attribute, $map, $discriminator, $embeddedMeta = null): void
+    private function buildMappedEmbedded(string $attribute, array $map, string $discriminator, ?array $embeddedMeta = null): void
     {
         $entity = reset($map);
 
@@ -898,7 +898,7 @@ class Metadata
      * @param FieldDefinition $meta
      * @param EmbeddedMetadata|null $embeddedMeta
      */
-    private function buildField($attribute, $meta, ?array $embeddedMeta): void
+    private function buildField(string $attribute, array $meta, ?array $embeddedMeta): void
     {
         //concatenation de l'attribut parent
         if ($embeddedMeta === null) {
@@ -955,7 +955,7 @@ class Metadata
      *
      * @param array{connection?:string,table?:string,column?:string,tableOptions?:array} $sequence
      */
-    private function buildSequence($sequence): void
+    private function buildSequence(array $sequence): void
     {
         if (!$this->isSequencePrimaryKey()) {
             return;

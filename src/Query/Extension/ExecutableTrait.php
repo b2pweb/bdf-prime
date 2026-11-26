@@ -6,6 +6,7 @@ use Bdf\Prime\Collection\CollectionInterface;
 use Bdf\Prime\Connection\Result\ResultSetInterface;
 use Bdf\Prime\Exception\PrimeException;
 use Bdf\Prime\Query\Contract\ReadOperation;
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Bdf\Prime\Query\QueryInterface;
 
 /**
@@ -23,7 +24,7 @@ trait ExecutableTrait
      * @return R[]|CollectionInterface<R>
      */
     #[ReadOperation]
-    public function all($columns = null)
+    public function all(string|array|null $columns = null): array|CollectionInterface
     {
         return $this->postProcessResult($this->execute($columns));
     }
@@ -35,7 +36,7 @@ trait ExecutableTrait
      * @return R|null
      */
     #[ReadOperation]
-    public function first($columns = null)
+    public function first(string|array|null $columns = null): array|object|null
     {
         foreach ($this->limit(1)->all($columns) as $entity) {
             return $entity;
@@ -51,7 +52,7 @@ trait ExecutableTrait
      * @return list<mixed>
      */
     #[ReadOperation]
-    public function inRows($column): array
+    public function inRows(string|ExpressionInterface $column): array
     {
         return $this->execute($column)->asColumn()->all();
     }
@@ -61,7 +62,7 @@ trait ExecutableTrait
      * @see QueryInterface::inRow()
      */
     #[ReadOperation]
-    public function inRow($column)
+    public function inRow(string|ExpressionInterface $column): mixed
     {
         foreach ($this->limit(1)->execute($column)->asColumn() as $value) {
             return $value;
@@ -89,7 +90,7 @@ trait ExecutableTrait
      * @throws PrimeException
      */
     #[ReadOperation]
-    abstract public function execute($columns = null): ResultSetInterface;
+    abstract public function execute(string|ExpressionInterface|array|null $columns = null): ResultSetInterface;
 
     /**
      * {@inheritdoc}

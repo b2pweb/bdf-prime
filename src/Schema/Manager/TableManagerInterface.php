@@ -65,7 +65,7 @@ interface TableManagerInterface extends DatabaseStructureManagerInterface
      * @return $this
      * @throws PrimeException
      */
-    public function add($structure);
+    public function add(object $structure);
 
     /**
      * Change table.

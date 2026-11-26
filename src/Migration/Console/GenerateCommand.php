@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class GenerateCommand
  */
 #[AsCommand('prime:migration:generate', 'Generate a new migration')]
-class GenerateCommand extends AbstractCommand
+final class GenerateCommand extends AbstractCommand
 {
     protected static $defaultName = 'prime:migration:generate';
 

@@ -26,17 +26,10 @@ use Doctrine\DBAL\Platforms\SQLitePlatform;
 /**
  * Base class for SQL platforms
  */
-class SqlPlatform implements PlatformInterface
+final class SqlPlatform implements PlatformInterface
 {
-    /**
-     * @var AbstractPlatform
-     */
-    private $grammar;
-
-    /**
-     * @var TypesRegistryInterface
-     */
-    private $types;
+    private AbstractPlatform $grammar;
+    private PlatformTypes $types;
 
 
     /**
@@ -85,7 +78,7 @@ class SqlPlatform implements PlatformInterface
     /**
      * {@inheritdoc}
      */
-    public function grammar()
+    public function grammar(): AbstractPlatform
     {
         return $this->grammar;
     }
@@ -93,7 +86,7 @@ class SqlPlatform implements PlatformInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(PlatformSpecificOperationInterface $operation)
+    public function apply(PlatformSpecificOperationInterface $operation): mixed
     {
         $grammar = $this->grammar;
 

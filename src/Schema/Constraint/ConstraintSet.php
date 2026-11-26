@@ -10,15 +10,12 @@ use Bdf\Prime\Schema\ConstraintSetInterface;
  */
 final class ConstraintSet implements ConstraintSetInterface
 {
-    /**
-     * @var ConstraintSet
-     */
-    private static $blank;
+    private static ?ConstraintSet $blank = null;
 
     /**
      * @var ConstraintInterface[]
      */
-    private $constraints;
+    private array $constraints;
 
 
     /**
@@ -38,7 +35,7 @@ final class ConstraintSet implements ConstraintSetInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(ConstraintVisitorInterface $visitor)
+    public function apply(ConstraintVisitorInterface $visitor): static
     {
         foreach ($this->constraints as $constraint) {
             $constraint->visit($visitor);

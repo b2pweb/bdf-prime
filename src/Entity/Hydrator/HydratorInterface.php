@@ -23,7 +23,7 @@ interface HydratorInterface
      *
      * @throws InvalidTypeException If the given type do not correspond with the declared type
      */
-    public function hydrate($object, array $data): void;
+    public function hydrate(object $object, array $data): void;
 
     /**
      * Extract attributes from the entity.
@@ -37,5 +37,5 @@ interface HydratorInterface
      *
      * @return array
      */
-    public function extract($object, array $attributes = []): array;
+    public function extract(object $object, array $attributes = []): array;
 }

@@ -34,14 +34,12 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
      *
      * @var C
      */
-    protected $connection;
+    protected ConnectionInterface $connection;
 
     /**
      * The collection class name that wrap query result
-     *
-     * @var string
      */
-    protected $wrapper;
+    protected ?string $wrapper = null;
 
     /**
      * The listeners processor.
@@ -51,28 +49,17 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
      *    each: callable(array<string, mixed>):mixed|null
      * }
      */
-    protected $listeners = [
+    protected array $listeners = [
         'post' => null,
         'each' => null,
     ];
 
     /**
      * The SQL compiler
-     *
-     * @var object
      */
-    protected $compiler;
-
-    /**
-     * @var CollectionFactory
-     */
-    private $collectionFactory;
-
-    /**
-     * @var object
-     */
-    protected $extension;
-
+    protected object $compiler;
+    private ?CollectionFactory $collectionFactory = null;
+    protected ?object $extension = null;
     protected ?string $recordClassName = null;
     protected ?RecordHydratorInterface $recordHydrator = null;
 
@@ -143,7 +130,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * {@inheritdoc}
      */
-    public function post(callable $processor, bool $forEach = true)
+    public function post(callable $processor, bool $forEach = true): static
     {
         $this->listeners[$forEach ? 'each' : 'post'] = $processor;
 
@@ -153,7 +140,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * {@inheritdoc}
      */
-    public function wrapAs(string $wrapperClass)
+    public function wrapAs(string $wrapperClass): static
     {
         $this->wrapper = $wrapperClass;
 
@@ -182,7 +169,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
      * @psalm-suppress InvalidReturnType
      * @psalm-suppress InvalidReturnStatement
      */
-    public function as(string $recordClassName)
+    public function as(string $recordClassName): static
     {
         $this->recordClassName = $recordClassName;
 
@@ -238,7 +225,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
     /**
      * {@inheritdoc}
      */
-    public function setExtension($extension): void
+    public function setExtension(?object $extension): void
     {
         $this->extension = $extension;
     }
@@ -252,7 +239,7 @@ abstract class AbstractReadCommand extends CompilableClause implements ReadComma
      *
      * @return mixed
      */
-    public function __call($name, $arguments)
+    public function __call(string $name, array $arguments): mixed
     {
         return $this->extension->$name($this, ...$arguments);
     }

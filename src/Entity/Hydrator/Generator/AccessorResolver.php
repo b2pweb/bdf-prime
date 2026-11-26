@@ -5,27 +5,18 @@ namespace Bdf\Prime\Entity\Hydrator\Generator;
 /**
  * Resolve accessor for embedded (or not) attributes / objects
  */
-class AccessorResolver
+final class AccessorResolver
 {
-    /**
-     * @var ClassAccessor
-     */
-    private $baseAccessor;
+    private ClassAccessor $baseAccessor;
 
-    /**
-     * @var AttributesResolver
-     */
-    private $resolver;
+    private AttributesResolver $resolver;
 
-    /**
-     * @var CodeGenerator
-     */
-    private $code;
+    private CodeGenerator $code;
 
     /**
      * @var ClassAccessor[]
      */
-    private $accessors = [];
+    private array $accessors = [];
 
 
     /**
@@ -69,12 +60,12 @@ class AccessorResolver
      *
      * @return EmbeddedAccessor
      */
-    public function embedded(EmbeddedInfo $embedded)
+    public function embedded(EmbeddedInfo $embedded): EmbeddedAccessor
     {
         return new EmbeddedAccessor(
             $this->code,
             $embedded,
-            array_values(array_map([$this, 'get'], $embedded->classes())),
+            array_values(array_map($this->get(...), $embedded->classes())),
             $embedded->isRoot()
                 ? $this->baseAccessor
                 : $this->embedded($embedded->parent())

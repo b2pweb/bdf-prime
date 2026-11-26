@@ -7,27 +7,12 @@ use ReflectionProperty;
 /**
  * Store info about attribute
  */
-class AttributeInfo
+final class AttributeInfo
 {
-    /**
-     * @var string
-     */
-    private $name;
-
-    /**
-     * @var array
-     */
-    private $metadata;
-
-    /**
-     * @var AttributesResolver
-     */
-    private $resolver;
-
-    /**
-     * @var ReflectionProperty|null
-     */
-    private $reflection;
+    private string $name;
+    private array $metadata;
+    private AttributesResolver $resolver;
+    private ?ReflectionProperty $reflection = null;
 
 
     /**
@@ -49,7 +34,7 @@ class AttributeInfo
      *
      * @return bool
      */
-    public function isEmbedded()
+    public function isEmbedded(): bool
     {
         return isset($this->metadata['embedded'])
             // If the attribute is a root attribute, check only for root embedded entities
@@ -62,7 +47,7 @@ class AttributeInfo
      *
      * @return EmbeddedInfo
      */
-    public function embedded()
+    public function embedded(): EmbeddedInfo
     {
         return empty($this->metadata['root'])
             ? $this->resolver->embedded($this->metadata['embedded'])
@@ -75,7 +60,7 @@ class AttributeInfo
      *
      * @return string
      */
-    public function name()
+    public function name(): string
     {
         return $this->name;
     }
@@ -85,7 +70,7 @@ class AttributeInfo
      *
      * @return string
      */
-    public function property()
+    public function property(): string
     {
         $finalAttribute = explode('.', $this->name);
 
@@ -98,7 +83,7 @@ class AttributeInfo
      *
      * @return string|null
      */
-    public function type()
+    public function type(): ?string
     {
         return $this->metadata['type'] ?? null;
     }
@@ -108,7 +93,7 @@ class AttributeInfo
      *
      * @return string
      */
-    public function field()
+    public function field(): string
     {
         return $this->metadata['field'];
     }

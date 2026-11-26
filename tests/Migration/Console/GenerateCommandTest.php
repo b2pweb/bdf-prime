@@ -68,15 +68,43 @@ class GenerateCommandTest extends CommandTestCase
      */
     public function test_execute_when_migration_already_exists()
     {
-        $repository = $this->getMockBuilder(DbVersionRepository::class)
-            ->setMethods(['newIdentifier'])
-            ->setConstructorArgs([Prime::connection('test'), 'migration'])
-            ->getMock();
+        $innerRepository = new DbVersionRepository(Prime::connection('test'), 'migration');
+        $repository = new class($innerRepository) implements VersionRepositoryInterface
+        {
+            public function __construct(
+                private DbVersionRepository $inner,
+            ) {}
 
-        $repository
-            ->expects($this->exactly(2))
-            ->method('newIdentifier')
-            ->will($this->returnValue('123'));
+            public function newIdentifier(): string
+            {
+                return '123';
+            }
+
+            public function has(string $version): bool
+            {
+                return $this->inner->has($version);
+            }
+
+            public function current(): string
+            {
+                return $this->inner->current();
+            }
+
+            public function all(): array
+            {
+                return $this->inner->all();
+            }
+
+            public function add(string $version)
+            {
+                return $this->inner->add($version);
+            }
+
+            public function remove(string $version)
+            {
+                return $this->inner->remove($version);
+            }
+        };
 
         $this->repository = $repository;
         $this->manager = new MigrationManager($this->repository, $this->provider);

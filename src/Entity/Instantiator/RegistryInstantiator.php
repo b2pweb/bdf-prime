@@ -5,17 +5,13 @@ namespace Bdf\Prime\Entity\Instantiator;
 /**
  * RegistryInstantiator
  */
-class RegistryInstantiator implements InstantiatorInterface
+final class RegistryInstantiator implements InstantiatorInterface
 {
     /**
      * @var InstantiatorInterface[]
      */
-    protected $registry = [];
-
-    /**
-     * @var InstantiatorInterface
-     */
-    protected $defaultInstantiator;
+    private array $registry = [];
+    private ?InstantiatorInterface $defaultInstantiator;
 
     /**
      * Instantiator constructor.
@@ -57,7 +53,7 @@ class RegistryInstantiator implements InstantiatorInterface
      *
      * @return InstantiatorInterface
      */
-    public function getDefaultInstantiator()
+    public function getDefaultInstantiator(): InstantiatorInterface
     {
         if ($this->defaultInstantiator === null) {
             $this->defaultInstantiator = new Instantiator();

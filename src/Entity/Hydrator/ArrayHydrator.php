@@ -18,7 +18,7 @@ use function ucfirst;
  * Base hydrator implementation.
  * Works like {@link ArrayHydrator}
  */
-class ArrayHydrator implements HydratorInterface
+final class ArrayHydrator implements HydratorInterface
 {
     /**
      * Array prefix for protected properties
@@ -28,7 +28,7 @@ class ArrayHydrator implements HydratorInterface
     /**
      * @var array<class-string, callable(object, array)>
      */
-    private $hydratorsCache = [];
+    private array $hydratorsCache = [];
 
     /**
      * {@inheritdoc}

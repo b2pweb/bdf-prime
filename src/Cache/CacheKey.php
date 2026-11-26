@@ -8,27 +8,24 @@ namespace Bdf\Prime\Cache;
 final class CacheKey
 {
     /**
-     * @var string|callable
+     * @var string|callable|null
      */
-    private $namespace;
+    private mixed $namespace;
 
     /**
-     * @var string|callable
+     * @var string|callable|null
      */
-    private $key;
+    private mixed $key;
 
-    /**
-     * @var integer
-     */
-    private $lifetime = 0;
+    private int $lifetime = 0;
 
     /**
      * CacheKey constructor.
-     * @param callable|string $namespace
-     * @param callable|string $key
+     * @param callable|string|null $namespace
+     * @param callable|string|null $key
      * @param int $lifetime
      */
-    public function __construct($namespace = null, $key = null, int $lifetime = 0)
+    public function __construct(callable|string|null $namespace = null, callable|string|null $key = null, int $lifetime = 0)
     {
         $this->namespace = $namespace;
         $this->key = $key;
@@ -48,7 +45,7 @@ final class CacheKey
      *
      * @return $this
      */
-    public function setNamespace($namespace): CacheKey
+    public function setNamespace(string|callable $namespace): CacheKey
     {
         $this->namespace = $namespace;
         return $this;
@@ -63,11 +60,11 @@ final class CacheKey
     }
 
     /**
-     * @param string|callable $key
+     * @param string|callable|null $key
      *
      * @return $this
      */
-    public function setKey($key): CacheKey
+    public function setKey(string|callable|null $key): CacheKey
     {
         $this->key = $key;
         return $this;

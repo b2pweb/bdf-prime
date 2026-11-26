@@ -12,13 +12,9 @@ use Bdf\Prime\Types\TypeInterface;
  * $query->where('roles', new Value([5, 2]));
  * With roles as 'searchable_array', the condition will not be transformed to an IN expression
  */
-class Value extends AbstractExpressionTransformer implements TypedExpressionInterface
+final class Value extends AbstractExpressionTransformer implements TypedExpressionInterface
 {
-    /**
-     * @var TypeInterface
-     */
-    protected $type;
-
+    private ?TypeInterface $type = null;
 
     /**
      * {@inheritdoc}
@@ -34,7 +30,7 @@ class Value extends AbstractExpressionTransformer implements TypedExpressionInte
     /**
      * {@inheritdoc}
      */
-    public function setType(TypeInterface $type)
+    public function setType(TypeInterface $type): static
     {
         $this->type = $type;
 

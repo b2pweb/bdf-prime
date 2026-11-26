@@ -5,7 +5,7 @@ namespace Bdf\Prime\Types;
 /**
  * Accept a time type (H:i:s)
  */
-class TimeType extends AbstractDateTimeType
+final class TimeType extends AbstractDateTimeType
 {
     /**
      * TimeType constructor.
@@ -14,7 +14,7 @@ class TimeType extends AbstractDateTimeType
      * @param string $className
      * @param \DateTimeZone|null $timezone
      */
-    public function __construct($name = self::TIME, string $className = \DateTime::class, ?\DateTimeZone $timezone = null)
+    public function __construct(string $name = self::TIME, string $className = \DateTime::class, ?\DateTimeZone $timezone = null)
     {
         parent::__construct($name);
 

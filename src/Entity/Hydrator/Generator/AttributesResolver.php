@@ -12,41 +12,34 @@ use Bdf\Prime\ServiceLocator;
 /**
  * Resolve attributes and embedded objects from Mapper
  */
-class AttributesResolver
+final class AttributesResolver
 {
-    /**
-     * @var Mapper
-     */
-    private $mapper;
-
-    /**
-     * @var ServiceLocator
-     */
-    private $prime;
+    private Mapper $mapper;
+    private ServiceLocator $prime;
 
     /**
      * List of all attributes of the entity
      *
      * @var AttributeInfo[]
      */
-    private $attributes = [];
+    private array $attributes = [];
 
     /**
      * List of all embedded entities
      *
      * @var EmbeddedInfo[]
      */
-    private $embeddeds = [];
+    private array $embeddeds = [];
 
     /**
      * @var AttributeInfo[]
      */
-    private $rootAttributes = [];
+    private array $rootAttributes = [];
 
     /**
      * @var EmbeddedInfo[]
      */
-    private $rootEmbeddeds = [];
+    private array $rootEmbeddeds = [];
 
 
     /**
@@ -78,7 +71,7 @@ class AttributesResolver
     /**
      * @return AttributeInfo[]
      */
-    public function attributes()
+    public function attributes(): array
     {
         return $this->attributes;
     }
@@ -89,7 +82,7 @@ class AttributesResolver
      *
      * @return AttributeInfo
      */
-    public function attribute($name)
+    public function attribute(string $name): AttributeInfo
     {
         return $this->attributes[$name];
     }
@@ -97,7 +90,7 @@ class AttributesResolver
     /**
      * @return EmbeddedInfo[]
      */
-    public function embeddeds()
+    public function embeddeds(): array
     {
         return $this->embeddeds;
     }
@@ -109,7 +102,7 @@ class AttributesResolver
      *
      * @return EmbeddedInfo
      */
-    public function embedded($attribute)
+    public function embedded(string $attribute): EmbeddedInfo
     {
         return $this->embeddeds[$attribute];
     }
@@ -121,7 +114,7 @@ class AttributesResolver
      *
      * @return EmbeddedInfo
      */
-    public function rootEmbedded($attribute)
+    public function rootEmbedded(string $attribute): EmbeddedInfo
     {
         return $this->rootEmbeddeds[$attribute];
     }
@@ -131,7 +124,7 @@ class AttributesResolver
      *
      * @return EmbeddedInfo[]
      */
-    public function rootEmbeddeds()
+    public function rootEmbeddeds(): array
     {
         return $this->rootEmbeddeds;
     }
@@ -143,7 +136,7 @@ class AttributesResolver
      *
      * @return bool
      */
-    public function hasRootEmbedded($attribute)
+    public function hasRootEmbedded(string $attribute): bool
     {
         return isset($this->rootEmbeddeds[$attribute]);
     }
@@ -153,7 +146,7 @@ class AttributesResolver
      *
      * @return AttributeInfo[]
      */
-    public function rootAttributes()
+    public function rootAttributes(): array
     {
         return $this->rootAttributes;
     }
@@ -166,7 +159,7 @@ class AttributesResolver
      *
      * @return bool
      */
-    public function isEntity($class)
+    public function isEntity(string $class): bool
     {
         return $this->prime->mappers()->isEntity($class);
     }
@@ -178,7 +171,7 @@ class AttributesResolver
      *
      * @return bool
      */
-    public function isImportable($class)
+    public function isImportable(string $class): bool
     {
         return is_subclass_of($class, ImportableInterface::class);
     }

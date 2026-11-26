@@ -28,17 +28,14 @@ use LogicException;
  */
 final class JsonContainsPath extends AbstractPlatformSpecificExpression
 {
-    /**
-     * @var string|ExpressionInterface
-     */
-    private $target;
+    private string|ExpressionInterface $target;
     private string $path;
 
     /**
      * @param ExpressionInterface|string $target The JSON document or array to search in. Can be an attribute name, or a SQL expression. The value should not be unquoted.
      * @param string $path The path to search in the JSON document. Must start with "$"
      */
-    public function __construct($target, string $path)
+    public function __construct(ExpressionInterface|string $target, string $path)
     {
         $this->target = $target;
         $this->path = $path;
@@ -76,7 +73,7 @@ final class JsonContainsPath extends AbstractPlatformSpecificExpression
      * @return string
      * @throws \Bdf\Prime\Exception\PrimeException
      */
-    private function target(CompilableClause $query, CompilerInterface $compiler)
+    private function target(CompilableClause $query, CompilerInterface $compiler): string
     {
         return $this->target instanceof ExpressionInterface
             ? $this->target->build($query, $compiler)
@@ -93,7 +90,7 @@ final class JsonContainsPath extends AbstractPlatformSpecificExpression
      */
     private static function getSqliteExpression(QuoteCompilerInterface $compiler, string $target, string $path): string
     {
-        return (string) $compiler->quote($path) . ' IN (SELECT fullkey FROM json_tree(' . $target . '))';
+        return $compiler->quote($path) . ' IN (SELECT fullkey FROM json_tree(' . $target . '))';
     }
 
     /**
@@ -105,6 +102,6 @@ final class JsonContainsPath extends AbstractPlatformSpecificExpression
      */
     private static function getDefaultExpression(CompilerInterface $compiler, string $target, string $path): string
     {
-        return 'JSON_CONTAINS_PATH(' . $target . ', "all", ' . (string) $compiler->quote($path) . ')';
+        return 'JSON_CONTAINS_PATH(' . $target . ', "all", ' . $compiler->quote($path) . ')';
     }
 }

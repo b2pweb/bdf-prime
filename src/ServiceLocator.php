@@ -12,54 +12,26 @@ use Bdf\Prime\Mapper\MapperFactoryInterface;
 use Bdf\Prime\Repository\EntityRepository;
 use Bdf\Prime\Repository\RepositoryInterface;
 use Bdf\Serializer\SerializerInterface;
+use Closure;
 use Psr\Container\ContainerInterface;
 
 /**
  * ServiceLocator
  */
-class ServiceLocator
+final class ServiceLocator
 {
-    /**
-     * @var ConnectionManager
-     */
-    private $connectionManager;
+    private ConnectionManager $connectionManager;
 
     /**
      * @var class-string-map<T, RepositoryInterface<T>>
      */
-    private $repositories = [];
-
-    /**
-     * @var MapperFactoryInterface
-     */
-    private $mapperFactory;
-
-    /**
-     * @var SerializerInterface
-     */
-    private $serializer;
-
-    /**
-     * @var \Closure
-     */
-    private $serializerResolver;
-
-    /**
-     * @var HydratorRegistry
-     */
-    private $hydrators;
-
-    /**
-     * @var InstantiatorInterface
-     */
-    private $instantiator;
-
-    /**
-     * DI container
-     *
-     * @var ContainerInterface
-     */
-    private $di;
+    private array $repositories = [];
+    private MapperFactoryInterface $mapperFactory;
+    private SerializerInterface $serializer;
+    private ?Closure $serializerResolver = null;
+    private HydratorRegistry $hydrators;
+    private InstantiatorInterface $instantiator;
+    private ?ContainerInterface $di = null;
 
     /**
      * SericeLocator constructor.
@@ -81,7 +53,7 @@ class ServiceLocator
      *
      * @return ConnectionManager
      */
-    public function connections()
+    public function connections(): ConnectionManager
     {
         return $this->connectionManager;
     }
@@ -103,7 +75,7 @@ class ServiceLocator
      *
      * @return ConnectionInterface
      */
-    public function connection($name = null)
+    public function connection(?string $name = null): ConnectionInterface
     {
         return $this->connectionManager->getConnection($name);
     }
@@ -118,7 +90,7 @@ class ServiceLocator
      *
      * @return void
      */
-    public function registerRepository($entityClass, RepositoryInterface $repository): void
+    public function registerRepository(string $entityClass, RepositoryInterface $repository): void
     {
         // https://github.com/vimeo/psalm/issues/4460
         /** @psalm-suppress InvalidPropertyAssignmentValue */
@@ -132,7 +104,7 @@ class ServiceLocator
      *
      * @return void
      */
-    public function unregisterRepository($entityClass): void
+    public function unregisterRepository(string $entityClass): void
     {
         if (isset($this->repositories[$entityClass]) && $this->repositories[$entityClass] instanceof EntityRepository) {
             $this->repositories[$entityClass]->destroy();
@@ -151,7 +123,7 @@ class ServiceLocator
      *
      * @psalm-ignore-nullable-return
      */
-    public function repository($entityClass): ?RepositoryInterface
+    public function repository(string|object $entityClass): ?RepositoryInterface
     {
         if (is_object($entityClass)) {
             $entityClass = get_class($entityClass);
@@ -175,7 +147,7 @@ class ServiceLocator
      *
      * @return array
      */
-    public function repositoryNames()
+    public function repositoryNames(): array
     {
         return array_keys($this->repositories);
     }
@@ -183,13 +155,13 @@ class ServiceLocator
     /**
      * Set the serializer
      *
-     * @param \Closure|SerializerInterface $serializer
+     * @param Closure|SerializerInterface $serializer
      *
      * @return $this
      */
-    public function setSerializer($serializer)
+    public function setSerializer(Closure|SerializerInterface $serializer): static
     {
-        if ($serializer instanceof \Closure) {
+        if ($serializer instanceof Closure) {
             $this->serializerResolver = $serializer;
         } elseif ($serializer instanceof SerializerInterface) {
             $this->serializer = $serializer;
@@ -203,7 +175,7 @@ class ServiceLocator
      *
      * @return SerializerInterface
      */
-    public function serializer()
+    public function serializer(): SerializerInterface
     {
         if ($this->serializerResolver !== null) {
             $resolver = $this->serializerResolver;
@@ -219,7 +191,7 @@ class ServiceLocator
      *
      * @return HydratorRegistry
      */
-    public function hydrators()
+    public function hydrators(): HydratorRegistry
     {
         return $this->hydrators;
     }
@@ -231,7 +203,7 @@ class ServiceLocator
      *
      * @return HydratorInterface
      */
-    public function hydrator($entity)
+    public function hydrator(string|object $entity): HydratorInterface
     {
         if (is_object($entity)) {
             $entity = get_class($entity);
@@ -245,7 +217,7 @@ class ServiceLocator
      *
      * @return InstantiatorInterface
      */
-    public function instantiator()
+    public function instantiator(): InstantiatorInterface
     {
         return $this->instantiator;
     }
@@ -253,9 +225,9 @@ class ServiceLocator
     /**
      * DI accessor
      *
-     * @return ContainerInterface
+     * @return ContainerInterface|null
      */
-    public function di()
+    public function di(): ?ContainerInterface
     {
         return $this->di;
     }
@@ -267,7 +239,7 @@ class ServiceLocator
      *
      * @return $this
      */
-    public function setDI(ContainerInterface $di)
+    public function setDI(ContainerInterface $di): static
     {
         $this->di = $di;
 

@@ -84,7 +84,7 @@ interface TableBuilderInterface
      *
      * @return $this
      */
-    public function index($columns, int $type = IndexInterface::TYPE_SIMPLE, ?string $name = null, array $options = []);
+    public function index(string|array $columns, int $type = IndexInterface::TYPE_SIMPLE, ?string $name = null, array $options = []);
 
     /**
      * Specify the primary key(s) for the table.
@@ -94,7 +94,7 @@ interface TableBuilderInterface
      *
      * @return $this
      */
-    public function primary($columns = null, ?string $name = null);
+    public function primary(string|array|null $columns = null, ?string $name = null);
 
     /**
      * Add a new column to the table
@@ -146,7 +146,7 @@ interface TableBuilderInterface
      *
      * @return $this
      */
-    public function foreignKey($foreignTable, array $localColumnNames, array $foreignColumnNames, array $options = [], ?string $constraintName = null);
+    public function foreignKey(TableInterface|string $foreignTable, array $localColumnNames, array $foreignColumnNames, array $options = [], ?string $constraintName = null);
 
     /**
      * Build the table object

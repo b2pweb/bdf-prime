@@ -49,5 +49,5 @@ interface RollbackQueryManagerInterface extends QueryManagerInterface
      *
      * @return $this
      */
-    public function pushRollback($queries);
+    public function pushRollback(mixed $queries);
 }

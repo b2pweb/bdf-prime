@@ -69,7 +69,7 @@ interface KeyValueQueryInterface extends ReadCommandInterface, Projectionable, A
      *
      * @return $this
      */
-    public function where($field, $value = null);
+    public function where(string|array $field, mixed $value = null);
 
     /**
      * Set new values for UPDATE operation
@@ -107,5 +107,5 @@ interface KeyValueQueryInterface extends ReadCommandInterface, Projectionable, A
      * @see KeyValueQueryInterface::values() For set value (internally used by $values parameters)
      * @throws PrimeException When execute fail
      */
-    public function update($values = null);
+    public function update(?array $values = null);
 }

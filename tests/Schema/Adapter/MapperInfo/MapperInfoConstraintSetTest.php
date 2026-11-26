@@ -34,7 +34,7 @@ class MapperInfoConstraintSetTest extends TestCase
 
         $set = new MapperInfoConstraintSet($info, [$resolver]);
 
-        $resolver->expects($this->exactly(9))
+        $resolver->expects($this->exactly(10))
             ->method('fromRelation')
             ->with($info, $this->isInstanceOf(ObjectPropertyInfo::class))
             ->willReturn([])

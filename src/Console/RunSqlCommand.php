@@ -11,7 +11,7 @@ use Symfony\Component\Console\Attribute\AsCommand;
  * Run SQL on a doctrine connection. This will display a dbal result.
  */
 #[AsCommand('prime:run:sql', 'Executes arbitrary SQL directly from the command line.')]
-class RunSqlCommand extends DoctrineRunSqlCommand
+final class RunSqlCommand extends DoctrineRunSqlCommand
 {
     protected static $defaultName = 'prime:run:sql';
 

@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class RedoCommand
  */
 #[AsCommand('prime:migration:redo', 'Redo a specific migration')]
-class RedoCommand extends AbstractCommand
+final class RedoCommand extends AbstractCommand
 {
     protected static $defaultName = 'prime:migration:redo';
 

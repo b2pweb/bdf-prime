@@ -13,39 +13,23 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * Manage the migration process
  */
-class MigrationManager
+final class MigrationManager
 {
     public const UP = 'up';
     public const DOWN = 'down';
 
     /**
      * The upgraded migration repository
-     *
-     * @var VersionRepositoryInterface
      */
-    private $repository;
+    private VersionRepositoryInterface $repository;
 
     /**
      * The migration provider
-     *
-     * @var MigrationProviderInterface
      */
-    private $provider;
-
-    /**
-     * @var OutputInterface
-     */
-    private $output;
-
-    /**
-     * @var HelperSet
-     */
-    private $helper;
-
-    /**
-     * @var InputInterface
-     */
-    private $input;
+    private MigrationProviderInterface $provider;
+    private OutputInterface $output;
+    private ?HelperSet $helper = null;
+    private ?InputInterface $input = null;
 
     /**
      * Constructor
@@ -378,7 +362,7 @@ class MigrationManager
      *
      * @return void
      */
-    private function applyConsoleContext(MigrationInterface $migration)
+    private function applyConsoleContext(MigrationInterface $migration): void
     {
         if (!$migration instanceof Migration) {
             return;

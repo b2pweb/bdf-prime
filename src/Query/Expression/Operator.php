@@ -16,7 +16,7 @@ use function is_array;
 final class Operator implements ExpressionTransformerInterface, TypedExpressionInterface
 {
     private string $operator;
-    private $value;
+    private mixed $value;
     private string $column;
     private ?TypeInterface $type = null;
     private ?PlatformInterface $platform = null;
@@ -27,7 +27,7 @@ final class Operator implements ExpressionTransformerInterface, TypedExpressionI
      * @param string $operator Comparison operator. Should be one of operators handled by compiler, and not a raw SQL one
      * @param mixed $value The value to compare
      */
-    public function __construct(string $operator, $value)
+    public function __construct(string $operator, mixed $value)
     {
         $this->operator = $operator;
         $this->value = $value;
@@ -68,7 +68,7 @@ final class Operator implements ExpressionTransformerInterface, TypedExpressionI
             return $type->toDatabase($this->value);
         }
 
-        return array_map([$type, 'toDatabase'], $this->value);
+        return array_map($type->toDatabase(...), $this->value);
     }
 
     /**
@@ -108,7 +108,7 @@ final class Operator implements ExpressionTransformerInterface, TypedExpressionI
      *
      * @return self
      */
-    public static function lessThan($value): self
+    public static function lessThan(mixed $value): self
     {
         return new self('<', $value);
     }
@@ -120,7 +120,7 @@ final class Operator implements ExpressionTransformerInterface, TypedExpressionI
      *
      * @return self
      */
-    public static function lessThanOrEqual($value): self
+    public static function lessThanOrEqual(mixed $value): self
     {
         return new self('<=', $value);
     }
@@ -132,7 +132,7 @@ final class Operator implements ExpressionTransformerInterface, TypedExpressionI
      *
      * @return self
      */
-    public static function greaterThan($value): self
+    public static function greaterThan(mixed $value): self
     {
         return new self('>', $value);
     }
@@ -144,7 +144,7 @@ final class Operator implements ExpressionTransformerInterface, TypedExpressionI
      *
      * @return self
      */
-    public static function greaterThanOrEqual($value): self
+    public static function greaterThanOrEqual(mixed $value): self
     {
         return new self('>=', $value);
     }
@@ -194,7 +194,7 @@ final class Operator implements ExpressionTransformerInterface, TypedExpressionI
      *
      * @return self
      */
-    public static function in(...$values): self
+    public static function in(mixed ...$values): self
     {
         return new self('in', $values);
     }
@@ -206,7 +206,7 @@ final class Operator implements ExpressionTransformerInterface, TypedExpressionI
      *
      * @return self
      */
-    public static function notIn(...$values): self
+    public static function notIn(mixed ...$values): self
     {
         return new self('!in', $values);
     }
@@ -219,7 +219,7 @@ final class Operator implements ExpressionTransformerInterface, TypedExpressionI
      *
      * @return self
      */
-    public static function between($min, $max): self
+    public static function between(mixed $min, mixed $max): self
     {
         return new self('between', [$min, $max]);
     }
@@ -232,7 +232,7 @@ final class Operator implements ExpressionTransformerInterface, TypedExpressionI
      *
      * @return self
      */
-    public static function notBetween($min, $max): self
+    public static function notBetween(mixed $min, mixed $max): self
     {
         return new self('!between', [$min, $max]);
     }
@@ -244,7 +244,7 @@ final class Operator implements ExpressionTransformerInterface, TypedExpressionI
      *
      * @return self
      */
-    public static function notEqual($value): self
+    public static function notEqual(mixed $value): self
     {
         return new self('!=', $value);
     }

@@ -16,15 +16,9 @@ use Bdf\Prime\Schema\TableInterface;
  */
 final class MetadataTable implements TableInterface
 {
-    /**
-     * @var Metadata
-     */
-    private $metadata;
+    private Metadata $metadata;
 
-    /**
-     * @var PlatformTypesInterface
-     */
-    private $types;
+    private PlatformTypesInterface $types;
 
 
     /**
@@ -100,7 +94,7 @@ final class MetadataTable implements TableInterface
     /**
      * {@inheritdoc}
      */
-    public function option(string $name)
+    public function option(string $name): mixed
     {
         return $this->metadata->tableOptions()[$name];
     }

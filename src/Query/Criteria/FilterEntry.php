@@ -9,21 +9,18 @@ use Bdf\Prime\Query\Expression\ExpressionInterface;
  *
  * @psalm-immutable
  */
-final class FilterEntry
+final readonly class FilterEntry
 {
-    /**
-     * @var string|ExpressionInterface
-     */
-    /*readonly string|ExpressionInterface*/ public $field;
-    /*readonly*/ public string $operator;
-    /*readonly mixed*/ public $value;
+    public string|ExpressionInterface $field;
+    public string $operator;
+    public mixed $value;
 
     /**
      * @param ExpressionInterface|string $field
      * @param string $operator
      * @param mixed $value
      */
-    public function __construct($field, string $operator, $value)
+    public function __construct(ExpressionInterface|string $field, string $operator, mixed $value)
     {
         $this->field = $field;
         $this->operator = $operator;

@@ -5,12 +5,12 @@ namespace Bdf\Prime\Types;
 /**
  * Map to stdClass object
  */
-class ObjectType extends AbstractSerializeType
+final class ObjectType extends AbstractSerializeType
 {
     /**
      * {@inheritdoc}
      */
-    public function __construct($type = self::OBJECT)
+    public function __construct(string $type = self::OBJECT)
     {
         parent::__construct($type);
     }
@@ -26,7 +26,7 @@ class ObjectType extends AbstractSerializeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase(mixed $value): ?string
     {
         if (!is_object($value)) {
             return $value;

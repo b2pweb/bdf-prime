@@ -13,12 +13,12 @@ use Doctrine\DBAL\Types\Types;
  *
  * @todo Handle "static" CHAR type
  */
-class SqlStringType extends AbstractPlatformType
+final class SqlStringType extends AbstractPlatformType
 {
     /**
      * @var string[]
      */
-    private static $doctrineTypeMap = [
+    private static array $doctrineTypeMap = [
         self::STRING => Types::STRING,
         self::TEXT   => Types::TEXT,
         self::BIGINT => Types::BIGINT,
@@ -29,7 +29,7 @@ class SqlStringType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function __construct(PlatformInterface $platform, $name = self::STRING)
+    public function __construct(PlatformInterface $platform, string $name = self::STRING)
     {
         parent::__construct($platform, $name);
     }
@@ -39,7 +39,7 @@ class SqlStringType extends AbstractPlatformType
      *
      * @todo can we remove this transformation for string value ?
      */
-    public function toDatabase($value)
+    public function toDatabase(mixed $value): ?string
     {
         return $value === null ? null : (string) $value;
     }
@@ -47,7 +47,7 @@ class SqlStringType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?string
     {
         return $value === null ? null : (string) $value;
     }
@@ -55,9 +55,9 @@ class SqlStringType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function declaration(ColumnInterface $column)
+    public function declaration(ColumnInterface $column): string
     {
-        return isset(self::$doctrineTypeMap[$this->name]) ? self::$doctrineTypeMap[$this->name] : Types::TEXT;
+        return self::$doctrineTypeMap[$this->name] ?? Types::TEXT;
     }
 
     /**
@@ -65,7 +65,7 @@ class SqlStringType extends AbstractPlatformType
      *
      * @return string[]
      */
-    public static function typeNames()
+    public static function typeNames(): array
     {
         return array_keys(self::$doctrineTypeMap);
     }

@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * CheckCommand
  */
 #[AsCommand('prime:migration:check', 'Check all migrations have been run, exit with non-zero if not')]
-class CheckCommand extends AbstractCommand
+final class CheckCommand extends AbstractCommand
 {
     protected static $defaultName = 'prime:migration:check';
 

@@ -27,7 +27,7 @@ final class JsonInsert extends JsonFunction
      * @param string $path The path to the field to add. Should start with '$' which is the root of the JSON document.
      * @param mixed $value The PHP value to set. This value will be converted to json.
      */
-    public function __construct($document, string $path, $value)
+    public function __construct(ExpressionInterface|string $document, string $path, mixed $value)
     {
         parent::__construct('JSON_INSERT', $document, $path, new ToJson($value));
     }

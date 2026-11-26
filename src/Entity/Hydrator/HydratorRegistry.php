@@ -5,22 +5,19 @@ namespace Bdf\Prime\Entity\Hydrator;
 /**
  * HydratorRegistry
  */
-class HydratorRegistry
+final class HydratorRegistry
 {
-    /**
-     * @var HydratorInterface
-     */
-    protected $baseHydrator;
+    private ?HydratorInterface $baseHydrator = null;
 
     /**
      * @var HydratorInterface[]
      */
-    protected $hydrators = [];
+    private array $hydrators = [];
 
     /**
      * @var callable[]
      */
-    protected $factories = [];
+    private array $factories = [];
 
     /**
      * Set the base hydrator.
@@ -54,7 +51,7 @@ class HydratorRegistry
      *
      * @return void
      */
-    public function add($entityClass, HydratorInterface $hydrator): void
+    public function add(string $entityClass, HydratorInterface $hydrator): void
     {
         $this->hydrators[$entityClass] = $hydrator;
     }
@@ -79,7 +76,7 @@ class HydratorRegistry
      *
      * @return void
      */
-    public function factory($entityClass, $factory): void
+    public function factory(string $entityClass, callable $factory): void
     {
         $this->factories[$entityClass] = $factory;
     }
@@ -91,7 +88,7 @@ class HydratorRegistry
      *
      * @return HydratorInterface
      */
-    public function get($entityClass)
+    public function get(string $entityClass): HydratorInterface
     {
         if (isset($this->hydrators[$entityClass])) {
             return $this->hydrators[$entityClass];

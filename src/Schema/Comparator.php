@@ -14,14 +14,12 @@ use Doctrine\DBAL\Schema\TableDiff;
  *
  * @internal Use {@see SchemaManager::diff()} instead
  */
-class Comparator extends BaseComparator
+final class Comparator extends BaseComparator
 {
     /**
      * Allow diff to list drop column
-     *
-     * @var bool
      */
-    protected $listDropColumn = true;
+    private bool $listDropColumn = true;
 
     /**
      * Set flag that allowed diff to list drop columns
@@ -30,9 +28,9 @@ class Comparator extends BaseComparator
      *
      * @return void
      */
-    public function setListDropColumn($flag): void
+    public function setListDropColumn(bool $flag): void
     {
-        $this->listDropColumn = (bool)$flag;
+        $this->listDropColumn = $flag;
     }
 
     /**

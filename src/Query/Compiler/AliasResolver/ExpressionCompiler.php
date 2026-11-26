@@ -115,7 +115,7 @@ use Bdf\Prime\Exception\QueryBuildingException;
  *              - Cannot ensure that the "right part" is an attribute
  *              - The real attribute is known
  */
-class ExpressionCompiler
+final class ExpressionCompiler
 {
     public const DYN_SEPARATOR    = '.';
     public const ATTR_IDENTIFIER  = '>';
@@ -132,7 +132,7 @@ class ExpressionCompiler
     /**
      * @var static
      */
-    private static $instance;
+    private static ?self $instance = null;
 
     /**
      * Compile the expression to expression tokens
@@ -141,7 +141,7 @@ class ExpressionCompiler
      *
      * @return ExpressionToken[]
      */
-    public function compile($expression)
+    public function compile(string $expression): array
     {
         $len = strlen($expression);
         $pos = 0;
@@ -177,7 +177,7 @@ class ExpressionCompiler
      *
      * @return ExpressionToken
      */
-    protected function compileAlias($expression, &$pos, $len)
+    protected function compileAlias(string $expression, int &$pos, int $len): ExpressionToken
     {
         if ($pos !== 0) {
             throw new QueryBuildingException('Alias should be the first expression token');
@@ -202,7 +202,7 @@ class ExpressionCompiler
      *
      * @return ExpressionToken
      */
-    protected function compileAttribute($expression, &$pos, $len)
+    protected function compileAttribute(string $expression, int &$pos, int $len): ExpressionToken
     {
         $value = substr($expression, $pos + 1);
         $pos = $len;
@@ -224,7 +224,7 @@ class ExpressionCompiler
      *
      * @return ExpressionToken
      */
-    protected function compileStatic($expression, &$pos, $len)
+    protected function compileStatic(string $expression, int &$pos, int $len): ExpressionToken
     {
         if ($pos !== 0) {
             throw new QueryBuildingException('Static expression should be the first expression token');
@@ -254,7 +254,7 @@ class ExpressionCompiler
      *
      * @return ExpressionToken
      */
-    protected function compileDynamic($expression, &$pos, $len)
+    protected function compileDynamic(string $expression, int &$pos, int $len): ExpressionToken
     {
         if ($expression[$pos] === self::DYN_SEPARATOR) {
             ++$pos;
@@ -292,7 +292,7 @@ class ExpressionCompiler
      *
      * @return string
      */
-    protected function compileName($expression, &$pos, $len)
+    protected function compileName(string $expression, int &$pos, int $len): string
     {
         $name = '';
 
@@ -312,14 +312,10 @@ class ExpressionCompiler
     /**
      * Get the compiler instance
      *
-     * @return static
+     * @return self
      */
-    public static function instance()
+    public static function instance(): self
     {
-        if (static::$instance === null) {
-            static::$instance = new static();
-        }
-
-        return static::$instance;
+        return self::$instance ??= new self();
     }
 }

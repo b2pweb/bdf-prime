@@ -14,17 +14,17 @@ final class WalkCursor
     /**
      * @var ReadCommandInterface<ConnectionInterface, R>
      */
-    public $query;
+    public ReadCommandInterface $query;
 
     /**
      * @var mixed
      */
-    public $cursor = null;
+    public mixed $cursor = null;
 
     /**
      * @var R[]|null
      */
-    public $entities;
+    public ?array $entities = null;
 
     /**
      * WalkCursor constructor.

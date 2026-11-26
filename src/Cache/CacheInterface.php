@@ -24,7 +24,7 @@ interface CacheInterface
      *
      * @return void
      */
-    public function set(CacheKey $key, $data): void;
+    public function set(CacheKey $key, mixed $data): void;
 
     /**
      * Delete key from namespace

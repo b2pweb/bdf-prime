@@ -15,7 +15,7 @@ interface TypesRegistryInterface
      *
      * @return $this
      */
-    public function register($type, ?string $alias = null);
+    public function register(string|TypeInterface $type, ?string $alias = null);
 
     /**
      * Get the type object from its name

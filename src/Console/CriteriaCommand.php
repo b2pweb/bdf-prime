@@ -26,11 +26,11 @@ use function str_starts_with;
  * Command for generate a custom criteria class from a mapper
  */
 #[AsCommand('prime:criteria', 'Generate criteria class by mapper')]
-class CriteriaCommand extends Command
+final class CriteriaCommand extends Command
 {
     public const CLASS_SUFFIX = 'Criteria';
 
-    protected static $defaultName = 'prime:criteria';
+    private static $defaultName = 'prime:criteria';
 
     private ServiceLocator $locator;
 

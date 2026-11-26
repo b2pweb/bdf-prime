@@ -114,7 +114,7 @@ final class Json implements ExpressionInterface, \ArrayAccess
      *
      * @return JsonContains
      */
-    public function contains($value): JsonContains
+    public function contains(string|int|float|bool $value): JsonContains
     {
         // JSON_CONTAINS() does not support unquoted values, so we need to disable unquote
         $self = $this->unquote(false);
@@ -164,7 +164,7 @@ final class Json implements ExpressionInterface, \ArrayAccess
      *
      * @return JsonSet
      */
-    public function set($value): JsonSet
+    public function set(mixed $value): JsonSet
     {
         return new JsonSet($this->field, $this->path, $value);
     }
@@ -177,7 +177,7 @@ final class Json implements ExpressionInterface, \ArrayAccess
      *
      * @return JsonInsert
      */
-    public function insert($value): JsonInsert
+    public function insert(mixed $value): JsonInsert
     {
         return new JsonInsert($this->field, $this->path, $value);
     }
@@ -192,7 +192,7 @@ final class Json implements ExpressionInterface, \ArrayAccess
      *
      * @return JsonReplace
      */
-    public function replace($value): JsonReplace
+    public function replace(mixed $value): JsonReplace
     {
         return new JsonReplace($this->field, $this->path, $value);
     }
@@ -202,7 +202,7 @@ final class Json implements ExpressionInterface, \ArrayAccess
      */
     public function build(CompilableClause $query, object $compiler): string
     {
-        return (new JsonExtract($this->field, $this->path, $this->unquote))->build($query, $compiler);
+        return new JsonExtract($this->field, $this->path, $this->unquote)->build($query, $compiler);
     }
 
     /**
@@ -222,7 +222,7 @@ final class Json implements ExpressionInterface, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetExists($offset): bool
+    public function offsetExists(mixed $offset): bool
     {
         throw new BadMethodCallException(self::class . ' is not an array and implements only offer get for build JSON path');
     }
@@ -236,7 +236,7 @@ final class Json implements ExpressionInterface, \ArrayAccess
      *
      * @return self The new instance
      */
-    public function offsetGet($offset): self
+    public function offsetGet(mixed $offset): self
     {
         return $this->addPath('[' . $offset . ']');
     }
@@ -244,7 +244,7 @@ final class Json implements ExpressionInterface, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetSet($offset, $value): void
+    public function offsetSet(mixed $offset, mixed $value): void
     {
         throw new BadMethodCallException(self::class . ' is not an array and implements only offer get for build JSON path');
     }
@@ -252,7 +252,7 @@ final class Json implements ExpressionInterface, \ArrayAccess
     /**
      * {@inheritdoc}
      */
-    public function offsetUnset($offset): void
+    public function offsetUnset(mixed $offset): void
     {
         throw new BadMethodCallException(self::class . ' is not an array and implements only offer get for build JSON path');
     }
@@ -276,7 +276,7 @@ final class Json implements ExpressionInterface, \ArrayAccess
      *
      * @return JsonValid
      */
-    public static function valid($document): JsonValid
+    public static function valid(string|ExpressionInterface $document): JsonValid
     {
         return new JsonValid($document);
     }

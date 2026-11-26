@@ -14,20 +14,14 @@ use Bdf\Prime\Schema\ConstraintSetInterface;
  */
 final class MapperInfoConstraintSet implements ConstraintSetInterface
 {
-    /**
-     * @var MapperInfo
-     */
-    private $info;
+    private MapperInfo $info;
 
     /**
      * @var MapperInfoResolverInterface[]
      */
-    private $resolvers;
+    private array $resolvers;
 
-    /**
-     * @var ConstraintSet|null
-     */
-    private $constraints;
+    private ?ConstraintSet $constraints = null;
 
 
     /**
@@ -45,7 +39,7 @@ final class MapperInfoConstraintSet implements ConstraintSetInterface
     /**
      * {@inheritdoc}
      */
-    public function apply(ConstraintVisitorInterface $visitor)
+    public function apply(ConstraintVisitorInterface $visitor): static
     {
         $this->loadConstraints()->apply($visitor);
 

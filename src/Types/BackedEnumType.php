@@ -7,7 +7,7 @@ use LogicException;
 
 use function is_subclass_of;
 
-class BackedEnumType extends AbstractFacadeType
+final class BackedEnumType extends AbstractFacadeType
 {
     public const INT_ENUM = 'int_enum';
     public const STRING_ENUM = 'string_enum';
@@ -27,7 +27,7 @@ class BackedEnumType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?BackedEnum
     {
         if ($value === null) {
             return null;
@@ -45,7 +45,7 @@ class BackedEnumType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase(mixed $value): mixed
     {
         if (!$value instanceof BackedEnum) {
             return $value;

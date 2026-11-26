@@ -28,8 +28,8 @@ interface QuoteCompilerInterface
      *
      * @param mixed $value
      *
-     * @return scalar
+     * @return string
      * @throws PrimeException
      */
-    public function quote($value);
+    public function quote(mixed $value): string;
 }

@@ -112,7 +112,7 @@ interface CollectionInterface extends Countable, ArrayAccess, Traversable
      *
      * @template R
      */
-    public function map($callback);
+    public function map(callable $callback);
 
     /**
      * Filter every entites with a callback
@@ -120,7 +120,7 @@ interface CollectionInterface extends Countable, ArrayAccess, Traversable
      * @param callable(E):bool $callback The function to run
      * @return static The new filtered collection
      */
-    public function filter($callback = null);
+    public function filter(?callable $callback = null);
 
     /**
      * Group an associative array by a field or using a callback.
@@ -131,14 +131,14 @@ interface CollectionInterface extends Countable, ArrayAccess, Traversable
      * 2. combine and preservee key
      * 3. custom injection in the new collection. The callback has to be a callable
      *
-     * @param callable(mixed,array-key,array)|string $groupBy
+     * @param (callable(mixed,array-key,array):int|string)|string $groupBy
      * @param int $mode
      *
      * @return self
      *
      * @throws \LogicException if the mode custom is set and the callback is not a callable
      */
-    public function groupBy($groupBy, $mode = self::GROUPBY);
+    public function groupBy(callable|string $groupBy, int $mode = self::GROUPBY);
 
     /**
      * Determine if an item exists in the collection.
@@ -147,7 +147,7 @@ interface CollectionInterface extends Countable, ArrayAccess, Traversable
      *
      * @return bool
      */
-    public function contains($element);
+    public function contains(mixed $element);
 
     /**
      * Search the collection for a given value and return the corresponding key if successful.
@@ -157,7 +157,7 @@ interface CollectionInterface extends Countable, ArrayAccess, Traversable
      *
      * @return array-key|false
      */
-    public function indexOf($value, $strict = false);
+    public function indexOf(mixed $value, bool $strict = false);
 
     /**
      * Merge the collection with the given items.
@@ -165,7 +165,7 @@ interface CollectionInterface extends Countable, ArrayAccess, Traversable
      * @param E[]|CollectionInterface<E> $items
      * @return self<E>
      */
-    public function merge($items);
+    public function merge(array|CollectionInterface $items);
 
     /**
      * Sort through each item with a callback.

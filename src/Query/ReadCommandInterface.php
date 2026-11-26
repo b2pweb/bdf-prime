@@ -49,11 +49,11 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      * $query->myCustomMethod(...); // Will call MyExtension->myCustomMethod()
      * </pre></code>
      *
-     * @param object $extension
+     * @param object|null $extension
      *
      * @return void
      */
-    public function setExtension($extension): void;
+    public function setExtension(?object $extension): void;
 
     /**
      * Get the collection factory
@@ -126,7 +126,7 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]
-    public function all($columns = null);
+    public function all(string|array|null $columns = null);
 
     /**
      * Get first matched data
@@ -143,7 +143,7 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]
-    public function first($columns = null);
+    public function first(string|array|null $columns = null);
 
     /**
      * Get a collection of column value
@@ -194,7 +194,7 @@ interface ReadCommandInterface extends CommandInterface, Cachable
      * @throws PrimeException When execute fail
      */
     #[ReadOperation]
-    public function inRow(string|ExpressionInterface $column);
+    public function inRow(string|ExpressionInterface $column): mixed;
 
     /**
      * Define the record hydrator to used when {@see ReadCommandInterface::as()} is called

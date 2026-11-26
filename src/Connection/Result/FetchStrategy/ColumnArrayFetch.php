@@ -22,7 +22,7 @@ final class ColumnArrayFetch implements ArrayFetchStrategyInterface
      *
      * @var string|null
      */
-    private ?string $columnName;
+    private ?string $columnName = null;
 
     /**
      * @param int $column The column index (starts at 0)

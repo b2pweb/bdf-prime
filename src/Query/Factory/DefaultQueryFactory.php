@@ -11,31 +11,24 @@ use Bdf\Prime\Query\Compiler\Preprocessor\PreprocessorInterface;
  * Base query factory
  * This factory can register query aliases
  */
-class DefaultQueryFactory implements QueryFactoryInterface
+final class DefaultQueryFactory implements QueryFactoryInterface
 {
-    /**
-     * @var ConnectionInterface
-     */
-    private $connection;
-
-    /**
-     * @var object
-     */
-    private $defaultCompiler;
+    private ConnectionInterface $connection;
+    private object $defaultCompiler;
 
     /**
      * Map query class name to compiler instance or class name
      *
      * @var array<class-string<CommandInterface>, class-string|object>
      */
-    private $compilers = [];
+    private array $compilers;
 
     /**
      * Map query name to query class name
      *
      * @var class-string-map<Q as CommandInterface, class-string<Q>>
      */
-    private $alias = [];
+    private array $alias = [];
 
 
     /**
@@ -62,7 +55,7 @@ class DefaultQueryFactory implements QueryFactoryInterface
      *
      * @return void
      */
-    public function register(string $query, $compiler): void
+    public function register(string $query, string|object $compiler): void
     {
         $this->compilers[$query] = $compiler;
     }
@@ -78,7 +71,7 @@ class DefaultQueryFactory implements QueryFactoryInterface
      * @template C as ConnectionInterface
      * @template Q as CommandInterface<C>
      */
-    public function alias(string $alias, string $query)
+    public function alias(string $alias, string $query): void
     {
         $this->alias[$alias] = $query;
     }

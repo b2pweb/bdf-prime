@@ -17,15 +17,9 @@ final class NamedIndex implements IndexInterface
     public const FOR_UNIQUE  = 'UNIQ';
     public const FOR_SIMPLE  = 'IDX';
 
-    /**
-     * @var IndexInterface
-     */
-    private $index;
+    private IndexInterface $index;
 
-    /**
-     * @var string
-     */
-    private $tableName;
+    private string $tableName;
 
 
     /**
@@ -130,7 +124,7 @@ final class NamedIndex implements IndexInterface
      * @return bool
      * @psalm-assert-if-true non-empty-string $name
      */
-    protected function isValidName($name)
+    protected function isValidName(?string $name): bool
     {
         if (empty($name)) {
             return false;

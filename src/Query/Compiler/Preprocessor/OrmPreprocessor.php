@@ -22,35 +22,19 @@ use function is_string;
 /**
  * Preprocessor for Orm operation (i.e. with EntityRepository and Alias resolver)
  */
-class OrmPreprocessor implements PreprocessorInterface
+final class OrmPreprocessor implements PreprocessorInterface
 {
-    /**
-     * @var AliasResolver
-     */
-    protected $aliasResolver;
-
-    /**
-     * @var Metadata
-     */
-    protected $metadata;
+    private ?AliasResolver $aliasResolver = null;
+    private Metadata $metadata;
 
     /**
      * The query repository
      *
-     * @var RepositoryInterface
      * @internal
      */
-    private $repository;
-
-    /**
-     * @var string
-     */
-    protected $type;
-
-    /**
-     * @var PlatformInterface
-     */
-    protected $platform;
+    private RepositoryInterface $repository;
+    private string $type = '';
+    private PlatformInterface $platform;
     private bool $allowUnknownAttribute = false;
 
 
@@ -71,7 +55,7 @@ class OrmPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function forInsert(CompilableClause $clause)
+    public function forInsert(CompilableClause $clause): CompilableClause
     {
         if ($this->repository->isReadOnly()) {
             throw new LogicException('Repository "'.$this->metadata->entityName.'" is read only. Cannot execute write query');
@@ -85,7 +69,7 @@ class OrmPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function forUpdate(CompilableClause $clause)
+    public function forUpdate(CompilableClause $clause): CompilableClause
     {
         if ($this->repository->isReadOnly()) {
             throw new LogicException('Repository "'.$this->metadata->entityName.'" is read only. Cannot execute write query');
@@ -101,7 +85,7 @@ class OrmPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function forDelete(CompilableClause $clause)
+    public function forDelete(CompilableClause $clause): CompilableClause
     {
         if ($this->repository->isReadOnly()) {
             throw new LogicException('Repository "'.$this->metadata->entityName.'" is read only. Cannot execute write query');
@@ -117,7 +101,7 @@ class OrmPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function forSelect(CompilableClause $clause)
+    public function forSelect(CompilableClause $clause): CompilableClause
     {
         $this->type = 'select';
 
@@ -139,11 +123,16 @@ class OrmPreprocessor implements PreprocessorInterface
             }
 
             foreach ($compilerQuery->statements['tables'] as &$table) {
-                $table['alias'] = $this->aliasResolver->registerMetadata($table['table'], $table['alias']);
+                // table can be the table name or a query instance
+                if (is_string($table['table'])) {
+                    $table['alias'] = $this->aliasResolver->registerMetadata($table['table'], $table['alias']);
+                }
             }
 
             foreach ($compilerQuery->statements['joins'] as &$join) {
-                $join['alias'] = $this->aliasResolver->registerMetadata($join['table'], $join['alias']);
+                if (is_string($join['table'])) {
+                    $join['alias'] = $this->aliasResolver->registerMetadata($join['table'], $join['alias']);
+                }
             }
 
             return $compilerQuery;
@@ -155,7 +144,7 @@ class OrmPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function field(string $attribute, &$type = null): string
+    public function field(string $attribute, mixed &$type = null): string
     {
         if ($this->type === 'select' && $this->aliasResolver !== null) {
             return $this->aliasResolver->resolve($attribute, $type);
@@ -172,7 +161,7 @@ class OrmPreprocessor implements PreprocessorInterface
      *
      * @return string
      */
-    protected function fieldForWriteQuery($attribute, &$type = null)
+    protected function fieldForWriteQuery(string $attribute, mixed &$type = null): string
     {
         // @fixme Throw exception if wants to write on undefined attribute ?
         if (!isset($this->metadata->attributes[$attribute])) {
@@ -290,7 +279,7 @@ class OrmPreprocessor implements PreprocessorInterface
      *
      * @return mixed
      */
-    protected function tryConvertValue($value, TypeInterface $type)
+    protected function tryConvertValue(mixed $value, TypeInterface $type): mixed
     {
         if (
             $value instanceof QueryInterface

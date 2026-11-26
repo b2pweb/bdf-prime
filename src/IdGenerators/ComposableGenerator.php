@@ -11,12 +11,12 @@ use Bdf\Prime\ServiceLocator;
  * @template C as ConnectionInterface
  * @implements GeneratorInterface<C>
  */
-class ComposableGenerator implements GeneratorInterface
+final class ComposableGenerator implements GeneratorInterface
 {
     /**
      * @var GeneratorInterface[]
      */
-    private $generators;
+    private array $generators;
 
     /**
      * ComposableGenerator constructor.
@@ -41,7 +41,7 @@ class ComposableGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function postProcess($entity): void
+    public function postProcess(object $entity): void
     {
         foreach ($this->generators as $generator) {
             $generator->postProcess($entity);

@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Query;
 
+use Bdf\Prime\Query\Expression\Attribute;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -26,7 +27,25 @@ class JoinClauseTest extends TestCase
         
         $this->assertEquals($expected, $join->clauses()[0]);
     }
-    
+
+    /**
+     *
+     */
+    public function test_join_on_with_expression()
+    {
+        $join = new JoinClause();
+        $join->on('id', new Attribute('foo'));
+
+        $expected = [
+            'column'    => 'id',
+            'operator'  => '=',
+            'value'     => new Attribute('foo'),
+            'glue'      => 'AND',
+        ];
+
+        $this->assertEquals($expected, $join->clauses()[0]);
+    }
+
     /**
      * 
      */
@@ -65,7 +84,25 @@ class JoinClauseTest extends TestCase
         
         $this->assertEquals($expected, $join->clauses()[0]);
     }
-    
+
+    /**
+     *
+     */
+    public function test_join_or_on_expression()
+    {
+        $join = new JoinClause();
+        $join->orOn('id', new Attribute('foo'));
+
+        $expected = [
+            'column'    => 'id',
+            'operator'  => '=',
+            'value'     => new Attribute('foo'),
+            'glue'      => 'OR',
+        ];
+
+        $this->assertEquals($expected, $join->clauses()[0]);
+    }
+
     /**
      * 
      */

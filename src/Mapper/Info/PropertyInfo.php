@@ -11,35 +11,22 @@ use DateTimeInterface;
 /**
  * PropertyInfo
  */
-class PropertyInfo implements InfoInterface
+final class PropertyInfo implements InfoInterface
 {
     /**
      * The property name
-     *
-     * @var string
      */
-    protected $name;
+    private string $name;
 
     /**
      * The metadata from the metadata object
-     *
-     * @var array
      */
-    protected $metadata;
-
-    /**
-     * The metadata from the metadata object
-     *
-     * @var array
-     */
-    protected $relation;
+    private array $metadata;
 
     /**
      * The types registry
-     *
-     * @var TypesRegistryInterface
      */
-    protected $typesRegistry;
+    private ?TypesRegistryInterface $typesRegistry;
 
 
     /**
@@ -220,7 +207,7 @@ class PropertyInfo implements InfoInterface
      *
      * @return mixed
      */
-    public function getDefault()
+    public function getDefault(): mixed
     {
         return $this->metadata['default'];
     }
@@ -234,7 +221,7 @@ class PropertyInfo implements InfoInterface
      *
      * @return mixed
      */
-    public function convert($value, bool $toPhp = true, array $fieldOptions = [])
+    public function convert(mixed $value, bool $toPhp = true, array $fieldOptions = []): mixed
     {
         if ($toPhp) {
             return $this->getType()->fromDatabase($value, $fieldOptions);
@@ -248,7 +235,7 @@ class PropertyInfo implements InfoInterface
      *
      * @return TypeInterface
      */
-    protected function getType()
+    protected function getType(): TypeInterface
     {
         return $this->typesRegistry->get($this->type());
     }

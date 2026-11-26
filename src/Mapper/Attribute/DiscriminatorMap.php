@@ -61,13 +61,13 @@ final class DiscriminatorMap implements MapperConfigurationInterface
     /**
      * @var array<string, class-string<Mapper>>|class-string<DiscriminatorMapEnumInterface>
      */
-    private $map;
+    private array|string $map;
 
     /**
      * @param string $field
      * @param array<string, class-string<Mapper>>|class-string<DiscriminatorMapEnumInterface> $map Key-value map of the discriminator values and their corresponding mapper class names
      */
-    public function __construct(string $field, $map)
+    public function __construct(string $field, array|string $map)
     {
         $this->field = $field;
         $this->map = $map;

@@ -56,7 +56,7 @@ class MyCustomRelation extends AbstractRelation implements CustomRelationInterfa
     /**
      * {@inheritdoc}
      */
-    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
+    public function load(EntityIndexerInterface $collection, array $with = [], iterable|callable $constraints = [], array $without = []): void
     {
         if (empty($collection)) {
             return;
@@ -86,10 +86,10 @@ class MyCustomRelation extends AbstractRelation implements CustomRelationInterfa
      *
      * @return EntityKeys|EntityKeys[]
      */
-    protected function getLocalKeyValue($entity)
+    protected function getLocalKeyValue(array|object $entity)
     {
         if (is_array($entity)) {
-            return array_map([$this, 'getLocalKeyValue'], $entity);
+            return array_map($this->getLocalKeyValue(...), $entity);
         }
 
         $keys = [];

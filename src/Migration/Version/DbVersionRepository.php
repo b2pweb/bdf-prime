@@ -12,39 +12,31 @@ use Bdf\Prime\Schema\Manager\TableManagerInterface;
  *
  * Contains the version of all upgraded migration
  */
-class DbVersionRepository implements VersionRepositoryInterface
+final class DbVersionRepository implements VersionRepositoryInterface
 {
     /**
      * The db connection
      *
      * @var ConnectionInterface&\Doctrine\DBAL\Connection
      */
-    private $connection;
+    private ConnectionInterface $connection;
 
     /**
      * The table name
-     *
-     * @var string
      */
-    private $tableName;
+    private string $tableName;
 
     /**
      * Check whether the table exists
-     *
-     * @var boolean
-     *
      * @internal
      */
-    private $hasSchema;
+    private ?bool $hasSchema = null;
 
     /**
      * Cache of version
-     *
-     * @var array
-     *
      * @internal
      */
-    private $cached;
+    private ?array $cached = null;
 
     /**
      * Constructor
@@ -122,7 +114,7 @@ class DbVersionRepository implements VersionRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function add(string $version)
+    public function add(string $version): static
     {
         $this->prepare();
 
@@ -138,7 +130,7 @@ class DbVersionRepository implements VersionRepositoryInterface
     /**
      * {@inheritDoc}
      */
-    public function remove(string $version)
+    public function remove(string $version): static
     {
         $this->prepare();
 
@@ -183,7 +175,7 @@ class DbVersionRepository implements VersionRepositoryInterface
      * @return $this
      * @throws PrimeException
      */
-    public function createSchema()
+    public function createSchema(): static
     {
         $schemaManager = $this->connection->schema();
 

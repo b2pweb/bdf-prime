@@ -17,21 +17,21 @@ final class EntitySetIndexer implements EntityIndexerInterface
     /**
      * @var Mapper<E>
      */
-    private $mapper;
+    private Mapper $mapper;
 
     /**
      * All entities, indexing by their object id
      *
      * @var E[]
      */
-    private $entities = [];
+    private array $entities = [];
 
     /**
      * The inner indexer
      *
      * @var EntityIndexer<E>|null
      */
-    private $indexer;
+    private ?EntityIndexer $indexer = null;
 
 
     /**
@@ -52,7 +52,7 @@ final class EntitySetIndexer implements EntityIndexerInterface
      *
      * @return void
      */
-    public function push($entity): void
+    public function push(object $entity): void
     {
         $hash = spl_object_id($entity);
 
@@ -105,7 +105,7 @@ final class EntitySetIndexer implements EntityIndexerInterface
      * @return EntityIndexer<E>
      * @psalm-assert EntityIndexer<E> $this->indexer
      */
-    private function indexer()
+    private function indexer(): EntityIndexer
     {
         if ($this->indexer) {
             return $this->indexer;

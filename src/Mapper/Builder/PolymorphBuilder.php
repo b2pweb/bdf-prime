@@ -5,12 +5,12 @@ namespace Bdf\Prime\Mapper\Builder;
 /**
  * Field builder for polymorph embedded
  */
-class PolymorphBuilder extends FieldBuilder
+final class PolymorphBuilder extends FieldBuilder
 {
     /**
      * @var string
      */
-    private $discriminator;
+    private string $discriminator;
 
     /**
      * Set the current field as type discriminator
@@ -30,7 +30,7 @@ class PolymorphBuilder extends FieldBuilder
      *
      * @return string
      */
-    public function getDiscriminatorField()
+    public function getDiscriminatorField(): string
     {
         return $this[$this->discriminator]['alias'] ?? $this->discriminator;
     }
@@ -40,7 +40,7 @@ class PolymorphBuilder extends FieldBuilder
      *
      * @return string
      */
-    public function getDiscriminatorAttribute()
+    public function getDiscriminatorAttribute(): string
     {
         return $this->discriminator;
     }

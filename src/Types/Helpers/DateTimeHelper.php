@@ -14,38 +14,32 @@ trait DateTimeHelper
 {
     /**
      * The date format
-     *
-     * @var string
      */
-    protected $format;
+    protected string $format;
 
     /**
      * The date timezone
      *
      * Let null manage default timezone
-     *
-     * @var null|DateTimeZone
      */
-    protected $timezone;
+    protected ?DateTimeZone $timezone = null;
 
     /**
      * Date class name
      *
-     * @var string
+     * @var class-string<DateTimeInterface>
      */
-    protected $className = DateTime::class;
+    protected string $className = DateTime::class;
 
     /**
      * Should reset the other fields of the format
-     *
-     * @var bool
      */
-    protected $resetFields = false;
+    protected bool $resetFields = false;
 
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase(mixed $value, array $fieldOptions = []): ?DateTimeInterface
     {
         if ($value === null) {
             return null;
@@ -60,7 +54,14 @@ trait DateTimeHelper
         $className = $fieldOptions['className'] ?? $this->className;
         $timezone = isset($fieldOptions['timezone']) ? new DateTimeZone($fieldOptions['timezone']) : $this->timezone;
 
+        /** @psalm-suppress UndefinedMethod */
         $date = $className::createFromFormat($format, $value, $timezone);
+
+        // Invalid format, fail-safe return
+        // @fixme flag to thow an error instead ?
+        if ($date === false) {
+            return null;
+        }
 
         if ($timezone && $date) {
             $date = $date->setTimezone($timezone);
@@ -72,7 +73,7 @@ trait DateTimeHelper
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase(mixed $value): mixed
     {
         if ($value === null) {
             return null;

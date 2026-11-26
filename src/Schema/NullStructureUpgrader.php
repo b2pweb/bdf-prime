@@ -5,7 +5,7 @@ namespace Bdf\Prime\Schema;
 /**
  * Null object for structure upgrader
  */
-class NullStructureUpgrader implements StructureUpgraderInterface
+final class NullStructureUpgrader implements StructureUpgraderInterface
 {
     /**
      * {@inheritdoc}

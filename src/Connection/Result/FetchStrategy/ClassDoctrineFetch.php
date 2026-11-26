@@ -16,7 +16,7 @@ final class ClassDoctrineFetch implements DoctrineFetchStrategyInterface
      * @var ClassArrayFetch<T>
      * @readonly
      */
-    private $arrayFetch;
+    private ClassArrayFetch $arrayFetch;
 
     /**
      * @param class-string<T> $className The result class name

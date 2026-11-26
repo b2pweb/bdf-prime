@@ -18,7 +18,7 @@ final class JsonValid extends JsonFunction
     /**
      * @param string|ExpressionInterface $document The value to check. Can be an attribute name, or a SQL expression.
      */
-    public function __construct($document)
+    public function __construct(string|ExpressionInterface $document)
     {
         parent::__construct('JSON_VALID', $document);
     }

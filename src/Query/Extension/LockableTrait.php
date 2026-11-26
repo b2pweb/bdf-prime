@@ -20,7 +20,7 @@ trait LockableTrait
      *
      * @see Lockable::lock()
      */
-    public function lock(LockMode $lock = LockMode::PESSIMISTIC_WRITE)
+    public function lock(LockMode $lock = LockMode::PESSIMISTIC_WRITE): static
     {
         $this->compilerState->invalidate('lock');
 

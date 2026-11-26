@@ -33,7 +33,7 @@ interface DatabaseStructureManagerInterface
      * @return $this
      * @throws PrimeException
      */
-    public function add($structure);
+    public function add(object $structure);
 
     /**
      * Get the diff queries from two tables
@@ -45,5 +45,5 @@ interface DatabaseStructureManagerInterface
      *
      * @internal The return value depends on the platform. You should not rely on the return of this method
      */
-    public function diff($new, $old);
+    public function diff(object $new, object $old);
 }

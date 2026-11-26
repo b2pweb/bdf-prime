@@ -12,12 +12,12 @@ use Ramsey\Uuid\Uuid;
  *
  * @extends AbstractGenerator<\Bdf\Prime\Connection\ConnectionInterface&\Doctrine\DBAL\Connection>
  */
-class GuidGenerator extends AbstractGenerator
+final class GuidGenerator extends AbstractGenerator
 {
     /**
      * {@inheritdoc}
      */
-    protected function doGenerate($property, array &$data, ServiceLocator $serviceLocator)
+    protected function doGenerate(string $property, array &$data, ServiceLocator $serviceLocator): string
     {
         return $data[$property] = Uuid::uuid4()->toString();
     }

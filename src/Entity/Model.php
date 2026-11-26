@@ -132,7 +132,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      *
      * @return EntityRepository<static>
      */
-    public static function repository()
+    public static function repository(): EntityRepository
     {
         return self::locator()->repository(static::class);
     }
@@ -145,7 +145,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      *
      * @return EntityRepository|QueryInterface|mixed
      */
-    public static function __callStatic($name, $arguments)
+    public static function __callStatic(string $name, array $arguments): mixed
     {
         return static::repository()->$name(...$arguments);
     }
@@ -241,7 +241,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @see Model::reload() For force loading
      */
     #[ReadOperation]
-    public function load($relations)
+    public function load(string|array $relations): static
     {
         static::repository()->loadRelations($this, $relations);
 
@@ -257,7 +257,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @throws PrimeException
      */
     #[ReadOperation]
-    public function reload($relations)
+    public function reload(string|array $relations): static
     {
         static::repository()->reloadRelations($this, $relations);
 
@@ -301,7 +301,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function saveAll($relations): int
+    public function saveAll(string|array $relations): int
     {
         return static::repository()->saveAll($this, $relations);
     }
@@ -315,7 +315,7 @@ class Model extends PrimeSerializable implements EntityInterface, ImportableInte
      * @throws PrimeException
      */
     #[WriteOperation]
-    public function deleteAll($relations): int
+    public function deleteAll(string|array $relations): int
     {
         return static::repository()->deleteAll($this, $relations);
     }

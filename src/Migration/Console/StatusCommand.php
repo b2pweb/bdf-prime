@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * Class StatusCommand
  */
 #[AsCommand('prime:migration:status', 'Show the up/down status of all migrations')]
-class StatusCommand extends AbstractCommand
+final class StatusCommand extends AbstractCommand
 {
     protected static $defaultName = 'prime:migration:status';
 

@@ -186,29 +186,6 @@ class OrmPreprocessorTest extends TestCase
     /**
      *
      */
-    public function test_field_on_select_unit()
-    {
-        $resolver = $this->createMock(AliasResolver::class);
-        $reflection = new \ReflectionProperty($this->preprocessor, 'aliasResolver');
-        PHP_VERSION_ID >= 80100 or $reflection->setAccessible(true);
-        $reflection->setValue($this->preprocessor, $resolver);
-
-        $reflection = new \ReflectionProperty($this->preprocessor, 'type');
-        PHP_VERSION_ID >= 80100 or $reflection->setAccessible(true);
-        $reflection->setValue($this->preprocessor, 'select');
-
-        $resolver->expects($this->once())
-            ->method('resolve')
-            ->with('userFaction.name', null)
-            ->willReturn('t1.name_')
-        ;
-
-        $this->assertEquals('t1.name_', $this->preprocessor->field('userFaction.name'));
-    }
-
-    /**
-     *
-     */
     public function test_field_on_select_functional()
     {
         $query = Prime::repository(Faction::class)->builder();

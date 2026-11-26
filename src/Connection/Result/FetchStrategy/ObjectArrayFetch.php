@@ -16,10 +16,9 @@ use stdClass;
 final class ObjectArrayFetch implements ArrayFetchStrategyInterface
 {
     /**
-     * @var ObjectArrayFetch
      * @readonly
      */
-    private static $instance;
+    private static ?ObjectArrayFetch $instance = null;
 
     /**
      * {@inheritdoc}

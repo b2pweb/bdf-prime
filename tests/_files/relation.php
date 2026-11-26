@@ -586,6 +586,12 @@ class CustomerMapper extends Mapper
             ->detached()
         ;
 
+        $builder->on('documents-system-closure')
+            ->hasMany(Document::class.'::customerId')
+            ->constraints(function ($query) { $query->where('uploaderType', 'system'); })
+            ->detached()
+        ;
+
         $builder->on('users')
             ->hasMany(User::class.'::customer.id')
             ->detached();

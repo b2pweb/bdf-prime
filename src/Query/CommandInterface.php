@@ -47,7 +47,7 @@ interface CommandInterface extends CompilableClauseInterface, SelfExecutable
      * @return ResultSetInterface<array<string, mixed>>
      * @throws PrimeException When execute fail
      */
-    public function execute($columns = null): ResultSetInterface;
+    public function execute(string|ExpressionInterface|array|null $columns = null): ResultSetInterface;
 
     /**
      * Creates and adds a query root corresponding to the table identified by the

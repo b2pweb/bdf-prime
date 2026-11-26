@@ -61,7 +61,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function setLocalAlias(?string $localAlias)
+    public function setLocalAlias(?string $localAlias): static
     {
         return $this;
     }
@@ -69,7 +69,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): static
     {
         return $this;
     }
@@ -77,7 +77,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
+    public function load(EntityIndexerInterface $collection, array $with = [], iterable|callable $constraints = [], array $without = []): void
     {
         // No-op
     }
@@ -93,7 +93,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function loadIfNotLoaded(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
+    public function loadIfNotLoaded(EntityIndexerInterface $collection, array $with = [], iterable|callable $constraints = [], array $without = []): void
     {
         // No-op
     }
@@ -101,7 +101,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function link($owner, ?string $queryClass = null): ReadCommandInterface
+    public function link(array|object $owner, ?string $queryClass = null): ReadCommandInterface
     {
         throw new \BadMethodCallException('Cannot request from a null relation');
     }
@@ -117,7 +117,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function joinRepositories(EntityJoinable $query, string $alias, $discriminator = null): array
+    public function joinRepositories(EntityJoinable $query, string $alias, string|int|null $discriminator = null): array
     {
         return [];
     }
@@ -125,7 +125,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function associate($owner, $entity)
+    public function associate(object $owner, object $entity): object
     {
         // No-op
         return $owner;
@@ -134,7 +134,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function dissociate($owner)
+    public function dissociate(object $owner): object
     {
         // No-op
         return $owner;
@@ -143,7 +143,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function add($owner, $related): int
+    public function add(object $owner, object $related): int
     {
         return 0;
     }
@@ -151,7 +151,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function create($owner, array $data = [])
+    public function create(object $owner, array $data = []): object
     {
         throw new \BadMethodCallException('There is no linked entity on relation entity');
     }
@@ -159,7 +159,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function saveAll($owner, array $relations = []): int
+    public function saveAll(object $owner, array $relations = []): int
     {
         return 0;
     }
@@ -167,7 +167,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function deleteAll($owner, array $relations = []): int
+    public function deleteAll(object $owner, array $relations = []): int
     {
         return 0;
     }
@@ -175,7 +175,7 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
-    public function isLoaded($entity): bool
+    public function isLoaded(object $entity): bool
     {
         return true;
     }

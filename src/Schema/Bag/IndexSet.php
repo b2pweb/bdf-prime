@@ -17,7 +17,7 @@ final class IndexSet implements IndexSetInterface
     /**
      * @var IndexInterface[]
      */
-    private $indexes;
+    private array $indexes;
 
 
     /**

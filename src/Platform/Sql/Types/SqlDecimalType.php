@@ -11,12 +11,12 @@ use Doctrine\DBAL\Types\Types;
 /**
  * Type that maps an SQL DECIMAL to a PHP string.
  */
-class SqlDecimalType extends AbstractPlatformType
+final class SqlDecimalType extends AbstractPlatformType
 {
     /**
      * {@inheritdoc}
      */
-    public function __construct(PlatformInterface $platform, $name = self::DECIMAL)
+    public function __construct(PlatformInterface $platform, string $name = self::DECIMAL)
     {
         parent::__construct($platform, $name);
     }
@@ -24,7 +24,7 @@ class SqlDecimalType extends AbstractPlatformType
     /**
      * {@inheritdoc}
      */
-    public function declaration(ColumnInterface $column)
+    public function declaration(ColumnInterface $column): string
     {
         return Types::DECIMAL;
     }

@@ -9,7 +9,7 @@ use ReflectionProperty;
 /**
  * Handle accessor from class
  */
-class ClassAccessor
+final class ClassAccessor
 {
     public const SCOPE_EXTERNAL = 'external';
     public const SCOPE_INHERIT  = 'inherit';
@@ -19,24 +19,21 @@ class ClassAccessor
      *
      * @var string
      */
-    private $className;
+    private string $className;
 
     /**
      * @var string[]
      */
-    private $subClasses;
+    private array $subClasses;
 
     /**
      * The scope which accessor will be called
      *
      * @var string
      */
-    private $scope;
+    private string $scope;
 
-    /**
-     * @var \ReflectionClass
-     */
-    private $reflection;
+    private \ReflectionClass $reflection;
 
 
     /**
@@ -48,7 +45,7 @@ class ClassAccessor
      *
      * @throws ReflectionException
      */
-    public function __construct($className, $scope, array $subClasses = [])
+    public function __construct(string $className, string $scope, array $subClasses = [])
     {
         $this->className = $className;
         $this->scope = $scope;
@@ -62,7 +59,7 @@ class ClassAccessor
      *
      * @return string
      */
-    public function className()
+    public function className(): string
     {
         return $this->className;
     }
@@ -77,9 +74,9 @@ class ClassAccessor
      *
      * @throws HydratorGenerationException When the attribute is not readable
      */
-    public function getter($varName, $attribute)
+    public function getter(string $varName, string $attribute): string
     {
-        if ($this->isPropertyAccessible($attribute, /*setter: */false)) {
+        if ($this->isPropertyAccessible($attribute, setter: false)) {
             return $varName.'->'.$attribute;
         }
 
@@ -104,7 +101,7 @@ class ClassAccessor
      *
      * @throws HydratorGenerationException When the attribute is not accessible
      */
-    public function setter($varName, $attribute, $value, $useSetterInPriority = true)
+    public function setter(string $varName, string $attribute, string $value, bool $useSetterInPriority = true): string
     {
         if ($useSetterInPriority && method_exists($this->className, 'set'.ucfirst($attribute))) {
             return $varName.'->set'.ucfirst($attribute).'('.$value.')';
@@ -130,7 +127,7 @@ class ClassAccessor
      *
      * @throws HydratorGenerationException When the property is not accessible
      */
-    public function isPropertyAccessible($prop, bool $setter = true)
+    public function isPropertyAccessible(string $prop, bool $setter = true): bool
     {
         try {
             $propertyReflection = $this->reflection->getProperty($prop);

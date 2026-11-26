@@ -10,12 +10,9 @@ use Psr\Container\ContainerInterface;
 /**
  * Instantiate a Migration class
  */
-class MigrationFactory implements MigrationFactoryInterface
+final class MigrationFactory implements MigrationFactoryInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    private $container;
+    private ContainerInterface $container;
 
     /**
      * BasicMigrationFactory constructor.

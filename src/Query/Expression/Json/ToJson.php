@@ -39,12 +39,12 @@ final class ToJson extends AbstractPlatformSpecificExpression
     /**
      * @var mixed|ExpressionInterface
      */
-    private $value;
+    private mixed $value;
 
     /**
      * @param ExpressionInterface|mixed $value The value to convert. Can be a PHP value, or a raw SQL expression when using ExpressionInterface.
      */
-    public function __construct($value)
+    public function __construct(mixed $value)
     {
         $this->value = $value;
     }
@@ -121,10 +121,10 @@ final class ToJson extends AbstractPlatformSpecificExpression
      *
      * @return string
      */
-    private function convertValue(QuoteCompilerInterface $compiler, $value): string
+    private function convertValue(QuoteCompilerInterface $compiler, mixed $value): string
     {
         if (is_string($value)) {
-            return (string) $compiler->quote($value);
+            return $compiler->quote($value);
         }
 
         if (is_int($value) || is_float($value)) {

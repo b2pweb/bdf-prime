@@ -78,7 +78,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function useDrop(bool $flag = true)
+    public function useDrop(bool $flag = true): static
     {
         $this->useDrop = $flag;
 
@@ -88,7 +88,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function generateRollback(bool $enable = true)
+    public function generateRollback(bool $enable = true): static
     {
         $this->generateRollback = $enable;
 
@@ -106,7 +106,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function table(string $tableName, callable $callback)
+    public function table(string $tableName, callable $callback): static
     {
         $table = new TypesHelperTableBuilder(
             new TableBuilder($tableName),
@@ -121,7 +121,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function add($structure)
+    public function add(object $structure): static
     {
         if ($this->has($structure->name())) {
             $current = $this->load($structure->name());
@@ -141,7 +141,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function change(string $tableName, callable $callback)
+    public function change(string $tableName, callable $callback): static
     {
         $table = $this->load($tableName);
         $builder = TableBuilder::fromTable($table);
@@ -164,7 +164,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function simulate(?callable $operations = null)
+    public function simulate(?callable $operations = null): static
     {
         $newSchema = clone $this;
         $newSchema->autoFlush = false;
@@ -179,7 +179,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function transaction(callable $operations)
+    public function transaction(callable $operations): static
     {
         $last = $this->autoFlush;
         $this->autoFlush = false;
@@ -230,7 +230,7 @@ abstract class AbstractSchemaManager implements SchemaManagerInterface
     /**
      * {@inheritdoc}
      */
-    public function pushRollback($queries)
+    public function pushRollback(mixed $queries): static
     {
         if (!$this->generateRollback) {
             return $this;

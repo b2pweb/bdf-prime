@@ -8,12 +8,12 @@ use Bdf\Prime\Query\CompilableClause;
  * Default preprocessor for Compiler.
  * Do nothing
  */
-class DefaultPreprocessor implements PreprocessorInterface
+final class DefaultPreprocessor implements PreprocessorInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function forInsert(CompilableClause $clause)
+    public function forInsert(CompilableClause $clause): CompilableClause
     {
         return $clause;
     }
@@ -21,7 +21,7 @@ class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function forUpdate(CompilableClause $clause)
+    public function forUpdate(CompilableClause $clause): CompilableClause
     {
         return $clause;
     }
@@ -29,7 +29,7 @@ class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function forDelete(CompilableClause $clause)
+    public function forDelete(CompilableClause $clause): CompilableClause
     {
         return $clause;
     }
@@ -37,7 +37,7 @@ class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function forSelect(CompilableClause $clause)
+    public function forSelect(CompilableClause $clause): CompilableClause
     {
         return $clause;
     }
@@ -45,7 +45,7 @@ class DefaultPreprocessor implements PreprocessorInterface
     /**
      * {@inheritdoc}
      */
-    public function field(string $attribute, &$type = null): string
+    public function field(string $attribute, mixed &$type = null): string
     {
         if ($type === true) {
             $type = null;

@@ -5,23 +5,23 @@ namespace Bdf\Prime\Query\Compiler\AliasResolver;
 /**
  * ExpressionToken
  */
-class ExpressionToken
+final class ExpressionToken
 {
     public const TYPE_DYN   = 0;
     public const TYPE_STA   = 1;
     public const TYPE_ATTR  = 2;
     public const TYPE_ALIAS = 3;
 
-    public $type;
-    public $value;
+    public int $type;
+    public string|array $value;
 
     /**
      * ExpressionToken constructor.
      *
-     * @param $type
-     * @param $value
+     * @param int $type
+     * @param string|array $value
      */
-    public function __construct($type, $value)
+    public function __construct(int $type, string|array $value)
     {
         $this->type = $type;
         $this->value = $value;

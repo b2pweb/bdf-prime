@@ -38,7 +38,7 @@ abstract class AbstractPlatformSpecificExpression implements ExpressionInterface
     /**
      * {@inheritdoc}
      */
-    final public function build(CompilableClause $query, object $compiler)
+    final public function build(CompilableClause $query, object $compiler): string
     {
         // @todo create a dedicated interface for platform() getter ?
         if (!$compiler instanceof CompilerInterface) {

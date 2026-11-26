@@ -44,7 +44,7 @@ interface TypeInterface
      *
      * @return mixed
      */
-    public function fromDatabase($value, array $fieldOptions = []);
+    public function fromDatabase(mixed $value, array $fieldOptions = []);
 
     /**
      * Transform PHP value to database value.
@@ -54,7 +54,7 @@ interface TypeInterface
      *
      * @return mixed
      */
-    public function toDatabase($value);
+    public function toDatabase(mixed $value);
 
     /**
      * Get the type name

@@ -39,8 +39,6 @@ final class RepositoryUpgraderResolver implements StructureUpgraderResolverInter
      */
     public function resolveByDomainClass(string $className, bool $force = false): ?StructureUpgraderInterface
     {
-        $repository = $this->locator->repository($className);
-
-        return $repository ? $repository->schema($force) : null;
+        return $this->locator->repository($className)?->schema($force);
     }
 }

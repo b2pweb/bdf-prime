@@ -6,6 +6,7 @@ namespace Php80\Mapper;
 require_once __DIR__.'/_files/entities.php';
 
 use Bdf\Prime\Mapper\Attribute\DiscriminatorMap;
+use Bdf\Prime\Mapper\Builder\FieldBuilder;
 use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Prime;
 use Bdf\Prime\PrimeTestCase;
@@ -89,6 +90,10 @@ class MapperAttributesTest extends TestCase
             public function schema(): array
             {
                 return [];
+            }
+
+            public function buildFields(FieldBuilder $builder): void
+            {
             }
         };
         $mapper->build();

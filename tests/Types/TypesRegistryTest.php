@@ -164,7 +164,7 @@ class TypesRegistryTest extends TestCase
 
 class NotRegisteredFacadeType extends AbstractFacadeType
 {
-    protected function defaultType()
+    protected function defaultType(): string
     {
         // TODO: Implement defaultType() method.
     }

@@ -262,7 +262,19 @@ class QueryOrmTest extends TestCase
             ->addOrder('id')
             ->toSql());
     }
-    
+
+    /**
+     *
+     */
+    public function test_order_with_expression()
+    {
+        $this->assertEquals("SELECT t0.* FROM $this->table t0 ORDER BY RANDOM() ASC, (t0.id & 42) ASC",
+            $this->query
+            ->order(new Raw('RANDOM()'))
+            ->addOrder(new Attribute('id', '(%s & 42)'))
+            ->toSql());
+    }
+
     /**
      * 
      */

@@ -41,7 +41,7 @@ interface Aggregatable
      *
      * @param null|string $column
      *
-     * @return float|int|string
+     * @return float|int|string|null
      * @throws PrimeException When execute fail
      *
      * @see Aggregate::min() For generate a min query
@@ -54,7 +54,7 @@ interface Aggregatable
      *
      * @param null|string $column
      *
-     * @return float|int|string
+     * @return float|int|string|null
      * @throws PrimeException When execute fail
      *
      * @see Aggregate::max() For generate a max query

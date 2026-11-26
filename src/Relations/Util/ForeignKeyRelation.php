@@ -24,17 +24,13 @@ trait ForeignKeyRelation
 {
     /**
      * The local property for the relation
-     *
-     * @var string
      */
-    protected $localKey;
+    protected ?string $localKey = null;
 
     /**
      * The distant key
-     *
-     * @var string
      */
-    protected $distantKey;
+    protected ?string $distantKey = null;
 
 
     /**
@@ -48,7 +44,7 @@ trait ForeignKeyRelation
      *
      * @see AbstractRelation::applyWhereKeys()
      */
-    protected function applyWhereKeys(ReadCommandInterface $query, $value): ReadCommandInterface
+    protected function applyWhereKeys(ReadCommandInterface $query, mixed $value): ReadCommandInterface
     {
         return $query->where($this->distantKey, $value);
     }
@@ -69,7 +65,7 @@ trait ForeignKeyRelation
      *
      * @return mixed
      */
-    protected function getLocalKeyValue($entity)
+    protected function getLocalKeyValue(array|object $entity): mixed
     {
         $mapper = $this->localRepository()->mapper();
 
@@ -94,7 +90,7 @@ trait ForeignKeyRelation
      *
      * @return void
      */
-    protected function setLocalKeyValue($entity, $id): void
+    protected function setLocalKeyValue(object $entity, mixed $id): void
     {
         $this->localRepository()->mapper()->hydrateOne($entity, $this->localKey, $id);
     }
@@ -106,7 +102,7 @@ trait ForeignKeyRelation
      *
      * @return mixed
      */
-    protected function getDistantKeyValue($entity)
+    protected function getDistantKeyValue(object $entity): mixed
     {
         /** @psalm-suppress InvalidArgument */
         return $this->relationRepository()->mapper()->extractOne($entity, $this->distantKey);
@@ -120,7 +116,7 @@ trait ForeignKeyRelation
      *
      * @return void
      */
-    protected function setDistantKeyValue($entity, $id): void
+    protected function setDistantKeyValue(object $entity, mixed $id): void
     {
         /** @psalm-suppress InvalidArgument */
         $this->relationRepository()->mapper()->hydrateOne($entity, $this->distantKey, $id);

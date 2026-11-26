@@ -55,7 +55,7 @@ abstract class PrimeSerializable extends Locatorizable
      * @return mixed
      * @psalm-return static
      */
-    public static function fromJson($json)
+    public static function fromJson(string $json)
     {
         /** @var static */
         return self::serializer()->fromJson($json, static::class);

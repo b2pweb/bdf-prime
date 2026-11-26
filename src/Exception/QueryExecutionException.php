@@ -27,7 +27,7 @@ class QueryExecutionException extends DBALException
      * @param mixed|null $query The executed query
      * @param array|null $parameters The query parameters
      */
-    public function __construct(string $message, $code = 0, ?Throwable $previous = null, $query = null, ?array $parameters = null)
+    public function __construct(string $message, mixed $code = 0, ?Throwable $previous = null, mixed $query = null, ?array $parameters = null)
     {
         parent::__construct($message, $code, $previous);
 

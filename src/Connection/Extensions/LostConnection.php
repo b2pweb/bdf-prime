@@ -14,7 +14,7 @@ trait LostConnection
      *
      * @var array
      */
-    private $lostConnectionErrors = [
+    private array $lostConnectionErrors = [
         'server has gone away',
         'no connection to the server',
         'Lost connection',

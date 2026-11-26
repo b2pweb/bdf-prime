@@ -13,7 +13,7 @@ class HydratorGenerationException extends LogicException implements HydratorExce
     /**
      * @var class-string
      */
-    private $entityClass;
+    private string $entityClass;
 
     /**
      * HydratorException constructor.

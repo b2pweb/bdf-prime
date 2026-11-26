@@ -15,12 +15,12 @@ namespace Bdf\Prime\Types;
  * - Regex : ".*,$search,.*"
  * - Like : "%,$search,%"
  */
-class ArrayType extends AbstractFacadeType
+final class ArrayType extends AbstractFacadeType
 {
     /**
      * {@inheritdoc}
      */
-    public function __construct($type = self::TARRAY)
+    public function __construct(string $type = self::TARRAY)
     {
         parent::__construct($type);
     }
@@ -28,9 +28,9 @@ class ArrayType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function fromDatabase($value, array $fieldOptions = [])
+    public function fromDatabase(mixed $value, array $fieldOptions = []): array
     {
-        if (empty($value)) {
+        if ($value === '' || $value === null) {
             return [];
         }
 
@@ -49,13 +49,13 @@ class ArrayType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase(mixed $value): ?string
     {
         if ($value === null) {
             return null;
         }
 
-        if (empty($value)) {
+        if ($value === []) {
             return '';
         }
 
@@ -69,7 +69,7 @@ class ArrayType extends AbstractFacadeType
     /**
      * {@inheritdoc}
      */
-    protected function defaultType()
+    protected function defaultType(): string
     {
         return self::TEXT;
     }

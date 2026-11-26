@@ -12,15 +12,9 @@ use Bdf\Prime\Schema\ColumnInterface;
  */
 final class MetadataColumn implements ColumnInterface
 {
-    /**
-     * @var array
-     */
-    private $metadata;
+    private array $metadata;
 
-    /**
-     * @var PlatformTypesInterface
-     */
-    private $types;
+    private PlatformTypesInterface $types;
 
 
     /**
@@ -57,7 +51,7 @@ final class MetadataColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function defaultValue()
+    public function defaultValue(): mixed
     {
         return $this->types->native($this->metadata['type'])->toDatabase($this->metadata['default']);
     }
@@ -137,7 +131,7 @@ final class MetadataColumn implements ColumnInterface
     /**
      * {@inheritdoc}
      */
-    public function option(string $name)
+    public function option(string $name): mixed
     {
         return $this->metadata['customSchemaOptions'][$name];
     }

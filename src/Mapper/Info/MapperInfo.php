@@ -15,28 +15,22 @@ use Bdf\Prime\Types\TypesRegistryInterface;
  * @todo remonter les traitements des classes du package Info sur les metadata, et completer
  * Pourrait etre util pour un hydrator
  */
-class MapperInfo
+final class MapperInfo
 {
     /**
      * The mapper
-     *
-     * @var Mapper
      */
-    protected $mapper;
+    private Mapper $mapper;
 
     /**
      * The types registry
-     *
-     * @var TypesRegistryInterface
      */
-    protected $typesRegistry;
+    private ?TypesRegistryInterface $typesRegistry;
 
     /**
      * The metadata
-     *
-     * @var Metadata
      */
-    protected $metadata;
+    private Metadata $metadata;
 
     /**
      * The properties info
@@ -44,14 +38,14 @@ class MapperInfo
      *
      * @var null|PropertyInfo[]
      */
-    private $properties;
+    private ?array $properties = null;
 
     /**
      * The primary properties
      *
      * @var null|PropertyInfo[]
      */
-    private $primaries;
+    private ?array $primaries = null;
 
     /**
      * The properties info
@@ -59,7 +53,7 @@ class MapperInfo
      *
      * @var null|PropertyInfo[]
      */
-    private $embedded;
+    private ?array $embedded = null;
 
     /**
      * The properties info
@@ -67,7 +61,7 @@ class MapperInfo
      *
      * @var null|ObjectPropertyInfo[]
      */
-    private $objects;
+    private ?array $objects = null;
 
     /**
      * Constructor
@@ -87,7 +81,7 @@ class MapperInfo
      *
      * @return Mapper
      */
-    public function mapper()
+    public function mapper(): Mapper
     {
         return $this->mapper;
     }
@@ -97,7 +91,7 @@ class MapperInfo
      *
      * @return Metadata
      */
-    public function metadata()
+    public function metadata(): Metadata
     {
         return $this->metadata;
     }
@@ -107,7 +101,7 @@ class MapperInfo
      *
      * @return string|null
      */
-    public function connection()
+    public function connection(): ?string
     {
         return $this->metadata->connection;
     }
@@ -117,7 +111,7 @@ class MapperInfo
      *
      * @return string
      */
-    public function className()
+    public function className(): string
     {
         return $this->metadata->entityName;
     }
@@ -127,7 +121,7 @@ class MapperInfo
      *
      * @return PropertyInfo[]
      */
-    public function properties()
+    public function properties(): array
     {
         if ($this->properties === null) {
             $this->buildProperties();
@@ -141,7 +135,7 @@ class MapperInfo
      *
      * @return PropertyInfo[]
      */
-    public function primaries()
+    public function primaries(): array
     {
         if ($this->primaries === null) {
             $this->buildProperties();
@@ -155,7 +149,7 @@ class MapperInfo
      *
      * @return PropertyInfo[]
      */
-    public function embedded()
+    public function embedded(): array
     {
         if ($this->embedded === null) {
             $this->buildProperties();
@@ -214,7 +208,7 @@ class MapperInfo
      *
      * @return ObjectPropertyInfo[]
      */
-    public function objects()
+    public function objects(): array
     {
         if ($this->objects === null) {
             $this->buildObjectProperties();
@@ -243,7 +237,7 @@ class MapperInfo
      * @param \ArrayAccess|array $relations
      * @return ObjectPropertyInfo|null
      */
-    private function buildObjectProperty(string $property, $relations): ?ObjectPropertyInfo
+    private function buildObjectProperty(string $property, \ArrayAccess|array $relations): ?ObjectPropertyInfo
     {
         if (!isset($this->metadata->embeddeds[$property])) {
             return null;
@@ -264,7 +258,7 @@ class MapperInfo
      *
      * @return ObjectPropertyInfo[]
      */
-    public function relations()
+    public function relations(): array
     {
         $relations = [];
 
@@ -281,7 +275,7 @@ class MapperInfo
      *
      * @return InfoInterface[]
      */
-    public function all()
+    public function all(): array
     {
         return $this->properties() + $this->objects();
     }
@@ -293,7 +287,7 @@ class MapperInfo
      *
      * @return null|InfoInterface
      */
-    public function property($name)
+    public function property(string $name): ?InfoInterface
     {
         return $this->properties[$name]
             ?? $this->objects[$name]

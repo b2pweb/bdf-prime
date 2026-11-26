@@ -2,6 +2,7 @@
 
 namespace Bdf\Prime\Query;
 
+use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
 /**
@@ -9,7 +10,7 @@ use Doctrine\DBAL\Query\Expression\CompositeExpression;
  *
  * @package Bdf\Prime\Query
  */
-class JoinClause extends Clause
+final class JoinClause extends Clause
 {
     /**
      * Add an "on" clause to the join.
@@ -23,13 +24,13 @@ class JoinClause extends Clause
      *
      * on `contacts`.`user_id` = `users`.`id`  and `contacts`.`info_id` = `info`.`id`
      *
-     * @param  \Closure|string  $key
-     * @param  string|null      $operator
-     * @param  string|null      $foreign
+     * @param \Closure|string $key
+     * @param mixed $operator The comparison operator, or the value if $foreign is not provided
+     * @param string|ExpressionInterface|null $foreign The comparison value
      *
      * @return $this
      */
-    public function on($key, $operator = null, $foreign = null)
+    public function on(\Closure|string $key, mixed $operator = null, mixed $foreign = null): self
     {
         if ($key instanceof \Closure) {
             $this->nested($key, $operator ?: CompositeExpression::TYPE_AND);
@@ -43,13 +44,13 @@ class JoinClause extends Clause
     /**
      * Add an "or on" clause to the join.
      *
-     * @param  \Closure|string  $key
-     * @param  string|null      $operator
-     * @param  string|null      $foreign
+     * @param \Closure|string $key
+     * @param mixed $operator The comparison operator, or the value if $foreign is not provided
+     * @param string|ExpressionInterface|null $foreign The comparison value
      *
      * @return $this
      */
-    public function orOn($key, $operator = null, $foreign = null)
+    public function orOn(\Closure|string $key, mixed $operator = null, mixed $foreign = null): self
     {
         if ($key instanceof \Closure) {
             $this->nested($key, $operator ?: CompositeExpression::TYPE_OR);
@@ -68,7 +69,7 @@ class JoinClause extends Clause
      *
      * @return $this This Query instance.
      */
-    public function onNull($column, $type = CompositeExpression::TYPE_AND)
+    public function onNull(string $column, string $type = CompositeExpression::TYPE_AND): self
     {
         return $this->buildClause('on', $column, '=', null, $type);
     }
@@ -81,7 +82,7 @@ class JoinClause extends Clause
      *
      * @return $this This Query instance.
      */
-    public function onNotNull($column, $type = CompositeExpression::TYPE_AND)
+    public function onNotNull(string $column, string $type = CompositeExpression::TYPE_AND): self
     {
         return $this->buildClause('on', $column, '!=', null, $type);
     }
@@ -93,7 +94,7 @@ class JoinClause extends Clause
      *
      * @return $this This Query instance.
      */
-    public function orOnNull($column)
+    public function orOnNull(string $column): self
     {
         return $this->onNull($column, CompositeExpression::TYPE_OR);
     }
@@ -105,7 +106,7 @@ class JoinClause extends Clause
      *
      * @return $this This Query instance.
      */
-    public function orOnNotNull($column)
+    public function orOnNotNull(string $column): self
     {
         return $this->onNotNull($column, CompositeExpression::TYPE_OR);
     }
@@ -113,12 +114,12 @@ class JoinClause extends Clause
     /**
      * Add on SQL expression
      *
-     * @param string $raw
+     * @param string|QueryInterface|ExpressionInterface $raw
      * @param string $type
      *
      * @return $this This Query instance.
      */
-    public function onRaw($raw, $type = CompositeExpression::TYPE_AND)
+    public function onRaw(string|QueryInterface|ExpressionInterface $raw, string $type = CompositeExpression::TYPE_AND): self
     {
         return $this->buildRaw('on', $raw, $type);
     }
@@ -126,11 +127,11 @@ class JoinClause extends Clause
     /**
      * Add OR on SQL expression
      *
-     * @param string $raw
+     * @param string|QueryInterface|ExpressionInterface $raw
      *
      * @return $this This Query instance.
      */
-    public function orOnRaw($raw)
+    public function orOnRaw(string|QueryInterface|ExpressionInterface $raw): self
     {
         return $this->onRaw($raw, CompositeExpression::TYPE_OR);
     }
@@ -143,7 +144,7 @@ class JoinClause extends Clause
      *
      * @return $this This Query instance.
      */
-    public function nested(\Closure $callback, $type = CompositeExpression::TYPE_AND)
+    public function nested(\Closure $callback, string $type = CompositeExpression::TYPE_AND): self
     {
         return $this->buildNested('on', $callback, $type);
     }
@@ -153,7 +154,7 @@ class JoinClause extends Clause
      *
      * @return array
      */
-    public function clauses()
+    public function clauses(): array
     {
         return $this->statement('on');
     }

@@ -18,7 +18,7 @@ interface QueryManagerInterface
      * @return $this
      * @throws PrimeException If auto flush is enabled and the query fail
      */
-    public function push($queries);
+    public function push(mixed $queries);
 
     /**
      * Simulate operations on schema

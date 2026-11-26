@@ -27,7 +27,7 @@ final class JsonSet extends JsonFunction
      * @param string $path The path to the field to update. Should start with '$' which is the root of the JSON document.
      * @param mixed $value The PHP value to set. This value will be converted to json.
      */
-    public function __construct($document, string $path, $value)
+    public function __construct(ExpressionInterface|string $document, string $path, mixed $value)
     {
         parent::__construct('JSON_SET', $document, $path, new ToJson($value));
     }

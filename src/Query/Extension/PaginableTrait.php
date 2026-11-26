@@ -15,10 +15,7 @@ use Bdf\Prime\Query\Pagination\Walker;
  */
 trait PaginableTrait
 {
-    /**
-     * @var PaginatorFactory|null
-     */
-    private $paginatorFactory;
+    private ?PaginatorFactory $paginatorFactory = null;
 
     /**
      * @param PaginatorFactory $paginatorFactory

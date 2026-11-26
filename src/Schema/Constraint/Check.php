@@ -12,12 +12,9 @@ final class Check implements CheckInterface
     /**
      * @var mixed
      */
-    private $expression;
+    private mixed $expression;
 
-    /**
-     * @var string|null
-     */
-    private $name;
+    private ?string $name;
 
 
     /**
@@ -26,7 +23,7 @@ final class Check implements CheckInterface
      * @param mixed $expression
      * @param string|null $name
      */
-    public function __construct($expression, ?string $name = null)
+    public function __construct(mixed $expression, ?string $name = null)
     {
         $this->expression = $expression;
         $this->name       = $name;
@@ -47,7 +44,7 @@ final class Check implements CheckInterface
     /**
      * {@inheritdoc}
      */
-    public function expression()
+    public function expression(): mixed
     {
         return $this->expression;
     }

@@ -10,7 +10,7 @@ use Symfony\Component\Console\Input\InputOption;
  *
  */
 #[AsCommand('prime:database:drop', 'Drops the database from the configuration')]
-class DropDatabaseCommand extends DatabaseCommand
+final class DropDatabaseCommand extends DatabaseCommand
 {
     protected static $defaultName = 'prime:database:drop';
 

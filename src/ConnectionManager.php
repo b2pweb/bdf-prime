@@ -13,28 +13,24 @@ use LogicException;
  *
  * doctrine dbal connection registry
  */
-class ConnectionManager implements ConnectionRegistryInterface
+final class ConnectionManager implements ConnectionRegistryInterface
 {
     /**
      * The connection registry
-     *
-     * @var ConnectionRegistryInterface
      */
-    private $registry;
+    private ConnectionRegistryInterface $registry;
 
     /**
      * Connections list
      *
      * @var ConnectionInterface[]
      */
-    private $connections = [];
+    private array $connections = [];
 
     /**
      * Default connection to use
-     *
-     * @var string|null
      */
-    private $defaultConnection;
+    private ?string $defaultConnection = null;
 
 
     /**
@@ -114,7 +110,7 @@ class ConnectionManager implements ConnectionRegistryInterface
      *
      * @return void
      */
-    public function declareConnection(string $connectionName, $parameters): void
+    public function declareConnection(string $connectionName, string|array $parameters): void
     {
         if ($this->registry instanceof ConnectionRegistry) {
             $this->registry->declareConnection($connectionName, $parameters);

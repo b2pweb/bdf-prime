@@ -11,17 +11,11 @@ use Bdf\Prime\Schema\IndexSetInterface;
  * /!\ The primary key is handle as it, and not as a named index.
  *     The primary key index name is not considered, so if its name changed, it will not result to a change / replace
  */
-class IndexSetComparator implements IndexSetComparatorInterface
+final class IndexSetComparator implements IndexSetComparatorInterface
 {
-    /**
-     * @var IndexSetInterface
-     */
-    private $from;
+    private IndexSetInterface $from;
 
-    /**
-     * @var IndexSetInterface
-     */
-    private $to;
+    private IndexSetInterface $to;
 
 
     /**

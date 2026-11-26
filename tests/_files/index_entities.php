@@ -53,11 +53,9 @@ class EntityWithIndexMapper extends Mapper
     /**
      * {@inheritdoc}
      */
-    public function indexes(): array
+    public function buildIndexes(IndexBuilder $builder): void
     {
-        return [
-            ['address', 'zipCode']
-        ];
+        $builder->add()->on(['address', 'zipCode']);
     }
 }
 

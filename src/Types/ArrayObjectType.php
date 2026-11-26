@@ -5,12 +5,12 @@ namespace Bdf\Prime\Types;
 /**
  * Map to associative array object
  */
-class ArrayObjectType extends AbstractSerializeType
+final class ArrayObjectType extends AbstractSerializeType
 {
     /**
      * {@inheritdoc}
      */
-    public function __construct($type = self::ARRAY_OBJECT)
+    public function __construct(string $type = self::ARRAY_OBJECT)
     {
         parent::__construct($type);
     }
@@ -26,7 +26,7 @@ class ArrayObjectType extends AbstractSerializeType
     /**
      * {@inheritdoc}
      */
-    public function toDatabase($value)
+    public function toDatabase(mixed $value): ?string
     {
         // Serialized type is string
         // The passed value should be an array,

@@ -12,10 +12,7 @@ use Bdf\Prime\ServiceLocator;
  */
 final class MapperInfoForeignKeyResolver implements MapperInfoResolverInterface
 {
-    /**
-     * @var ServiceLocator
-     */
-    private $service;
+    private ServiceLocator $service;
 
 
     /**
@@ -31,7 +28,7 @@ final class MapperInfoForeignKeyResolver implements MapperInfoResolverInterface
     /**
      * {@inheritdoc}
      */
-    public function fromRelation(MapperInfo $info, ObjectPropertyInfo $relation)
+    public function fromRelation(MapperInfo $info, ObjectPropertyInfo $relation): array
     {
         list($entity, $foreignKey) = $relation->foreignInfos();
 

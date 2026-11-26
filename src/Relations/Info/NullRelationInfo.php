@@ -10,12 +10,12 @@ namespace Bdf\Prime\Relations\Info;
  */
 final class NullRelationInfo implements RelationInfoInterface
 {
-    private static $instance;
+    private static ?NullRelationInfo $instance = null;
 
     /**
      * {@inheritdoc}
      */
-    public function isLoaded($entity): bool
+    public function isLoaded(object $entity): bool
     {
         return false;
     }
@@ -23,14 +23,14 @@ final class NullRelationInfo implements RelationInfoInterface
     /**
      * {@inheritdoc}
      */
-    public function clear($entity): void
+    public function clear(object $entity): void
     {
     }
 
     /**
      * {@inheritdoc}
      */
-    public function markAsLoaded($entity): void
+    public function markAsLoaded(object $entity): void
     {
     }
 

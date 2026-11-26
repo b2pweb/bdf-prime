@@ -73,7 +73,7 @@ class Configuration extends BaseConfiguration
      * @param string|null $alias Type alias
      * @return void
      */
-    public function addPlatformType($platformType, ?string $alias = null): void
+    public function addPlatformType(string|PlatformTypeInterface $platformType, ?string $alias = null): void
     {
         if ($alias !== null) {
             $this->platformTypes[$alias] = $platformType;

@@ -9,9 +9,9 @@ use Doctrine\Instantiator\InstantiatorInterface as DoctrineInstantiatorInterface
 /**
  * Instantiator
  */
-class Instantiator implements InstantiatorInterface
+final class Instantiator implements InstantiatorInterface
 {
-    protected DoctrineInstantiatorInterface $instantiator;
+    private DoctrineInstantiatorInterface $instantiator;
 
     /**
      * Instantiator constructor.

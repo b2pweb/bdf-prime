@@ -21,11 +21,11 @@ abstract class Locatorizable
     /**
      * Set the prime service locator
      *
-     * @param Closure():ServiceLocator|ServiceLocator $locator
+     * @param Closure():ServiceLocator|ServiceLocator|null $locator
      *
      * @return void
      */
-    final public static function configure($locator): void
+    final public static function configure(Closure|ServiceLocator|null $locator): void
     {
         self::$locator = $locator;
     }

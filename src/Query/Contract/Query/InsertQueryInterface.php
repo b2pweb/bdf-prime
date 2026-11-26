@@ -51,5 +51,5 @@ interface InsertQueryInterface extends BulkWriteBuilderInterface, CommandInterfa
      * @return ResultSetInterface<array<string, mixed>>
      * @throws PrimeException When execute fail
      */
-    public function execute($columns = null): ResultSetInterface;
+    public function execute(mixed $columns = null): ResultSetInterface;
 }

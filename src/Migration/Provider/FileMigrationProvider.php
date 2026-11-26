@@ -12,28 +12,24 @@ use Symfony\Component\Filesystem\Filesystem;
 /**
  * Migration file provider
  */
-class FileMigrationProvider implements MigrationProviderInterface
+final class FileMigrationProvider implements MigrationProviderInterface
 {
     /**
      * The migration factory
-     *
-     * @var MigrationFactoryInterface
      */
-    private $factory;
+    private MigrationFactoryInterface $factory;
 
     /**
      * The path to migration files
-     *
-     * @var string
      */
-    private $path;
+    private string $path;
 
     /**
      * The collection of migration name by version
      *
      * @var MigrationInterface[]
      */
-    private $migrations = [];
+    private array $migrations = [];
 
     /**
      * Locator constructor
@@ -178,7 +174,7 @@ class FileMigrationProvider implements MigrationProviderInterface
      *
      * @return void
      */
-    private function assertUnique($version, $className): void
+    private function assertUnique(string $version, string $className): void
     {
         // Check if version already exists
         if (isset($this->migrations[$version])) {
@@ -214,7 +210,7 @@ class FileMigrationProvider implements MigrationProviderInterface
      *
      * @throws InvalidArgumentException
      */
-    private function parseFilename($filename)
+    private function parseFilename(string $filename): array
     {
         if (!preg_match('/^([0-9]+)_(.+)\.php/', basename($filename), $matches)) {
             throw new InvalidArgumentException(sprintf('The file "%s" does not have a valid migration filename', $filename));
@@ -234,7 +230,7 @@ class FileMigrationProvider implements MigrationProviderInterface
      *
      * @return string  The file name
      */
-    private function createFilename($version, $className)
+    private function createFilename(string $version, string $className): string
     {
         return $this->path . DIRECTORY_SEPARATOR . $version . '_' . $className . '.php';
     }
@@ -246,7 +242,7 @@ class FileMigrationProvider implements MigrationProviderInterface
      *
      * @return string
      */
-    private function normalizeName($name)
+    private function normalizeName(string $name): string
     {
         $name = str_replace(['_', '.'], ' ', $name);
         $name = ucwords($name);

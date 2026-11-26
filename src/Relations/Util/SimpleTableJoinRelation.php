@@ -29,7 +29,7 @@ trait SimpleTableJoinRelation
     /**
      * {@inheritdoc}
      */
-    public function link($owner, ?string $queryClass = null): ReadCommandInterface
+    public function link(array|object $owner, ?string $queryClass = null): ReadCommandInterface
     {
         return $this->query($this->getLocalKeyValue($owner), [], $queryClass);
     }
@@ -55,7 +55,7 @@ trait SimpleTableJoinRelation
     /**
      * {@inheritdoc}
      */
-    public function joinRepositories(EntityJoinable $query, string $alias, $discriminator = null): array
+    public function joinRepositories(EntityJoinable $query, string $alias, string|int|null $discriminator = null): array
     {
         return [
             $alias => $this->relationRepository()
@@ -65,17 +65,17 @@ trait SimpleTableJoinRelation
     /**
      * @see AbstractRelation::query()
      */
-    abstract protected function query($value, $constraints = [], ?string $queryClass = null): ReadCommandInterface;
+    abstract protected function query(mixed $value, iterable|callable $constraints = [], ?string $queryClass = null): ReadCommandInterface;
 
     /**
      * @see AbstractRelation::applyConstraints()
      */
-    abstract protected function applyConstraints(ReadCommandInterface $query, $constraints = [], $context = null): ReadCommandInterface;
+    abstract protected function applyConstraints(ReadCommandInterface $query, iterable|callable $constraints = [], ?string $context = null): ReadCommandInterface;
 
     /**
      * @see AbstractRelation::applyContext()
      */
-    abstract protected function applyContext(?string $context, $constraints);
+    abstract protected function applyContext(?string $context, iterable|callable $constraints);
 
     /**
      * Extract local (owner) entity key(s)
@@ -89,7 +89,7 @@ trait SimpleTableJoinRelation
      *
      * @return mixed Can return any values that defined AbstractRelation::applyWhereKeys() supports
      */
-    abstract protected function getLocalKeyValue($entity);
+    abstract protected function getLocalKeyValue(array|object $entity);
 
     /**
      * Configure the join clause
@@ -112,5 +112,5 @@ trait SimpleTableJoinRelation
      *
      * @return void
      */
-    abstract protected function buildJoinClause(JoinClause $clause, $query, $alias);
+    abstract protected function buildJoinClause(JoinClause $clause, QueryInterface $query, string $alias);
 }
