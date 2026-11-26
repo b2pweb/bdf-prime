@@ -9,15 +9,10 @@ use Bdf\Prime\Query\Expression\ExpressionInterface;
  * @psalm-immutable
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class StartsWithCriterion extends LikeCriterion
+readonly class StartsWithCriterion extends LikeCriterion
 {
-    /**
-     * @param string|ExpressionInterface|null $field
-     * @param bool $escape
-     * @param bool $skipNull
-     */
-    public function __construct($field = null, bool $escape = true, bool $skipNull = true)
+    public function __construct(string|ExpressionInterface|null $field = null, bool $escape = true, bool $skipNull = true, bool $skipEmpty = false)
     {
-        parent::__construct($field, true, false, false, $escape, null, null, $skipNull);
+        parent::__construct($field, true, false, false, $escape, null, null, $skipNull, $skipEmpty);
     }
 }

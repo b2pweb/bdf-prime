@@ -5,6 +5,7 @@ namespace Bdf\Prime\Query\Criteria;
 use Attribute;
 use Bdf\Prime\Query\Expression\ExpressionInterface;
 use Bdf\Prime\Query\Expression\Like;
+use Override;
 
 /**
  * Define the property as a LIKE filter
@@ -12,7 +13,7 @@ use Bdf\Prime\Query\Expression\Like;
  * @psalm-immutable
  */
 #[Attribute(Attribute::TARGET_PROPERTY)]
-class LikeCriterion extends Criterion
+readonly class LikeCriterion extends Criterion
 {
     /**
      * If true, the LIKE expression will match for the start of the value (prefix)
@@ -57,9 +58,9 @@ class LikeCriterion extends Criterion
      * @param string|null $end
      * @param bool $skipNull
      */
-    public function __construct($field = null, bool $startsWith = false, bool $endsWith = false, bool $contains = false, bool $escape = true, ?string $start = null, ?string $end = null, bool $skipNull = true)
+    public function __construct($field = null, bool $startsWith = false, bool $endsWith = false, bool $contains = false, bool $escape = true, ?string $start = null, ?string $end = null, bool $skipNull = true, bool $skipEmpty = false)
     {
-        parent::__construct($field, null, $skipNull);
+        parent::__construct($field, null, $skipNull, $skipEmpty);
 
         $this->startsWith = $startsWith;
         $this->endsWith = $endsWith;
@@ -103,5 +104,16 @@ class LikeCriterion extends Criterion
         }
 
         return $value;
+    }
+
+    #[Override]
+    public function shouldSkipValue(mixed $value): bool
+    {
+        if (parent::shouldSkipValue($value)) {
+            return true;
+        }
+
+        // Like with empty array is not supported, so it must be skipped
+        return $value === [];
     }
 }
