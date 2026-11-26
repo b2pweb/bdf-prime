@@ -4,6 +4,8 @@ namespace Bdf\Prime\Query;
 
 use BadMethodCallException;
 use Bdf\Prime\Collection\Indexer\EntityIndexer;
+use Bdf\Prime\Collection\Indexer\EntityIndexerInterface;
+use Bdf\Prime\Collection\Indexer\RecordIndexer;
 use Bdf\Prime\Connection\ConnectionInterface;
 use Bdf\Prime\Exception\EntityNotFoundException;
 use Bdf\Prime\Exception\PrimeException;
@@ -12,6 +14,7 @@ use Bdf\Prime\Mapper\Mapper;
 use Bdf\Prime\Mapper\Metadata;
 use Bdf\Prime\Platform\PlatformInterface;
 use Bdf\Prime\Query\Closure\ClosureCompiler;
+use Bdf\Prime\Query\Contract\Projectionable;
 use Bdf\Prime\Query\Contract\Query\KeyValueQueryInterface;
 use Bdf\Prime\Query\Contract\Whereable;
 use Bdf\Prime\Record\RecordHydratorInterface;
@@ -23,10 +26,15 @@ use Bdf\Prime\Repository\RepositoryInterface;
 use Closure;
 use Doctrine\DBAL\Query\Expression\CompositeExpression;
 
+use function array_any;
 use function array_diff;
 use function array_keys;
+use function array_merge;
+use function class_exists;
 use function count;
 use function is_array;
+use function is_int;
+use function spl_object_id;
 
 /**
  * QueryRepositoryExtension
@@ -363,6 +371,11 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
             'combine'   => $combine,
         ];
 
+        // Ensure that the field has been projected
+        if ($query instanceof Projectionable) {
+            $query->addProjection($attribute);
+        }
+
         return $query;
     }
 
@@ -424,7 +437,21 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
      */
     public function projection(string $recordClass): ?array
     {
-        return $this->recordManager->projection($recordClass);
+        $projection = $this->recordManager->projection($recordClass);
+
+        if ($this->byOptions && $projection) {
+            $byAttribute = $this->byOptions['attribute'];
+
+            // The "by" attribute is not project neither as alias nor simple projection (i.e. int key in prime)
+            if (
+                !isset($projection[$byAttribute])
+                && !array_any(array_keys($projection, $byAttribute, true), static fn ($value) => is_int($value))
+            ) {
+                $projection[] = $byAttribute;
+            }
+        }
+
+        return $projection;
     }
 
     /**
@@ -446,67 +473,21 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
     /**
      * {@inheritdoc}
      */
-    public function finalize(string $recordClass, array $entities): array
+    public function finalize(string $recordClass, array $entities, array $rows): array
     {
-        $entities = $this->recordManager->finalize($recordClass, $entities);
-
-        /** @var EntityRepository<E> $repository */
-        $repository = $this->repository;
-        $hasLoadEvent = $repository->hasListeners(AfterLoad::class);
-
-        // Save into local vars to ensure that value will not be changed during execution
-        $withRelations = $this->withRelations;
-        $withoutRelations = $this->withoutRelations;
+        $isRecord = $recordClass !== $this->repository->entityClass() && class_exists($recordClass);
         $byOptions = $this->byOptions;
 
-        // @todo handle by() with record. with() cannot be used with record
-        if (($byOptions || $withRelations) && ($recordClass !== $this->repository->entityClass() && class_exists($recordClass))) {
-            throw new BadMethodCallException('by() or with() methods are not available with record.');
-        }
+        $indexer = $isRecord
+            ? $this->finalizeRecord($recordClass, $entities, $rows)
+            : $this->finalizeEntity($recordClass, $entities, $rows)
+        ;
 
-        $indexer = new EntityIndexer($this->mapper, $byOptions ? [$byOptions['attribute']] : []);
-
-        // Force loading of eager relations
-        if (!empty($this->metadata->eagerRelations)) {
-            $withRelations = array_merge($this->metadata->eagerRelations, $withRelations);
-
-            // Skip relation that should not be loaded.
-            foreach ($withoutRelations as $relationName => $nestedRelations) {
-                // Only a leaf concerns this query.
-                if (empty($nestedRelations)) {
-                    unset($withRelations[$relationName]);
-                }
-            }
-        }
-
-        /** @var E $entity */
-        foreach ($entities as $entity) {
-            $indexer->push($entity);
-
-            if ($hasLoadEvent) {
-                $repository->notify(new AfterLoad($entity, $repository));
-            }
-        }
-
-        foreach ($withRelations as $relationName => $relationInfos) {
-            $repository->relation($relationName)->load(
-                $indexer,
-                $relationInfos['relations'],
-                $relationInfos['constraints'],
-                $withoutRelations[$relationName] ?? []
-            );
-        }
-
-        switch (true) {
-            case $byOptions === null:
-                return $indexer->all();
-
-            case $byOptions['combine']:
-                return $indexer->by($byOptions['attribute']);
-
-            default:
-                return $indexer->byOverride($byOptions['attribute']);
-        }
+        return match (true) {
+            $byOptions === null => $indexer->all(),
+            $byOptions['combine'] => $indexer->by($byOptions['attribute']),
+            default => $indexer->byOverride($byOptions['attribute']),
+        };
     }
 
     /**
@@ -542,5 +523,92 @@ class QueryRepositoryExtension extends QueryCompatExtension implements RecordHyd
         $query->setExtension($this);
         $query->setRecordHydrator($this);
         $query->as($this->mapper->getEntityClass());
+    }
+
+    private function finalizeEntity(string $recordClass, array $entities, array $rows): EntityIndexerInterface
+    {
+        $entities = $this->recordManager->finalize($recordClass, $entities, $rows);
+
+        /** @var EntityRepository<E> $repository */
+        $repository = $this->repository;
+        $hasLoadEvent = $repository->hasListeners(AfterLoad::class);
+
+        // Save into local vars to ensure that value will not be changed during execution
+        $withRelations = $this->withRelations;
+        $withoutRelations = $this->withoutRelations;
+        $byOptions = $this->byOptions;
+
+        $indexer = new EntityIndexer($this->mapper, $byOptions ? [$byOptions['attribute']] : []);
+
+        // Force loading of eager relations
+        if (!empty($this->metadata->eagerRelations)) {
+            $withRelations = array_merge($this->metadata->eagerRelations, $withRelations);
+
+            // Skip relation that should not be loaded.
+            foreach ($withoutRelations as $relationName => $nestedRelations) {
+                // Only a leaf concerns this query.
+                if (empty($nestedRelations)) {
+                    unset($withRelations[$relationName]);
+                }
+            }
+        }
+
+        /** @var E $entity */
+        foreach ($entities as $entity) {
+            $indexer->push($entity);
+
+            if ($hasLoadEvent) {
+                $repository->notify(new AfterLoad($entity, $repository));
+            }
+        }
+
+        foreach ($withRelations as $relationName => $relationInfos) {
+            $repository->relation($relationName)->load(
+                $indexer,
+                $relationInfos['relations'],
+                $relationInfos['constraints'],
+                $withoutRelations[$relationName] ?? []
+            );
+        }
+
+        return $indexer;
+    }
+
+    private function finalizeRecord(string $recordClass, array $entities, array $rows): EntityIndexerInterface
+    {
+        /** @var EntityRepository<E> $repository */
+        $repository = $this->repository;
+        $entities = $this->recordManager->finalize($recordClass, $entities, $rows);
+        $byOptions = $this->byOptions;
+
+        if ($this->withRelations) {
+            throw new BadMethodCallException('with() method is not available with record. Use #[LoadRelation] attribute instead.');
+        }
+
+        $rowsByObjectId = [];
+
+        if ($byOptions) {
+            foreach ($entities as $index => $entity) {
+                $row = $rows[$index] ?? null;
+                $rowsByObjectId[spl_object_id($entity)] = $row;
+            }
+        }
+
+        $indexer = new RecordIndexer(function (object $record, string $property) use ($rowsByObjectId, $repository) {
+            $dbField = $repository->metadata()->attributes[$property]['field'] ?? null;
+
+            if (!$dbField) {
+                return null;
+            }
+
+            return $rowsByObjectId[spl_object_id($record)][$dbField] ?? null;
+        }, $byOptions ? [$byOptions['attribute']] : []);
+
+        /** @var E $entity */
+        foreach ($entities as $entity) {
+            $indexer->push($entity);
+        }
+
+        return $indexer;
     }
 }

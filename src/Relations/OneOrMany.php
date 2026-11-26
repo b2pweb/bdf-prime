@@ -85,13 +85,19 @@ abstract class OneOrMany extends Relation
      * {@inheritdoc}
      */
     #[ReadOperation]
-    protected function relations($keys, $with, $constraints, $without): array
+    protected function relations($keys, $with, $constraints, $without, ?string $recordClass = null): array
     {
-        /** @var R[] */
-        return $this->relationQuery($keys, $constraints)
+        $query = $this->relationQuery($keys, $constraints, recreate: $recordClass !== null)
             ->with($with)
             ->without($without)
-            ->all();
+        ;
+
+        if ($recordClass !== null) {
+            $query->as($recordClass);
+        }
+
+        /** @var array */
+        return $query->all();
     }
 
     /**
@@ -255,10 +261,11 @@ abstract class OneOrMany extends Relation
      *
      * @param array $keys The owner keys
      * @param array $constraints Constraints to apply on the query
+     * @param bool $recreate If true, the query will be always recreated instead of using the one in memory
      *
      * @return ReadCommandInterface
      */
-    abstract protected function relationQuery($keys, $constraints): ReadCommandInterface;
+    abstract protected function relationQuery($keys, $constraints, bool $recreate = false): ReadCommandInterface;
 
     /**
      * Check if the entity is the foreign key barrier

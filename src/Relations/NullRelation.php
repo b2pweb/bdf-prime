@@ -93,6 +93,14 @@ final class NullRelation implements RelationInterface
     /**
      * {@inheritdoc}
      */
+    public function loadRecordByForeignKeys(array $keys, string $recordClass): array
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function loadIfNotLoaded(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
     {
         // No-op

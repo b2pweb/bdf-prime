@@ -124,6 +124,62 @@ class HasManyTest extends TestCase
         ], $loaded);
     }
 
+    public function test_loadRecordByForeignKeys()
+    {
+        $this->pack()->nonPersist([
+            new Document([
+                'id'             => '3',
+                'customerId'     => '456',
+                'uploaderType'   => 'admin',
+                'uploaderId'     => '1',
+            ]),
+        ]);
+
+        $relation = Customer::repository()->relation('documents');
+
+        $loaded = $relation->loadRecordByForeignKeys(['123', '456', '404'], HasManyDocumentRecord::class);
+
+        $this->assertEquals([
+            '123' => [
+                new HasManyDocumentRecord(1, 'admin'),
+                new HasManyDocumentRecord(2, 'user'),
+            ],
+            '456' => [new HasManyDocumentRecord(3, 'admin')],
+            '404' => [],
+        ], $loaded);
+    }
+
+    public function test_loadRecordByForeignKeys_empty()
+    {
+        $relation = Customer::repository()->relation('documents');
+
+        $this->assertSame([], $relation->loadRecordByForeignKeys([], HasManyDocumentRecord::class));
+        $this->assertSame(['404' => []], $relation->loadRecordByForeignKeys(['404'], HasManyDocumentRecord::class));
+    }
+
+    /**
+     * The relation query is cached (i.e. HasMany::$relationQuery), so the record class
+     * must not be kept on the next call, which loads entities
+     */
+    public function test_loadRecordByForeignKeys_should_not_keep_record_class_on_next_load()
+    {
+        $relation = Customer::repository()->relation('documents');
+
+        // Use a single key to enable the KeyValueQuery optimisation, which caches the query
+        $this->assertEquals(
+            ['123' => [new HasManyDocumentRecord(1, 'admin'), new HasManyDocumentRecord(2, 'user')]],
+            $relation->loadRecordByForeignKeys(['123'], HasManyDocumentRecord::class)
+        );
+
+        $this->assertEquals(
+            ['123' => [
+                $this->getTestPack()->get('document-admin'),
+                $this->getTestPack()->get('document-user'),
+            ]],
+            $relation->loadByForeignKeys(['123'])
+        );
+    }
+
     /**
      *
      */
@@ -523,4 +579,12 @@ class HasManyTest extends TestCase
         $customer->reload('documents');
         $this->assertNotSame($loadedDocuments, $customer->documents);
     }
+}
+
+final readonly class HasManyDocumentRecord
+{
+    public function __construct(
+        public int $id,
+        public string $uploaderType,
+    ) {}
 }

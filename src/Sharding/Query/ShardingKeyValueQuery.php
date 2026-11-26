@@ -17,6 +17,8 @@ use Bdf\Prime\Query\Extension\ExecutableTrait;
 use Bdf\Prime\Sharding\Extension\ShardPicker;
 use Bdf\Prime\Sharding\ShardingConnection;
 
+use function is_array;
+
 /**
  * Handle simple key/value query on sharding connection
  * If the distribution key is found on the filters, the corresponding sharding query is used
@@ -82,6 +84,31 @@ class ShardingKeyValueQuery extends AbstractReadCommand implements KeyValueQuery
     public function project($columns = null)
     {
         $this->statements['columns'] = (array) $columns;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addProjection($columns)
+    {
+        // Empty project means that all fields are projected, so no need to add new projections
+        if ($this->statements['columns'] === []) {
+            return $this;
+        }
+
+        $columns = is_array($columns) ? $columns : [$columns];
+
+        foreach ($columns as $alias => $column) {
+            if (is_int($alias)) {
+                if (!in_array($column, $this->statements['columns'])) {
+                    $this->statements['columns'][] = $column;
+                }
+            } elseif (!isset($this->statements['columns'][$alias])) {
+                $this->statements['columns'][$alias] = $column;
+            }
+        }
 
         return $this;
     }

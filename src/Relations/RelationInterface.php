@@ -117,6 +117,24 @@ interface RelationInterface
     public function loadByForeignKeys(array $keys): array;
 
     /**
+     * Manually load relation entities as record by their foreign keys
+     *
+     * The keys of the returned array should match with the parameter keys.
+     * If the related entity is not found, the key may be omitted from the result array.
+     * No other keys should be present in the result array.
+     *
+     * @param list<array-key> $keys The foreign keys
+     * @param class-string<P> $recordClass The read record class to return
+     *
+     * @return array<array-key, P|P[]> Records, indexed by the foreign key. The value can be a single entity for single entity relation, or an array of entities for collection relation
+     * @throws PrimeException
+     *
+     * @template P as object
+     */
+    #[ReadOperation]
+    public function loadRecordByForeignKeys(array $keys, string $recordClass): array;
+
+    /**
      * Load relation if not yet loaded
      *
      * - If the relation is already loaded, but sub-relations is requested ($with parameter), only sub-relations will be loaded

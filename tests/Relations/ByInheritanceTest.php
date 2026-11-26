@@ -101,6 +101,15 @@ class ByInheritanceTest extends TestCase
         $relation->loadByForeignKeys(['10', '321']);
     }
 
+    public function test_loadRecordByForeignKeys()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Unsupported operation Bdf\Prime\Relations\AbstractRelation::loadRecordByForeignKeys');
+
+        $relation = Task::repository()->relation('target');
+        $relation->loadRecordByForeignKeys(['10', '321'], \stdClass::class);
+    }
+
     /**
      *
      */

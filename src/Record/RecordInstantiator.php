@@ -29,7 +29,7 @@ final class RecordInstantiator
         public readonly string $recordClass,
 
         /**
-         * @var array<string, Field>
+         * @var list<RecordParameterInterface>
          */
         public readonly array $fields,
     ) {
@@ -43,18 +43,8 @@ final class RecordInstantiator
 
         $projection = [];
 
-        foreach ($this->fields as $name => $field) {
-            if ($field->projection === false) {
-                continue;
-            }
-
-            $name = $field->projection ?? $field->name ?? $name;
-
-            if ($field->expression) {
-                $projection[$name] = $field->expression;
-            } else {
-                $projection[] = $name;
-            }
+        foreach ($this->fields as $field) {
+            $projection = [...$projection, ...$field->projection()];
         }
 
         return $projection;
@@ -67,17 +57,10 @@ final class RecordInstantiator
      */
     public function instantiate(array $data, PlatformInterface $platform): object
     {
-        $types = $platform->types();
         $constructorParameters = [];
 
-        foreach ($this->fields as $name => $field) {
-            $value = $data[$field->name ?? $name] ?? null;
-
-            if ($field->type !== null) {
-                $value = $types->fromDatabase($value, $field->type);
-            }
-
-            $constructorParameters[] = $field->cast($value);
+        foreach ($this->fields as $field) {
+            $constructorParameters[] = $field->value($platform, $data);
         }
 
         $recordClass = $this->recordClass;
@@ -86,12 +69,15 @@ final class RecordInstantiator
 
     /**
      * @param class-string<T> $recordClass
+     * @param array|null $attributesMetadata The metadata of attributes, if called from an ORM query. Null on DBAL query.
+     * @param string|null $fieldPrefix Prefix to add to fields
+     *
      * @return self<T>
      * @template T as object
      */
-    public static function fromRecordClass(string $recordClass): self
+    public static function fromRecordClass(string $recordClass, ?array $attributesMetadata = null, ?string $fieldPrefix = null): self
     {
-        $reflectionParameters = (new ReflectionClass($recordClass))->getConstructor()?->getParameters();
+        $reflectionParameters = new ReflectionClass($recordClass)->getConstructor()?->getParameters();
 
         if ($reflectionParameters === null) {
             throw new InvalidArgumentException(sprintf('The record class %s must have a constructor', $recordClass));
@@ -100,7 +86,23 @@ final class RecordInstantiator
         $parameters = [];
 
         foreach ($reflectionParameters as $parameter) {
-            $parameters[$parameter->getName()] = Field::fromReflectionParameter($parameter);
+            $recordParameter = Embedded::fromReflectionParameter($parameter, $attributesMetadata, $fieldPrefix);
+
+            if ($recordParameter === null) {
+                $recordParameter = Field::fromReflectionParameter($parameter);
+
+                if ($fieldPrefix !== null && $fieldPrefix !== '') {
+                    $recordParameter = $recordParameter->with(
+                        name: $fieldPrefix . $recordParameter->name,
+                    );
+                }
+
+                if ($attributesMetadata) {
+                    $recordParameter = $recordParameter->withAttributesMetadata($attributesMetadata);
+                }
+            }
+
+            $parameters[] = $recordParameter;
         }
 
         return new self($recordClass, $parameters);

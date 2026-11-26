@@ -146,18 +146,28 @@ abstract class Relation extends AbstractRelation
     }
 
     /**
+     * {@inheritdoc}
+     */
+    #[ReadOperation]
+    public function loadRecordByForeignKeys(array $keys, string $recordClass): array
+    {
+        return $this->relations($keys, [], [], [], $recordClass);
+    }
+
+    /**
      * Get the entities
      *
      * @param array $keys List of local keys values (i.e. foreign key on the owner table) to load
      * @param array $with
      * @param array $constraints
      * @param array $without
+     * @param class-string|null $recordClass The read record class to use instead of the relation entity
      *
      * @return array Entities, indexed by the local key value (i.e. foreign key on the owner table). The value may be an array of entities if the relation is a collection, or a single entity if the relation is a single entity
      * @throws PrimeException
      */
     #[ReadOperation]
-    abstract protected function relations($keys, $with, $constraints, $without): array;
+    abstract protected function relations($keys, $with, $constraints, $without, ?string $recordClass = null): array;
 
     /**
      * Set the relation in a collection of entities

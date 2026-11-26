@@ -139,6 +139,61 @@ class KeyValueSqlCompilerTest extends TestCase
     /**
      *
      */
+    public function test_compileSelect_addProjection()
+    {
+        $query = $this->query()->from('test_')->project('id')->addProjection('name');
+
+        $this->assertEquals($this->connection->prepare('SELECT id, name FROM test_'), $this->compiler->compileSelect($query));
+    }
+
+    /**
+     *
+     */
+    public function test_compileSelect_addProjection_without_projection_should_be_ignored()
+    {
+        $query = $this->query()->from('test_')->addProjection('name');
+
+        $this->assertEquals($this->connection->prepare('SELECT * FROM test_'), $this->compiler->compileSelect($query));
+    }
+
+    /**
+     *
+     */
+    public function test_compileSelect_addProjection_already_projected_should_be_ignored()
+    {
+        $query = $this->query()->from('test_')->project(['id', 'name'])->addProjection(['name', 'foreign_key']);
+
+        $this->assertEquals($this->connection->prepare('SELECT id, name, foreign_key FROM test_'), $this->compiler->compileSelect($query));
+    }
+
+    /**
+     *
+     */
+    public function test_compileSelect_addProjection_should_recompile_query()
+    {
+        $query = $this->query()->from('test_')->project('id');
+
+        $this->assertEquals($this->connection->prepare('SELECT id FROM test_'), $this->compiler->compileSelect($query));
+        $this->assertEquals($this->connection->prepare('SELECT id, name FROM test_'), $this->compiler->compileSelect($query->addProjection('name')));
+    }
+
+    /**
+     *
+     */
+    public function test_compileSelect_addProjection_with_orm_preprocessor()
+    {
+        $query = (new KeyValueQuery($this->connection, new OrmPreprocessor(User::repository())))
+            ->from('user_')
+            ->project('customer.id')
+            ->addProjection(['faction.id', 'customer.id'])
+        ;
+
+        $this->assertEquals($this->connection->prepare('SELECT customer_id, faction_id FROM user_'), $this->compiler->compileSelect($query));
+    }
+
+    /**
+     *
+     */
     public function test_compileSelect_aggregate()
     {
         $query = $this->query()->from('test_');

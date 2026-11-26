@@ -30,6 +30,13 @@ final class RelationLoader
          * The database field name storing the foreign key of the relation
          */
         public readonly string $foreignKeyField,
+
+        /**
+         * The read record class name to hydrate instead of the relation entity
+         *
+         * @var class-string|null
+         */
+        public readonly ?string $readRecord = null,
     ) {
     }
 
@@ -52,7 +59,11 @@ final class RelationLoader
             }
         }
 
-        $entities = $relation->loadByForeignKeys(array_values($keys));
+        $entities = $this->readRecord === null
+            ? $relation->loadByForeignKeys(array_values($keys))
+            : $relation->loadRecordByForeignKeys(array_values($keys), $this->readRecord)
+        ;
+
         $loaded = $rows;
 
         foreach ($rows as $k => $row) {

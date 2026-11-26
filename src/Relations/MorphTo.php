@@ -72,6 +72,14 @@ class MorphTo extends BelongsTo
     /**
      * {@inheritdoc}
      */
+    public function loadRecordByForeignKeys(array $keys, string $recordClass): array
+    {
+        throw new \BadMethodCallException('MorphTo relation do not supports querying by foreign keys');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     #[ReadOperation]
     public function load(EntityIndexerInterface $collection, array $with = [], $constraints = [], array $without = []): void
     {
@@ -217,7 +225,7 @@ class MorphTo extends BelongsTo
     /**
      * {@inheritdoc}
      */
-    protected function relationQuery($keys, $constraints): ReadCommandInterface
+    protected function relationQuery($keys, $constraints, bool $recreate = false): ReadCommandInterface
     {
         return $this->query($keys, $constraints)->by($this->distantKey);
     }

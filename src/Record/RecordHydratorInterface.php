@@ -54,10 +54,11 @@ interface RecordHydratorInterface
      *
      * @param class-string<R> $recordClass The record class name
      * @param array<R> $entities The entities to finalize
+     * @param array<array<string, mixed>> $rows Raw database rows
      *
      * @return array Resulting entities. Usually the same as input entities
      *
      * @template R as object
      */
-    public function finalize(string $recordClass, array $entities): array;
+    public function finalize(string $recordClass, array $entities, array $rows): array;
 }

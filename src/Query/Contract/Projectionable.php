@@ -22,6 +22,28 @@ interface Projectionable
     public function project($columns = null);
 
     /**
+     * Adds an item that is to be returned in the query result, if not yet present.
+     * To define an alias, an associative array must be used, with the alias as key, and expression as value.
+     *
+     * Note: To ensure that expressions string will not be parsed, use expression objects, or wrap with `new Raw('...')`
+     *
+     * <code>
+     *     $query
+     *         ->project('u.id')
+     *         ->addProjection('p.id')
+     *         ->from('users', 'u');
+     * </code>
+     *
+     * @param ColumnType|ColumnType[] $columns The selection expression.
+     *
+     * @return $this This Query instance.
+     *
+     * @see Projectionable::select() for exemples
+     * @see Projectionable::addSelect() Same as this method, but do not check if the projection is already present.
+     */
+    public function addProjection($columns);
+
+    /**
      * Specifies an item that is to be returned in the query result.
      * Replaces any previously specified selections, if any.
      *
@@ -72,7 +94,9 @@ interface Projectionable
      * @param ColumnType|ColumnType[]|null $columns The selection expression.
      *
      * @return $this This Query instance.
+     *
      * @see Projectionable::select() for exemples
+     * @see Projectionable::addProjection() Same as this method, but check if the projection is already present.
      */
     public function addSelect($columns);
 }

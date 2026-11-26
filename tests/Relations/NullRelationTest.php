@@ -87,6 +87,11 @@ class NullRelationTest extends TestCase
         $this->assertSame([], User::repository()->relation('none')->loadByForeignKeys([1, 2, 3]));
     }
 
+    public function test_loadRecordByForeignKeys()
+    {
+        $this->assertSame([], User::repository()->relation('none')->loadRecordByForeignKeys([1, 2, 3], \stdClass::class));
+    }
+
     /**
      *
      */

@@ -39,6 +39,17 @@ class CustomRelationTest extends TestCase
     /**
      *
      */
+    public function test_loadRecordByForeignKeys_not_supported()
+    {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Unsupported operation Bdf\Prime\Relations\AbstractRelation::loadRecordByForeignKeys');
+
+        EntityWithCustomRelation::repository()->relation('distant')->loadRecordByForeignKeys(['123'], \stdClass::class);
+    }
+
+    /**
+     *
+     */
     public function test_load()
     {
         $this->pack()->nonPersist([
